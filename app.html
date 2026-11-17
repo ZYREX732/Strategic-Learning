@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CogniLearn – Module 4: Strategic Analysis</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+<script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.hidden{display:none!important}
+.btn-primary{background:#2b6cb0;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-primary:hover{background:#3182ce}
+.btn-green{background:#48bb78;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-green:hover{background:#38a169}
+.btn-red{background:#e53e3e;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-ghost{background:none;border:1px solid #475569;color:#94a3b8;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+.btn-ghost:hover{border-color:#63b3ed;color:#63b3ed}
+#auth-view{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.auth-box{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:40px;width:100%;max-width:400px}
+.auth-box h2{color:#63b3ed;margin-bottom:8px;font-size:24px}
+.auth-box p{color:#94a3b8;font-size:13px;margin-bottom:24px}
+.auth-box input{width:100%;padding:12px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#e2e8f0;font-size:15px;margin-bottom:12px;outline:none}
+.auth-box input:focus{border-color:#63b3ed}
+.auth-box button{width:100%;padding:12px;font-size:16px;margin-top:8px}
+.auth-toggle{text-align:center;margin-top:16px;font-size:13px;color:#94a3b8}
+.auth-toggle a{color:#63b3ed;cursor:pointer;text-decoration:none}
+.auth-error{color:#fc8181;font-size:13px;margin-bottom:8px;min-height:20px}
+#dash-view{max-width:720px;margin:0 auto;padding:24px}
+.dash-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.dash-top h1{font-size:24px;color:#63b3ed}
+.dash-top .user-line{font-size:14px;color:#94a3b8}
+.dash-top .right{display:flex;gap:8px;align-items:center}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.dash-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;cursor:pointer;transition:all .2s}
+.dash-card:hover{border-color:#63b3ed;transform:translateY(-2px)}
+.dash-card .icon{font-size:36px;margin-bottom:12px}
+.dash-card h3{font-size:18px;margin-bottom:4px}
+.dash-card p{font-size:13px;color:#94a3b8}
+.section{margin-bottom:24px}
+.section-title{font-size:14px;color:#63b3ed;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;font-weight:600}
+.code-box{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;text-align:center;margin-bottom:16px}
+.code-display{font-size:40px;font-weight:700;color:#f6e05e;letter-spacing:8px;font-family:'Courier New',monospace;margin:12px 0}
+.code-box p{color:#94a3b8;font-size:13px}
+.join-row{display:flex;gap:8px;margin-bottom:24px}
+.join-row input{flex:1;padding:14px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#e2e8f0;font-size:18px;text-transform:uppercase;letter-spacing:4px;text-align:center;font-family:'Courier New',monospace;outline:none}
+.join-row input:focus{border-color:#63b3ed}
+.challenge-item{background:#1e293b;border:1px solid #ed8936;border-radius:8px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.challenge-item span{font-size:14px}
+.challenge-item .btns{display:flex;gap:6px}
+#friends-view{max-width:620px;margin:0 auto;padding:24px}
+.search-row{display:flex;gap:8px;margin-bottom:16px}
+.search-row input{flex:1;padding:10px 14px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#e2e8f0;font-size:14px;outline:none}
+.search-row input:focus{border-color:#63b3ed}
+.friend-item,.req-item,.search-result-item{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.req-item{border-color:#ed8936}
+.friend-info{display:flex;align-items:center;gap:10px}
+.status-dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.dot-online{background:#48bb78}
+.dot-offline{background:#4a5568}
+.friend-name{font-weight:600;font-size:15px}
+.friend-status{font-size:11px;color:#718096}
+.friend-btns{display:flex;gap:6px}
+.empty-text{color:#4a5568;font-size:13px;padding:8px 0}
+#game-view{min-height:100vh;background:#111827}
+.game-top{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#1e293b;border-bottom:1px solid #334155}
+.game-top .title{font-size:15px;font-weight:600;color:#63b3ed}
+.game-body{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:24px;padding:20px;max-width:1100px;margin:0 auto}
+.board-area{width:480px;max-width:95vw}
+.player-row{display:flex;align-items:center;gap:10px;padding:8px 4px;font-size:14px}
+.player-row .dot{width:10px;height:10px;border-radius:50%}
+.player-row .pname{font-weight:600}
+.player-row .pcap{font-size:16px;letter-spacing:1px;color:#94a3b8;margin-left:auto}
+.active-turn{background:rgba(72,187,120,.12);border-radius:6px;padding:4px 8px}
+#board{width:100%}
+.game-side{width:280px;display:flex;flex-direction:column;gap:14px}
+.gpanel{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px}
+.gpanel h3{font-size:12px;color:#63b3ed;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.status-line{font-size:15px;font-weight:600;color:#f6e05e;min-height:22px}
+.game-ctrls{display:flex;flex-direction:column;gap:8px}
+.game-ctrls label{font-size:12px;color:#94a3b8}
+.game-ctrls select{padding:8px;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#e2e8f0;font-size:14px}
+.game-code-display{font-family:'Courier New',monospace;font-size:22px;color:#f6e05e;letter-spacing:5px;text-align:center;padding:8px;background:#0f172a;border-radius:6px;margin-bottom:4px}
+.move-log{max-height:280px;overflow-y:auto;font-family:'Courier New',monospace;font-size:13px;line-height:1.9;color:#cbd5e0}
+.move-log .num{color:#4a5568;margin-right:4px}
+.move-log .wm{color:#e2e8f0;margin-right:14px}
+.move-log .bm{color:#94a3b8}
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:200;justify-content:center;align-items:center}
+.overlay.show{display:flex}
+.overlay-card{background:#1e293b;border:2px solid #63b3ed;border-radius:16px;padding:40px 48px;text-align:center;max-width:420px;width:90%}
+.overlay-card h2{font-size:28px;color:#f6e05e;margin-bottom:8px}
+.overlay-card p{color:#94a3b8;margin-bottom:24px;font-size:16px}
+.overlay-card button{padding:12px 36px;font-size:16px}
+@media(max-width:800px){.game-body{flex-direction:column;align-items:center}.game-side{width:100%;max-width:480px}.board-area{width:100%}.dash-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="auth-view">
+<div class="auth-box">
+  <h2 id="auth-title">Welcome Back</h2>
+  <p id="auth-subtitle">Sign in to continue your learning modules</p>
+  <div class="auth-error" id="auth-error"></div>
+  <input id="auth-username" type="text" placeholder="Choose a username" class="hidden">
+  <input id="auth-email" type="email" placeholder="Email address">
+  <input id="auth-pass" type="password" placeholder="Password">
+  <button class="btn-primary" id="auth-btn" onclick="handleAuth()">Sign In</button>
+  <div class="auth-toggle">
+    <span id="auth-prompt">Don't have an account? </span>
+    <a onclick="switchAuthMode()" id="auth-switch">Register here</a>
+  </div>
+</div>
+</div>
+
+<div id="dash-view" class="hidden">
+<div class="dash-top">
+  <div>
+    <h1>📘 Module 4</h1>
+    <div class="user-line">Signed in as <strong id="dash-user"></strong></div>
+  </div>
+  <div class="right">
+    <a href="index.html" class="btn-ghost">← Landing Page</a>
+    <button class="btn-ghost" onclick="logout()">Logout</button>
+  </div>
+</div>
+<div id="incoming-section" class="section hidden">
+  <div class="section-title">⚔️ Incoming Challenges</div>
+  <div id="incoming-list"></div>
+</div>
+<div class="dash-grid">
+  <div class="dash-card" onclick="launchBot()">
+    <div class="icon">🤖</div>
+    <h3>Play vs Bot</h3>
+    <p>Practice against AI with 3 difficulty levels</p>
+  </div>
+  <div class="dash-card" onclick="navigate('friends')">
+    <div class="icon">👥</div>
+    <h3>Friends</h3>
+    <p>Add friends, see who's online, send challenges</p>
+  </div>
+</div>
+<div class="section">
+  <div class="section-title">🌐 Play Online</div>
+  <div class="code-box">
+    <p>Create a game and share the code with your friend</p>
+    <button class="btn-primary" onclick="createGame()" style="margin-top:12px">Create Game</button>
+    <div id="created-game" class="hidden" style="margin-top:16px">
+      <div class="code-display" id="show-code"></div>
+      <p>Share this code — waiting for opponent...</p>
+    </div>
+  </div>
+  <div class="join-row">
+    <input id="join-input" type="text" placeholder="ENTER CODE" maxlength="6">
+    <button class="btn-green" onclick="joinGame()">Join Game</button>
+  </div>
+</div>
+</div>
+
+<div id="friends-view" class="hidden">
+<button class="btn-ghost" onclick="navigate('dash')" style="margin-bottom:16px">← Back</button>
+<h2 style="color:#63b3ed;margin-bottom:20px">Friends</h2>
+<div class="section">
+  <div class="section-title">🔍 Find Players</div>
+  <div class="search-row">
+    <input id="search-box" type="text" placeholder="Type a username...">
+    <button class="btn-primary" onclick="doSearch()">Search</button>
+  </div>
+  <div id="search-results"></div>
+</div>
+<div class="section">
+  <div class="section-title">📩 Friend Requests</div>
+  <div id="request-list"><p class="empty-text">No pending requests</p></div>
+</div>
+<div class="section">
+  <div class="section-title">👥 Your Friends</div>
+  <div id="friend-list"><p class="empty-text">No friends yet — search and add someone above!</p></div>
+</div>
+</div>
+
+<div id="game-view" class="hidden">
+<div class="game-top">
+  <div class="title" id="game-header">📘 Module 4 – Strategic Analysis</div>
+  <button class="btn-ghost" onclick="exitGame()">← Leave</button>
+</div>
+<div class="game-body">
+  <div class="board-area">
+    <div class="player-row" id="row-top">
+      <div class="dot" id="dot-top" style="background:#e53e3e"></div>
+      <span class="pname" id="name-top">Opponent</span>
+      <span class="pcap" id="cap-top"></span>
+    </div>
+    <div id="board"></div>
+    <div class="player-row" id="row-bot">
+      <div class="dot" id="dot-bot" style="background:#48bb78"></div>
+      <span class="pname" id="name-bot">You</span>
+      <span class="pcap" id="cap-bot"></span>
+    </div>
+  </div>
+  <div class="game-side">
+    <div class="gpanel">
+      <h3>Status</h3>
+      <div class="status-line" id="status">Your turn</div>
+    </div>
+    <div class="gpanel" id="code-panel">
+      <h3>Game Code</h3>
+      <div class="game-code-display" id="live-code"></div>
+    </div>
+    <div class="gpanel">
+      <h3>Controls</h3>
+      <div class="game-ctrls">
+        <div id="diff-section">
+          <label>Difficulty</label>
+          <select id="difficulty">
+            <option value="1">Easy</option>
+            <option value="2" selected>Medium</option>
+            <option value="3">Hard</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="restartGame()">New Game</button>
+        <button class="btn-ghost" onclick="doFlip()">Flip Board</button>
+        <button class="btn-ghost" id="undo-btn" onclick="doUndo()">Undo Move</button>
+        <button class="btn-ghost" id="resign-btn" onclick="doResign()">Resign</button>
+      </div>
+    </div>
+    <div class="gpanel">
+      <h3>Move History</h3>
+      <div class="move-log" id="move-log"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="overlay" id="result-overlay">
+<div class="overlay-card">
+  <h2 id="result-h">Game Over</h2>
+  <p id="result-p"></p>
+  <button class="btn-green" onclick="dismissResult()">OK</button>
+</div>
+</div>
+
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
+  authDomain: "chess-7df7a.firebaseapp.com",
+  databaseURL: "https://chess-7df7a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "chess-7df7a",
+  storageBucket: "chess-7df7a.firebasestorage.app",
+  messagingSenderId: "807640572322",
+  appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
+});
+const auth = firebase.auth();
+const db = firebase.database();
+
+let me = null;
+let myName = '';
+let mode = null;
+let myColor = null;
+let gameCode = null;
+let gameRef = null;
+let gameSub = null;
+let game = null;
+let board = null;
+let botBusy = false;
+const PT = 'https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/img/chesspieces/wikipedia/{piece}.png';
+
+let authIsLogin = true;
+function switchAuthMode(){
+  authIsLogin = !authIsLogin;
+  document.getElementById('auth-title').textContent = authIsLogin ? 'Welcome Back' : 'Create Account';
+  document.getElementById('auth-subtitle').textContent = authIsLogin ? 'Sign in to continue your learning modules' : 'Register to start your learning journey';
+  document.getElementById('auth-btn').textContent = authIsLogin ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-username').classList.toggle('hidden', authIsLogin);
+  document.getElementById('auth-prompt').textContent = authIsLogin ? "Don't have an account? " : 'Already registered? ';
+  document.getElementById('auth-switch').textContent = authIsLogin ? 'Register here' : 'Sign in';
+  document.getElementById('auth-error').textContent = '';
+}
+
+async function handleAuth(){
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const err = document.getElementById('auth-error');
+  err.textContent = '';
+  if(!email || !pass){err.textContent = 'Please fill in all fields'; return;}
+  try{
+    if(!authIsLogin){
+      const uname = document.getElementById('auth-username').value.trim();
+      if(!uname || uname.length < 2){err.textContent = 'Username must be at least 2 characters'; return;}
+      if(uname.length > 16){err.textContent = 'Username max 16 characters'; return;}
+      const exists = await db.ref('users').orderByChild('username').equalTo(uname).once('value');
+      if(exists.exists()){err.textContent = 'That username is taken'; return;}
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      await db.ref('users/'+cred.user.uid).set({username:uname, email:email, online:true});
+    } else {
+      await auth.signInWithEmailAndPassword(email, pass);
+    }
+  } catch(e){
+    let msg = e.message || 'Something went wrong';
+    msg = msg.replace('Firebase: ','').replace(/\(auth\/.*\)/,'').trim();
+    err.textContent = msg;
+  }
+}
+
+function logout(){
+  if(me){
+    db.ref('users/'+me.uid+'/online').set(false);
+    db.ref('presence/'+me.uid).remove();
+  }
+  exitGame();
+  auth.signOut();
+}
+
+auth.onAuthStateChanged(async u => {
+  if(u){
+    me = u;
+    const snap = await db.ref('users/'+u.uid+'/username').once('value');
+    myName = snap.val() || 'Player';
+    document.getElementById('dash-user').textContent = myName;
+    db.ref('users/'+u.uid+'/online').set(true);
+    db.ref('presence/'+u.uid).set({online:true, username:myName, ts:firebase.database.ServerValue.TIMESTAMP});
+    db.ref('presence/'+u.uid).onDisconnect().remove();
+    db.ref('users/'+u.uid+'/online').onDisconnect().set(false);
+    navigate('dash');
+    watchChallenges();
+  } else {
+    me = null; myName = '';
+    navigate('auth');
+  }
+});
+
+function navigate(page){
+  ['auth-view','dash-view','friends-view','game-view'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById(page+'-view').classList.remove('hidden');
+  if(page==='friends'){loadFriendList(); loadRequestList();}
+  if(page==='dash'){document.getElementById('created-game').classList.add('hidden');}
+}
+
+async function doSearch(){
+  const q = document.getElementById('search-box').value.trim().toLowerCase();
+  const el = document.getElementById('search-results');
+  if(!q){el.innerHTML=''; return;}
+  const snap = await db.ref('users').orderByChild('username').once('value');
+  let html = '';
+  snap.forEach(c => {
+    const u = c.val(); const uid = c.key;
+    if(uid === me.uid) return;
+    if(u.username && u.username.toLowerCase().includes(q)){
+      html += '<div class="search-result-item"><span>'+u.username+'</span><button class="btn-green" onclick="sendFriendReq(\''+uid+'\',\''+u.username+'\')">+ Add</button></div>';
+    }
+  });
+  el.innerHTML = html || '<p class="empty-text">No users found</p>';
+}
+
+async function sendFriendReq(toUid, toName){
+  const f = await db.ref('friends/'+me.uid+'/'+toUid).once('value');
+  if(f.exists()){alert('Already friends with '+toName); return;}
+  const existing = await db.ref('requests').orderByChild('from').equalTo(me.uid).once('value');
+  let alreadySent = false;
+  existing.forEach(c => {
+    const r = c.val();
+    if(r.to === toUid && r.type === 'friend' && r.status === 'pending') alreadySent = true;
+  });
+  if(alreadySent){alert('Request already sent to '+toName); return;}
+  await db.ref('requests').push().set({
+    from:me.uid, to:toUid, fromName:myName, toName:toName,
+    type:'friend', status:'pending',
+    ts:firebase.database.ServerValue.TIMESTAMP
+  });
+  alert('Friend request sent to '+toName+'!');
+}
+
+function loadRequestList(){
+  db.ref('requests').orderByChild('to').equalTo(me.uid).on('value', snap => {
+    const el = document.getElementById('request-list');
+    let html = '';
+    snap.forEach(c => {
+      const r = c.val();
+      if(r.status !== 'pending' || r.type !== 'friend') return;
+      html += '<div class="req-item"><span><strong>'+r.fromName+'</strong> wants to be friends</span><div class="friend-btns"><button class="btn-green" onclick="acceptFR(\''+c.key+'\',\''+r.from+'\',\''+r.fromName+'\')">Accept</button><button class="btn-red" onclick="declineFR(\''+c.key+'\')">Decline</button></div></div>';
+    });
+    el.innerHTML = html || '<p class="empty-text">No pending requests</p>';
+  });
+}
+
+async function acceptFR(rid, fromUid, fromName){
+  await db.ref('friends/'+me.uid+'/'+fromUid).set({username:fromName, ts:firebase.database.ServerValue.TIMESTAMP});
+  await db.ref('friends/'+fromUid+'/'+me.uid).set({username:myName, ts:firebase.database.ServerValue.TIMESTAMP});
+  await db.ref('requests/'+rid).remove();
+}
+
+async function declineFR(rid){
+  await db.ref('requests/'+rid).remove();
+}
+
+function loadFriendList(){
+  db.ref('friends/'+me.uid).on('value', async snap => {
+    const el = document.getElementById('friend-list');
+    if(!snap.exists()){el.innerHTML='<p class="empty-text">No friends yet</p>'; return;}
+    let html = '';
+    const promises = [];
+    snap.forEach(c => {
+      const f = c.val(); const fuid = c.key;
+      promises.push(
+        db.ref('users/'+fuid+'/online').once('value').then(s => {
+          const on = s.val() === true;
+          return '<div class="friend-item"><div class="friend-info"><span class="status-dot '+(on?'dot-online':'dot-offline')+'"></span><span class="friend-name">'+f.username+'</span><span class="friend-status">'+(on?'Online':'Offline')+'</span></div><div class="friend-btns"><button class="btn-primary" onclick="challengeFriend(\''+fuid+'\',\''+f.username+'\')">⚔️ Challenge</button><button class="btn-red" onclick="removeFriend(\''+fuid+'\',\''+f.username+'\')">Remove</button></div></div>';
+        })
+      );
+    });
+    const items = await Promise.all(promises);
+    el.innerHTML = items.join('') || '<p class="empty-text">No friends yet</p>';
+  });
+}
+
+async function removeFriend(fuid, fname){
+  if(!confirm('Remove '+fname+' from friends?')) return;
+  await db.ref('friends/'+me.uid+'/'+fuid).remove();
+  await db.ref('friends/'+fuid+'/'+me.uid).remove();
+}
+
+function watchChallenges(){
+  db.ref('requests').orderByChild('to').equalTo(me.uid).on('value', snap => {
+    const el = document.getElementById('incoming-list');
+    const sec = document.getElementById('incoming-section');
+    let html = ''; let has = false;
+    snap.forEach(c => {
+      const r = c.val();
+      if(r.status !== 'pending' || r.type !== 'challenge') return;
+      has = true;
+      html += '<div class="challenge-item"><span>⚔️ <strong>'+r.fromName+'</strong> wants to play!</span><div class="btns"><button class="btn-green" onclick="acceptChallenge(\''+c.key+'\',\''+r.gameCode+'\')">Accept</button><button class="btn-red" onclick="declineFR(\''+c.key+'\')">Decline</button></div></div>';
+    });
+    el.innerHTML = html;
+    sec.classList.toggle('hidden', !has);
+  });
+}
+
+async function challengeFriend(fuid, fname){
+  const code = makeCode();
+  await db.ref('games/'+code).set({
+    white:me.uid, black:null, whiteName:myName, blackName:fname,
+    fen:'start', turn:'w', moves:0, status:'waiting', result:null,
+    ts:firebase.database.ServerValue.TIMESTAMP
+  });
+  await db.ref('requests').push().set({
+    from:me.uid, to:fuid, fromName:myName, toName:fname,
+    type:'challenge', status:'pending', gameCode:code,
+    ts:firebase.database.ServerValue.TIMESTAMP
+  });
+  alert('Challenge sent to '+fname+'!\nGame code: '+code);
+}
+
+async function acceptChallenge(rid, code){
+  await db.ref('requests/'+rid).remove();
+  const snap = await db.ref('games/'+code).once('value');
+  if(!snap.exists()){alert('Game no longer exists'); return;}
+  await db.ref('games/'+code).update({black:me.uid, blackName:myName, status:'playing'});
+  beginOnline(code, 'b');
+}
+
+function makeCode(){
+  const ch = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let r = '';
+  for(let i=0;i<6;i++) r += ch[Math.floor(Math.random()*ch.length)];
+  return r;
+}
+
+async function createGame(){
+  const code = makeCode();
+  gameCode = code;
+  await db.ref('games/'+code).set({
+    white:me.uid, black:null, whiteName:myName, blackName:null,
+    fen:'start', turn:'w', moves:0, status:'waiting', result:null,
+    ts:firebase.database.ServerValue.TIMESTAMP
+  });
+  document.getElementById('show-code').textContent = code;
+  document.getElementById('created-game').classList.remove('hidden');
+  const ref = db.ref('games/'+code);
+  const fn = ref.on('value', snap => {
+    const g = snap.val();
+    if(g && g.status === 'playing' && g.black){
+      ref.off('value', fn);
+      beginOnline(code, 'w');
+    }
+  });
+}
+
+async function joinGame(){
+  const code = document.getElementById('join-input').value.trim().toUpperCase();
+  if(code.length !== 6){alert('Enter a 6-character code'); return;}
+  const snap = await db.ref('games/'+code).once('value');
+  const g = snap.val();
+  if(!g){alert('Game not found — check the code'); return;}
+  if(g.status === 'playing'){alert('Game already in progress'); return;}
+  if(g.white === me.uid){alert("Can't join your own game!"); return;}
+  await db.ref('games/'+code).update({black:me.uid, blackName:myName, status:'playing'});
+  beginOnline(code, 'b');
+}
+
+function beginOnline(code, color){
+  mode = 'online'; myColor = color; gameCode = code;
+  game = new Chess();
+  navigate('game');
+  document.getElementById('game-header').textContent = '📘 Online Match';
+  document.getElementById('diff-section').classList.add('hidden');
+  document.getElementById('undo-btn').classList.add('hidden');
+  document.getElementById('resign-btn').classList.remove('hidden');
+  document.getElementById('code-panel').classList.remove('hidden');
+  document.getElementById('live-code').textContent = code;
+  const orient = color === 'w' ? 'white' : 'black';
+  if(board) board.destroy();
+  board = Chessboard('board',{
+    draggable:true, position:'start', orientation:orient,
+    pieceTheme:PT, onDragStart:onDrag, onDrop:onDrop, onSnapEnd:onSnap
+  });
+  $(window).resize(()=>board.resize());
+  gameRef = db.ref('games/'+code);
+  gameSub = gameRef.on('value', snap => {
+    const g = snap.val(); if(!g) return;
+    if(g.fen && g.fen !== 'start') game.load(g.fen);
+    else game.reset();
+    board.position(game.fen());
+    renderOnlineUI(g);
+    if(g.result && !document.getElementById('result-overlay').classList.contains('show')){
+      showResult(g.result.includes('wins') ? '🏆 '+g.result : '🤝 '+g.result, g.result);
+    }
+  });
+}
+
+function renderOnlineUI(g){
+  const wn = g.whiteName||'White', bn = g.blackName||'Black';
+  const turn = g.turn || game.turn();
+  if(myColor==='w'){
+    document.getElementById('name-top').textContent = bn+' (Black)';
+    document.getElementById('name-bot').textContent = wn+' (White)';
+    document.getElementById('dot-top').style.background = turn==='b'?'#48bb78':'#4a5568';
+    document.getElementById('dot-bot').style.background = turn==='w'?'#48bb78':'#4a5568';
+  } else {
+    document.getElementById('name-top').textContent = wn+' (White)';
+    document.getElementById('name-bot').textContent = bn+' (Black)';
+    document.getElementById('dot-top').style.background = turn==='w'?'#48bb78':'#4a5568';
+    document.getElementById('dot-bot').style.background = turn==='b'?'#48bb78':'#4a5568';
+  }
+  document.getElementById('row-top').classList.toggle('active-turn', turn===(myColor==='w'?'b':'w'));
+  document.getElementById('row-bot').classList.toggle('active-turn', turn===myColor);
+  const st = document.getElementById('status');
+  if(g.result){st.textContent=g.result; st.style.color='#68d391';}
+  else if(game.in_check()){st.textContent=(turn===myColor?'You are':'Opponent is')+' in check!'; st.style.color='#fc8181';}
+  else{st.textContent=turn===myColor?'Your turn!':'Waiting for opponent...'; st.style.color='#f6e05e';}
+  renderMoves(); renderCaptures();
+}
+
+function launchBot(){
+  mode = 'bot'; myColor = 'w'; gameCode = null;
+  game = new Chess();
+  navigate('game');
+  document.getElementById('game-header').textContent = '📘 Bot Practice';
+  document.getElementById('diff-section').classList.remove('hidden');
+  document.getElementById('undo-btn').classList.remove('hidden');
+  document.getElementById('resign-btn').classList.add('hidden');
+  document.getElementById('code-panel').classList.add('hidden');
+  if(board) board.destroy();
+  board = Chessboard('board',{
+    draggable:true, position:'start', orientation:'white',
+    pieceTheme:PT, onDragStart:onDrag, onDrop:onDrop, onSnapEnd:onSnap
+  });
+  $(window).resize(()=>board.resize());
+  document.getElementById('name-top').textContent = 'AI Bot (Black)';
+  document.getElementById('name-bot').textContent = myName+' (White)';
+  refreshBotUI();
+}
+
+function refreshBotUI(){
+  const st = document.getElementById('status');
+  if(game.in_checkmate()){st.textContent=game.turn()==='w'?'Bot wins!':'You win! 🎉';st.style.color='#68d391';}
+  else if(game.in_draw()||game.in_stalemate()){st.textContent='Draw!';st.style.color='#f6e05e';}
+  else if(game.in_check()){st.textContent=game.turn()==='w'?'You are in check!':'Bot is in check!';st.style.color='#fc8181';}
+  else{st.textContent=game.turn()==='w'?'Your turn':'Bot thinking...';st.style.color='#f6e05e';}
+  const turn = game.turn();
+  document.getElementById('dot-top').style.background = turn==='b'?'#48bb78':'#4a5568';
+  document.getElementById('dot-bot').style.background = turn==='w'?'#48bb78':'#4a5568';
+  document.getElementById('row-top').classList.toggle('active-turn', turn==='b');
+  document.getElementById('row-bot').classList.toggle('active-turn', turn==='w');
+  renderMoves(); renderCaptures();
+}
+
+function onDrag(source, piece){
+  if(game.game_over() || botBusy) return false;
+  if(mode==='bot'){return game.turn()==='w' && piece[0]==='w';}
+  return game.turn()===myColor && piece[0]===myColor;
+}
+
+function onDrop(source, target){
+  let move = game.move({from:source,to:target,promotion:'q'});
+  if(!move) return 'snapback';
+  if(mode==='online'){
+    gameRef.update({fen:game.fen(), turn:game.turn(), moves:game.history().length});
+    if(game.game_over()){
+      let res = 'Draw';
+      if(game.in_checkmate()) res = (game.turn()==='w'?'Black':'White')+' wins by checkmate!';
+      else if(game.in_stalemate()) res = 'Stalemate — Draw';
+      gameRef.update({result:res});
+    }
+  } else {
+    refreshBotUI();
+    if(!game.game_over() && game.turn()==='b'){
+      botBusy = true;
+      setTimeout(()=>{botMove(); botBusy=false;}, 350);
+    }
+    if(game.game_over()) showResult(
+      game.in_checkmate()?(game.turn()==='w'?'😞 Bot Wins':'🏆 You Win!'):'🤝 Draw',
+      game.in_checkmate()?'Checkmate!':'Stalemate or draw'
+    );
+  }
+}
+
+function onSnap(){board.position(game.fen());}
+
+function renderMoves(){
+  const h = game.history();
+  let html = '';
+  for(let i=0;i<h.length;i+=2){
+    html += '<span class="num">'+(Math.floor(i/2)+1)+'.</span>';
+    html += '<span class="wm">'+h[i]+'</span>';
+    if(h[i+1]) html += '<span class="bm">'+h[i+1]+'</span>';
+    html += '<br>';
+  }
+  const el = document.getElementById('move-log');
+  el.innerHTML = html;
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderCaptures(){
+  const sym = {p:'♟',n:'♞',b:'♝',r:'♜',q:'♛'};
+  const hist = game.history({verbose:true});
+  let wCap='', bCap='';
+  hist.forEach(m=>{if(m.captured){if(m.color==='w')wCap+=sym[m.captured];else bCap+=sym[m.captured];}});
+  const topBlack = (mode==='bot' || myColor==='w');
+  document.getElementById('cap-top').textContent = topBlack ? wCap : bCap;
+  document.getElementById('cap-bot').textContent = topBlack ? bCap : wCap;
+}
+
+function restartGame(){
+  if(mode==='online'){
+    if(!confirm('Reset game?')) return;
+    game.reset(); gameRef.update({fen:'start',turn:'w',moves:0,result:null});
+  } else {
+    game.reset(); board.start(); refreshBotUI();
+  }
+}
+function doFlip(){board.flip();}
+function doUndo(){
+  if(mode!=='bot'||game.turn()!=='w')return;
+  game.undo(); game.undo();
+  board.position(game.fen()); refreshBotUI();
+}
+async function doResign(){
+  if(mode!=='online'||!gameCode) return;
+  if(!confirm('Are you sure you want to resign?')) return;
+  const winner = myColor==='w'?'Black':'White';
+  await gameRef.update({result:winner+' wins by resignation!'});
+}
+function exitGame(){
+  if(gameRef && gameSub){gameRef.off('value',gameSub); gameRef=null; gameSub=null;}
+  mode=null; gameCode=null;
+  if(me) navigate('dash');
+}
+function showResult(title, desc){
+  document.getElementById('result-h').textContent=title;
+  document.getElementById('result-p').textContent=desc;
+  document.getElementById('result-overlay').classList.add('show');
+}
+function dismissResult(){
+  document.getElementById('result-overlay').classList.remove('show');
+  if(mode==='bot') restartGame();
+}
+
+const PV={p:100,n:320,b:330,r:500,q:900,k:20000};
+const PST={
+p:[0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0],
+n:[-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50],
+b:[-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,10,10,10,10,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20],
+r:[0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0],
+q:[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20],
+k:[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20]
+};
+function si(sq,c){const f=sq.charCodeAt(0)-97,r=parseInt(sq[1])-1;return c==='w'?(7-r)*8+f:r*8+f;}
+function ev(){
+  if(game.in_checkmate())return game.turn()==='w'?-99999:99999;
+  if(game.in_draw()||game.in_stalemate())return 0;
+  let s=0;const b=game.board();
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=b[r][c];if(p){const v=PV[p.type],t=PST[p.type],i=si(p.square,p.color);s+=(p.color==='w'?1:-1)*(v+(t?t[i]:0));}}
+  return s;
+}
+function mm(d,a,b,mx){
+  if(d===0||game.game_over())return ev();
+  const mv=game.moves({verbose:true});
+  mv.sort((x,y)=>{let a=0,b=0;if(x.captured)a+=PV[x.captured]*10;if(y.captured)b+=PV[y.captured]*10;return b-a;});
+  if(mx){let m=-Infinity;for(const v of mv){game.move(v);const e=mm(d-1,a,b,false);game.undo();m=Math.max(m,e);a=Math.max(a,e);if(b<=a)break;}return m;}
+  else{let m=Infinity;for(const v of mv){game.move(v);const e=mm(d-1,a,b,true);game.undo();m=Math.min(m,e);b=Math.min(b,e);if(b<=a)break;}return m;}
+}
+function botMove(){
+  if(game.game_over()||game.turn()!=='b')return;
+  const d=parseInt(document.getElementById('difficulty').value);
+  const mv=game.moves({verbose:true});if(!mv.length)return;
+  let best=mv[0],be=Infinity;
+  for(const m of mv){game.move(m);const e=mm(d-1,-Infinity,Infinity,true);game.undo();if(e<be){be=e;best=m;}}
+  if(d===1&&Math.random()<0.25)best=mv[Math.floor(Math.random()*mv.length)];
+  game.move(best); board.position(game.fen()); refreshBotUI();
+  if(game.game_over()) showResult(
+    game.in_checkmate()?'😞 Bot Wins':'🤝 Draw',
+    game.in_checkmate()?'Checkmate!':'Stalemate or draw'
+  );
+}
+</script>
+</body>
+</html>

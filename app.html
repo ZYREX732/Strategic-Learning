@@ -127,7 +127,7 @@
     <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 max-w-md w-full shadow-2xl space-y-4">
       <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-3xl">🛠️</div>
       <h2 class="text-2xl font-bold text-white">System Under Maintenance</h2>
-      <p class="text-sm text-slate-400">CogniLearn is currently undergoing scheduled platform upgrades and updates. Access is temporarily suspended for students.</p>
+      <p class="text-sm text-slate-400">CogniLearn is currently undergoing scheduled platform upgrades. Access is temporarily suspended.</p>
       <div class="text-xs text-indigo-400 font-mono bg-slate-950 p-2 rounded border border-slate-800">Please check back in a few minutes.</div>
     </div>
   </div>
@@ -137,7 +137,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
       <!-- LOGO / BRANDING -->
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='index.html'">
         <div class="bg-indigo-600 p-2 rounded-lg">
           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -145,32 +145,33 @@
         </div>
         <div>
           <span class="font-bold text-lg tracking-wide text-indigo-400">CogniLearn</span>
-          <span class="text-xs text-slate-400 block -mt-1">Strategic Thinking Lab</span>
+          <span class="text-xs text-slate-400 block -mt-1">1v1 Strategy Arena</span>
         </div>
       </div>
 
-      <!-- TABS / NAVIGATION -->
+      <!-- TABS / NAVIGATION (HIDDEN WHEN LOGGED OUT) -->
       <nav id="nav-tabs" class="hidden md:flex space-x-1">
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition">Dashboard</button>
         <button onclick="switchTab('bot')" id="tab-bot" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition">Practice vs AI</button>
-        <button onclick="switchTab('multiplayer')" id="tab-multiplayer" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition">Peer Match</button>
+        <button onclick="switchTab('multiplayer')" id="tab-multiplayer" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition">1v1 Arena</button>
         <button onclick="switchTab('friends')" id="tab-friends" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition relative">
-          Classmates
+          Friends
           <span id="friend-badge" class="hidden absolute -top-1 -right-1 bg-indigo-500 text-white text-xs px-1.5 py-0.5 rounded-full">0</span>
         </button>
         <!-- EXCLUSIVE ADMIN TAB -->
         <button onclick="switchTab('admin')" id="tab-admin" class="hidden nav-btn px-4 py-2 text-sm font-bold rounded-md text-amber-400 hover:text-white hover:bg-amber-900/50 border border-amber-600/50 transition">⚡ Admin Panel</button>
       </nav>
 
-      <!-- USER PROFILE & ELO DISPLAY -->
+      <!-- USER PROFILE & EXIT BUTTON -->
       <div id="user-header-profile" class="flex items-center space-x-4">
         <div id="auth-loading" class="text-xs text-slate-400">Connecting...</div>
         <div id="user-info" class="hidden flex items-center space-x-3">
           <div class="text-right">
-            <span id="header-username" class="text-sm font-semibold text-slate-200 block">Student</span>
+            <span id="header-username" class="text-sm font-semibold text-slate-200 block">Player</span>
             <span class="text-xs text-indigo-400 font-bold">Rating: <span id="header-elo">500</span> Elo</span>
           </div>
-          <button onclick="logout()" class="text-xs text-slate-400 hover:text-red-400 bg-slate-800 border border-slate-700 px-2.5 py-1.5 rounded hover:border-red-500 transition">Exit</button>
+          <!-- EXIT REDIRECTS STRAIGHT TO INDEX.HTML BYPASS PAGE -->
+          <button onclick="logout()" class="text-xs text-slate-300 hover:text-white bg-rose-900/60 border border-rose-700 px-3 py-1.5 rounded hover:bg-rose-700 transition font-semibold">Exit Page</button>
         </div>
       </div>
 
@@ -182,13 +183,13 @@
 
     <!-- AUTH SECTION (LOGIN / REGISTER) -->
     <div id="auth-container" class="max-w-md mx-auto bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl mt-8">
-      <h2 class="text-2xl font-bold text-center text-indigo-400 mb-2">Student Access Portal</h2>
-      <p class="text-slate-400 text-sm text-center mb-6">Enter your username or email code to access modules.</p>
+      <h2 class="text-2xl font-bold text-center text-indigo-400 mb-2">CogniLearn Strategy Lab</h2>
+      <p class="text-slate-400 text-sm text-center mb-6">Enter your Username or Email to access matches.</p>
       
       <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Username or Email</label>
-          <input type="text" id="auth-username" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="e.g. Alex2025 or ZYREX">
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Username or Email Address</label>
+          <input type="text" id="auth-username" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="e.g. ZYREX or zainisgo123@gmail.com">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
@@ -201,6 +202,11 @@
           Sign In / Create Account
         </button>
       </form>
+
+      <!-- FORCE CLEAR SESSION BUTTON -->
+      <div class="mt-6 border-t border-slate-700/60 pt-4 text-center">
+        <button onclick="forceClearSession()" class="text-xs text-slate-400 hover:text-slate-200 underline">Sign Out Saved Session / Switch Account</button>
+      </div>
     </div>
 
     <!-- MAIN APP VIEWS (HIDDEN UNTIL AUTHENTICATED) -->
@@ -209,8 +215,8 @@
       <!-- DASHBOARD TAB -->
       <div id="view-dashboard" class="view-content space-y-6">
         <div class="bg-gradient-to-r from-slate-800 to-indigo-950 p-6 rounded-2xl border border-slate-700">
-          <h1 class="text-2xl font-bold text-white mb-2">Welcome back, <span id="dash-username" class="text-indigo-400">Student</span>!</h1>
-          <p class="text-slate-300 text-sm max-w-2xl">Sharpen your analytical skills and critical thinking through interactive chess simulations. Track your progress on the leaderboard.</p>
+          <h1 class="text-2xl font-bold text-white mb-2">Welcome back, <span id="dash-username" class="text-indigo-400">Player</span>!</h1>
+          <p class="text-slate-300 text-sm max-w-2xl">Sharpen your analytical skills and critical thinking through interactive chess simulations. Track your rating on the global leaderboard.</p>
         </div>
 
         <div class="grid md:grid-cols-3 gap-6">
@@ -223,23 +229,23 @@
 
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center hover:border-indigo-500 transition cursor-pointer" onclick="switchTab('multiplayer')">
             <div class="w-12 h-12 bg-emerald-600/20 text-emerald-400 rounded-lg flex items-center justify-center mx-auto mb-3">⚔️</div>
-            <h3 class="font-bold text-lg mb-1">Peer Match</h3>
-            <p class="text-xs text-slate-400 mb-4">Challenge classmates using private match codes or direct invites.</p>
+            <h3 class="font-bold text-lg mb-1">1v1 Arena</h3>
+            <p class="text-xs text-slate-400 mb-4">Challenge opponents using private match codes or direct invites.</p>
             <span class="inline-block bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">Join Room</span>
           </div>
 
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center hover:border-indigo-500 transition cursor-pointer" onclick="switchTab('friends')">
             <div class="w-12 h-12 bg-amber-600/20 text-amber-400 rounded-lg flex items-center justify-center mx-auto mb-3">👥</div>
-            <h3 class="font-bold text-lg mb-1">Classmates List</h3>
+            <h3 class="font-bold text-lg mb-1">Friends List</h3>
             <p class="text-xs text-slate-400 mb-4">Add friends, view live online status, and challenge them directly.</p>
             <span class="inline-block bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">Manage Friends</span>
           </div>
         </div>
 
-        <!-- TOP STUDENTS LEADERBOARD (FIXED NUMERICAL SORTING) -->
+        <!-- GLOBAL 1V1 LEADERBOARD (STRICT MATHEMATICAL SORTING) -->
         <div class="bg-slate-800 rounded-xl border border-slate-700 p-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">🏆 Top Students Leaderboard</h3>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">🏆 Global 1v1 Leaderboard</h3>
             <span class="text-xs text-slate-400">Live Numerical Rankings</span>
           </div>
           <div class="overflow-x-auto">
@@ -247,7 +253,7 @@
               <thead class="bg-slate-900/50 text-xs uppercase text-slate-400">
                 <tr>
                   <th class="py-3 px-4 rounded-l-lg">Rank</th>
-                  <th class="py-3 px-4">Student</th>
+                  <th class="py-3 px-4">Player</th>
                   <th class="py-3 px-4">Rating (Elo)</th>
                   <th class="py-3 px-4 rounded-r-lg">Status</th>
                 </tr>
@@ -297,7 +303,7 @@
         <div class="max-w-md mx-auto bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-6">
           <div>
             <h3 class="text-lg font-bold mb-2 text-indigo-400">Create Private Room</h3>
-            <p class="text-xs text-slate-400 mb-4">Generate a 6-character code and share it with your classmate.</p>
+            <p class="text-xs text-slate-400 mb-4">Generate a 6-character code and share it with your opponent.</p>
             <button onclick="createOnlineRoom()" class="w-full bg-indigo-600 hover:bg-indigo-500 font-semibold py-2.5 rounded-lg transition">Create Match Room</button>
           </div>
 
@@ -316,7 +322,7 @@
       <div id="view-friends" class="view-content hidden space-y-6">
         <div class="grid md:grid-cols-2 gap-6">
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <h3 class="text-lg font-bold text-indigo-400">Add Classmate</h3>
+            <h3 class="text-lg font-bold text-indigo-400">Add Friend</h3>
             <div class="flex gap-2">
               <input type="text" id="search-friend-username" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500" placeholder="Enter username...">
               <button onclick="sendFriendRequest()" class="bg-indigo-600 hover:bg-indigo-500 px-4 font-semibold rounded-lg text-sm transition">Send Request</button>
@@ -330,7 +336,7 @@
           </div>
 
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <h3 class="text-lg font-bold text-emerald-400">My Classmates List</h3>
+            <h3 class="text-lg font-bold text-emerald-400">My Friends List</h3>
             <div id="friends-list" class="space-y-3">
               <div class="text-xs text-slate-500">Loading friends...</div>
             </div>
@@ -352,7 +358,7 @@
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h3 class="text-lg font-bold text-white mb-1">System Suspension / Maintenance Mode</h3>
-            <p class="text-xs text-slate-400">Lock all non-admin students out with a maintenance screen while making changes.</p>
+            <p class="text-xs text-slate-400">Lock all non-admin users out with a maintenance screen while making changes.</p>
           </div>
           <button id="admin-maintenance-btn" onclick="toggleMaintenanceMode()" class="bg-slate-700 text-slate-300 font-bold px-6 py-3 rounded-lg border border-slate-600 transition">Loading Status...</button>
         </div>
@@ -601,8 +607,11 @@
         currentUser = null;
         userProfile = null;
         isUserAdmin = false;
+        
+        // Hide All Tabs and App Views When Logged Out
         $('#auth-loading').addClass('hidden');
         $('#user-info').addClass('hidden');
+        $('#nav-tabs').addClass('hidden');
         $('#auth-container').removeClass('hidden');
         $('#app-view').addClass('hidden');
         $('#tab-admin').addClass('hidden');
@@ -617,7 +626,6 @@
 
       if (!userInput || !password) return;
 
-      // Allow login via direct email (zainisgo123@gmail.com) or username
       let email = userInput.includes('@') ? userInput : `${userInput.toLowerCase()}@cognilearn.internal`;
 
       try {
@@ -645,13 +653,26 @@
       $('#auth-error').text(msg).removeClass('hidden');
     }
 
+    function forceClearSession() {
+      auth.signOut().then(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.reload();
+      });
+    }
+
     function loadUserProfile(uid) {
       db.ref(`users/${uid}`).on('value', snapshot => {
         userProfile = snapshot.val() || {};
-        userProfile.elo = parseInt(userProfile.elo, 10) || 500;
+        let parsedElo = Number(userProfile.elo);
+        userProfile.elo = isNaN(parsedElo) ? 500 : parsedElo;
 
-        // Check Admin Privileges
+        // Check Admin Privileges (ZYREX or zainisgo123@gmail.com)
         isUserAdmin = (currentUser.email === 'zainisgo123@gmail.com' || userProfile.username === 'ZYREX');
+        
+        // Show Navigation Bar
+        $('#nav-tabs').removeClass('hidden');
+
         if (isUserAdmin) {
           $('#tab-admin').removeClass('hidden');
           loadAdminUserList();
@@ -661,8 +682,8 @@
 
         checkMaintenanceLock();
 
-        $('#header-username').text(userProfile.username || 'Student');
-        $('#dash-username').text(userProfile.username || 'Student');
+        $('#header-username').text(userProfile.username || 'Player');
+        $('#dash-username').text(userProfile.username || 'Player');
         $('#header-elo').text(userProfile.elo);
         $('#your-elo-text').text(`Rating: ${userProfile.elo} Elo`);
 
@@ -691,12 +712,17 @@
       });
     }
 
+    // EXIT REDIRECTS TO BYPASS PAGE (INDEX.HTML)
     function logout() {
       if (currentUser) {
         db.ref(`presence/${currentUser.uid}`).set({ status: 'offline', lastSeen: firebase.database.ServerValue.TIMESTAMP });
       }
       stopTimer();
-      auth.signOut();
+      auth.signOut().then(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = 'index.html';
+      });
     }
 
     // ==========================================
@@ -1052,14 +1078,13 @@
       if (gameMode === 'bot') {
         oppRating = botRatings[currentBotLevel];
       } else if (gameMode === 'online') {
-        oppRating = parseInt($('#opp-elo-text').text().replace(/\D/g, ''), 10) || 500;
+        oppRating = Number($('#opp-elo-text').text().replace(/\D/g, '')) || 500;
       }
 
-      const currentElo = parseInt(userProfile.elo, 10) || 500;
+      const currentElo = Number(userProfile.elo) || 500;
       const { newRating, change } = calculateEloChange(currentElo, oppRating, score);
 
-      // Save parsed numerical Elo
-      db.ref(`users/${currentUser.uid}`).update({ elo: parseInt(newRating, 10) });
+      db.ref(`users/${currentUser.uid}`).update({ elo: Number(newRating) });
 
       $('#modal-title').text(isDraw ? 'Game Drawn' : (isWin ? 'Victory!' : 'Defeat'));
       $('#modal-icon').text(isDraw ? '🤝' : (isWin ? '🏆' : '💔'));
@@ -1473,7 +1498,7 @@
 
             db.ref(`users/${fUid}`).once('value', userSnap => {
               const uData = userSnap.val() || {};
-              const friendElo = parseInt(uData.elo, 10) || 500;
+              const friendElo = Number(uData.elo) || 500;
 
               const friendCard = `
                 <div class="flex items-center justify-between bg-slate-900 p-3 rounded-lg border border-slate-700">
@@ -1501,13 +1526,13 @@
 
     function challengeFriend(fUid) {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      alert(`Challenge created! Room code is: ${code}. Share this code with your classmate to join.`);
+      alert(`Challenge created! Room code is: ${code}. Share this code to join.`);
       myColor = 'w';
       setupOnlineGame(code, true);
     }
 
     async function removeFriend(fUid) {
-      if (confirm('Remove classmate from list?')) {
+      if (confirm('Remove friend from list?')) {
         const updates = {};
         updates[`friends/${currentUser.uid}/${fUid}`] = null;
         updates[`friends/${fUid}/${currentUser.uid}`] = null;
@@ -1516,7 +1541,7 @@
     }
 
     // ==========================================
-    // 13. TOP STUDENTS LEADERBOARD (NUMERICAL SORT)
+    // 13. GLOBAL LEADERBOARD (STRICT NUMERICAL SORTING)
     // ==========================================
     function loadLeaderboard() {
       db.ref('users').once('value', snapshot => {
@@ -1524,15 +1549,18 @@
         snapshot.forEach(child => {
           const val = child.val();
           if (val && val.username) {
+            let parsedElo = Number(val.elo);
+            if (isNaN(parsedElo)) parsedElo = 500;
+
             players.push({
               uid: child.key,
               username: val.username,
-              elo: parseInt(val.elo, 10) || 500
+              elo: parsedElo
             });
           }
         });
 
-        // Strict Numerical Sort Descending (Highest Elo at the top)
+        // Strict Numerical Sort Descending (Guarantees 500 > 495)
         players.sort((a, b) => b.elo - a.elo);
         const topPlayers = players.slice(0, 10);
 
@@ -1544,7 +1572,7 @@
               <td class="py-3 px-4 font-bold text-slate-300">${rankBadge}</td>
               <td class="py-3 px-4 font-semibold ${p.uid === currentUser.uid ? 'text-indigo-400' : 'text-slate-200'}">${p.username} ${p.uid === currentUser.uid ? '(You)' : ''}</td>
               <td class="py-3 px-4 font-mono font-bold text-emerald-400">${p.elo}</td>
-              <td class="py-3 px-4 text-xs text-slate-400">Active Student</td>
+              <td class="py-3 px-4 text-xs text-slate-400">Active Player</td>
             </tr>
           `;
         });
@@ -1562,7 +1590,7 @@
         snapshot.forEach(child => {
           const u = child.val();
           const uid = child.key;
-          const uElo = parseInt(u.elo, 10) || 500;
+          const uElo = Number(u.elo) || 500;
 
           html += `
             <tr class="hover:bg-slate-800/50 transition">
@@ -1619,7 +1647,7 @@
           let count = 0;
           snapshot.forEach(child => {
             const u = child.val();
-            const uElo = parseInt(u.elo, 10) || 500;
+            const uElo = Number(u.elo) || 500;
             if (uElo > 3000) {
               db.ref(`users/${child.key}`).remove();
               count++;

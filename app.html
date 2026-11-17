@@ -16,7 +16,7 @@
   <!-- Chess.js Engine -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   
-  <!-- Chessboard.js CSS & JS (from cdnjs for 100% reliable piece loading) -->
+  <!-- Chessboard.js CSS & JS (from cdnjs) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 
@@ -507,7 +507,7 @@
   <script>
     // --- FIREBASE CONFIGURATION ---
     const firebaseConfig = {
-      apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGMD",
+      apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGX",
       authDomain: "chess-7df7a.firebaseapp.com",
       databaseURL: "https://chess-7df7a-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "chess-7df7a",
@@ -712,7 +712,6 @@
       list.innerHTML = count > 0 ? html : '<div style="color: var(--text-muted); font-size: 0.85rem;">No pending requests.</div>';
     }
 
-    // FIXED: Atomic friend request acceptance
     function acceptRequest(reqId, fromUid, fromName) {
       const updates = {};
       updates['friends/' + currentUser.uid + '/' + fromUid] = { username: fromName, ts: Date.now() };
@@ -807,16 +806,14 @@
       removeHighlights();
 
       const config = {
-        draggable: false, // Click to move strictly enabled
+        draggable: false,
         position: game ? game.fen() : 'start',
         orientation: orientation,
-        // Guaranteed working piece CDN
         pieceTheme: 'https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/img/chesspieces/wikipedia/{piece}.png'
       };
 
       board = Chessboard('board', config);
 
-      // Trigger automatic layout fix and click listeners
       setTimeout(() => {
         if (board) {
           board.resize();
@@ -840,7 +837,6 @@
     function handleSquareClick(square) {
       if (!game || game.game_over()) return;
 
-      // Restrict move if not your turn in Online mode
       if (gameMode === 'online') {
         if ((game.turn() === 'w' && playerColor !== 'w') || (game.turn() === 'b' && playerColor !== 'b')) {
           return;
@@ -850,7 +846,6 @@
       }
 
       if (selectedSquare === null) {
-        // Select square if it contains a piece belonging to active player
         const piece = game.get(square);
         if (piece && piece.color === game.turn()) {
           selectedSquare = square;
@@ -858,7 +853,6 @@
           highlightLegalMoves(square);
         }
       } else {
-        // Attempt to execute move
         const move = game.move({
           from: selectedSquare,
           to: square,
@@ -871,7 +865,6 @@
           updateBoardUI();
           onMoveExecuted(move);
         } else {
-          // Re-select if clicking another piece of same color
           const piece = game.get(square);
           if (piece && piece.color === game.turn()) {
             selectedSquare = square;
@@ -989,17 +982,15 @@
 
       let chosenMove;
       if (botDifficulty === 1) {
-        // Random moves
         chosenMove = moves[Math.floor(Math.random() * moves.length)];
       } else {
-        // Simple Minimax Evaluation
         let bestScore = -Infinity;
         let bestMove = moves[0];
 
         for (let i = 0; i < moves.length; i++) {
           game.move(moves[i]);
           let score = evaluateBoard(game.board());
-          if (botDifficulty === 3) score += (Math.random() * 0.2); // subtle variation
+          if (botDifficulty === 3) score += (Math.random() * 0.2);
           game.undo();
 
           if (score > bestScore) {
@@ -1135,7 +1126,6 @@
         document.getElementById('top-player-name').innerText = (playerColor === 'w' ? data.blackName : data.whiteName) || "Opponent";
         document.getElementById('bottom-player-name').innerText = currentProfile.username + " (" + (playerColor==='w'?'White':'Black') + ")";
 
-        // Handle draw overlay
         if (data.drawOffer && data.drawOffer !== playerColor) {
           document.getElementById('draw-overlay').classList.add('active');
         } else {
@@ -1186,7 +1176,6 @@
       }
     }
 
-    // Helper Utility
     function escapeHtml(str) {
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }

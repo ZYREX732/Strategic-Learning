@@ -122,8 +122,18 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
+  <!-- MAINTENANCE SCREEN OVERLAY (FOR NON-ADMIN USERS WHEN SUSPENDED) -->
+  <div id="maintenance-screen" class="hidden fixed inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-6 text-center">
+    <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 max-w-md w-full shadow-2xl space-y-4">
+      <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-3xl">🛠️</div>
+      <h2 class="text-2xl font-bold text-white">System Under Maintenance</h2>
+      <p class="text-sm text-slate-400">CogniLearn is currently undergoing scheduled platform upgrades and updates. Access is temporarily suspended for students.</p>
+      <div class="text-xs text-indigo-400 font-mono bg-slate-950 p-2 rounded border border-slate-800">Please check back in a few minutes.</div>
+    </div>
+  </div>
+
   <!-- TOP HEADER / DISGUISED NAVIGATION -->
-  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
       <!-- LOGO / BRANDING -->
@@ -148,6 +158,8 @@
           Classmates
           <span id="friend-badge" class="hidden absolute -top-1 -right-1 bg-indigo-500 text-white text-xs px-1.5 py-0.5 rounded-full">0</span>
         </button>
+        <!-- EXCLUSIVE ADMIN TAB -->
+        <button onclick="switchTab('admin')" id="tab-admin" class="hidden nav-btn px-4 py-2 text-sm font-bold rounded-md text-amber-400 hover:text-white hover:bg-amber-900/50 border border-amber-600/50 transition">⚡ Admin Panel</button>
       </nav>
 
       <!-- USER PROFILE & ELO DISPLAY -->
@@ -171,12 +183,12 @@
     <!-- AUTH SECTION (LOGIN / REGISTER) -->
     <div id="auth-container" class="max-w-md mx-auto bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl mt-8">
       <h2 class="text-2xl font-bold text-center text-indigo-400 mb-2">Student Access Portal</h2>
-      <p class="text-slate-400 text-sm text-center mb-6">Enter your username and security code to access learning modules.</p>
+      <p class="text-slate-400 text-sm text-center mb-6">Enter your username or email code to access modules.</p>
       
       <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Username</label>
-          <input type="text" id="auth-username" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="e.g. Alex2025">
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Username or Email</label>
+          <input type="text" id="auth-username" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="e.g. Alex2025 or ZYREX">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
@@ -224,11 +236,11 @@
           </div>
         </div>
 
-        <!-- TOP STUDENTS LEADERBOARD -->
+        <!-- TOP STUDENTS LEADERBOARD (FIXED NUMERICAL SORTING) -->
         <div class="bg-slate-800 rounded-xl border border-slate-700 p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-bold text-white flex items-center gap-2">🏆 Top Students Leaderboard</h3>
-            <span class="text-xs text-slate-400">Live Rating Rankings</span>
+            <span class="text-xs text-slate-400">Live Numerical Rankings</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-300">
@@ -326,6 +338,46 @@
         </div>
       </div>
 
+      <!-- EXCLUSIVE ADMIN PANEL TAB -->
+      <div id="view-admin" class="view-content hidden space-y-6">
+        <div class="bg-amber-950/40 border border-amber-600/50 p-6 rounded-xl flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-amber-400">⚡ Master Control Panel</h2>
+            <p class="text-xs text-amber-200">Authorized Access Only: ZYREX (zainisgo123@gmail.com)</p>
+          </div>
+          <button onclick="purgeHackedAccounts()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-lg">🧹 Purge Hacked Accounts (>3000 Elo)</button>
+        </div>
+
+        <!-- MAINTENANCE SUSPENSION TOGGLE -->
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-white mb-1">System Suspension / Maintenance Mode</h3>
+            <p class="text-xs text-slate-400">Lock all non-admin students out with a maintenance screen while making changes.</p>
+          </div>
+          <button id="admin-maintenance-btn" onclick="toggleMaintenanceMode()" class="bg-slate-700 text-slate-300 font-bold px-6 py-3 rounded-lg border border-slate-600 transition">Loading Status...</button>
+        </div>
+
+        <!-- ALL REGISTERED USERS TABLE -->
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <h3 class="text-lg font-bold text-white">Registered Users & Ratings Control</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="bg-slate-900/50 text-xs uppercase text-slate-400">
+                <tr>
+                  <th class="py-3 px-4">Username</th>
+                  <th class="py-3 px-4">UID</th>
+                  <th class="py-3 px-4">Rating (Elo)</th>
+                  <th class="py-3 px-4 text-right">Admin Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-user-table" class="divide-y divide-slate-700/50">
+                <tr><td colspan="4" class="py-4 text-center text-slate-500">Loading user database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- GAME BOARD CONTAINER (SHARED FOR BOT & MULTIPLAYER) -->
       <div id="view-game" class="view-content hidden">
         <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-6">
@@ -399,7 +451,7 @@
                 <button onclick="startBotMatch(currentBotLevel)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded-lg text-sm transition">Restart Practice</button>
               </div>
 
-              <!-- ONLINE MULTIPLAYER CONTROLS (NO NEW GAME BUTTON TO PREVENT RAGE-RESET) -->
+              <!-- ONLINE MULTIPLAYER CONTROLS -->
               <div id="online-controls" class="hidden space-y-2">
                 <button onclick="offerDraw()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold py-2 rounded-lg text-sm transition">Offer Draw</button>
                 <button onclick="resignMatch()" class="w-full bg-rose-900/50 hover:bg-rose-800 text-rose-200 border border-rose-700 font-semibold py-2 rounded-lg text-sm transition">Resign Game</button>
@@ -496,6 +548,8 @@
     // ==========================================
     let currentUser = null;
     let userProfile = null;
+    let isUserAdmin = false;
+    let isMaintenanceActive = false;
 
     let game = new Chess();
     let board = null;
@@ -521,6 +575,21 @@
       return `https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/${piece}.png`;
     }
 
+    // System Maintenance Listener
+    db.ref('system/maintenance').on('value', snapshot => {
+      isMaintenanceActive = !!snapshot.val();
+      checkMaintenanceLock();
+      updateAdminMaintenanceBtnUI();
+    });
+
+    function checkMaintenanceLock() {
+      if (isMaintenanceActive && !isUserAdmin) {
+        $('#maintenance-screen').removeClass('hidden');
+      } else {
+        $('#maintenance-screen').addClass('hidden');
+      }
+    }
+
     // ==========================================
     // 3. AUTHENTICATION & USER MANAGEMENT
     // ==========================================
@@ -531,22 +600,25 @@
       } else {
         currentUser = null;
         userProfile = null;
+        isUserAdmin = false;
         $('#auth-loading').addClass('hidden');
         $('#user-info').addClass('hidden');
         $('#auth-container').removeClass('hidden');
         $('#app-view').addClass('hidden');
+        $('#tab-admin').addClass('hidden');
       }
     });
 
     async function handleAuth(e) {
       e.preventDefault();
-      const username = $('#auth-username').val().trim();
+      const userInput = $('#auth-username').val().trim();
       const password = $('#auth-password').val().trim();
       $('#auth-error').addClass('hidden');
 
-      if (!username || !password) return;
+      if (!userInput || !password) return;
 
-      const email = `${username.toLowerCase()}@cognilearn.internal`;
+      // Allow login via direct email (zainisgo123@gmail.com) or username
+      let email = userInput.includes('@') ? userInput : `${userInput.toLowerCase()}@cognilearn.internal`;
 
       try {
         await auth.signInWithEmailAndPassword(email, password);
@@ -554,8 +626,9 @@
         if (err.code === 'auth/user-not-found') {
           try {
             const userCred = await auth.createUserWithEmailAndPassword(email, password);
+            const usernameToSave = userInput.includes('@') ? 'ZYREX' : userInput;
             await db.ref(`users/${userCred.user.uid}`).set({
-              username: username,
+              username: usernameToSave,
               elo: 500,
               createdAt: firebase.database.ServerValue.TIMESTAMP
             });
@@ -575,7 +648,18 @@
     function loadUserProfile(uid) {
       db.ref(`users/${uid}`).on('value', snapshot => {
         userProfile = snapshot.val() || {};
-        if (!userProfile.elo) userProfile.elo = 500;
+        userProfile.elo = parseInt(userProfile.elo, 10) || 500;
+
+        // Check Admin Privileges
+        isUserAdmin = (currentUser.email === 'zainisgo123@gmail.com' || userProfile.username === 'ZYREX');
+        if (isUserAdmin) {
+          $('#tab-admin').removeClass('hidden');
+          loadAdminUserList();
+        } else {
+          $('#tab-admin').addClass('hidden');
+        }
+
+        checkMaintenanceLock();
 
         $('#header-username').text(userProfile.username || 'Student');
         $('#dash-username').text(userProfile.username || 'Student');
@@ -691,9 +775,6 @@
     }
 
     function updateTimerUI() {
-      const topTimer = myColor === 'w' ? $('#top-timer') : $('#bottom-timer');
-      const bottomTimer = myColor === 'w' ? $('#bottom-timer') : $('#top-timer');
-
       const whiteTimerBadge = myColor === 'w' ? $('#bottom-timer') : $('#top-timer');
       const blackTimerBadge = myColor === 'w' ? $('#top-timer') : $('#bottom-timer');
 
@@ -739,12 +820,10 @@
     function onSquareClick(square) {
       if (game.game_over()) return;
 
-      // In Online mode, ensure it's your turn
       if (gameMode === 'online' && game.turn() !== myColor) return;
 
       const piece = game.get(square);
 
-      // 1. SELECT PIECE
       if (selectedSquare === null) {
         if (piece && piece.color === game.turn()) {
           selectedSquare = square;
@@ -753,7 +832,6 @@
         return;
       }
 
-      // 2. DESELECT OR SWITCH SELECTION
       if (selectedSquare === square) {
         selectedSquare = null;
         removeHighlights();
@@ -766,12 +844,10 @@
         return;
       }
 
-      // 3. ATTEMPT MOVE
       const moves = game.moves({ square: selectedSquare, verbose: true });
       const validMove = moves.find(m => m.to === square);
 
       if (validMove) {
-        // PAWN PROMOTION CHECK
         if (validMove.promotion) {
           pendingPromotion = { from: selectedSquare, to: square };
           showPromotionModal();
@@ -821,7 +897,6 @@
         return;
       }
 
-      // Sync or trigger Bot
       if (gameMode === 'bot') {
         updateStatus();
         startTimer();
@@ -883,14 +958,12 @@
       let capturedByBlackHtml = '';
 
       ['p', 'n', 'b', 'r', 'q'].forEach(type => {
-        // Black pieces captured by White
         const capturedB = currentCounts['b'][type];
         for (let i = 0; i < capturedB; i++) {
           capturedByWhiteHtml += `<img src="${getPieceImgUrl('b' + type.toUpperCase())}" class="captured-piece-img">`;
           whiteScore += pieceValues[type];
         }
 
-        // White pieces captured by Black
         const capturedW = currentCounts['w'][type];
         for (let i = 0; i < capturedW; i++) {
           capturedByBlackHtml += `<img src="${getPieceImgUrl('w' + type.toUpperCase())}" class="captured-piece-img">`;
@@ -973,23 +1046,21 @@
 
       let score = isDraw ? 0.5 : (isWin ? 1 : 0);
 
-      // Bot Ratings
       const botRatings = { 1: 300, 2: 800, 3: 1500 };
       let oppRating = 500;
 
       if (gameMode === 'bot') {
         oppRating = botRatings[currentBotLevel];
       } else if (gameMode === 'online') {
-        oppRating = parseInt($('#opp-elo-text').text().replace(/\D/g, '')) || 500;
+        oppRating = parseInt($('#opp-elo-text').text().replace(/\D/g, ''), 10) || 500;
       }
 
-      const currentElo = userProfile.elo || 500;
+      const currentElo = parseInt(userProfile.elo, 10) || 500;
       const { newRating, change } = calculateEloChange(currentElo, oppRating, score);
 
-      // Save updated Elo
-      db.ref(`users/${currentUser.uid}`).update({ elo: newRating });
+      // Save parsed numerical Elo
+      db.ref(`users/${currentUser.uid}`).update({ elo: parseInt(newRating, 10) });
 
-      // Display Modal Overlay
       $('#modal-title').text(isDraw ? 'Game Drawn' : (isWin ? 'Victory!' : 'Defeat'));
       $('#modal-icon').text(isDraw ? '🤝' : (isWin ? '🏆' : '💔'));
       
@@ -1097,7 +1168,6 @@
       let moves = game.moves({ verbose: true });
       if (moves.length === 0) return null;
 
-      // 20% Blunder Chance on Level 2
       if (currentBotLevel === 2 && Math.random() < 0.20) {
         return moves[Math.floor(Math.random() * moves.length)];
       }
@@ -1163,7 +1233,7 @@
           if (p) {
             let val = pieceValues[p.type] || 0;
             if (p.color === 'b') {
-              totalEval += val; // AI is Black
+              totalEval += val;
             } else {
               totalEval -= val;
             }
@@ -1243,7 +1313,6 @@
         const data = snapshot.val();
         if (!data) return;
 
-        // Sync Opponent Card
         if (myColor === 'w') {
           if (data.guest) {
             $('#opp-name').text(data.guest.username);
@@ -1258,7 +1327,6 @@
           $('#your-name').text(data.guest ? data.guest.username : 'You');
         }
 
-        // Sync Board Position
         if (data.fen && data.fen !== game.fen()) {
           game.load(data.fen);
           board.position(game.fen(), true);
@@ -1272,12 +1340,10 @@
           }
         }
 
-        // Sync Clocks
         if (data.whiteTime !== undefined) whiteTime = data.whiteTime;
         if (data.blackTime !== undefined) blackTime = data.blackTime;
         updateTimerUI();
 
-        // Handle Resignations / Draw offers
         if (data.status === 'resigned') {
           stopTimer();
           const winner = data.resignedBy === 'w' ? 'b' : 'w';
@@ -1407,7 +1473,7 @@
 
             db.ref(`users/${fUid}`).once('value', userSnap => {
               const uData = userSnap.val() || {};
-              const friendElo = uData.elo || 500;
+              const friendElo = parseInt(uData.elo, 10) || 500;
 
               const friendCard = `
                 <div class="flex items-center justify-between bg-slate-900 p-3 rounded-lg border border-slate-700">
@@ -1450,25 +1516,34 @@
     }
 
     // ==========================================
-    // 13. TOP STUDENTS LEADERBOARD
+    // 13. TOP STUDENTS LEADERBOARD (NUMERICAL SORT)
     // ==========================================
     function loadLeaderboard() {
-      db.ref('users').orderByChild('elo').limitToLast(10).on('value', snapshot => {
+      db.ref('users').once('value', snapshot => {
         let players = [];
         snapshot.forEach(child => {
-          players.push({ uid: child.key, ...child.val() });
+          const val = child.val();
+          if (val && val.username) {
+            players.push({
+              uid: child.key,
+              username: val.username,
+              elo: parseInt(val.elo, 10) || 500
+            });
+          }
         });
 
-        players.reverse(); // Highest Elo top
+        // Strict Numerical Sort Descending (Highest Elo at the top)
+        players.sort((a, b) => b.elo - a.elo);
+        const topPlayers = players.slice(0, 10);
 
         let html = '';
-        players.forEach((p, idx) => {
+        topPlayers.forEach((p, idx) => {
           let rankBadge = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx + 1}`));
           html += `
             <tr class="hover:bg-slate-800/50 transition">
               <td class="py-3 px-4 font-bold text-slate-300">${rankBadge}</td>
               <td class="py-3 px-4 font-semibold ${p.uid === currentUser.uid ? 'text-indigo-400' : 'text-slate-200'}">${p.username} ${p.uid === currentUser.uid ? '(You)' : ''}</td>
-              <td class="py-3 px-4 font-mono font-bold text-emerald-400">${p.elo || 500}</td>
+              <td class="py-3 px-4 font-mono font-bold text-emerald-400">${p.elo}</td>
               <td class="py-3 px-4 text-xs text-slate-400">Active Student</td>
             </tr>
           `;
@@ -1477,7 +1552,83 @@
         $('#leaderboard-body').html(html || '<tr><td colspan="4" class="py-4 text-center text-slate-500">No rankings available yet.</td></tr>');
       });
     }
+
+    // ==========================================
+    // 14. ADMIN PANEL FUNCTIONS (ZYREX ONLY)
+    // ==========================================
+    function loadAdminUserList() {
+      db.ref('users').on('value', snapshot => {
+        let html = '';
+        snapshot.forEach(child => {
+          const u = child.val();
+          const uid = child.key;
+          const uElo = parseInt(u.elo, 10) || 500;
+
+          html += `
+            <tr class="hover:bg-slate-800/50 transition">
+              <td class="py-3 px-4 font-bold ${uElo > 3000 ? 'text-rose-400' : 'text-slate-200'}">${u.username || 'N/A'}</td>
+              <td class="py-3 px-4 text-xs font-mono text-slate-500">${uid}</td>
+              <td class="py-3 px-4 font-mono font-bold ${uElo > 3000 ? 'text-rose-400' : 'text-amber-400'}">${uElo}</td>
+              <td class="py-3 px-4 text-right space-x-2">
+                <button onclick="adminResetElo('${uid}')" class="bg-amber-600/30 hover:bg-amber-600 text-amber-200 text-xs px-2.5 py-1 rounded border border-amber-600/50 transition">Reset to 500</button>
+                <button onclick="adminDeleteUser('${uid}', '${u.username}')" class="bg-rose-900/50 hover:bg-rose-700 text-rose-200 text-xs px-2.5 py-1 rounded border border-rose-700 transition">Delete Profile</button>
+              </td>
+            </tr>
+          `;
+        });
+
+        $('#admin-user-table').html(html || '<tr><td colspan="4" class="py-4 text-center text-slate-500">No registered users found.</td></tr>');
+      });
+    }
+
+    function toggleMaintenanceMode() {
+      if (!isUserAdmin) return;
+      const newState = !isMaintenanceActive;
+      db.ref('system/maintenance').set(newState);
+    }
+
+    function updateAdminMaintenanceBtnUI() {
+      const btn = $('#admin-maintenance-btn');
+      if (isMaintenanceActive) {
+        btn.text('⚠️ MAINTENANCE MODE ACTIVE (System Locked)')
+           .attr('class', 'bg-rose-600 hover:bg-rose-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg border border-rose-400 transition');
+      } else {
+        btn.text('✅ LIVE MODE (App Available to All)')
+           .attr('class', 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg border border-emerald-400 transition');
+      }
+    }
+
+    function adminResetElo(uid) {
+      if (!isUserAdmin) return;
+      db.ref(`users/${uid}`).update({ elo: 500 });
+      alert('User Elo reset to 500.');
+    }
+
+    function adminDeleteUser(uid, username) {
+      if (!isUserAdmin) return;
+      if (confirm(`Are you sure you want to delete profile for user "${username}"?`)) {
+        db.ref(`users/${uid}`).remove();
+        alert(`User profile ${username} deleted.`);
+      }
+    }
+
+    function purgeHackedAccounts() {
+      if (!isUserAdmin) return;
+      if (confirm('Scan and delete all accounts with Elo > 3000?')) {
+        db.ref('users').once('value', snapshot => {
+          let count = 0;
+          snapshot.forEach(child => {
+            const u = child.val();
+            const uElo = parseInt(u.elo, 10) || 500;
+            if (uElo > 3000) {
+              db.ref(`users/${child.key}`).remove();
+              count++;
+            }
+          });
+          alert(`Purged ${count} hacked user profile(s).`);
+        });
+      }
+    }
   </script>
 </body>
 </html>
-```

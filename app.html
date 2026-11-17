@@ -129,7 +129,6 @@
 
     /* Cards & Grids */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 
     .card {
       background: var(--bg-card);
@@ -209,6 +208,7 @@
     #board {
       width: 100%;
       max-width: 480px;
+      min-height: 320px;
       aspect-ratio: 1;
       margin: 0 auto;
     }
@@ -459,7 +459,7 @@
           <!-- Opponent Profile Card -->
           <div class="player-card">
             <span id="top-player-name" style="font-weight: 600;">Opponent</span>
-            <span id="top-player-status" class="user-pill" style="font-size:0.8rem; padding: 4px 10px;">Thinking</span>
+            <span id="top-player-status" class="user-pill" style="font-size:0.8rem; padding: 4px 10px;">Active</span>
           </div>
 
           <!-- Chessboard -->
@@ -523,9 +523,9 @@
     // --- GLOBAL GAME STATE ---
     let currentUser = null;
     let currentProfile = null;
-    let gameMode = 'bot'; // 'bot' or 'online'
-    let game = null; // Chess.js instance
-    let board = null; // Chessboard.js instance
+    let gameMode = 'bot';
+    let game = null;
+    let board = null;
     let playerColor = 'w';
     let botDifficulty = 2;
     let currentOnlineCode = null;
@@ -623,7 +623,6 @@
         document.querySelectorAll('.tab-btn')[tabs[tabId]].classList.add('active');
       }
 
-      // Handle Board Auto-Resize on View Switch
       if (tabId === 'game' && board) {
         setTimeout(() => {
           board.resize();
@@ -635,13 +634,11 @@
 
     // --- FRIENDS & REQUESTS SYSTEM ---
     function listenUserData() {
-      // Listen for incoming requests
       db.ref('requests').on('value', snap => {
         const requests = snap.val() || {};
         renderRequests(requests);
       });
 
-      // Listen for friends list
       db.ref('friends/' + currentUser.uid).on('value', snap => {
         const friends = snap.val() || {};
         renderFriends(friends);
@@ -721,7 +718,6 @@
       db.ref().update(updates).then(() => {
         console.log("Friend request accepted successfully");
       }).catch(err => {
-        console.error("Error accepting request:", err);
         alert("Error accepting request: " + err.message);
       });
     }
@@ -796,12 +792,13 @@
       joinOnlineGameWithCode(gameCode);
     }
 
-    // --- CHESS BOARD INITIALIZATION & CLICK HANDLERS ---
+    // --- CHESS BOARD INITIALIZATION ---
     function initBoard(orientation = 'white') {
       if (board) {
         try { board.destroy(); } catch(e){}
         board = null;
       }
+      $('#board').empty();
       selectedSquare = null;
       removeHighlights();
 
@@ -809,7 +806,10 @@
         draggable: false,
         position: game ? game.fen() : 'start',
         orientation: orientation,
-        pieceTheme: 'https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/img/chesspieces/wikipedia/{piece}.png'
+        // Guaranteed working jsDelivr piece theme
+        pieceTheme: function(piece) {
+          return 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/' + piece + '.png';
+        }
       };
 
       board = Chessboard('board', config);
@@ -820,7 +820,7 @@
           if (game) board.position(game.fen());
         }
         attachBoardClickHandlers();
-      }, 100);
+      }, 120);
     }
 
     function attachBoardClickHandlers() {

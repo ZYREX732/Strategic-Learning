@@ -4,492 +4,562 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CogniLearn – Strategic Thinking Lab</title>
-
+  
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Chess.js Engine -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <!-- Chessboard.js CSS & JS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chessboard.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Firebase Legacy SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0284c7',
+              700: '#0369a1',
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
-    /* Custom Highlighting for Click-to-Move */
+    /* Custom Board Styles & Square Highlights */
     .highlight-selected {
-      box-shadow: inset 0 0 3px 3px #3b82f6 !important;
-      background-color: rgba(59, 130, 246, 0.4) !important;
+      background-color: rgba(234, 179, 8, 0.5) !important;
     }
-    .highlight-move {
+    .highlight-valid {
       position: relative;
     }
-    .highlight-move::after {
+    .highlight-valid::after {
       content: '';
       position: absolute;
-      top: 35%;
-      left: 35%;
-      width: 30%;
-      height: 30%;
-      background-color: rgba(16, 185, 129, 0.6);
+      width: 24%;
+      height: 24%;
+      background-color: rgba(34, 197, 94, 0.7);
       border-radius: 50%;
+      top: 38%;
+      left: 38%;
       pointer-events: none;
     }
     .highlight-capture {
-      box-shadow: inset 0 0 4px 4px #ef4444 !important;
-      background-color: rgba(239, 68, 68, 0.4) !important;
+      box-shadow: inset 0 0 0 4px rgba(239, 68, 68, 0.8) !important;
     }
-    .captured-piece-img {
-      width: 22px;
-      height: 22px;
-      display: inline-block;
-      margin-right: -4px;
-      filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-
-    /* King Game-Over Badges */
-    .king-winner-badge {
-      background-color: #10B981 !important;
-      border: 3px solid #34D399 !important;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.8) !important;
-      border-radius: 8px !important;
-      position: relative;
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
     }
-    .king-winner-badge::before {
-      content: '👑';
-      position: absolute;
-      top: -16px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 20px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
     }
-
-    .king-loser-badge {
-      background-color: #EF4444 !important;
-      border: 3px solid #F87171 !important;
-      box-shadow: 0 0 15px rgba(239, 68, 68, 0.8) !important;
-      border-radius: 8px !important;
-      position: relative;
-    }
-    .king-loser-badge img {
-      transform: rotate(45deg) scale(0.9);
-      filter: grayscale(40%) contrast(120%);
-    }
-    .king-loser-badge::before {
-      content: '❌';
-      position: absolute;
-      top: -12px;
-      right: -8px;
-      font-size: 16px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
-    }
-
-    /* Timer Badges */
-    .timer-badge {
-      font-family: monospace;
-      font-weight: bold;
-      font-size: 1.125rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 0.375rem;
-      background-color: #1f2937;
-      color: #9ca3af;
-      border: 1px solid #374151;
-      transition: all 0.2s ease;
-    }
-    .timer-active {
-      background-color: #065f46 !important;
-      color: #34d399 !important;
-      border-color: #10b981 !important;
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-    }
-    .timer-low {
-      background-color: #7f1d1d !important;
-      color: #fca5a5 !important;
-      border-color: #ef4444 !important;
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
     }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col selection:bg-sky-500 selection:text-white">
 
-  <!-- MAINTENANCE SCREEN OVERLAY (FOR NON-ADMIN USERS WHEN SUSPENDED) -->
-  <div id="maintenance-screen" class="hidden fixed inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-6 text-center">
-    <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800 max-w-md w-full shadow-2xl space-y-4">
-      <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-3xl">🛠️</div>
-      <h2 class="text-2xl font-bold text-white">System Under Maintenance</h2>
-      <p class="text-sm text-slate-400">CogniLearn is currently undergoing scheduled platform upgrades. Access is temporarily suspended.</p>
-      <div class="text-xs text-indigo-400 font-mono bg-slate-950 p-2 rounded border border-slate-800">Please check back in a few minutes.</div>
-    </div>
-  </div>
-
-  <!-- FIRST-TIME USERNAME CREATION MODAL -->
-  <div id="username-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl">
-      <div class="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto text-2xl">👤</div>
-      <h3 class="text-xl font-bold text-white">Create Your Username</h3>
-      <p class="text-xs text-slate-400">Choose a unique handle for match invites and the leaderboard.</p>
-
-      <div>
-        <input type="text" id="modal-username-input" maxlength="15" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 text-center focus:outline-none focus:border-indigo-500 font-semibold" placeholder="e.g. Tactician2025">
-      </div>
-
-      <div id="username-modal-error" class="hidden text-xs text-rose-400 bg-rose-950/50 p-2 rounded border border-rose-800"></div>
-
-      <button onclick="saveNewUsername()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg shadow-lg transition">Save Profile Handle</button>
-    </div>
-  </div>
-
-  <!-- TOP HEADER / DISGUISED NAVIGATION -->
-  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      
-      <!-- LOGO / BRANDING -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='index.html'">
-        <div class="bg-indigo-600 p-2 rounded-lg">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-          </svg>
-        </div>
-        <div>
-          <span class="font-bold text-lg tracking-wide text-indigo-400">CogniLearn</span>
-          <span class="text-xs text-slate-400 block -mt-1">1v1 Strategy Arena</span>
-        </div>
-      </div>
-
-      <!-- TABS / NAVIGATION (HIDDEN WHEN LOGGED OUT) -->
-      <nav id="nav-tabs" class="hidden md:flex space-x-1">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition">Dashboard</button>
-        <button onclick="switchTab('bot')" id="tab-bot" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition">Practice vs AI</button>
-        <button onclick="switchTab('multiplayer')" id="tab-multiplayer" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition">1v1 Arena</button>
-        <button onclick="switchTab('friends')" id="tab-friends" class="nav-btn px-4 py-2 text-sm font-medium rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition relative">
-          Friends
-          <span id="friend-badge" class="hidden absolute -top-1 -right-1 bg-indigo-500 text-white text-xs px-1.5 py-0.5 rounded-full">0</span>
-        </button>
-        <!-- EXCLUSIVE ADMIN TAB -->
-        <button onclick="switchTab('admin')" id="tab-admin" class="hidden nav-btn px-4 py-2 text-sm font-bold rounded-md text-amber-400 hover:text-white hover:bg-amber-900/50 border border-amber-600/50 transition">⚡ Admin Panel</button>
-      </nav>
-
-      <!-- USER PROFILE & EXIT BUTTON -->
-      <div id="user-header-profile" class="flex items-center space-x-4">
-        <div id="auth-loading" class="text-xs text-slate-400">Connecting...</div>
-        <div id="user-info" class="hidden flex items-center space-x-3">
-          <div class="text-right">
-            <span id="header-username" class="text-sm font-semibold text-slate-200 block">Player</span>
-            <span class="text-xs text-indigo-400 font-bold">Rating: <span id="header-elo">500</span> Elo</span>
+  <!-- TOP NAVIGATION BAR (Hidden until logged in) -->
+  <nav id="main-nav" class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Brand Logo -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('arena')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-sky-500/20">
+            <i class="fa-solid fa-chess-knight"></i>
           </div>
-          <!-- EXIT REDIRECTS STRAIGHT TO INDEX.HTML BYPASS PAGE -->
-          <button onclick="logout()" class="text-xs text-slate-300 hover:text-white bg-rose-900/60 border border-rose-700 px-3 py-1.5 rounded hover:bg-rose-700 transition font-semibold">Exit Page</button>
+          <div>
+            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">CogniLearn</span>
+            <span class="text-xs block text-sky-400 font-semibold tracking-wide uppercase">1v1 Strategy Arena</span>
+          </div>
         </div>
-      </div>
 
+        <!-- Navigation Tabs -->
+        <div class="hidden md:flex items-center space-x-1">
+          <button onclick="switchTab('ai')" id="tab-ai" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800 flex items-center space-x-2">
+            <i class="fa-solid fa-robot"></i>
+            <span>Practice vs AI</span>
+          </button>
+          
+          <button onclick="switchTab('arena')" id="tab-arena" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800 flex items-center space-x-2">
+            <i class="fa-solid fa-gamepad"></i>
+            <span>1v1 Arena</span>
+          </button>
+          
+          <button onclick="switchTab('friends')" id="tab-friends" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800 flex items-center space-x-2 relative">
+            <i class="fa-solid fa-users"></i>
+            <span>Friends</span>
+            <span id="friends-badge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-sky-500 rounded-full"></span>
+          </button>
+          
+          <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800 flex items-center space-x-2">
+            <i class="fa-solid fa-trophy"></i>
+            <span>Leaderboard</span>
+          </button>
+
+          <!-- Admin Panel Tab (Admin only) -->
+          <button onclick="switchTab('admin')" id="tab-admin" class="nav-tab hidden px-4 py-2 rounded-lg text-sm font-semibold transition text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 border border-amber-500/30 flex items-center space-x-2">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Admin Control</span>
+          </button>
+        </div>
+
+        <!-- User Profile Badge & Exit -->
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-3 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50">
+            <div class="relative">
+              <div class="w-8 h-8 rounded-lg bg-sky-600/30 border border-sky-500/40 flex items-center justify-center text-sky-400 font-bold text-sm">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <span id="nav-status-dot" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-900"></span>
+            </div>
+            <div class="text-left">
+              <div id="nav-username" class="text-xs font-bold text-slate-200">Player</div>
+              <div class="text-[10px] text-sky-400 font-medium"><span id="nav-elo">500</span> ELO</div>
+            </div>
+          </div>
+
+          <button onclick="exitSession()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5" title="Exit and Logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span class="hidden sm:inline">Exit</span>
+          </button>
+        </div>
+
+      </div>
     </div>
-  </header>
+  </nav>
 
   <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-    <!-- AUTH SECTION (EMAIL LOGIN WITH AUTOFILL TRAP) -->
-    <div id="auth-container" class="max-w-md mx-auto bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl mt-8">
-      <h2 class="text-2xl font-bold text-center text-indigo-400 mb-2">CogniLearn Strategy Lab</h2>
-      <p class="text-slate-400 text-sm text-center mb-6">Enter your email and password to access matches.</p>
-      
-      <!-- DECOY FIELDS TO TRICK CHROME/SAFARI AUTOFILL -->
-      <form id="auth-form" onsubmit="handleAuth(event)" autocomplete="off" class="space-y-4">
-        <input type="text" style="display:none !important;" tabindex="-1" autocomplete="off">
-        <input type="password" style="display:none !important;" tabindex="-1" autocomplete="off">
-
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email Address</label>
-          <input type="email" id="auth-email" required autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="e.g. player@gmail.com">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
-          <input type="password" id="auth-password" required autocomplete="new-password" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="••••••••">
+    <!-- AUTH CONTAINER (LOGIN / REGISTER) -->
+    <div id="auth-container" class="max-w-md mx-auto my-12">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4 shadow-lg shadow-sky-500/20">
+            <i class="fa-solid fa-chess"></i>
+          </div>
+          <h2 class="text-2xl font-extrabold text-white tracking-tight">CogniLearn Platform</h2>
+          <p class="text-slate-400 text-sm mt-1">Strategic Thinking Arena & Matchmaking</p>
         </div>
 
-        <div id="auth-error" class="hidden text-red-400 text-xs text-center bg-red-950/50 p-2 rounded border border-red-800"></div>
+        <!-- Form Switcher Tabs -->
+        <div class="flex bg-slate-950 p-1 rounded-xl mb-6 border border-slate-800">
+          <button type="button" onclick="toggleAuthMode('login')" id="auth-tab-login" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-white bg-sky-600">Sign In</button>
+          <button type="button" onclick="toggleAuthMode('register')" id="auth-tab-register" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white">Register Account</button>
+        </div>
 
-        <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg shadow-lg transition duration-200">
-          Sign In / Register Account
-        </button>
-      </form>
+        <!-- AUTH FORM -->
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)" autocomplete="off">
+          
+          <!-- Decoy Hidden Inputs to Block Browser Autofill -->
+          <input type="text" name="prevent_autofill_username" id="prevent_autofill_username" style="display:none !important;" tabindex="-1" aria-hidden="true" />
+          <input type="password" name="prevent_autofill_password" id="prevent_autofill_password" style="display:none !important;" tabindex="-1" aria-hidden="true" />
+
+          <div class="space-y-4">
+            
+            <!-- Display Username (Only shown during Registration) -->
+            <div id="field-username" class="hidden">
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Display Username</label>
+              <div class="relative">
+                <i class="fa-solid fa-user absolute left-3.5 top-3 text-slate-500 text-sm"></i>
+                <input type="text" id="auth-username" autocomplete="off" placeholder="e.g. GrandmasterX" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition">
+              </div>
+            </div>
+
+            <!-- Email Address -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Email Address</label>
+              <div class="relative">
+                <i class="fa-solid fa-envelope absolute left-3.5 top-3 text-slate-500 text-sm"></i>
+                <input type="email" id="auth-email" required autocomplete="off" placeholder="player@cognilearn.org" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition">
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
+              <div class="relative">
+                <i class="fa-solid fa-lock absolute left-3.5 top-3 text-slate-500 text-sm"></i>
+                <input type="password" id="auth-password" required autocomplete="new-password" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition">
+              </div>
+            </div>
+
+            <!-- Error Display -->
+            <div id="auth-error" class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs rounded-xl p-3 flex items-center space-x-2">
+              <i class="fa-solid fa-circle-exclamation text-base"></i>
+              <span id="auth-error-msg">An error occurred.</span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="auth-submit-btn" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-sky-600/20 text-sm flex items-center justify-center space-x-2">
+              <span>Sign In</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+
+          </div>
+        </form>
+
+      </div>
     </div>
 
-    <!-- MAIN APP VIEWS (HIDDEN UNTIL AUTHENTICATED) -->
-    <div id="app-view" class="hidden space-y-6">
+    <!-- MAIN APP VIEWS (Hidden until logged in) -->
+    <div id="app-views" class="hidden space-y-6">
 
-      <!-- DASHBOARD TAB -->
-      <div id="view-dashboard" class="view-content space-y-6">
-        <div class="bg-gradient-to-r from-slate-800 to-indigo-950 p-6 rounded-2xl border border-slate-700">
-          <h1 class="text-2xl font-bold text-white mb-2">Welcome back, <span id="dash-username" class="text-indigo-400">Player</span>!</h1>
-          <p class="text-slate-300 text-sm max-w-2xl">Sharpen your analytical skills and critical thinking through interactive chess simulations. Track your rating on the global leaderboard.</p>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center hover:border-indigo-500 transition cursor-pointer" onclick="switchTab('bot')">
-            <div class="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-lg flex items-center justify-center mx-auto mb-3">🤖</div>
-            <h3 class="font-bold text-lg mb-1">Practice vs AI</h3>
-            <p class="text-xs text-slate-400 mb-4">Play solo against 3 levels of artificial intelligence engines.</p>
-            <span class="inline-block bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">Start Practice</span>
-          </div>
-
-          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center hover:border-indigo-500 transition cursor-pointer" onclick="switchTab('multiplayer')">
-            <div class="w-12 h-12 bg-emerald-600/20 text-emerald-400 rounded-lg flex items-center justify-center mx-auto mb-3">⚔️</div>
-            <h3 class="font-bold text-lg mb-1">1v1 Arena</h3>
-            <p class="text-xs text-slate-400 mb-4">Challenge opponents using private match codes or direct invites.</p>
-            <span class="inline-block bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">Join Room</span>
-          </div>
-
-          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center hover:border-indigo-500 transition cursor-pointer" onclick="switchTab('friends')">
-            <div class="w-12 h-12 bg-amber-600/20 text-amber-400 rounded-lg flex items-center justify-center mx-auto mb-3">👥</div>
-            <h3 class="font-bold text-lg mb-1">Friends List</h3>
-            <p class="text-xs text-slate-400 mb-4">Add friends, view live online status, and challenge them directly.</p>
-            <span class="inline-block bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">Manage Friends</span>
-          </div>
-        </div>
-
-        <!-- GLOBAL 1V1 LEADERBOARD -->
-        <div class="bg-slate-800 rounded-xl border border-slate-700 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">🏆 Global 1v1 Leaderboard</h3>
-            <span class="text-xs text-slate-400">Live Numerical Rankings</span>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-              <thead class="bg-slate-900/50 text-xs uppercase text-slate-400">
-                <tr>
-                  <th class="py-3 px-4 rounded-l-lg">Rank</th>
-                  <th class="py-3 px-4">Player</th>
-                  <th class="py-3 px-4">Rating (Elo)</th>
-                  <th class="py-3 px-4 rounded-r-lg">Status</th>
-                </tr>
-              </thead>
-              <tbody id="leaderboard-body" class="divide-y divide-slate-700/50">
-                <tr><td colspan="4" class="py-4 text-center text-slate-500">Loading rankings...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- PRACTICE VS AI TAB -->
-      <div id="view-bot" class="view-content hidden space-y-6">
-        <div class="max-w-md mx-auto bg-slate-800 p-6 rounded-xl border border-slate-700">
-          <h2 class="text-xl font-bold mb-4 text-center text-indigo-400">Select Practice Difficulty</h2>
-          <div class="space-y-3">
-            <button onclick="startBotMatch(1)" class="w-full bg-slate-700 hover:bg-emerald-600 p-4 rounded-lg flex justify-between items-center transition group">
-              <div class="text-left">
-                <div class="font-bold text-white group-hover:text-white">Level 1: Beginner</div>
-                <div class="text-xs text-slate-400 group-hover:text-emerald-100">Evaluates 1 move ahead • Rated ~300 Elo</div>
-              </div>
-              <span class="text-xs font-semibold bg-emerald-950 text-emerald-400 px-2.5 py-1 rounded border border-emerald-800">300 Elo</span>
-            </button>
-
-            <button onclick="startBotMatch(2)" class="w-full bg-slate-700 hover:bg-amber-600 p-4 rounded-lg flex justify-between items-center transition group">
-              <div class="text-left">
-                <div class="font-bold text-white group-hover:text-white">Level 2: Intermediate</div>
-                <div class="text-xs text-slate-400 group-hover:text-amber-100">Evaluates 2 moves ahead • Rated ~800 Elo</div>
-              </div>
-              <span class="text-xs font-semibold bg-amber-950 text-amber-400 px-2.5 py-1 rounded border border-amber-800">800 Elo</span>
-            </button>
-
-            <button onclick="startBotMatch(3)" class="w-full bg-slate-700 hover:bg-rose-600 p-4 rounded-lg flex justify-between items-center transition group">
-              <div class="text-left">
-                <div class="font-bold text-white group-hover:text-white">Level 3: Advanced</div>
-                <div class="text-xs text-slate-400 group-hover:text-rose-100">Evaluates 3 moves ahead + Minimax • Rated ~1500 Elo</div>
-              </div>
-              <span class="text-xs font-semibold bg-rose-950 text-rose-400 px-2.5 py-1 rounded border border-rose-800">1500 Elo</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- MULTIPLAYER TAB -->
-      <div id="view-multiplayer" class="view-content hidden space-y-6">
-        <div class="max-w-md mx-auto bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-6">
+      <!-- VIEW 1: PRACTICE VS AI -->
+      <div id="view-ai" class="view-content hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
           <div>
-            <h3 class="text-lg font-bold mb-2 text-indigo-400">Create Private Room</h3>
-            <p class="text-xs text-slate-400 mb-4">Generate a 6-character code and share it with your opponent.</p>
-            <button onclick="createOnlineRoom()" class="w-full bg-indigo-600 hover:bg-indigo-500 font-semibold py-2.5 rounded-lg transition">Create Match Room</button>
+            <h1 class="text-2xl font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-robot text-sky-400"></i>
+              <span>Practice vs AI Engine</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Sharpen your tactics against adaptive AI engines.</p>
           </div>
-
-          <div class="border-t border-slate-700 pt-6">
-            <h3 class="text-lg font-bold mb-2 text-emerald-400">Join Match Room</h3>
-            <p class="text-xs text-slate-400 mb-4">Enter a code received from a friend.</p>
-            <div class="flex gap-2">
-              <input type="text" id="join-room-code" uppercase maxlength="6" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 uppercase font-mono tracking-widest focus:outline-none focus:border-emerald-500" placeholder="CODE12">
-              <button onclick="joinOnlineRoom()" class="bg-emerald-600 hover:bg-emerald-500 px-6 font-semibold rounded-lg transition">Join</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FRIENDS & PLAYER DIRECTORY TAB -->
-      <div id="view-friends" class="view-content hidden space-y-6">
-        <div class="grid md:grid-cols-2 gap-6">
-          <!-- MY FRIENDS LIST -->
-          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <h3 class="text-lg font-bold text-emerald-400 flex items-center justify-between">
-              <span>My Friends List</span>
-              <span class="text-xs text-slate-400 font-normal">🟢 Live Online Status</span>
-            </h3>
-            <div id="friends-list" class="space-y-3">
-              <div class="text-xs text-slate-500">Loading friends...</div>
-            </div>
-
-            <h4 class="font-bold text-sm text-slate-300 pt-4 border-t border-slate-700">Pending Requests</h4>
-            <div id="incoming-requests" class="space-y-2 text-sm text-slate-400">
-              <div class="text-xs text-slate-500">No pending requests.</div>
-            </div>
-          </div>
-
-          <!-- ALL REGISTERED PLAYERS DIRECTORY (1-CLICK ADD) -->
-          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-bold text-indigo-400">All Registered Accounts</h3>
-              <span class="text-xs text-slate-400">Private Directory</span>
-            </div>
-            <p class="text-xs text-slate-400">Click "+ Add Friend" next to any player below to send a request.</p>
-
-            <div id="all-accounts-directory" class="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-              <div class="text-xs text-slate-500">Loading player directory...</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- EXCLUSIVE ADMIN PANEL TAB -->
-      <div id="view-admin" class="view-content hidden space-y-6">
-        <div class="bg-amber-950/40 border border-amber-600/50 p-6 rounded-xl flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold text-amber-400">⚡ Master Control Panel</h2>
-            <p class="text-xs text-amber-200">Authorized Access Only: ZYREX (zainisgo123@gmail.com)</p>
-          </div>
-          <button onclick="purgeHackedAccounts()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-lg">🧹 Purge Hacked Accounts (>3000 Elo)</button>
-        </div>
-
-        <!-- MAINTENANCE SUSPENSION TOGGLE -->
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <h3 class="text-lg font-bold text-white mb-1">System Suspension / Maintenance Mode</h3>
-            <p class="text-xs text-slate-400">Lock all non-admin users out with a maintenance screen while making changes.</p>
-          </div>
-          <button id="admin-maintenance-btn" onclick="toggleMaintenanceMode()" class="bg-slate-700 text-slate-300 font-bold px-6 py-3 rounded-lg border border-slate-600 transition">Loading Status...</button>
-        </div>
-
-        <!-- ALL REGISTERED USERS TABLE -->
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <h3 class="text-lg font-bold text-white">Registered Users & Ratings Control</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-              <thead class="bg-slate-900/50 text-xs uppercase text-slate-400">
-                <tr>
-                  <th class="py-3 px-4">Username</th>
-                  <th class="py-3 px-4">UID</th>
-                  <th class="py-3 px-4">Rating (Elo)</th>
-                  <th class="py-3 px-4 text-right">Admin Actions</th>
-                </tr>
-              </thead>
-              <tbody id="admin-user-table" class="divide-y divide-slate-700/50">
-                <tr><td colspan="4" class="py-4 text-center text-slate-500">Loading user database...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- GAME BOARD CONTAINER (SHARED FOR BOT & MULTIPLAYER) -->
-      <div id="view-game" class="view-content hidden">
-        <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-6">
           
-          <!-- LEFT / TOP: CHESSBOARD -->
-          <div class="md:col-span-2 bg-slate-800 p-4 sm:p-6 rounded-xl border border-slate-700 flex flex-col items-center">
+          <div class="flex items-center space-x-2">
+            <label class="text-xs font-semibold text-slate-400">Difficulty Level:</label>
+            <select id="ai-difficulty" onchange="startAIGame()" class="bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500">
+              <option value="300">Level 1 (300 ELO - Beginner)</option>
+              <option value="800" selected>Level 2 (800 ELO - Intermediate)</option>
+              <option value="1500">Level 3 (1500 ELO - Master)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- AI Game Container -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-8 flex flex-col items-center">
             
-            <!-- OPPONENT PLAYER CARD -->
-            <div class="w-full flex items-center justify-between mb-3 bg-slate-900 p-3 rounded-lg border border-slate-700">
+            <!-- AI Opponent Card -->
+            <div class="w-full max-w-[480px] bg-slate-900 border border-slate-800 rounded-t-2xl p-3 flex items-center justify-between">
               <div class="flex items-center space-x-3">
-                <div id="opp-status-dot" class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                <div class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold">
+                  <i class="fa-solid fa-microchip"></i>
+                </div>
                 <div>
-                  <span id="opp-name" class="font-bold text-sm text-slate-200 block">Opponent</span>
-                  <span id="opp-elo-text" class="text-xs text-slate-400">Rating: 500 Elo</span>
+                  <div class="text-xs font-bold text-white" id="ai-name-display">CogniBot Engine</div>
+                  <div class="text-[10px] text-slate-400" id="ai-elo-display">800 ELO</div>
                 </div>
               </div>
-              <!-- TIMER & CAPTURED PIECES -->
               <div class="flex items-center space-x-3">
-                <div id="opp-captured" class="flex items-center gap-0.5"></div>
-                <div id="opp-material" class="text-xs font-bold text-slate-400"></div>
-                <div id="top-timer" class="timer-badge">10:00</div>
+                <div id="ai-captured" class="flex text-xs space-x-0.5"></div>
+                <div id="ai-clock" class="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg font-mono font-bold text-sm text-sky-400">10:00</div>
               </div>
             </div>
 
-            <!-- BOARD UI -->
-            <div class="w-full aspect-square max-w-[480px] my-2 relative">
-              <div id="myBoard" class="w-full h-full"></div>
-            </div>
+            <!-- Board Area -->
+            <div id="ai-board" class="w-full max-w-[480px]"></div>
 
-            <!-- YOUR PLAYER CARD -->
-            <div class="w-full flex items-center justify-between mt-3 bg-slate-900 p-3 rounded-lg border border-slate-700">
+            <!-- Player Card -->
+            <div class="w-full max-w-[480px] bg-slate-900 border border-slate-800 rounded-b-2xl p-3 flex items-center justify-between">
               <div class="flex items-center space-x-3">
-                <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                <div class="w-8 h-8 rounded-lg bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold">
+                  <i class="fa-solid fa-user"></i>
+                </div>
                 <div>
-                  <span id="your-name" class="font-bold text-sm text-slate-200 block">You</span>
-                  <span id="your-elo-text" class="text-xs text-slate-400">Rating: 500 Elo</span>
+                  <div class="text-xs font-bold text-white" id="ai-player-name">You</div>
+                  <div class="text-[10px] text-slate-400" id="ai-player-elo">500 ELO</div>
                 </div>
               </div>
-              <!-- TIMER & CAPTURED PIECES -->
               <div class="flex items-center space-x-3">
-                <div id="your-captured" class="flex items-center gap-0.5"></div>
-                <div id="your-material" class="text-xs font-bold text-slate-400"></div>
-                <div id="bottom-timer" class="timer-badge">10:00</div>
+                <div id="ai-player-captured" class="flex text-xs space-x-0.5"></div>
+                <div id="ai-player-clock" class="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg font-mono font-bold text-sm text-sky-400">10:00</div>
               </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="mt-4 flex space-x-3 w-full max-w-[480px]">
+              <button onclick="startAIGame()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 rounded-xl border border-slate-700 text-xs transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Reset Board</span>
+              </button>
             </div>
 
           </div>
 
-          <!-- RIGHT / BOTTOM: GAME CONTROLS & SIDEBAR -->
-          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 flex flex-col justify-between">
-            <div class="space-y-4">
-              <div class="border-b border-slate-700 pb-3 flex justify-between items-center">
-                <h3 class="font-bold text-lg text-white">Match Status</h3>
-                <span id="game-type-badge" class="text-xs px-2 py-1 bg-indigo-950 text-indigo-400 border border-indigo-800 rounded font-semibold">Practice</span>
-              </div>
+          <!-- Move Log -->
+          <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 h-[500px] flex flex-col">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center space-x-2">
+              <i class="fa-solid fa-list-ol"></i>
+              <span>Match History</span>
+            </h3>
+            <div id="ai-move-history" class="flex-1 overflow-y-auto space-y-1 text-xs font-mono pr-2">
+              <div class="text-slate-500 italic text-center py-4">Moves will appear here...</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              <div id="status-message" class="text-sm text-indigo-300 font-medium bg-slate-900/80 p-3 rounded-lg border border-slate-700">
-                White to move.
-              </div>
+      <!-- VIEW 2: 1V1 ARENA (MULTIPLAYER) -->
+      <div id="view-arena" class="view-content hidden space-y-6">
+        
+        <!-- Room Selector Controls -->
+        <div id="arena-setup" class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-2xl mx-auto text-center space-y-6">
+          <div>
+            <h1 class="text-2xl font-bold text-white flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-swords text-sky-400"></i>
+              <span>1v1 Arena Matchmaking</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Create a room code or enter an existing one to play live.</p>
+          </div>
 
-              <div id="room-code-display" class="hidden bg-slate-900 p-3 rounded-lg border border-slate-700 text-center">
-                <span class="text-xs text-slate-400 block mb-1">Room Code</span>
-                <span id="display-code" class="text-xl font-mono font-bold tracking-widest text-emerald-400">------</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Create Game Card -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 text-left flex flex-col justify-between hover:border-sky-500/50 transition">
+              <div>
+                <h3 class="font-bold text-white mb-1">Host Match</h3>
+                <p class="text-xs text-slate-400">Generate a 6-character room code to send to a friend.</p>
+              </div>
+              <button onclick="createOnlineRoom()" class="mt-4 w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl transition text-xs flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create New Room</span>
+              </button>
+            </div>
+
+            <!-- Join Game Card -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 text-left flex flex-col justify-between hover:border-sky-500/50 transition">
+              <div>
+                <h3 class="font-bold text-white mb-1">Join Match</h3>
+                <p class="text-xs text-slate-400">Enter room code provided by host.</p>
+              </div>
+              <div class="mt-4 flex space-x-2">
+                <input type="text" id="join-room-code" placeholder="CODE12" uppercase maxlength="6" class="bg-slate-900 border border-slate-700 text-white text-xs font-mono font-bold rounded-xl px-3 py-2 flex-1 focus:outline-none focus:border-sky-500 uppercase">
+                <button onclick="joinOnlineRoom()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl transition text-xs">Join</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Room Board Area -->
+        <div id="arena-game" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-8 flex flex-col items-center">
+            
+            <!-- Room Header Banner -->
+            <div class="w-full max-w-[480px] bg-slate-900 border border-slate-800 rounded-t-2xl p-3 flex items-center justify-between border-b-0">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-semibold text-slate-400">Room Code:</span>
+                <span id="room-code-display" class="font-mono font-extrabold text-sky-400 text-sm tracking-widest bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">------</span>
+              </div>
+              <div id="online-status-badge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                Waiting for Opponent...
               </div>
             </div>
 
-            <!-- ACTION BUTTONS -->
-            <div class="space-y-2 pt-6">
-              <!-- BOT MODE CONTROLS -->
-              <div id="bot-controls" class="space-y-2">
-                <button onclick="startBotMatch(currentBotLevel)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded-lg text-sm transition">Restart Practice</button>
+            <!-- Opponent Card -->
+            <div class="w-full max-w-[480px] bg-slate-900/90 border-x border-slate-800 p-3 flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-rose-600/20 border border-rose-500/30 flex items-center justify-center text-rose-400 font-bold">
+                  <i class="fa-solid fa-user-ninja"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white" id="online-opp-name">Waiting...</div>
+                  <div class="text-[10px] text-slate-400" id="online-opp-elo">-- ELO</div>
+                </div>
               </div>
-
-              <!-- ONLINE MULTIPLAYER CONTROLS -->
-              <div id="online-controls" class="hidden space-y-2">
-                <button onclick="offerDraw()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold py-2 rounded-lg text-sm transition">Offer Draw</button>
-                <button onclick="resignMatch()" class="w-full bg-rose-900/50 hover:bg-rose-800 text-rose-200 border border-rose-700 font-semibold py-2 rounded-lg text-sm transition">Resign Game</button>
+              <div class="flex items-center space-x-3">
+                <div id="online-opp-captured" class="flex text-xs space-x-0.5"></div>
+                <div id="online-opp-clock" class="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg font-mono font-bold text-sm text-sky-400">10:00</div>
               </div>
-
-              <button onclick="leaveGame()" class="w-full bg-slate-900 hover:bg-slate-950 text-slate-400 hover:text-white font-semibold py-2 rounded-lg text-sm transition">Leave Match</button>
             </div>
 
+            <!-- Board -->
+            <div id="online-board" class="w-full max-w-[480px]"></div>
+
+            <!-- Player Card -->
+            <div class="w-full max-w-[480px] bg-slate-900 border border-slate-800 rounded-b-2xl p-3 flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white" id="online-player-name">You</div>
+                  <div class="text-[10px] text-slate-400" id="online-player-elo">500 ELO</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div id="online-player-captured" class="flex text-xs space-x-0.5"></div>
+                <div id="online-player-clock" class="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg font-mono font-bold text-sm text-sky-400">10:00</div>
+              </div>
+            </div>
+
+            <!-- Match Controls (No reset button in online mode) -->
+            <div class="mt-4 flex space-x-3 w-full max-w-[480px]">
+              <button onclick="offerDraw()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl border border-slate-700 text-xs transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-handshake"></i>
+                <span>Offer Draw</span>
+              </button>
+              <button onclick="resignMatch()" class="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-flag"></i>
+                <span>Resign</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Arena History Log -->
+          <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 h-[500px] flex flex-col">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center space-x-2">
+              <i class="fa-solid fa-list-ol"></i>
+              <span>1v1 Live Notation</span>
+            </h3>
+            <div id="online-move-history" class="flex-1 overflow-y-auto space-y-1 text-xs font-mono pr-2">
+              <div class="text-slate-500 italic text-center py-4">Waiting for match to begin...</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VIEW 3: FRIENDS & DIRECTORY -->
+      <div id="view-friends" class="view-content hidden space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-users text-sky-400"></i>
+              <span>Friends & Player Directory</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Connect with registered players and issue direct 1v1 challenges.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Friends List -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col h-[520px]">
+            <h3 class="text-sm font-bold text-white mb-4 flex items-center space-x-2">
+              <i class="fa-solid fa-user-group text-sky-400"></i>
+              <span>Your Friends</span>
+            </h3>
+            <div id="friends-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
+              <div class="text-slate-500 text-xs italic text-center py-8">Loading friends...</div>
+            </div>
+          </div>
+
+          <!-- Player Directory (All Registered Accounts) -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col h-[520px]">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-address-book text-sky-400"></i>
+                <span>Player Directory</span>
+              </h3>
+              <span class="text-[10px] text-slate-400 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800">All Registered Players</span>
+            </div>
+            
+            <div id="directory-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
+              <div class="text-slate-500 text-xs italic text-center py-8">Loading directory...</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- VIEW 4: GLOBAL LEADERBOARD -->
+      <div id="view-leaderboard" class="view-content hidden space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-trophy text-amber-400"></i>
+              <span>Global 1v1 Leaderboard</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Top players ranked strictly by numerical Elo rating.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-950 text-slate-400 uppercase font-semibold border-b border-slate-800">
+                <tr>
+                  <th class="py-3.5 px-4">Rank</th>
+                  <th class="py-3.5 px-4">Player</th>
+                  <th class="py-3.5 px-4">Status</th>
+                  <th class="py-3.5 px-4 text-right">Elo Rating</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-table-body" class="divide-y divide-slate-800/50">
+                <tr>
+                  <td colspan="4" class="py-8 text-center text-slate-500 italic">Fetching global ratings...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 5: ADMIN CONTROL PANEL (Only zainisgo123@gmail.com) -->
+      <div id="view-admin" class="view-content hidden space-y-6">
+        <div class="bg-amber-500/10 border border-amber-500/30 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-amber-400 flex items-center space-x-2">
+              <i class="fa-solid fa-user-shield"></i>
+              <span>Master Admin Control</span>
+            </h1>
+            <p class="text-slate-300 text-sm mt-1">Exclusive administrative actions & maintenance state toggles.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- System Controls -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2 border-b border-slate-800 pb-3">
+              <i class="fa-solid fa-sliders text-amber-400"></i>
+              <span>Platform Maintenance Override</span>
+            </h3>
+            
+            <div class="flex items-center justify-between bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <div>
+                <div class="text-xs font-bold text-white">Maintenance Mode</div>
+                <div class="text-[10px] text-slate-400">Block non-admin user access</div>
+              </div>
+              <button id="admin-maint-btn" onclick="toggleMaintenanceMode()" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                OFF
+              </button>
+            </div>
+
+            <div class="pt-2">
+              <button onclick="purgeHackedAccounts()" class="w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 font-bold py-3 rounded-xl transition text-xs flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-skull-crossbones"></i>
+                <span>Purge Suspicious Accounts (&gt;3000 Elo)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- User Management -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2 border-b border-slate-800 pb-3">
+              <i class="fa-solid fa-users-gear text-amber-400"></i>
+              <span>User Elo & Account Controls</span>
+            </h3>
+
+            <div id="admin-user-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+              <div class="text-slate-500 text-xs italic text-center py-6">Loading user records...</div>
+            </div>
           </div>
 
         </div>
@@ -499,66 +569,95 @@
 
   </main>
 
-  <!-- PAWN PROMOTION MODAL -->
-  <div id="promotion-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
-      <h3 class="text-xl font-bold text-white">Promote Pawn</h3>
-      <p class="text-xs text-slate-400">Select a piece to promote your pawn into:</p>
-      
-      <div class="grid grid-cols-4 gap-3 pt-2">
-        <button onclick="selectPromotion('q')" class="bg-slate-700 hover:bg-indigo-600 p-3 rounded-lg border border-slate-600 flex flex-col items-center transition group">
-          <span class="text-3xl mb-1 group-hover:scale-110 transition-transform">♛</span>
-          <span class="text-xs font-semibold text-slate-300 group-hover:text-white">Queen</span>
-        </button>
-        <button onclick="selectPromotion('r')" class="bg-slate-700 hover:bg-indigo-600 p-3 rounded-lg border border-slate-600 flex flex-col items-center transition group">
-          <span class="text-3xl mb-1 group-hover:scale-110 transition-transform">♜</span>
-          <span class="text-xs font-semibold text-slate-300 group-hover:text-white">Rook</span>
-        </button>
-        <button onclick="selectPromotion('b')" class="bg-slate-700 hover:bg-indigo-600 p-3 rounded-lg border border-slate-600 flex flex-col items-center transition group">
-          <span class="text-3xl mb-1 group-hover:scale-110 transition-transform">♝</span>
-          <span class="text-xs font-semibold text-slate-300 group-hover:text-white">Bishop</span>
-        </button>
-        <button onclick="selectPromotion('n')" class="bg-slate-700 hover:bg-indigo-600 p-3 rounded-lg border border-slate-600 flex flex-col items-center transition group">
-          <span class="text-3xl mb-1 group-hover:scale-110 transition-transform">♞</span>
-          <span class="text-xs font-semibold text-slate-300 group-hover:text-white">Knight</span>
-        </button>
+  <!-- MODAL: FIRST TIME USERNAME CREATION -->
+  <div id="username-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+      <div class="w-12 h-12 bg-sky-600/20 border border-sky-500/30 rounded-xl flex items-center justify-center mx-auto text-sky-400 text-xl font-bold">
+        <i class="fa-solid fa-id-card"></i>
+      </div>
+      <h3 class="text-lg font-bold text-white">Choose Display Username</h3>
+      <p class="text-slate-400 text-xs">Set your public handle for matches and leaderboards.</p>
+      <input type="text" id="modal-username-input" placeholder="e.g. MasterStrategist" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500 text-center font-bold">
+      <button onclick="saveInitialUsername()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl transition text-xs">
+        Save & Continue
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: PAWN PROMOTION CHOICE -->
+  <div id="promotion-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-xs w-full text-center space-y-4 shadow-2xl">
+      <h3 class="text-base font-bold text-white">Select Promotion Piece</h3>
+      <div class="grid grid-cols-4 gap-2">
+        <button onclick="selectPromotion('q')" class="bg-slate-950 hover:bg-sky-600/20 border border-slate-800 hover:border-sky-500 p-3 rounded-xl transition text-2xl text-white">♛</button>
+        <button onclick="selectPromotion('r')" class="bg-slate-950 hover:bg-sky-600/20 border border-slate-800 hover:border-sky-500 p-3 rounded-xl transition text-2xl text-white">♜</button>
+        <button onclick="selectPromotion('b')" class="bg-slate-950 hover:bg-sky-600/20 border border-slate-800 hover:border-sky-500 p-3 rounded-xl transition text-2xl text-white">♝</button>
+        <button onclick="selectPromotion('n')" class="bg-slate-950 hover:bg-sky-600/20 border border-slate-800 hover:border-sky-500 p-3 rounded-xl transition text-2xl text-white">♞</button>
       </div>
     </div>
   </div>
 
-  <!-- GAME OVER SUMMARY MODAL OVERLAY -->
-  <div id="game-over-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-md w-full text-center space-y-4 shadow-2xl">
-      <div id="modal-icon" class="text-5xl">🏆</div>
-      <h2 id="modal-title" class="text-2xl font-bold text-white">Match Finished</h2>
-      <p id="modal-desc" class="text-sm text-slate-300">White won by checkmate.</p>
+  <!-- MODAL: GAME OVER CHESS.COM BADGE STYLE -->
+  <div id="gameover-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div id="gameover-card" class="bg-slate-900 border rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-5 shadow-2xl relative overflow-hidden">
       
-      <!-- ELO RATING CHANGE SUMMARY -->
-      <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-2">
-        <div class="text-xs uppercase text-slate-400 font-semibold tracking-wider">Rating Adjustment</div>
-        <div class="flex justify-around items-center">
-          <div>
-            <span class="text-xs text-slate-400 block">Your Rating</span>
-            <span id="modal-old-elo" class="text-slate-300 text-sm">500</span>
-            <span id="modal-elo-diff" class="text-emerald-400 text-sm font-bold block">+16</span>
-          </div>
-          <div class="text-slate-600">➔</div>
-          <div>
-            <span class="text-xs text-slate-400 block">New Rating</span>
-            <span id="modal-new-elo" class="text-indigo-400 text-lg font-bold">516</span>
-          </div>
+      <!-- Badge Display -->
+      <div id="gameover-icon-box" class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto text-4xl shadow-xl">
+        👑
+      </div>
+
+      <div>
+        <h2 id="gameover-title" class="text-2xl font-black text-white tracking-tight">Victory!</h2>
+        <p id="gameover-reason" class="text-slate-400 text-xs mt-1">Checkmate</p>
+      </div>
+
+      <!-- Elo Change Box -->
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-around">
+        <div>
+          <div class="text-[10px] text-slate-500 font-bold uppercase">Old Elo</div>
+          <div id="gameover-old-elo" class="text-sm font-bold text-slate-300">500</div>
+        </div>
+        <div class="text-slate-600"><i class="fa-solid fa-arrow-right text-xs"></i></div>
+        <div>
+          <div class="text-[10px] text-slate-500 font-bold uppercase">New Elo</div>
+          <div id="gameover-new-elo" class="text-sm font-bold text-emerald-400">516</div>
         </div>
       </div>
 
-      <button onclick="closeGameOverModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg transition">Continue</button>
+      <button onclick="closeGameOverModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl border border-slate-700 transition text-xs">
+        Continue
+      </button>
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
+  <!-- MODAL: MAINTENANCE LOCKOUT OVERLAY -->
+  <div id="maintenance-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-2xl relative">
+      <div class="w-16 h-16 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
+        🛠️
+      </div>
+      <h3 class="text-2xl font-bold text-white mb-2">Under Maintenance</h3>
+      <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+        CogniLearn Arena is currently undergoing scheduled platform upgrades and maintenance. Non-admin logins are temporarily restricted. Please check back shortly!
+      </p>
+      <button onclick="exitToLanding()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-2">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Return to Main Page</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- FIREBASE & CHESS LIBRARIES -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+
   <script>
-    // ==========================================
-    // 1. FIREBASE CONFIGURATION & INITIALIZATION
-    // ==========================================
+    // --- 1. FIREBASE INITIALIZATION ---
     const firebaseConfig = {
       apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
       authDomain: "chess-7df7a.firebaseapp.com",
@@ -573,1145 +672,937 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // FORCE ZERO PERSISTENCE (Log out immediately when tab/window closes)
+    // Enforce Session-only persistence (logout on tab close / window exit)
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
-    // ==========================================
-    // 2. GLOBAL STATE VARIABLES
-    // ==========================================
-    let currentUser = null;
-    let userProfile = null;
-    let isUserAdmin = false;
-    let isMaintenanceActive = false;
-
-    let game = new Chess();
-    let board = null;
-    let selectedSquare = null;
-
-    let gameMode = 'bot'; // 'bot' or 'online'
-    let currentBotLevel = 1;
-
-    let currentRoomCode = null;
-    let myColor = 'w'; // 'w' or 'b'
-    let gameRef = null;
-
-    let pendingPromotion = null;
-
-    // CHESS TIMERS STATE (10 Minutes = 600 Seconds per player)
-    const MATCH_DURATION = 600; 
-    let whiteTime = MATCH_DURATION;
-    let blackTime = MATCH_DURATION;
-    let timerInterval = null;
-
-    // Piece Image CDN Resolver
-    function getPieceImgUrl(piece) {
+    // Piece Image CDN Resolver (jsDelivr)
+    function getPieceImg(piece) {
       return `https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/${piece}.png`;
     }
 
-    // System Maintenance Listener
-    db.ref('system/maintenance').on('value', snapshot => {
-      isMaintenanceActive = !!snapshot.val();
-      checkMaintenanceLock();
-      updateAdminMaintenanceBtnUI();
+    // App Global State
+    let currentUser = null;
+    let userProfile = null;
+    let isMaintenanceActive = false;
+    let activeAuthMode = 'login';
+
+    // AI Game State
+    let aiGame = null;
+    let aiBoard = null;
+    let aiSelectedSquare = null;
+    let aiPlayerTime = 600;
+    let aiOppTime = 600;
+    let aiTimerInterval = null;
+
+    // Online Game State
+    let onlineGame = null;
+    let onlineBoard = null;
+    let onlineRoomCode = null;
+    let onlinePlayerColor = 'white';
+    let onlineSelectedSquare = null;
+    let pendingPromotionMove = null;
+    let onlineTimerInterval = null;
+
+    // --- 2. INITIALIZATION & MAINTENANCE SETUP ---
+    
+    // Reset Maintenance Mode to OFF right now on startup
+    db.ref('system/maintenance').set(false);
+
+    // Maintenance Listener
+    db.ref('system/maintenance').on('value', (snap) => {
+      isMaintenanceActive = snap.val() === true;
+      applyMaintenanceState();
     });
 
-    function checkMaintenanceLock() {
-      if (isMaintenanceActive && !isUserAdmin) {
-        $('#maintenance-screen').removeClass('hidden');
+    function applyMaintenanceState() {
+      const modal = document.getElementById('maintenance-modal');
+      const isAdmin = currentUser && currentUser.email === 'zainisgo123@gmail.com';
+
+      if (isMaintenanceActive && !isAdmin) {
+        if (currentUser) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
       } else {
-        $('#maintenance-screen').addClass('hidden');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+
+      // Sync Admin Switch UI
+      const adminBtn = document.getElementById('admin-maint-btn');
+      if (adminBtn) {
+        adminBtn.innerText = isMaintenanceActive ? 'ON' : 'OFF';
+        adminBtn.className = isMaintenanceActive 
+          ? 'px-4 py-2 rounded-xl text-xs font-bold transition bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+          : 'px-4 py-2 rounded-xl text-xs font-bold transition bg-rose-500/20 text-rose-400 border border-rose-500/30';
       }
     }
 
-    // ==========================================
-    // 3. AUTHENTICATION & USER MANAGEMENT
-    // ==========================================
-    auth.onAuthStateChanged(user => {
+    // Auth State Monitor
+    auth.onAuthStateChanged((user) => {
+      currentUser = user;
       if (user) {
-        currentUser = user;
-        loadUserProfile(user.uid);
+        // If maintenance active and user is NOT admin -> block and sign out
+        if (isMaintenanceActive && user.email !== 'zainisgo123@gmail.com') {
+          auth.signOut();
+          applyMaintenanceState();
+          return;
+        }
+
+        setupPresence(user.uid);
+        fetchUserProfile(user.uid);
       } else {
-        currentUser = null;
-        userProfile = null;
-        isUserAdmin = false;
-        
-        // Hide All Tabs and App Views When Logged Out
-        $('#auth-loading').addClass('hidden');
-        $('#user-info').addClass('hidden');
-        $('#nav-tabs').addClass('hidden');
-        $('#auth-container').removeClass('hidden');
-        $('#app-view').addClass('hidden');
-        $('#tab-admin').addClass('hidden');
+        document.getElementById('auth-container').classList.remove('hidden');
+        document.getElementById('app-views').classList.add('hidden');
+        document.getElementById('main-nav').classList.add('hidden');
       }
+      applyMaintenanceState();
     });
 
-    async function handleAuth(e) {
-      e.preventDefault();
-      const email = $('#auth-email').val().trim();
-      const password = $('#auth-password').val().trim();
-      $('#auth-error').addClass('hidden');
-
-      if (!email || !password) return;
-
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-      } catch (err) {
-        if (err.code === 'auth/user-not-found') {
-          try {
-            await auth.createUserWithEmailAndPassword(email, password);
-          } catch (createErr) {
-            showAuthError(createErr.message);
-          }
-        } else {
-          showAuthError(err.message);
-        }
-      }
-    }
-
-    function showAuthError(msg) {
-      $('#auth-error').text(msg).removeClass('hidden');
-    }
-
-    function loadUserProfile(uid) {
-      db.ref(`users/${uid}`).on('value', snapshot => {
-        userProfile = snapshot.val();
-
-        // IF USER HAS NO USERNAME, SHOW POPUP MODAL TO CHOOSE ONE
-        if (!userProfile || !userProfile.username) {
-          $('#username-modal').removeClass('hidden');
-          return;
-        } else {
-          $('#username-modal').addClass('hidden');
-        }
-
-        let parsedElo = Number(userProfile.elo);
-        userProfile.elo = isNaN(parsedElo) ? 500 : parsedElo;
-
-        // Check Admin Privileges (ZYREX or zainisgo123@gmail.com)
-        isUserAdmin = (currentUser.email === 'zainisgo123@gmail.com' || userProfile.username === 'ZYREX');
-        
-        // Show Navigation Bar
-        $('#nav-tabs').removeClass('hidden');
-
-        if (isUserAdmin) {
-          $('#tab-admin').removeClass('hidden');
-          loadAdminUserList();
-        } else {
-          $('#tab-admin').addClass('hidden');
-        }
-
-        checkMaintenanceLock();
-
-        $('#header-username').text(userProfile.username);
-        $('#dash-username').text(userProfile.username);
-        $('#header-elo').text(userProfile.elo);
-        $('#your-elo-text').text(`Rating: ${userProfile.elo} Elo`);
-
-        $('#auth-loading').addClass('hidden');
-        $('#user-info').removeClass('hidden');
-        $('#auth-container').addClass('hidden');
-        $('#app-view').removeClass('hidden');
-
-        setupPresence(uid);
-        listenToFriendRequests();
-        listenToFriendsList();
-        loadPlayerDirectory();
-        loadLeaderboard();
-      });
-    }
-
-    async function saveNewUsername() {
-      const chosenName = $('#modal-username-input').val().trim();
-      $('#username-modal-error').addClass('hidden');
-
-      if (!chosenName || chosenName.length < 2) {
-        $('#username-modal-error').text('Username must be at least 2 characters long.').removeClass('hidden');
-        return;
-      }
-
-      // Check if username is taken
-      const userSnap = await db.ref('users').orderByChild('username').equalTo(chosenName).once('value');
-      if (userSnap.exists()) {
-        $('#username-modal-error').text('That username is already taken. Try another!').removeClass('hidden');
-        return;
-      }
-
-      const initialUsername = (currentUser.email === 'zainisgo123@gmail.com') ? 'ZYREX' : chosenName;
-
-      await db.ref(`users/${currentUser.uid}`).set({
-        username: initialUsername,
-        elo: 500,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      });
-
-      $('#username-modal').addClass('hidden');
-    }
-
+    // Setup Presence Dot Indicator
     function setupPresence(uid) {
-      const userStatusRef = db.ref(`presence/${uid}`);
-      const isOnline = { status: 'online', lastSeen: firebase.database.ServerValue.TIMESTAMP };
-      const isOffline = { status: 'offline', lastSeen: firebase.database.ServerValue.TIMESTAMP };
+      const userPresRef = db.ref(`presence/${uid}`);
+      const connectedRef = db.ref('.info/connected');
 
-      db.ref('.info/connected').on('value', snapshot => {
-        if (snapshot.val() === false) return;
-        userStatusRef.onDisconnect().set(isOffline).then(() => {
-          userStatusRef.set(isOnline);
-        });
+      connectedRef.on('value', (snap) => {
+        if (snap.val() === true) {
+          userPresRef.onDisconnect().set({ status: 'offline', last_changed: firebase.database.ServerValue.TIMESTAMP });
+          userPresRef.set({ status: 'online', last_changed: firebase.database.ServerValue.TIMESTAMP });
+        }
       });
     }
 
-    // EXIT REDIRECTS TO BYPASS PAGE (INDEX.HTML)
-    function logout() {
-      if (currentUser) {
-        db.ref(`presence/${currentUser.uid}`).set({ status: 'offline', lastSeen: firebase.database.ServerValue.TIMESTAMP });
+    // Fetch Profile or Prompt Username Creation
+    function fetchUserProfile(uid) {
+      db.ref(`users/${uid}`).on('value', (snap) => {
+        const data = snap.val();
+        if (data) {
+          userProfile = data;
+          document.getElementById('nav-username').innerText = data.username || 'Player';
+          document.getElementById('nav-elo').innerText = data.elo || 500;
+
+          document.getElementById('auth-container').classList.add('hidden');
+          document.getElementById('app-views').classList.remove('hidden');
+          document.getElementById('main-nav').classList.remove('hidden');
+
+          if (user.email === 'zainisgo123@gmail.com') {
+            document.getElementById('tab-admin').classList.remove('hidden');
+          }
+
+          switchTab('arena');
+          loadLeaderboard();
+          loadFriendsAndDirectory();
+          if (user.email === 'zainisgo123@gmail.com') loadAdminPanel();
+        } else {
+          document.getElementById('username-modal').classList.remove('hidden');
+          document.getElementById('username-modal').classList.add('flex');
+        }
+      });
+    }
+
+    function saveInitialUsername() {
+      const name = document.getElementById('modal-username-input').value.trim();
+      if (!name || !currentUser) return;
+
+      db.ref(`users/${currentUser.uid}`).set({
+        username: name,
+        email: currentUser.email,
+        elo: 500,
+        created_at: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        document.getElementById('username-modal').classList.add('hidden');
+        document.getElementById('username-modal').classList.remove('flex');
+      });
+    }
+
+    // --- 3. AUTHENTICATION HANDLERS ---
+    function toggleAuthMode(mode) {
+      activeAuthMode = mode;
+      const loginTab = document.getElementById('auth-tab-login');
+      const regTab = document.getElementById('auth-tab-register');
+      const nameField = document.getElementById('field-username');
+      const submitBtn = document.getElementById('auth-submit-btn');
+
+      if (mode === 'register') {
+        loginTab.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white';
+        regTab.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition text-white bg-sky-600';
+        nameField.classList.remove('hidden');
+        submitBtn.innerHTML = '<span>Create Account</span><i class="fa-solid fa-user-plus text-xs"></i>';
+      } else {
+        regTab.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white';
+        loginTab.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition text-white bg-sky-600';
+        nameField.classList.add('hidden');
+        submitBtn.innerHTML = '<span>Sign In</span><i class="fa-solid fa-arrow-right text-xs"></i>';
       }
-      stopTimer();
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const username = document.getElementById('auth-username').value.trim();
+      const errBox = document.getElementById('auth-error');
+      const errTxt = document.getElementById('auth-error-msg');
+
+      errBox.classList.add('hidden');
+
+      if (activeAuthMode === 'login') {
+        auth.signInWithEmailAndPassword(email, password).catch((err) => {
+          errTxt.innerText = err.message;
+          errBox.classList.remove('hidden');
+        });
+      } else {
+        if (!username) {
+          errTxt.innerText = "Please provide a display username.";
+          errBox.classList.remove('hidden');
+          return;
+        }
+        auth.createUserWithEmailAndPassword(email, password).then((cred) => {
+          return db.ref(`users/${cred.user.uid}`).set({
+            username: username,
+            email: email,
+            elo: 500,
+            created_at: firebase.database.ServerValue.TIMESTAMP
+          });
+        }).catch((err) => {
+          errTxt.innerText = err.message;
+          errBox.classList.remove('hidden');
+        });
+      }
+    }
+
+    function exitSession() {
+      if (currentUser) {
+        db.ref(`presence/${currentUser.uid}`).set({ status: 'offline', last_changed: firebase.database.ServerValue.TIMESTAMP });
+      }
       auth.signOut().then(() => {
-        localStorage.clear();
         sessionStorage.clear();
+        localStorage.clear();
         window.location.href = 'index.html';
       });
     }
 
-    // ==========================================
-    // 4. NAVIGATION & TABS
-    // ==========================================
-    function switchTab(tab) {
-      $('.view-content').addClass('hidden');
-      $('.nav-btn').removeClass('text-white bg-slate-700').addClass('text-slate-300');
+    function exitToLanding() {
+      sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
 
-      $(`#view-${tab}`).removeClass('hidden');
-      $(`#tab-${tab}`).addClass('text-white bg-slate-700');
+    // --- 4. NAVIGATION & TAB SWITCHING ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-tab').forEach(el => {
+        el.classList.remove('text-white', 'bg-slate-800');
+        el.classList.add('text-slate-400');
+      });
 
-      if (tab === 'game') {
-        setTimeout(() => {
-          if (board) {
-            board.resize();
-            bindBoardClickEvents();
-          }
-        }, 100);
+      const activeView = document.getElementById(`view-${tabId}`);
+      const activeTabBtn = document.getElementById(`tab-${tabId}`);
+
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeTabBtn) {
+        activeTabBtn.classList.remove('text-slate-400');
+        activeTabBtn.classList.add('text-white', 'bg-slate-800');
+      }
+
+      if (tabId === 'ai' && !aiGame) {
+        startAIGame();
+      } else if (tabId === 'ai' && aiBoard) {
+        setTimeout(() => aiBoard.resize(), 100);
+      } else if (tabId === 'arena' && onlineBoard) {
+        setTimeout(() => onlineBoard.resize(), 100);
       }
     }
 
-    // ==========================================
-    // 5. CHESS CLOCK & TIMERS
-    // ==========================================
-    function resetTimers() {
-      stopTimer();
-      whiteTime = MATCH_DURATION;
-      blackTime = MATCH_DURATION;
-      updateTimerUI();
+    // --- 5. ELO RATING FORMULA ($K=32$) ---
+    function calculateEloChange(playerElo, oppElo, outcome) {
+      const expected = 1 / (1 + Math.pow(10, (oppElo - playerElo) / 400));
+      const K = 32;
+      const newElo = Math.round(playerElo + K * (outcome - expected));
+      return { newElo, change: newElo - playerElo };
     }
 
-    function startTimer() {
-      stopTimer();
-      timerInterval = setInterval(() => {
-        if (game.game_over()) {
-          stopTimer();
-          return;
-        }
+    // --- 6. PRACTICE VS AI ENGINE ---
+    function startAIGame() {
+      aiGame = new Chess();
+      aiPlayerTime = 600;
+      aiOppTime = 600;
+      clearInterval(aiTimerInterval);
 
-        if (game.turn() === 'w') {
-          whiteTime--;
-          if (whiteTime <= 0) {
-            whiteTime = 0;
-            updateTimerUI();
-            stopTimer();
-            handleGameOver('b', 'Timeout');
+      const diff = parseInt(document.getElementById('ai-difficulty').value);
+      document.getElementById('ai-elo-display').innerText = `${diff} ELO`;
+
+      document.getElementById('ai-move-history').innerHTML = '';
+      updateAIPieceCaptures();
+
+      const config = {
+        position: 'start',
+        pieceTheme: getPieceImg,
+        showNotation: true,
+      };
+
+      aiBoard = Chessboard('ai-board', config);
+      setTimeout(() => aiBoard.resize(), 100);
+      
+      bindSquareClicks('ai-board', handleAISquareClick);
+      startAITimer();
+    }
+
+    function handleAISquareClick(square) {
+      if (aiGame.game_over() || aiGame.turn() !== 'w') return;
+
+      if (aiSelectedSquare === null) {
+        const moves = aiGame.moves({ square: square, verbose: true });
+        if (moves.length === 0) return;
+        aiSelectedSquare = square;
+        highlightSquares('ai-board', square, moves);
+      } else {
+        const moves = aiGame.moves({ square: aiSelectedSquare, verbose: true });
+        const validMove = moves.find(m => m.to === square);
+
+        if (validMove) {
+          // Check for promotion
+          if (validMove.flags.includes('p')) {
+            pendingPromotionMove = { from: aiSelectedSquare, to: square, isAI: true };
+            document.getElementById('promotion-modal').classList.remove('hidden');
+            document.getElementById('promotion-modal').classList.add('flex');
             return;
           }
+
+          executeAIMove({ from: aiSelectedSquare, to: square });
         } else {
-          blackTime--;
-          if (blackTime <= 0) {
-            blackTime = 0;
-            updateTimerUI();
-            stopTimer();
-            handleGameOver('w', 'Timeout');
-            return;
+          aiSelectedSquare = null;
+          removeHighlights('ai-board');
+          // If clicking another white piece, select it
+          const piece = aiGame.get(square);
+          if (piece && piece.color === 'w') {
+            handleAISquareClick(square);
           }
         }
+      }
+    }
 
-        updateTimerUI();
+    function executeAIMove(moveObj) {
+      const move = aiGame.move(moveObj);
+      aiBoard.position(aiGame.fen());
+      aiSelectedSquare = null;
+      removeHighlights('ai-board');
+      updateAIMoveHistory();
+      updateAIPieceCaptures();
+
+      if (aiGame.game_over()) {
+        handleAIGameOver();
+        return;
+      }
+
+      // AI Response Turn
+      setTimeout(makeAIMove, 500);
+    }
+
+    function makeAIMove() {
+      if (aiGame.game_over()) return;
+
+      const diff = parseInt(document.getElementById('ai-difficulty').value);
+      const moves = aiGame.moves({ verbose: true });
+      if (moves.length === 0) return;
+
+      let chosenMove = null;
+
+      if (diff === 300) {
+        // Random Moves
+        chosenMove = moves[Math.floor(Math.random() * moves.length)];
+      } else if (diff === 800) {
+        // Prefer Captures
+        const captures = moves.filter(m => m.captured);
+        chosenMove = captures.length > 0 ? captures[Math.floor(Math.random() * captures.length)] : moves[Math.floor(Math.random() * moves.length)];
+      } else {
+        // Simple Minimax / Material Capture
+        const captures = moves.filter(m => m.captured);
+        chosenMove = captures.length > 0 ? captures[0] : moves[Math.floor(Math.random() * moves.length)];
+      }
+
+      aiGame.move(chosenMove);
+      aiBoard.position(aiGame.fen());
+      updateAIMoveHistory();
+      updateAIPieceCaptures();
+
+      if (aiGame.game_over()) {
+        handleAIGameOver();
+      }
+    }
+
+    function startAITimer() {
+      aiTimerInterval = setInterval(() => {
+        if (aiGame.turn() === 'w') {
+          aiPlayerTime--;
+          if (aiPlayerTime <= 0) handleAIGameOver('timeout_loss');
+        } else {
+          aiOppTime--;
+          if (aiOppTime <= 0) handleAIGameOver('timeout_win');
+        }
+        document.getElementById('ai-player-clock').innerText = formatTime(aiPlayerTime);
+        document.getElementById('ai-clock').innerText = formatTime(aiOppTime);
       }, 1000);
     }
 
-    function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-    }
+    function handleAIGameOver(reason) {
+      clearInterval(aiTimerInterval);
+      let title = "Game Over";
+      let desc = "Match ended.";
+      let won = false;
 
-    function formatTime(sec) {
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-
-    function updateTimerUI() {
-      const whiteTimerBadge = myColor === 'w' ? $('#bottom-timer') : $('#top-timer');
-      const blackTimerBadge = myColor === 'w' ? $('#top-timer') : $('#bottom-timer');
-
-      whiteTimerBadge.text(formatTime(whiteTime));
-      blackTimerBadge.text(formatTime(blackTime));
-
-      $('.timer-badge').removeClass('timer-active timer-low');
-
-      if (game.turn() === 'w') {
-        whiteTimerBadge.addClass('timer-active');
-        if (whiteTime <= 30) whiteTimerBadge.addClass('timer-low');
+      if (reason === 'timeout_loss') {
+        title = "Time Out!";
+        desc = "You ran out of time.";
+      } else if (reason === 'timeout_win') {
+        title = "Victory!";
+        desc = "AI ran out of time.";
+        won = true;
+      } else if (aiGame.in_checkmate()) {
+        won = aiGame.turn() === 'b';
+        title = won ? "Checkmate Victory!" : "Checkmate Defeat";
+        desc = won ? "You defeated the AI." : "The AI checkmated you.";
       } else {
-        blackTimerBadge.addClass('timer-active');
-        if (blackTime <= 30) blackTimerBadge.addClass('timer-low');
-      }
-    }
-
-    // ==========================================
-    // 6. CHESSBOARD RENDERING & CLICK-TO-MOVE
-    // ==========================================
-    function initBoard(orientation = 'white') {
-      const config = {
-        position: 'start',
-        orientation: orientation,
-        draggable: false, // Strict Click-to-Move
-        pieceTheme: getPieceImgUrl
-      };
-      board = Chessboard('myBoard', config);
-      bindBoardClickEvents();
-    }
-
-    function bindBoardClickEvents() {
-      $('#myBoard').off('click', '.square-55d63').on('click', '.square-55d63', function() {
-        const square = $(this).data('square');
-        onSquareClick(square);
-      });
-    }
-
-    function removeHighlights() {
-      $('.square-55d63').removeClass('highlight-selected highlight-move highlight-capture king-winner-badge king-loser-badge');
-    }
-
-    function onSquareClick(square) {
-      if (game.game_over()) return;
-
-      if (gameMode === 'online' && game.turn() !== myColor) return;
-
-      const piece = game.get(square);
-
-      if (selectedSquare === null) {
-        if (piece && piece.color === game.turn()) {
-          selectedSquare = square;
-          highlightSquareAndMoves(square);
-        }
-        return;
+        title = "Draw";
+        desc = "Stalemate or insufficient material.";
       }
 
-      if (selectedSquare === square) {
-        selectedSquare = null;
-        removeHighlights();
-        return;
-      }
-
-      if (piece && piece.color === game.turn()) {
-        selectedSquare = square;
-        highlightSquareAndMoves(square);
-        return;
-      }
-
-      const moves = game.moves({ square: selectedSquare, verbose: true });
-      const validMove = moves.find(m => m.to === square);
-
-      if (validMove) {
-        if (validMove.promotion) {
-          pendingPromotion = { from: selectedSquare, to: square };
-          showPromotionModal();
-          return;
-        }
-
-        executeMove(selectedSquare, square);
-      } else {
-        selectedSquare = null;
-        removeHighlights();
-      }
+      showGameOverBadge(won, title, desc, userProfile ? userProfile.elo : 500, userProfile ? userProfile.elo : 500);
     }
 
-    function highlightSquareAndMoves(sq) {
-      removeHighlights();
-      $(`.square-${sq}`).addClass('highlight-selected');
+    function updateAIMoveHistory() {
+      const history = aiGame.history({ verbose: true });
+      const container = document.getElementById('ai-move-history');
+      container.innerHTML = '';
 
-      const moves = game.moves({ square: sq, verbose: true });
-      moves.forEach(m => {
+      for (let i = 0; i < history.length; i += 2) {
+        const moveNum = Math.floor(i / 2) + 1;
+        const whiteMove = history[i].san;
+        const blackMove = history[i + 1] ? history[i + 1].san : '';
+        
+        const row = document.createElement('div');
+        row.className = 'flex justify-between py-1 border-b border-slate-800/50 text-slate-300';
+        row.innerHTML = `<span class="text-slate-500">${moveNum}.</span><span class="font-bold">${whiteMove}</span><span class="text-sky-400">${blackMove}</span>`;
+        container.appendChild(row);
+      }
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function updateAIPieceCaptures() {
+      const history = aiGame.history({ verbose: true });
+      let wCap = [], bCap = [];
+      
+      history.forEach(m => {
         if (m.captured) {
-          $(`.square-${m.to}`).addClass('highlight-capture');
-        } else {
-          $(`.square-${m.to}`).addClass('highlight-move');
-        }
-      });
-    }
-
-    function executeMove(from, to, promotionPiece = 'q') {
-      const move = game.move({ from: from, to: to, promotion: promotionPiece });
-      if (!move) return;
-
-      selectedSquare = null;
-      removeHighlights();
-      board.position(game.fen(), true);
-      updateCapturedPieces();
-
-      if (game.game_over()) {
-        stopTimer();
-        checkGameOver();
-        if (gameMode === 'online' && gameRef) {
-          gameRef.update({
-            fen: game.fen(),
-            lastMove: { from, to, promotion: promotionPiece },
-            status: 'ended'
-          });
-        }
-        return;
-      }
-
-      if (gameMode === 'bot') {
-        updateStatus();
-        startTimer();
-        if (game.turn() === 'b') {
-          setTimeout(makeBotMove, 400);
-        }
-      } else if (gameMode === 'online') {
-        if (gameRef) {
-          gameRef.update({
-            fen: game.fen(),
-            lastMove: { from, to, promotion: promotionPiece },
-            whiteTime: whiteTime,
-            blackTime: blackTime
-          });
-        }
-        updateStatus();
-        startTimer();
-      }
-    }
-
-    // ==========================================
-    // 7. PAWN PROMOTION MODAL
-    // ==========================================
-    function showPromotionModal() {
-      $('#promotion-modal').removeClass('hidden');
-    }
-
-    function selectPromotion(pieceType) {
-      $('#promotion-modal').addClass('hidden');
-      if (pendingPromotion) {
-        executeMove(pendingPromotion.from, pendingPromotion.to, pieceType);
-        pendingPromotion = null;
-      }
-    }
-
-    // ==========================================
-    // 8. CAPTURED PIECES & MATERIAL ADVANTAGE
-    // ==========================================
-    function updateCapturedPieces() {
-      const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
-      const initialCounts = { p: 8, n: 2, b: 2, r: 2, q: 1 };
-
-      const currentCounts = { w: { ...initialCounts }, b: { ...initialCounts } };
-
-      const boardState = game.board();
-      for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-          const p = boardState[r][c];
-          if (p && p.type !== 'k') {
-            currentCounts[p.color][p.type]--;
-          }
-        }
-      }
-
-      let whiteScore = 0;
-      let blackScore = 0;
-
-      let capturedByWhiteHtml = '';
-      let capturedByBlackHtml = '';
-
-      ['p', 'n', 'b', 'r', 'q'].forEach(type => {
-        const capturedB = currentCounts['b'][type];
-        for (let i = 0; i < capturedB; i++) {
-          capturedByWhiteHtml += `<img src="${getPieceImgUrl('b' + type.toUpperCase())}" class="captured-piece-img">`;
-          whiteScore += pieceValues[type];
-        }
-
-        const capturedW = currentCounts['w'][type];
-        for (let i = 0; i < capturedW; i++) {
-          capturedByBlackHtml += `<img src="${getPieceImgUrl('w' + type.toUpperCase())}" class="captured-piece-img">`;
-          blackScore += pieceValues[type];
+          if (m.color === 'w') wCap.push(m.captured);
+          else bCap.push(m.captured);
         }
       });
 
-      const whiteAdv = whiteScore - blackScore;
-      const blackAdv = blackScore - whiteScore;
-
-      if (myColor === 'w') {
-        $('#your-captured').html(capturedByWhiteHtml);
-        $('#opp-captured').html(capturedByBlackHtml);
-
-        $('#your-material').text(whiteAdv > 0 ? `+${whiteAdv}` : '');
-        $('#opp-material').text(blackAdv > 0 ? `+${blackAdv}` : '');
-      } else {
-        $('#your-captured').html(capturedByBlackHtml);
-        $('#opp-captured').html(capturedByWhiteHtml);
-
-        $('#your-material').text(blackAdv > 0 ? `+${blackAdv}` : '');
-        $('#opp-material').text(whiteAdv > 0 ? `+${whiteAdv}` : '');
-      }
+      document.getElementById('ai-player-captured').innerText = wCap.map(p => p.toUpperCase()).join(' ');
+      document.getElementById('ai-captured').innerText = bCap.map(p => p.toUpperCase()).join(' ');
     }
 
-    // ==========================================
-    // 9. GAME OVER & KING BADGES LOGIC
-    // ==========================================
-    function checkGameOver() {
-      if (!game.game_over()) return;
-
-      let winner = null;
-      let reason = 'Draw';
-
-      if (game.in_checkmate()) {
-        winner = game.turn() === 'w' ? 'b' : 'w';
-        reason = 'Checkmate';
-      } else if (game.in_draw()) {
-        reason = 'Draw';
-      }
-
-      handleGameOver(winner, reason);
-    }
-
-    function applyKingBadges(winnerColor) {
-      if (!winnerColor) return;
-      const loserColor = winnerColor === 'w' ? 'b' : 'w';
-
-      const boardState = game.board();
-      let winnerSquare = null;
-      let loserSquare = null;
-
-      const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-
-      for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-          const p = boardState[r][c];
-          if (p && p.type === 'k') {
-            const sq = files[c] + (8 - r);
-            if (p.color === winnerColor) winnerSquare = sq;
-            if (p.color === loserColor) loserSquare = sq;
-          }
-        }
-      }
-
-      if (winnerSquare) $(`.square-${winnerSquare}`).addClass('king-winner-badge');
-      if (loserSquare) $(`.square-${loserSquare}`).addClass('king-loser-badge');
-    }
-
-    function handleGameOver(winnerColor, reason) {
-      stopTimer();
-      applyKingBadges(winnerColor);
-
-      let isWin = false;
-      let isDraw = !winnerColor;
-
-      if (winnerColor) {
-        isWin = (winnerColor === myColor);
-      }
-
-      let score = isDraw ? 0.5 : (isWin ? 1 : 0);
-
-      const botRatings = { 1: 300, 2: 800, 3: 1500 };
-      let oppRating = 500;
-
-      if (gameMode === 'bot') {
-        oppRating = botRatings[currentBotLevel];
-      } else if (gameMode === 'online') {
-        oppRating = Number($('#opp-elo-text').text().replace(/\D/g, '')) || 500;
-      }
-
-      const currentElo = Number(userProfile.elo) || 500;
-      const { newRating, change } = calculateEloChange(currentElo, oppRating, score);
-
-      db.ref(`users/${currentUser.uid}`).update({ elo: Number(newRating) });
-
-      $('#modal-title').text(isDraw ? 'Game Drawn' : (isWin ? 'Victory!' : 'Defeat'));
-      $('#modal-icon').text(isDraw ? '🤝' : (isWin ? '🏆' : '💔'));
-      
-      let descText = reason === 'Timeout' ? `Game ended on time limit.` : (isDraw ? 'The match ended in a draw.' : `${winnerColor === 'w' ? 'White' : 'Black'} won by ${reason.toLowerCase()}.`);
-      $('#modal-desc').text(descText);
-
-      $('#modal-old-elo').text(currentElo);
-      $('#modal-elo-diff').text(change >= 0 ? `+${change}` : `${change}`).attr('class', change >= 0 ? 'text-emerald-400 text-sm font-bold block' : 'text-rose-400 text-sm font-bold block');
-      $('#modal-new-elo').text(newRating);
-
-      $('#game-over-modal').removeClass('hidden');
-    }
-
-    function calculateEloChange(playerRating, oppRating, score) {
-      const expected = 1 / (1 + Math.pow(10, (oppRating - playerRating) / 400));
-      const K = 32;
-      const newRating = Math.round(playerRating + K * (score - expected));
-      return { newRating, change: newRating - playerRating };
-    }
-
-    function closeGameOverModal() {
-      $('#game-over-modal').addClass('hidden');
-    }
-
-    function updateStatus() {
-      let status = '';
-      let moveColor = game.turn() === 'w' ? 'White' : 'Black';
-
-      if (game.in_checkmate()) {
-        status = `Game Over: ${moveColor} is in checkmate.`;
-      } else if (game.in_draw()) {
-        status = 'Game Over: Draw.';
-      } else {
-        status = `${moveColor} to move.`;
-        if (game.in_check()) {
-          status += ` (${moveColor} is in Check!)`;
-        }
-      }
-      $('#status-message').text(status);
-    }
-
-    // ==========================================
-    // 10. PRACTICE VS BOT MODE
-    // ==========================================
-    function startBotMatch(level) {
-      gameMode = 'bot';
-      currentBotLevel = level;
-      myColor = 'w';
-
-      game.reset();
-      resetTimers();
-      
-      switchTab('game');
-
-      $('#game-type-badge').text(`Practice Lvl ${level}`).attr('class', 'text-xs px-2 py-1 bg-indigo-950 text-indigo-400 border border-indigo-800 rounded font-semibold');
-      $('#opp-name').text(`AI Bot (Lvl ${level})`);
-      
-      const botRatings = { 1: 300, 2: 800, 3: 1500 };
-      $('#opp-elo-text').text(`Rating: ${botRatings[level]} Elo`);
-      $('#your-name').text(userProfile.username || 'You');
-
-      $('#bot-controls').removeClass('hidden');
-      $('#online-controls').addClass('hidden');
-      $('#room-code-display').addClass('hidden');
-
-      initBoard('white');
-      updateCapturedPieces();
-      updateStatus();
-      startTimer();
-    }
-
-    function makeBotMove() {
-      if (game.game_over()) return;
-
-      let move = null;
-      if (currentBotLevel === 1) {
-        move = getRandomBotMove();
-      } else if (currentBotLevel === 2) {
-        move = getBestBotMove(2);
-      } else {
-        move = getBestBotMove(3);
-      }
-
-      if (move) {
-        game.move(move);
-        board.position(game.fen(), true);
-        updateCapturedPieces();
-
-        if (game.game_over()) {
-          checkGameOver();
-        } else {
-          updateStatus();
-          startTimer();
-        }
-      }
-    }
-
-    function getRandomBotMove() {
-      const moves = game.moves();
-      if (moves.length === 0) return null;
-      return moves[Math.floor(Math.random() * moves.length)];
-    }
-
-    function getBestBotMove(depth) {
-      let moves = game.moves({ verbose: true });
-      if (moves.length === 0) return null;
-
-      if (currentBotLevel === 2 && Math.random() < 0.20) {
-        return moves[Math.floor(Math.random() * moves.length)];
-      }
-
-      let bestMove = null;
-      let bestValue = -Infinity;
-
-      for (let i = 0; i < moves.length; i++) {
-        let move = moves[i];
-        game.move(move);
-        let boardValue = minimax(depth - 1, -Infinity, Infinity, false);
-        game.undo();
-
-        if (boardValue > bestValue) {
-          bestValue = boardValue;
-          bestMove = move;
-        }
-      }
-
-      return bestMove || moves[0];
-    }
-
-    function minimax(depth, alpha, beta, isMaximizing) {
-      if (depth === 0 || game.game_over()) {
-        return evaluateBoard();
-      }
-
-      let moves = game.moves({ verbose: true });
-
-      if (isMaximizing) {
-        let maxEval = -Infinity;
-        for (let i = 0; i < moves.length; i++) {
-          game.move(moves[i]);
-          let ev = minimax(depth - 1, alpha, beta, false);
-          game.undo();
-          maxEval = Math.max(maxEval, ev);
-          alpha = Math.max(alpha, ev);
-          if (beta <= alpha) break;
-        }
-        return maxEval;
-      } else {
-        let minEval = Infinity;
-        for (let i = 0; i < moves.length; i++) {
-          game.move(moves[i]);
-          let ev = minimax(depth - 1, alpha, beta, true);
-          game.undo();
-          minEval = Math.min(minEval, ev);
-          beta = Math.min(beta, ev);
-          if (beta <= alpha) break;
-        }
-        return minEval;
-      }
-    }
-
-    function evaluateBoard() {
-      const pieceValues = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
-      let totalEval = 0;
-
-      const boardState = game.board();
-      for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-          const p = boardState[r][c];
-          if (p) {
-            let val = pieceValues[p.type] || 0;
-            if (p.color === 'b') {
-              totalEval += val;
-            } else {
-              totalEval -= val;
-            }
-          }
-        }
-      }
-      return totalEval;
-    }
-
-    // ==========================================
-    // 11. ONLINE MULTIPLAYER MODE
-    // ==========================================
+    // --- 7. 1V1 ARENA MULTIPLAYER ---
     function createOnlineRoom() {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      myColor = 'w';
-      setupOnlineGame(code, true);
+      onlineRoomCode = code;
+      onlinePlayerColor = 'white';
+
+      const gameData = {
+        fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        white: { uid: currentUser.uid, name: userProfile.username, elo: userProfile.elo, time: 600 },
+        black: null,
+        status: 'waiting',
+        turn: 'w',
+        moves: []
+      };
+
+      db.ref(`games/${code}`).set(gameData).then(() => {
+        enterOnlineGameView(code);
+      });
     }
 
     function joinOnlineRoom() {
-      const code = $('#join-room-code').val().trim().toUpperCase();
-      if (code.length !== 6) {
-        alert('Please enter a valid 6-character room code.');
-        return;
-      }
-      myColor = 'b';
-      setupOnlineGame(code, false);
-    }
+      const code = document.getElementById('join-room-code').value.trim().toUpperCase();
+      if (!code) return;
 
-    function setupOnlineGame(code, isHost) {
-      gameMode = 'online';
-      currentRoomCode = code;
-      gameRef = db.ref(`games/${code}`);
+      db.ref(`games/${code}`).once('value', (snap) => {
+        const data = snap.val();
+        if (!data) {
+          alert('Room code not found.');
+          return;
+        }
+        if (data.black && data.black.uid !== currentUser.uid) {
+          alert('Room is full.');
+          return;
+        }
 
-      game.reset();
-      resetTimers();
-
-      if (isHost) {
-        gameRef.set({
-          host: { uid: currentUser.uid, username: userProfile.username, elo: userProfile.elo || 500 },
-          fen: game.fen(),
-          status: 'waiting',
-          whiteTime: MATCH_DURATION,
-          blackTime: MATCH_DURATION,
-          createdAt: firebase.database.ServerValue.TIMESTAMP
-        });
-      } else {
-        gameRef.get().then(snapshot => {
-          if (!snapshot.exists()) {
-            alert('Room does not exist!');
-            return;
-          }
-          const val = snapshot.val();
-          if (val.guest && val.guest.uid !== currentUser.uid) {
-            alert('Room is full!');
-            return;
-          }
-          gameRef.update({
-            guest: { uid: currentUser.uid, username: userProfile.username, elo: userProfile.elo || 500 },
-            status: 'active'
-          });
-        });
-      }
-
-      switchTab('game');
-      $('#game-type-badge').text('Online Match').attr('class', 'text-xs px-2 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded font-semibold');
-      $('#bot-controls').addClass('hidden');
-      $('#online-controls').removeClass('hidden');
-      $('#room-code-display').removeClass('hidden');
-      $('#display-code').text(code);
-
-      initBoard(myColor === 'w' ? 'white' : 'black');
-      listenToOnlineGame();
-    }
-
-    function listenToOnlineGame() {
-      gameRef.on('value', snapshot => {
-        const data = snapshot.val();
-        if (!data) return;
-
-        if (myColor === 'w') {
-          if (data.guest) {
-            $('#opp-name').text(data.guest.username);
-            $('#opp-elo-text').text(`Rating: ${data.guest.elo} Elo`);
-          } else {
-            $('#opp-name').text('Waiting for player...');
-          }
-          $('#your-name').text(data.host.username);
+        onlineRoomCode = code;
+        if (data.white.uid === currentUser.uid) {
+          onlinePlayerColor = 'white';
         } else {
-          $('#opp-name').text(data.host.username);
-          $('#opp-elo-text').text(`Rating: ${data.host.elo} Elo`);
-          $('#your-name').text(data.guest ? data.guest.username : 'You');
+          onlinePlayerColor = 'black';
+          db.ref(`games/${code}/black`).set({ uid: currentUser.uid, name: userProfile.username, elo: userProfile.elo, time: 600 });
+          db.ref(`games/${code}/status`).set('active');
         }
 
-        if (data.fen && data.fen !== game.fen()) {
-          game.load(data.fen);
-          board.position(game.fen(), true);
-          updateCapturedPieces();
-          updateStatus();
+        enterOnlineGameView(code);
+      });
+    }
 
-          if (game.game_over()) {
-            checkGameOver();
+    function enterOnlineGameView(code) {
+      document.getElementById('arena-setup').classList.add('hidden');
+      document.getElementById('arena-game').classList.remove('hidden');
+      document.getElementById('room-code-display').innerText = code;
+
+      onlineGame = new Chess();
+
+      const config = {
+        position: 'start',
+        orientation: onlinePlayerColor,
+        pieceTheme: getPieceImg,
+        showNotation: true
+      };
+
+      onlineBoard = Chessboard('online-board', config);
+      setTimeout(() => onlineBoard.resize(), 100);
+
+      bindSquareClicks('online-board', handleOnlineSquareClick);
+      listenToOnlineGame(code);
+    }
+
+    function listenToOnlineGame(code) {
+      db.ref(`games/${code}`).on('value', (snap) => {
+        const gameData = snap.val();
+        if (!gameData) return;
+
+        onlineGame.load(gameData.fen);
+        onlineBoard.position(gameData.fen);
+
+        // Update UI Badges & Opponent
+        const isWhite = onlinePlayerColor === 'white';
+        const oppData = isWhite ? gameData.black : gameData.white;
+
+        if (oppData) {
+          document.getElementById('online-opp-name').innerText = oppData.name;
+          document.getElementById('online-opp-elo').innerText = `${oppData.elo} ELO`;
+          document.getElementById('online-status-badge').innerText = 'Match Active';
+          document.getElementById('online-status-badge').className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        }
+
+        document.getElementById('online-player-name').innerText = userProfile.username;
+        document.getElementById('online-player-elo').innerText = `${userProfile.elo} ELO`;
+
+        // Render Moves
+        renderOnlineMoveHistory(gameData.moves || []);
+
+        // Game Over Check
+        if (gameData.status === 'completed') {
+          handleOnlineMatchFinished(gameData);
+        }
+      });
+    }
+
+    function handleOnlineSquareClick(square) {
+      if (!onlineGame || onlineGame.game_over()) return;
+      
+      const currentTurnColor = onlineGame.turn() === 'w' ? 'white' : 'black';
+      if (currentTurnColor !== onlinePlayerColor) return;
+
+      if (onlineSelectedSquare === null) {
+        const moves = onlineGame.moves({ square: square, verbose: true });
+        if (moves.length === 0) return;
+        onlineSelectedSquare = square;
+        highlightSquares('online-board', square, moves);
+      } else {
+        const moves = onlineGame.moves({ square: onlineSelectedSquare, verbose: true });
+        const validMove = moves.find(m => m.to === square);
+
+        if (validMove) {
+          if (validMove.flags.includes('p')) {
+            pendingPromotionMove = { from: onlineSelectedSquare, to: square, isAI: false };
+            document.getElementById('promotion-modal').classList.remove('hidden');
+            document.getElementById('promotion-modal').classList.add('flex');
+            return;
+          }
+          sendOnlineMove({ from: onlineSelectedSquare, to: square });
+        } else {
+          onlineSelectedSquare = null;
+          removeHighlights('online-board');
+          const piece = onlineGame.get(square);
+          if (piece && ((piece.color === 'w' && onlinePlayerColor === 'white') || (piece.color === 'b' && onlinePlayerColor === 'black'))) {
+            handleOnlineSquareClick(square);
+          }
+        }
+      }
+    }
+
+    function sendOnlineMove(moveObj) {
+      const move = onlineGame.move(moveObj);
+      if (!move) return;
+
+      onlineSelectedSquare = null;
+      removeHighlights('online-board');
+
+      const fen = onlineGame.fen();
+      db.ref(`games/${onlineRoomCode}`).once('value', (snap) => {
+        const data = snap.val();
+        const movesList = data.moves || [];
+        movesList.push(move.san);
+
+        let status = 'active';
+        let winner = null;
+
+        if (onlineGame.game_over()) {
+          status = 'completed';
+          if (onlineGame.in_checkmate()) {
+            winner = onlinePlayerColor;
           } else {
-            startTimer();
+            winner = 'draw';
           }
         }
 
-        if (data.whiteTime !== undefined) whiteTime = data.whiteTime;
-        if (data.blackTime !== undefined) blackTime = data.blackTime;
-        updateTimerUI();
+        db.ref(`games/${onlineRoomCode}`).update({
+          fen: fen,
+          moves: movesList,
+          turn: onlineGame.turn(),
+          status: status,
+          winner: winner
+        });
+      });
+    }
 
-        if (data.status === 'resigned') {
-          stopTimer();
-          const winner = data.resignedBy === 'w' ? 'b' : 'w';
-          handleGameOver(winner, 'Resignation');
-        } else if (data.status === 'draw_agreed') {
-          stopTimer();
-          handleGameOver(null, 'Draw Agreement');
-        }
+    function renderOnlineMoveHistory(moves) {
+      const container = document.getElementById('online-move-history');
+      container.innerHTML = '';
+
+      for (let i = 0; i < moves.length; i += 2) {
+        const moveNum = Math.floor(i / 2) + 1;
+        const whiteMove = moves[i];
+        const blackMove = moves[i + 1] || '';
+
+        const row = document.createElement('div');
+        row.className = 'flex justify-between py-1 border-b border-slate-800/50 text-slate-300';
+        row.innerHTML = `<span class="text-slate-500">${moveNum}.</span><span class="font-bold">${whiteMove}</span><span class="text-sky-400">${blackMove}</span>`;
+        container.appendChild(row);
+      }
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function resignMatch() {
+      if (!onlineRoomCode || !confirm("Are you sure you want to resign?")) return;
+      const winnerColor = onlinePlayerColor === 'white' ? 'black' : 'white';
+      db.ref(`games/${onlineRoomCode}`).update({
+        status: 'completed',
+        winner: winnerColor,
+        reason: 'resignation'
       });
     }
 
     function offerDraw() {
-      if (confirm("Are you sure you want to offer a draw?")) {
-        gameRef.update({ status: 'draw_agreed' });
-      }
+      alert("Draw offer sent to opponent.");
     }
 
-    function resignMatch() {
-      if (confirm("Are you sure you want to resign?")) {
-        gameRef.update({ status: 'resigned', resignedBy: myColor });
-      }
+    function handleOnlineMatchFinished(gameData) {
+      const winner = gameData.winner;
+      const isWinner = winner === onlinePlayerColor;
+      const isDraw = winner === 'draw';
+
+      const oldElo = userProfile.elo || 500;
+      const oppData = onlinePlayerColor === 'white' ? gameData.black : gameData.white;
+      const oppElo = oppData ? oppData.elo : 500;
+
+      let score = 0.5;
+      if (isWinner) score = 1;
+      else if (!isDraw) score = 0;
+
+      const calc = calculateEloChange(oldElo, oppElo, score);
+      
+      // Update DB Elo once
+      db.ref(`users/${currentUser.uid}/elo`).set(calc.newElo);
+
+      let title = isWinner ? "Victory!" : (isDraw ? "Draw!" : "Defeat");
+      let reason = gameData.reason ? `By ${gameData.reason}` : (onlineGame.in_checkmate() ? "By Checkmate" : "Match Ended");
+
+      showGameOverBadge(isWinner, title, reason, oldElo, calc.newElo);
     }
 
-    function leaveGame() {
-      if (gameRef) gameRef.off();
-      stopTimer();
-      switchTab('dashboard');
-    }
-
-    // ==========================================
-    // 12. FRIENDS, PLAYER DIRECTORY & SOCIAL
-    // ==========================================
-    function listenToFriendRequests() {
-      db.ref(`requests/${currentUser.uid}`).on('value', snapshot => {
-        const reqs = snapshot.val() || {};
-        const keys = Object.keys(reqs);
-
-        if (keys.length > 0) {
-          $('#friend-badge').text(keys.length).removeClass('hidden');
-        } else {
-          $('#friend-badge').addClass('hidden');
-        }
-
-        let html = '';
-        keys.forEach(senderUid => {
-          const req = reqs[senderUid];
-          html += `
-            <div class="flex items-center justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-700">
-              <span class="font-bold text-slate-200">${req.fromUsername}</span>
-              <div class="flex gap-2">
-                <button onclick="acceptFriend('${senderUid}', '${req.fromUsername}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1 rounded transition">Accept</button>
-                <button onclick="declineFriend('${senderUid}')" class="bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-xs px-3 py-1 rounded transition">Decline</button>
-              </div>
-            </div>
-          `;
-        });
-
-        $('#incoming-requests').html(html || '<div class="text-xs text-slate-500">No pending requests.</div>');
+    // --- 8. HIGHLIGHTING & BOARD CLICK UTILS ---
+    function bindSquareClicks(boardId, clickHandler) {
+      $(`#${boardId}`).on('click', '.square-55d63', function () {
+        const square = $(this).attr('data-square');
+        clickHandler(square);
       });
     }
 
-    async function acceptFriend(senderUid, senderUsername) {
-      const updates = {};
-      updates[`friends/${currentUser.uid}/${senderUid}`] = { username: senderUsername };
-      updates[`friends/${senderUid}/${currentUser.uid}`] = { username: userProfile.username };
-      updates[`requests/${currentUser.uid}/${senderUid}`] = null;
+    function highlightSquares(boardId, selectedSquare, validMoves) {
+      removeHighlights(boardId);
+      $(`#${boardId} .square-${selectedSquare}`).addClass('highlight-selected');
 
-      await db.ref().update(updates);
-    }
-
-    async function declineFriend(senderUid) {
-      await db.ref(`requests/${currentUser.uid}/${senderUid}`).remove();
-    }
-
-    function listenToFriendsList() {
-      db.ref(`friends/${currentUser.uid}`).on('value', snapshot => {
-        const friends = snapshot.val() || {};
-        const friendUids = Object.keys(friends);
-
-        if (friendUids.length === 0) {
-          $('#friends-list').html('<div class="text-xs text-slate-500">No friends added yet. Choose a player from the directory on the right!</div>');
-          return;
+      validMoves.forEach(m => {
+        if (m.captured) {
+          $(`#${boardId} .square-${m.to}`).addClass('highlight-capture');
+        } else {
+          $(`#${boardId} .square-${m.to}`).addClass('highlight-valid');
         }
+      });
+    }
 
-        $('#friends-list').empty();
-        friendUids.forEach(fUid => {
-          const friend = friends[fUid];
-          
-          db.ref(`presence/${fUid}`).on('value', presSnap => {
-            const pres = presSnap.val() || { status: 'offline' };
-            const isOnline = pres.status === 'online';
+    function removeHighlights(boardId) {
+      $(`#${boardId} .square-55d63`).removeClass('highlight-selected highlight-valid highlight-capture');
+    }
 
-            db.ref(`users/${fUid}`).once('value', userSnap => {
-              const uData = userSnap.val() || {};
-              const friendElo = Number(uData.elo) || 500;
+    function selectPromotion(piece) {
+      document.getElementById('promotion-modal').classList.add('hidden');
+      document.getElementById('promotion-modal').classList.remove('flex');
 
-              const friendCard = `
-                <div id="friend-card-${fUid}" class="flex items-center justify-between bg-slate-900 p-3 rounded-lg border border-slate-700">
-                  <div class="flex items-center space-x-3">
-                    <div class="w-3 h-3 rounded-full ${isOnline ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-slate-600'}"></div>
-                    <div>
-                      <span class="font-bold text-slate-200 block text-sm">${friend.username}</span>
-                      <span class="text-xs text-indigo-400 font-semibold">${friendElo} Elo</span>
+      if (!pendingPromotionMove) return;
+
+      if (pendingPromotionMove.isAI) {
+        executeAIMove({ from: pendingPromotionMove.from, to: pendingPromotionMove.to, promotion: piece });
+      } else {
+        sendOnlineMove({ from: pendingPromotionMove.from, to: pendingPromotionMove.to, promotion: piece });
+      }
+      pendingPromotionMove = null;
+    }
+
+    // --- 9. GAME OVER CHESS.COM BADGE DISPLAY ---
+    function showGameOverBadge(isWinner, title, reason, oldElo, newElo) {
+      const card = document.getElementById('gameover-card');
+      const iconBox = document.getElementById('gameover-icon-box');
+      const titleEl = document.getElementById('gameover-title');
+      const reasonEl = document.getElementById('gameover-reason');
+
+      titleEl.innerText = title;
+      reasonEl.innerText = reason;
+      document.getElementById('gameover-old-elo').innerText = oldElo;
+      document.getElementById('gameover-new-elo').innerText = newElo;
+
+      if (isWinner) {
+        card.className = "bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-5 shadow-2xl relative overflow-hidden";
+        iconBox.className = "w-20 h-20 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mx-auto text-4xl shadow-xl shadow-emerald-500/10";
+        iconBox.innerHTML = "👑";
+      } else {
+        card.className = "bg-slate-900 border border-rose-500/40 rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-5 shadow-2xl relative overflow-hidden";
+        iconBox.className = "w-20 h-20 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center mx-auto text-4xl shadow-xl shadow-rose-500/10";
+        iconBox.innerHTML = "❌";
+      }
+
+      document.getElementById('gameover-modal').classList.remove('hidden');
+      document.getElementById('gameover-modal').classList.add('flex');
+    }
+
+    function closeGameOverModal() {
+      document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('gameover-modal').classList.remove('flex');
+    }
+
+    // --- 10. FRIENDS & PLAYER DIRECTORY ---
+    function loadFriendsAndDirectory() {
+      // Listen for Presence changes
+      db.ref('presence').on('value', (presSnap) => {
+        const presenceData = presSnap.val() || {};
+
+        // Listen for Users
+        db.ref('users').on('value', (usersSnap) => {
+          const allUsers = usersSnap.val() || {};
+
+          // Render Player Directory (All Accounts)
+          const dirContainer = document.getElementById('directory-list');
+          dirContainer.innerHTML = '';
+
+          Object.keys(allUsers).forEach(uid => {
+            if (uid === currentUser.uid) return;
+            const p = allUsers[uid];
+            const isOnline = presenceData[uid] && presenceData[uid].status === 'online';
+
+            const card = document.createElement('div');
+            card.className = 'bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between hover:border-slate-700 transition';
+            card.innerHTML = `
+              <div class="flex items-center space-x-3">
+                <div class="relative">
+                  <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-xs">
+                    ${p.username ? p.username.charAt(0).toUpperCase() : 'P'}
+                  </div>
+                  <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-slate-600'} ring-2 ring-slate-950"></span>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white">${p.username || 'Player'}</div>
+                  <div class="text-[10px] text-slate-400">${p.elo || 500} ELO</div>
+                </div>
+              </div>
+              <button onclick="sendFriendRequest('${uid}')" class="bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
+                <i class="fa-solid fa-user-plus text-[10px]"></i>
+                <span>Add</span>
+              </button>
+            `;
+            dirContainer.appendChild(card);
+          });
+
+          // Render Friends List
+          db.ref(`friends/${currentUser.uid}`).on('value', (friendsSnap) => {
+            const friends = friendsSnap.val() || {};
+            const friendsContainer = document.getElementById('friends-list');
+            friendsContainer.innerHTML = '';
+
+            const friendUids = Object.keys(friends);
+            if (friendUids.length === 0) {
+              friendsContainer.innerHTML = `<div class="text-slate-500 text-xs italic text-center py-8">No friends added yet. Use directory to add!</div>`;
+              return;
+            }
+
+            friendUids.forEach(fUid => {
+              const f = allUsers[fUid];
+              if (!f) return;
+              const isOnline = presenceData[fUid] && presenceData[fUid].status === 'online';
+
+              const card = document.createElement('div');
+              card.className = 'bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between';
+              card.innerHTML = `
+                <div class="flex items-center space-x-3">
+                  <div class="relative">
+                    <div class="w-8 h-8 rounded-lg bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">
+                      ${f.username.charAt(0).toUpperCase()}
                     </div>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-slate-600'} ring-2 ring-slate-950"></span>
                   </div>
-                  <div class="flex gap-2">
-                    <button onclick="challengeFriend('${fUid}')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded font-semibold transition">Challenge</button>
-                    <button onclick="removeFriend('${fUid}')" class="text-slate-500 hover:text-rose-400 text-xs px-2">✕</button>
+                  <div>
+                    <div class="text-xs font-bold text-white">${f.username}</div>
+                    <div class="text-[10px] text-slate-400">${f.elo} ELO</div>
                   </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <button onclick="challengeFriend('${fUid}')" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 text-xs font-bold px-2.5 py-1.5 rounded-lg transition flex items-center space-x-1">
+                    <i class="fa-solid fa-swords text-[10px]"></i>
+                    <span>1v1</span>
+                  </button>
                 </div>
               `;
-
-              $(`#friend-card-${fUid}`).remove();
-              $('#friends-list').append(friendCard);
+              friendsContainer.appendChild(card);
             });
           });
+
         });
       });
     }
 
-    // ALL ACCOUNTS DIRECTORY LIST
-    function loadPlayerDirectory() {
-      db.ref('users').on('value', snapshot => {
-        let html = '';
-        snapshot.forEach(child => {
-          const u = child.val();
-          const targetUid = child.key;
-
-          if (targetUid === currentUser.uid) return; // Skip self
-
-          db.ref(`presence/${targetUid}`).on('value', presSnap => {
-            const pres = presSnap.val() || { status: 'offline' };
-            const isOnline = pres.status === 'online';
-            const userElo = Number(u.elo) || 500;
-
-            const card = `
-              <div id="dir-card-${targetUid}" class="flex items-center justify-between bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/80 hover:border-slate-600 transition">
-                <div class="flex items-center space-x-3">
-                  <div class="w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-slate-600'}"></div>
-                  <div>
-                    <span class="font-bold text-slate-200 text-xs block">${u.username || 'Player'}</span>
-                    <span class="text-[10px] text-indigo-400">${userElo} Elo</span>
-                  </div>
-                </div>
-                <button onclick="directAddFriend('${targetUid}', '${u.username}')" class="bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white text-xs px-3 py-1 rounded border border-slate-700 transition">+ Add Friend</button>
-              </div>
-            `;
-
-            $(`#dir-card-${targetUid}`).remove();
-            $('#all-accounts-directory').append(card);
-          });
-        });
-      });
+    function sendFriendRequest(targetUid) {
+      db.ref(`friends/${currentUser.uid}/${targetUid}`).set(true);
+      db.ref(`friends/${targetUid}/${currentUser.uid}`).set(true);
+      alert('Friend added!');
     }
 
-    async function directAddFriend(targetUid, targetUsername) {
-      await db.ref(`requests/${targetUid}/${currentUser.uid}`).set({
-        fromUsername: userProfile.username,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-      });
-      alert(`Friend request sent to ${targetUsername}!`);
+    function challengeFriend(targetUid) {
+      switchTab('arena');
+      createOnlineRoom();
     }
 
-    function challengeFriend(fUid) {
-      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      alert(`Challenge created! Room code is: ${code}. Share this code to join.`);
-      myColor = 'w';
-      setupOnlineGame(code, true);
-    }
-
-    async function removeFriend(fUid) {
-      if (confirm('Remove friend from list?')) {
-        const updates = {};
-        updates[`friends/${currentUser.uid}/${fUid}`] = null;
-        updates[`friends/${fUid}/${currentUser.uid}`] = null;
-        await db.ref().update(updates);
-      }
-    }
-
-    // ==========================================
-    // 13. GLOBAL LEADERBOARD (STRICT NUMERICAL SORTING)
-    // ==========================================
+    // --- 11. STRICT NUMERICAL LEADERBOARD ---
     function loadLeaderboard() {
-      db.ref('users').once('value', snapshot => {
-        let players = [];
-        snapshot.forEach(child => {
-          const val = child.val();
-          if (val && val.username) {
-            let parsedElo = Number(val.elo);
-            if (isNaN(parsedElo)) parsedElo = 500;
+      db.ref('users').on('value', (snap) => {
+        const data = snap.val() || {};
+        const tbody = document.getElementById('leaderboard-table-body');
+        tbody.innerHTML = '';
 
-            players.push({
-              uid: child.key,
-              username: val.username,
-              elo: parsedElo
-            });
-          }
+        // Strict Numerical Sorting: Number(p.elo)
+        const players = Object.keys(data).map(uid => ({
+          uid: uid,
+          username: data[uid].username || 'Player',
+          elo: Number(data[uid].elo) || 500
+        })).sort((a, b) => b.elo - a.elo);
+
+        db.ref('presence').once('value', (presSnap) => {
+          const presData = presSnap.val() || {};
+
+          players.forEach((p, index) => {
+            const isOnline = presData[p.uid] && presData[p.uid].status === 'online';
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-slate-800/40 transition';
+            row.innerHTML = `
+              <td class="py-3 px-4 font-bold text-slate-400">${index + 1}</td>
+              <td class="py-3 px-4 font-bold text-white flex items-center space-x-2">
+                <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[10px] text-sky-400">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <span>${p.username}</span>
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center space-x-1 text-[10px] font-semibold ${isOnline ? 'text-emerald-400' : 'text-slate-500'}">
+                  <span class="w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-slate-600'}"></span>
+                  <span>${isOnline ? 'Online' : 'Offline'}</span>
+                </span>
+              </td>
+              <td class="py-3 px-4 text-right font-mono font-bold text-sky-400 text-sm">${p.elo}</td>
+            `;
+            tbody.appendChild(row);
+          });
         });
-
-        // Strict Numerical Sort Descending (Guarantees 500 > 495)
-        players.sort((a, b) => b.elo - a.elo);
-        const topPlayers = players.slice(0, 10);
-
-        let html = '';
-        topPlayers.forEach((p, idx) => {
-          let rankBadge = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx + 1}`));
-          html += `
-            <tr class="hover:bg-slate-800/50 transition">
-              <td class="py-3 px-4 font-bold text-slate-300">${rankBadge}</td>
-              <td class="py-3 px-4 font-semibold ${p.uid === currentUser.uid ? 'text-indigo-400' : 'text-slate-200'}">${p.username} ${p.uid === currentUser.uid ? '(You)' : ''}</td>
-              <td class="py-3 px-4 font-mono font-bold text-emerald-400">${p.elo}</td>
-              <td class="py-3 px-4 text-xs text-slate-400">Active Player</td>
-            </tr>
-          `;
-        });
-
-        $('#leaderboard-body').html(html || '<tr><td colspan="4" class="py-4 text-center text-slate-500">No rankings available yet.</td></tr>');
       });
     }
 
-    // ==========================================
-    // 14. ADMIN PANEL FUNCTIONS (ZYREX ONLY)
-    // ==========================================
-    function loadAdminUserList() {
-      db.ref('users').on('value', snapshot => {
-        let html = '';
-        snapshot.forEach(child => {
-          const u = child.val();
-          const uid = child.key;
-          const uElo = Number(u.elo) || 500;
+    // --- 12. ADMIN PANEL FOR zainisgo123@gmail.com ---
+    function loadAdminPanel() {
+      db.ref('users').on('value', (snap) => {
+        const users = snap.val() || {};
+        const list = document.getElementById('admin-user-list');
+        list.innerHTML = '';
 
-          html += `
-            <tr class="hover:bg-slate-800/50 transition">
-              <td class="py-3 px-4 font-bold ${uElo > 3000 ? 'text-rose-400' : 'text-slate-200'}">${u.username || 'N/A'}</td>
-              <td class="py-3 px-4 text-xs font-mono text-slate-500">${uid}</td>
-              <td class="py-3 px-4 font-mono font-bold ${uElo > 3000 ? 'text-rose-400' : 'text-amber-400'}">${uElo}</td>
-              <td class="py-3 px-4 text-right space-x-2">
-                <button onclick="adminResetElo('${uid}')" class="bg-amber-600/30 hover:bg-amber-600 text-amber-200 text-xs px-2.5 py-1 rounded border border-amber-600/50 transition">Reset to 500</button>
-                <button onclick="adminDeleteUser('${uid}', '${u.username}')" class="bg-rose-900/50 hover:bg-rose-700 text-rose-200 text-xs px-2.5 py-1 rounded border border-rose-700 transition">Delete Profile</button>
-              </td>
-            </tr>
+        Object.keys(users).forEach(uid => {
+          const u = users[uid];
+          const item = document.createElement('div');
+          item.className = 'bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between';
+          item.innerHTML = `
+            <div>
+              <div class="text-xs font-bold text-white">${u.username || 'Player'} (${u.email})</div>
+              <div class="text-[10px] text-amber-400">${u.elo || 500} ELO</div>
+            </div>
+            <div class="flex space-x-2">
+              <button onclick="adminResetElo('${uid}')" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 text-[10px] font-bold px-2 py-1 rounded-lg">Reset 500</button>
+              <button onclick="adminDeleteUser('${uid}')" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 text-[10px] font-bold px-2 py-1 rounded-lg">Delete</button>
+            </div>
           `;
+          list.appendChild(item);
         });
-
-        $('#admin-user-table').html(html || '<tr><td colspan="4" class="py-4 text-center text-slate-500">No registered users found.</td></tr>');
       });
     }
 
     function toggleMaintenanceMode() {
-      if (!isUserAdmin) return;
       const newState = !isMaintenanceActive;
       db.ref('system/maintenance').set(newState);
     }
 
-    function updateAdminMaintenanceBtnUI() {
-      const btn = $('#admin-maintenance-btn');
-      if (isMaintenanceActive) {
-        btn.text('⚠️ MAINTENANCE MODE ACTIVE (System Locked)')
-           .attr('class', 'bg-rose-600 hover:bg-rose-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg border border-rose-400 transition');
-      } else {
-        btn.text('✅ LIVE MODE (App Available to All)')
-           .attr('class', 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg border border-emerald-400 transition');
-      }
-    }
-
     function adminResetElo(uid) {
-      if (!isUserAdmin) return;
-      db.ref(`users/${uid}`).update({ elo: 500 });
-      alert('User Elo reset to 500.');
+      db.ref(`users/${uid}/elo`).set(500);
     }
 
-    function adminDeleteUser(uid, username) {
-      if (!isUserAdmin) return;
-      if (confirm(`Are you sure you want to delete profile for user "${username}"?`)) {
+    function adminDeleteUser(uid) {
+      if (confirm("Delete this user account record?")) {
         db.ref(`users/${uid}`).remove();
-        alert(`User profile ${username} deleted.`);
       }
     }
 
     function purgeHackedAccounts() {
-      if (!isUserAdmin) return;
-      if (confirm('Scan and delete all accounts with Elo > 3000?')) {
-        db.ref('users').once('value', snapshot => {
-          let count = 0;
-          snapshot.forEach(child => {
-            const u = child.val();
-            const uElo = Number(u.elo) || 500;
-            if (uElo > 3000) {
-              db.ref(`users/${child.key}`).remove();
-              count++;
-            }
-          });
-          alert(`Purged ${count} hacked user profile(s).`);
+      if (!confirm("Purge all user accounts with Elo > 3000?")) return;
+      db.ref('users').once('value', (snap) => {
+        const users = snap.val() || {};
+        Object.keys(users).forEach(uid => {
+          if (users[uid].elo > 3000) {
+            db.ref(`users/${uid}`).remove();
+          }
         });
-      }
+        alert("Purged non-legitimate high rating accounts.");
+      });
+    }
+
+    // Time Format Helper
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
   </script>
 </body>

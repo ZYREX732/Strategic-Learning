@@ -1267,7 +1267,6 @@
         }
       }
 
-      // White captures Black pieces; Black captures White pieces
       let whiteCapStr = '', blackCapStr = '';
       let whiteMat = 0, blackMat = 0;
 
@@ -1388,7 +1387,6 @@
         document.getElementById('online-player-name').innerText = userProfile.username;
         document.getElementById('online-player-elo').innerText = `${userProfile.elo} ELO`;
 
-        // Render Notation & Captured Pieces
         renderOnlineMoveHistory(gameData.moves || []);
         if (isWhite) {
           updateCapturedPiecesDisplay(onlineGame, 'online-player-captured', 'online-opp-captured');
@@ -1396,11 +1394,9 @@
           updateCapturedPiecesDisplay(onlineGame, 'online-opp-captured', 'online-player-captured');
         }
 
-        // Toggle Abort vs Resign button
         const moveCount = (gameData.moves || []).length;
         const abortBtn = document.getElementById('btn-abort-match');
         const drawBtn = document.getElementById('btn-offer-draw');
-        const resignBtn = document.getElementById('btn-resign-match');
 
         if (moveCount <= 1 && gameData.status === 'active') {
           abortBtn.classList.remove('hidden');
@@ -1410,14 +1406,12 @@
           drawBtn.classList.remove('hidden');
         }
 
-        // Sync Clock State
         onlineWhiteTime = gameData.whiteTime !== undefined ? gameData.whiteTime : 600;
         onlineBlackTime = gameData.blackTime !== undefined ? gameData.blackTime : 600;
         onlineLastMoveTimestamp = gameData.lastMoveTimestamp || Date.now();
 
         startOnlineTimerSync(gameData.turn, gameData.status);
 
-        // Check completion state
         if (gameData.status === 'completed') {
           clearInterval(onlineTimerInterval);
           document.getElementById('btn-back-lobby').classList.remove('hidden');
@@ -1684,87 +1678,97 @@
       }
     }
 
-    // --- 11. FRIENDS & PLAYER DIRECTORY ---
+    // --- 11. FRIENDS & PLAYER DIRECTORY (WITH FRIEND FILTERING) ---
     function loadFriendsAndDirectory() {
-      db.ref('presence').on('value', (presSnap) => {
-        const presenceData = presSnap.val() || {};
+      db.ref(`friends/${currentUser.uid}`).on('value', (friendsSnap) => {
+        const friendsMap = friendsSnap.val() || {};
 
-        db.ref('users').on('value', (usersSnap) => {
-          const allUsers = usersSnap.val() || {};
+        db.ref('presence').on('value', (presSnap) => {
+          const presenceData = presSnap.val() || {};
 
-          const dirContainer = document.getElementById('directory-list');
-          dirContainer.innerHTML = '';
+          db.ref('users').on('value', (usersSnap) => {
+            const allUsers = usersSnap.val() || {};
 
-          Object.keys(allUsers).forEach(uid => {
-            if (uid === currentUser.uid) return;
-            const p = allUsers[uid];
-            const isOnline = presenceData[uid] && presenceData[uid].status === 'online';
-
-            const card = document.createElement('div');
-            card.className = 'bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between hover:border-slate-700 transition';
-            card.innerHTML = `
-              <div class="flex items-center space-x-3">
-                <div class="relative">
-                  <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-xs">
-                    ${p.username ? p.username.charAt(0).toUpperCase() : 'P'}
-                  </div>
-                  <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-slate-600'} ring-2 ring-slate-950"></span>
-                </div>
-                <div>
-                  <div class="text-xs font-bold text-white">${p.username || 'Player'}</div>
-                  <div class="text-[10px] text-slate-400">${p.elo || 500} ELO</div>
-                </div>
-              </div>
-              <button onclick="sendFriendRequest('${uid}')" class="bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
-                <i class="fa-solid fa-user-plus text-[10px]"></i>
-                <span>Add</span>
-              </button>
-            `;
-            dirContainer.appendChild(card);
-          });
-
-          db.ref(`friends/${currentUser.uid}`).on('value', (friendsSnap) => {
-            const friends = friendsSnap.val() || {};
+            // 1. Render Friends List
             const friendsContainer = document.getElementById('friends-list');
             friendsContainer.innerHTML = '';
+            const friendUids = Object.keys(friendsMap);
 
-            const friendUids = Object.keys(friends);
             if (friendUids.length === 0) {
               friendsContainer.innerHTML = `<div class="text-slate-500 text-xs italic text-center py-8">No friends added yet. Use directory to add!</div>`;
-              return;
+            } else {
+              friendUids.forEach(fUid => {
+                const f = allUsers[fUid];
+                if (!f) return;
+                const isOnline = presenceData[fUid] && presenceData[fUid].status === 'online';
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between';
+                card.innerHTML = `
+                  <div class="flex items-center space-x-3">
+                    <div class="relative">
+                      <div class="w-8 h-8 rounded-lg bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">
+                        ${f.username ? f.username.charAt(0).toUpperCase() : 'P'}
+                      </div>
+                      <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-slate-600'} ring-2 ring-slate-950"></span>
+                    </div>
+                    <div>
+                      <div class="text-xs font-bold text-white">${f.username || 'Player'}</div>
+                      <div class="text-[10px] text-slate-400">${f.elo || 500} ELO</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <button onclick="challengeFriend('${fUid}')" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 text-xs font-bold px-2.5 py-1.5 rounded-lg transition flex items-center space-x-1">
+                      <i class="fa-solid fa-swords text-[10px]"></i>
+                      <span>1v1</span>
+                    </button>
+                  </div>
+                `;
+                friendsContainer.appendChild(card);
+              });
             }
 
-            friendUids.forEach(fUid => {
-              const f = allUsers[fUid];
-              if (!f) return;
-              const isOnline = presenceData[fUid] && presenceData[fUid].status === 'online';
+            // 2. Render Player Directory (Excludes self AND current friends)
+            const dirContainer = document.getElementById('directory-list');
+            dirContainer.innerHTML = '';
+            let nonFriendCount = 0;
+
+            Object.keys(allUsers).forEach(uid => {
+              if (uid === currentUser.uid) return; // Exclude current user
+              if (friendsMap[uid]) return; // Exclude already added friends!
+
+              nonFriendCount++;
+              const p = allUsers[uid];
+              const isOnline = presenceData[uid] && presenceData[uid].status === 'online';
 
               const card = document.createElement('div');
-              card.className = 'bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between';
+              card.className = 'bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between hover:border-slate-700 transition';
               card.innerHTML = `
                 <div class="flex items-center space-x-3">
                   <div class="relative">
-                    <div class="w-8 h-8 rounded-lg bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">
-                      ${f.username.charAt(0).toUpperCase()}
+                    <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-xs">
+                      ${p.username ? p.username.charAt(0).toUpperCase() : 'P'}
                     </div>
                     <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-slate-600'} ring-2 ring-slate-950"></span>
                   </div>
                   <div>
-                    <div class="text-xs font-bold text-white">${f.username}</div>
-                    <div class="text-[10px] text-slate-400">${f.elo} ELO</div>
+                    <div class="text-xs font-bold text-white">${p.username || 'Player'}</div>
+                    <div class="text-[10px] text-slate-400">${p.elo || 500} ELO</div>
                   </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                  <button onclick="challengeFriend('${fUid}')" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 text-xs font-bold px-2.5 py-1.5 rounded-lg transition flex items-center space-x-1">
-                    <i class="fa-solid fa-swords text-[10px]"></i>
-                    <span>1v1</span>
-                  </button>
-                </div>
+                <button onclick="sendFriendRequest('${uid}')" class="bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
+                  <i class="fa-solid fa-user-plus text-[10px]"></i>
+                  <span>Add</span>
+                </button>
               `;
-              friendsContainer.appendChild(card);
+              dirContainer.appendChild(card);
             });
-          });
 
+            if (nonFriendCount === 0) {
+              dirContainer.innerHTML = `<div class="text-slate-500 text-xs italic text-center py-8">All registered players are in your friends list!</div>`;
+            }
+
+          });
         });
       });
     }

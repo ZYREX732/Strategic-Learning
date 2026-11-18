@@ -788,14 +788,19 @@
           document.getElementById('app-views').classList.remove('hidden');
           document.getElementById('main-nav').classList.remove('hidden');
 
-          if (user.email === 'zainisgo123@gmail.com') {
+          if (currentUser && currentUser.email === 'zainisgo123@gmail.com') {
             document.getElementById('tab-admin').classList.remove('hidden');
+          } else {
+            document.getElementById('tab-admin').classList.add('hidden');
           }
 
           switchTab('arena');
           loadLeaderboard();
           loadFriendsAndDirectory();
-          if (user.email === 'zainisgo123@gmail.com') loadAdminPanel();
+
+          if (currentUser && currentUser.email === 'zainisgo123@gmail.com') {
+            loadAdminPanel();
+          }
         } else {
           document.getElementById('username-modal').classList.remove('hidden');
           document.getElementById('username-modal').classList.add('flex');

@@ -132,6 +132,23 @@
     </div>
   </div>
 
+  <!-- FIRST-TIME USERNAME CREATION MODAL -->
+  <div id="username-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl">
+      <div class="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto text-2xl">👤</div>
+      <h3 class="text-xl font-bold text-white">Create Your Username</h3>
+      <p class="text-xs text-slate-400">Choose a unique handle for match invites and the leaderboard.</p>
+
+      <div>
+        <input type="text" id="modal-username-input" maxlength="15" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 text-center focus:outline-none focus:border-indigo-500 font-semibold" placeholder="e.g. Tactician2025">
+      </div>
+
+      <div id="username-modal-error" class="hidden text-xs text-rose-400 bg-rose-950/50 p-2 rounded border border-rose-800"></div>
+
+      <button onclick="saveNewUsername()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg shadow-lg transition">Save Profile Handle</button>
+    </div>
+  </div>
+
   <!-- TOP HEADER / DISGUISED NAVIGATION -->
   <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -181,32 +198,31 @@
   <!-- MAIN CONTAINER -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-    <!-- AUTH SECTION (LOGIN / REGISTER WITH AUTOCOMPLETE DISABLED) -->
+    <!-- AUTH SECTION (EMAIL LOGIN WITH AUTOFILL TRAP) -->
     <div id="auth-container" class="max-w-md mx-auto bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl mt-8">
       <h2 class="text-2xl font-bold text-center text-indigo-400 mb-2">CogniLearn Strategy Lab</h2>
-      <p class="text-slate-400 text-sm text-center mb-6">Enter your Username or Email to access matches.</p>
+      <p class="text-slate-400 text-sm text-center mb-6">Enter your email and password to access matches.</p>
       
+      <!-- DECOY FIELDS TO TRICK CHROME/SAFARI AUTOFILL -->
       <form id="auth-form" onsubmit="handleAuth(event)" autocomplete="off" class="space-y-4">
+        <input type="text" style="display:none !important;" tabindex="-1" autocomplete="off">
+        <input type="password" style="display:none !important;" tabindex="-1" autocomplete="off">
+
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Username or Email Address</label>
-          <input type="text" id="auth-username" name="no_autofill_user" autocomplete="off" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="e.g. Tactician2025">
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email Address</label>
+          <input type="email" id="auth-email" required autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="e.g. player@gmail.com">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
-          <input type="password" id="auth-password" name="no_autofill_pass" autocomplete="new-password" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="••••••••">
+          <input type="password" id="auth-password" required autocomplete="new-password" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500" placeholder="••••••••">
         </div>
 
         <div id="auth-error" class="hidden text-red-400 text-xs text-center bg-red-950/50 p-2 rounded border border-red-800"></div>
 
         <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg shadow-lg transition duration-200">
-          Sign In / Create Account
+          Sign In / Register Account
         </button>
       </form>
-
-      <!-- FORCE CLEAR SESSION BUTTON -->
-      <div class="mt-6 border-t border-slate-700/60 pt-4 text-center">
-        <button onclick="forceClearSession()" class="text-xs text-slate-400 hover:text-slate-200 underline">Sign Out Saved Session / Switch Account</button>
-      </div>
     </div>
 
     <!-- MAIN APP VIEWS (HIDDEN UNTIL AUTHENTICATED) -->
@@ -318,27 +334,35 @@
         </div>
       </div>
 
-      <!-- FRIENDS TAB -->
+      <!-- FRIENDS & PLAYER DIRECTORY TAB -->
       <div id="view-friends" class="view-content hidden space-y-6">
         <div class="grid md:grid-cols-2 gap-6">
+          <!-- MY FRIENDS LIST -->
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <h3 class="text-lg font-bold text-indigo-400">Add Friend</h3>
-            <div class="flex gap-2">
-              <input type="text" id="search-friend-username" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500" placeholder="Enter username...">
-              <button onclick="sendFriendRequest()" class="bg-indigo-600 hover:bg-indigo-500 px-4 font-semibold rounded-lg text-sm transition">Send Request</button>
+            <h3 class="text-lg font-bold text-emerald-400 flex items-center justify-between">
+              <span>My Friends List</span>
+              <span class="text-xs text-slate-400 font-normal">🟢 Live Online Status</span>
+            </h3>
+            <div id="friends-list" class="space-y-3">
+              <div class="text-xs text-slate-500">Loading friends...</div>
             </div>
-            <div id="friend-search-msg" class="text-xs hidden"></div>
 
-            <h4 class="font-bold text-sm text-slate-300 pt-4 border-t border-slate-700">Pending Incoming Requests</h4>
+            <h4 class="font-bold text-sm text-slate-300 pt-4 border-t border-slate-700">Pending Requests</h4>
             <div id="incoming-requests" class="space-y-2 text-sm text-slate-400">
               <div class="text-xs text-slate-500">No pending requests.</div>
             </div>
           </div>
 
+          <!-- ALL REGISTERED PLAYERS DIRECTORY (1-CLICK ADD) -->
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <h3 class="text-lg font-bold text-emerald-400">My Friends List</h3>
-            <div id="friends-list" class="space-y-3">
-              <div class="text-xs text-slate-500">Loading friends...</div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-indigo-400">All Registered Accounts</h3>
+              <span class="text-xs text-slate-400">Private Directory</span>
+            </div>
+            <p class="text-xs text-slate-400">Click "+ Add Friend" next to any player below to send a request.</p>
+
+            <div id="all-accounts-directory" class="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+              <div class="text-xs text-slate-500">Loading player directory...</div>
             </div>
           </div>
         </div>
@@ -549,6 +573,9 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
+    // FORCE ZERO PERSISTENCE (Log out immediately when tab/window closes)
+    auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
     // ==========================================
     // 2. GLOBAL STATE VARIABLES
     // ==========================================
@@ -620,26 +647,18 @@
 
     async function handleAuth(e) {
       e.preventDefault();
-      const userInput = $('#auth-username').val().trim();
+      const email = $('#auth-email').val().trim();
       const password = $('#auth-password').val().trim();
       $('#auth-error').addClass('hidden');
 
-      if (!userInput || !password) return;
-
-      let email = userInput.includes('@') ? userInput : `${userInput.toLowerCase()}@cognilearn.internal`;
+      if (!email || !password) return;
 
       try {
         await auth.signInWithEmailAndPassword(email, password);
       } catch (err) {
         if (err.code === 'auth/user-not-found') {
           try {
-            const userCred = await auth.createUserWithEmailAndPassword(email, password);
-            const usernameToSave = userInput.includes('@') ? 'ZYREX' : userInput;
-            await db.ref(`users/${userCred.user.uid}`).set({
-              username: usernameToSave,
-              elo: 500,
-              createdAt: firebase.database.ServerValue.TIMESTAMP
-            });
+            await auth.createUserWithEmailAndPassword(email, password);
           } catch (createErr) {
             showAuthError(createErr.message);
           }
@@ -653,17 +672,18 @@
       $('#auth-error').text(msg).removeClass('hidden');
     }
 
-    function forceClearSession() {
-      auth.signOut().then(() => {
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.reload();
-      });
-    }
-
     function loadUserProfile(uid) {
       db.ref(`users/${uid}`).on('value', snapshot => {
-        userProfile = snapshot.val() || {};
+        userProfile = snapshot.val();
+
+        // IF USER HAS NO USERNAME, SHOW POPUP MODAL TO CHOOSE ONE
+        if (!userProfile || !userProfile.username) {
+          $('#username-modal').removeClass('hidden');
+          return;
+        } else {
+          $('#username-modal').addClass('hidden');
+        }
+
         let parsedElo = Number(userProfile.elo);
         userProfile.elo = isNaN(parsedElo) ? 500 : parsedElo;
 
@@ -682,8 +702,8 @@
 
         checkMaintenanceLock();
 
-        $('#header-username').text(userProfile.username || 'Player');
-        $('#dash-username').text(userProfile.username || 'Player');
+        $('#header-username').text(userProfile.username);
+        $('#dash-username').text(userProfile.username);
         $('#header-elo').text(userProfile.elo);
         $('#your-elo-text').text(`Rating: ${userProfile.elo} Elo`);
 
@@ -695,8 +715,36 @@
         setupPresence(uid);
         listenToFriendRequests();
         listenToFriendsList();
+        loadPlayerDirectory();
         loadLeaderboard();
       });
+    }
+
+    async function saveNewUsername() {
+      const chosenName = $('#modal-username-input').val().trim();
+      $('#username-modal-error').addClass('hidden');
+
+      if (!chosenName || chosenName.length < 2) {
+        $('#username-modal-error').text('Username must be at least 2 characters long.').removeClass('hidden');
+        return;
+      }
+
+      // Check if username is taken
+      const userSnap = await db.ref('users').orderByChild('username').equalTo(chosenName).once('value');
+      if (userSnap.exists()) {
+        $('#username-modal-error').text('That username is already taken. Try another!').removeClass('hidden');
+        return;
+      }
+
+      const initialUsername = (currentUser.email === 'zainisgo123@gmail.com') ? 'ZYREX' : chosenName;
+
+      await db.ref(`users/${currentUser.uid}`).set({
+        username: initialUsername,
+        elo: 500,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      $('#username-modal').addClass('hidden');
     }
 
     function setupPresence(uid) {
@@ -1399,43 +1447,8 @@
     }
 
     // ==========================================
-    // 12. FRIENDS & SOCIAL SYSTEM
+    // 12. FRIENDS, PLAYER DIRECTORY & SOCIAL
     // ==========================================
-    async function sendFriendRequest() {
-      const targetName = $('#search-friend-username').val().trim();
-      $('#friend-search-msg').addClass('hidden');
-
-      if (!targetName) return;
-      if (targetName === userProfile.username) {
-        showFriendMsg('You cannot add yourself.', 'red');
-        return;
-      }
-
-      const usersSnap = await db.ref('users').orderByChild('username').equalTo(targetName).once('value');
-      if (!usersSnap.exists()) {
-        showFriendMsg('User not found.', 'red');
-        return;
-      }
-
-      let targetUid = null;
-      usersSnap.forEach(child => { targetUid = child.key; });
-
-      await db.ref(`requests/${targetUid}/${currentUser.uid}`).set({
-        fromUsername: userProfile.username,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-      });
-
-      showFriendMsg('Friend request sent!', 'green');
-      $('#search-friend-username').val('');
-    }
-
-    function showFriendMsg(msg, color) {
-      $('#friend-search-msg')
-        .text(msg)
-        .attr('class', `text-xs ${color === 'red' ? 'text-red-400' : 'text-emerald-400'}`)
-        .removeClass('hidden');
-    }
-
     function listenToFriendRequests() {
       db.ref(`requests/${currentUser.uid}`).on('value', snapshot => {
         const reqs = snapshot.val() || {};
@@ -1484,11 +1497,11 @@
         const friendUids = Object.keys(friends);
 
         if (friendUids.length === 0) {
-          $('#friends-list').html('<div class="text-xs text-slate-500">No friends added yet. Search a username to get started!</div>');
+          $('#friends-list').html('<div class="text-xs text-slate-500">No friends added yet. Choose a player from the directory on the right!</div>');
           return;
         }
 
-        let html = '';
+        $('#friends-list').empty();
         friendUids.forEach(fUid => {
           const friend = friends[fUid];
           
@@ -1501,7 +1514,7 @@
               const friendElo = Number(uData.elo) || 500;
 
               const friendCard = `
-                <div class="flex items-center justify-between bg-slate-900 p-3 rounded-lg border border-slate-700">
+                <div id="friend-card-${fUid}" class="flex items-center justify-between bg-slate-900 p-3 rounded-lg border border-slate-700">
                   <div class="flex items-center space-x-3">
                     <div class="w-3 h-3 rounded-full ${isOnline ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-slate-600'}"></div>
                     <div>
@@ -1517,11 +1530,54 @@
               `;
 
               $(`#friend-card-${fUid}`).remove();
-              $('#friends-list').append(`<div id="friend-card-${fUid}">${friendCard}</div>`);
+              $('#friends-list').append(friendCard);
             });
           });
         });
       });
+    }
+
+    // ALL ACCOUNTS DIRECTORY LIST
+    function loadPlayerDirectory() {
+      db.ref('users').on('value', snapshot => {
+        let html = '';
+        snapshot.forEach(child => {
+          const u = child.val();
+          const targetUid = child.key;
+
+          if (targetUid === currentUser.uid) return; // Skip self
+
+          db.ref(`presence/${targetUid}`).on('value', presSnap => {
+            const pres = presSnap.val() || { status: 'offline' };
+            const isOnline = pres.status === 'online';
+            const userElo = Number(u.elo) || 500;
+
+            const card = `
+              <div id="dir-card-${targetUid}" class="flex items-center justify-between bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/80 hover:border-slate-600 transition">
+                <div class="flex items-center space-x-3">
+                  <div class="w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-slate-600'}"></div>
+                  <div>
+                    <span class="font-bold text-slate-200 text-xs block">${u.username || 'Player'}</span>
+                    <span class="text-[10px] text-indigo-400">${userElo} Elo</span>
+                  </div>
+                </div>
+                <button onclick="directAddFriend('${targetUid}', '${u.username}')" class="bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white text-xs px-3 py-1 rounded border border-slate-700 transition">+ Add Friend</button>
+              </div>
+            `;
+
+            $(`#dir-card-${targetUid}`).remove();
+            $('#all-accounts-directory').append(card);
+          });
+        });
+      });
+    }
+
+    async function directAddFriend(targetUid, targetUsername) {
+      await db.ref(`requests/${targetUid}/${currentUser.uid}`).set({
+        fromUsername: userProfile.username,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+      alert(`Friend request sent to ${targetUsername}!`);
     }
 
     function challengeFriend(fUid) {

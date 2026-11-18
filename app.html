@@ -141,8 +141,8 @@
     </div>
   </div>
 
-  <!-- Notification Toast Container -->
-  <div id="toast-container" class="fixed top-5 right-5 z-[120] flex flex-col gap-2 pointer-events-none"></div>
+  <!-- Realtime Toast & Challenge Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-[120] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
 
   <!-- Main App Root -->
   <div id="main-app" class="hidden flex-1 flex flex-col min-h-screen">
@@ -328,36 +328,58 @@
         </section>
 
         <!-- 1V1 ARENA VIEW -->
-        <section id="view-arena" class="content-view hidden max-w-4xl mx-auto space-y-4">
+        <section id="view-arena" class="content-view hidden max-w-4xl mx-auto space-y-6">
           
           <!-- Lobby / Room Setup -->
-          <div id="arena-setup" class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-            <div class="max-w-md mx-auto text-center space-y-4">
-              <div class="w-12 h-12 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl flex items-center justify-center text-indigo-400 mx-auto text-xl">
-                <i class="fas fa-swords"></i>
-              </div>
-              <h2 class="text-xl font-bold text-white">1v1 Multiplayer Arena</h2>
-              <p class="text-xs text-slate-400">Create a private match or join an ongoing room using a 6-character room code.</p>
+          <div id="arena-setup" class="space-y-6">
+            
+            <!-- Host / Join Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+              <div class="max-w-md mx-auto text-center space-y-4">
+                <div class="w-12 h-12 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl flex items-center justify-center text-indigo-400 mx-auto text-xl">
+                  <i class="fas fa-swords"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white">1v1 Multiplayer Arena</h2>
+                <p class="text-xs text-slate-400">Invite a player directly or join an ongoing room using a 6-character room code.</p>
 
-              <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                <button onclick="create1v1Room()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-4 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
-                  <i class="fas fa-plus-circle"></i> Host Match
-                </button>
-              </div>
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button onclick="create1v1Room()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-4 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
+                    <i class="fas fa-plus-circle"></i> Create Open Room
+                  </button>
+                </div>
 
-              <div class="relative flex py-2 items-center">
-                <div class="flex-grow border-t border-slate-800"></div>
-                <span class="flex-shrink mx-4 text-xs font-semibold uppercase text-slate-500">or Join Room</span>
-                <div class="flex-grow border-t border-slate-800"></div>
-              </div>
+                <div class="relative flex py-2 items-center">
+                  <div class="flex-grow border-t border-slate-800"></div>
+                  <span class="flex-shrink mx-4 text-xs font-semibold uppercase text-slate-500">or Join Room Code</span>
+                  <div class="flex-grow border-t border-slate-800"></div>
+                </div>
 
-              <div class="flex gap-2">
-                <input type="text" id="room-code-input" placeholder="Enter 6-digit Code" maxlength="6" class="flex-1 bg-slate-800 border border-slate-700 uppercase tracking-widest text-center text-white font-mono font-bold rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
-                <button onclick="join1v1Room()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/20">
-                  Join
-                </button>
+                <div class="flex gap-2">
+                  <input type="text" id="room-code-input" placeholder="Enter 6-digit Code" maxlength="6" class="flex-1 bg-slate-800 border border-slate-700 uppercase tracking-widest text-center text-white font-mono font-bold rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                  <button onclick="join1v1Room()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/20">
+                    Join
+                  </button>
+                </div>
               </div>
             </div>
+
+            <!-- Direct Player Challenge Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold">
+                  <i class="fas fa-user-check"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-white">Quick Invite a Friend to 1v1</h3>
+                  <p class="text-xs text-slate-400">Click "Challenge" to instantly send an in-game match request to a friend</p>
+                </div>
+              </div>
+
+              <div id="arena-friends-list" class="space-y-2">
+                <!-- Dynamic Quick Challenge Items -->
+              </div>
+            </div>
+
           </div>
 
           <!-- Live Match View -->
@@ -886,6 +908,8 @@
 
       if (viewId === 'ai') {
         initAiGame();
+      } else if (viewId === 'arena') {
+        loadArenaFriendsList();
       } else if (viewId === 'leaderboard') {
         loadLeaderboard();
       } else if (viewId === 'friends') {
@@ -1342,6 +1366,7 @@
       document.getElementById('arena-game').classList.add('hidden');
       document.getElementById('arena-setup').classList.remove('hidden');
       document.getElementById('room-code-input').value = '';
+      loadArenaFriendsList();
     }
 
     // ------------------------------------------------------------------
@@ -1608,7 +1633,7 @@
                 <div class="flex items-center gap-2">
                   <button onclick="challengeFriend('${fUid}', '${escapeHtml(uData.username)}')" 
                           class="px-3 py-1.5 bg-indigo-600/80 hover:bg-indigo-600 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
-                    <i class="fas fa-gamepad"></i> Challenge
+                    <i class="fas fa-swords"></i> Challenge 1v1
                   </button>
                   <button onclick="removeFriend('${fUid}', '${escapeHtml(uData.username)}')" 
                           title="Remove Friend"
@@ -1617,6 +1642,63 @@
                   </button>
                 </div>
               `;
+            });
+          });
+        });
+      });
+    }
+
+    // LOAD FRIENDS IN ARENA QUICK CHALLENGE TAB
+    function loadArenaFriendsList() {
+      if (!currentUser) return;
+      const arenaFriendsContainer = document.getElementById('arena-friends-list');
+
+      db.ref('friends/' + currentUser.uid).once('value', snapshot => {
+        arenaFriendsContainer.innerHTML = '';
+        const friendsObj = snapshot.val() || {};
+        const friendUids = Object.keys(friendsObj);
+
+        if (friendUids.length === 0) {
+          arenaFriendsContainer.innerHTML = `<div class="p-4 text-center text-slate-400 bg-slate-800/30 rounded-xl border border-slate-700/50 text-xs">
+            No friends added yet. Go to <button onclick="showView('friends')" class="text-indigo-400 font-bold underline">Friends & Directory</button> to add players!
+          </div>`;
+          return;
+        }
+
+        friendUids.forEach(fUid => {
+          db.ref('users/' + fUid).once('value', uSnap => {
+            const uData = uSnap.val() || { username: 'Unknown', elo: 500 };
+            db.ref('presence/' + fUid).once('value', pSnap => {
+              const isOnline = pSnap.exists() && pSnap.val().state === 'online';
+
+              const itemEl = document.createElement('div');
+              itemEl.className = 'flex items-center justify-between p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-800/70 transition';
+
+              itemEl.innerHTML = `
+                <div class="flex items-center gap-3">
+                  <div class="relative">
+                    <div class="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center font-bold text-slate-300 border border-slate-600">
+                      ${escapeHtml(uData.username.charAt(0).toUpperCase())}
+                    </div>
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-500 ring-2 ring-slate-900' : 'bg-slate-500'}"></span>
+                  </div>
+                  <div>
+                    <div class="font-medium text-slate-200 text-sm flex items-center gap-2">
+                      <span>${escapeHtml(uData.username)}</span>
+                      ${isOnline ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Online</span>' : ''}
+                    </div>
+                    <div class="text-xs text-slate-400 font-mono">Elo: ${uData.elo || 500}</div>
+                  </div>
+                </div>
+                <div>
+                  <button onclick="challengeFriend('${fUid}', '${escapeHtml(uData.username)}')" 
+                          class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20">
+                    <i class="fas fa-paper-plane"></i> Send 1v1 Invite
+                  </button>
+                </div>
+              `;
+
+              arenaFriendsContainer.appendChild(itemEl);
             });
           });
         });
@@ -1637,6 +1719,7 @@
         const friendEl = document.getElementById('friend-item-' + fUid);
         if (friendEl) friendEl.remove();
         loadDirectory();
+        loadArenaFriendsList();
       }).catch(err => {
         showNotification('Error removing friend: ' + err.message, 'error');
       });
@@ -1652,7 +1735,7 @@
         roomCode: roomCode,
         timestamp: firebase.database.ServerValue.TIMESTAMP
       }).then(() => {
-        showNotification(`Challenge sent to ${fName}! Opening room...`, 'success');
+        showNotification(`1v1 Invite sent to ${fName}! Launching room...`, 'success');
         showView('arena');
         currentRoomCode = roomCode;
         window.arenaMyColor = 'w';
@@ -1710,7 +1793,7 @@
           // EXCLUSION 1: Skip self
           if (targetUid === currentUser.uid) return;
 
-          // EXCLUSION 2: Skip existing friends (Fixes "eli" showing in directory)
+          // EXCLUSION 2: Skip existing friends
           if (friendUids.has(targetUid)) return;
 
           const username = uData.username || 'Anonymous';
@@ -1782,6 +1865,7 @@
       });
     }
 
+    // REALTIME CHALLENGE TOAST NOTIFICATION + REQUEST LISTENER
     function listenFriendRequests() {
       if (!currentUser) return;
       db.ref('requests').on('value', snap => {
@@ -1797,6 +1881,13 @@
           const r = reqs[rId];
           if (r.toUid === currentUser.uid) {
             myReqCount++;
+
+            // Realtime Toast Popup for 1v1 Challenge
+            if (r.type === 'challenge' && !r.notified) {
+              r.notified = true;
+              showChallengeToast(rId, r.fromName, r.roomCode);
+            }
+
             const item = document.createElement('div');
             item.className = 'flex items-center justify-between p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl';
 
@@ -1835,6 +1926,36 @@
       });
     }
 
+    // Display Realtime Floating 1v1 Match Invite Toast
+    function showChallengeToast(rId, challengerName, roomCode) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.id = 'toast-invite-' + rId;
+      toast.className = 'p-4 bg-slate-900 border border-indigo-500/60 text-slate-100 rounded-2xl shadow-2xl transition transform duration-300 pointer-events-auto flex flex-col gap-2.5 animate-bounce';
+
+      toast.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold text-lg">
+            <i class="fas fa-swords"></i>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-white">1v1 Challenge Invite!</div>
+            <div class="text-xs text-slate-300"><span class="font-semibold text-indigo-300">${escapeHtml(challengerName)}</span> wants to play 1v1 chess.</div>
+          </div>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button onclick="acceptChallenge('${rId}', '${roomCode}'); document.getElementById('toast-invite-${rId}')?.remove();" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-md shadow-emerald-600/20">
+            Accept Challenge
+          </button>
+          <button onclick="declineRequest('${rId}'); document.getElementById('toast-invite-${rId}')?.remove();" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition">
+            Decline
+          </button>
+        </div>
+      `;
+
+      container.appendChild(toast);
+    }
+
     function acceptFriendRequest(reqId, fromUid) {
       db.ref('friends/' + currentUser.uid + '/' + fromUid).set(true);
       db.ref('friends/' + fromUid + '/' + currentUser.uid).set(true);
@@ -1842,6 +1963,7 @@
         showNotification('Friend request accepted!', 'success');
         loadFriends();
         loadDirectory();
+        loadArenaFriendsList();
       });
     }
 

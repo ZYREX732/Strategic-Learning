@@ -267,7 +267,7 @@
                 </div>
               </div>
               <div class="flex items-center space-x-3">
-                <div id="ai-captured" class="flex text-xs space-x-0.5"></div>
+                <div id="ai-captured" class="flex text-xs space-x-1 font-mono items-center"></div>
                 <div id="ai-clock" class="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg font-mono font-bold text-sm text-sky-400">10:00</div>
               </div>
             </div>
@@ -287,7 +287,7 @@
                 </div>
               </div>
               <div class="flex items-center space-x-3">
-                <div id="ai-player-captured" class="flex text-xs space-x-0.5"></div>
+                <div id="ai-player-captured" class="flex text-xs space-x-1 font-mono items-center"></div>
                 <div id="ai-player-clock" class="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg font-mono font-bold text-sm text-sky-400">10:00</div>
               </div>
             </div>
@@ -365,8 +365,13 @@
                 <span class="text-xs font-semibold text-slate-400">Room Code:</span>
                 <span id="room-code-display" class="font-mono font-extrabold text-sky-400 text-sm tracking-widest bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">------</span>
               </div>
-              <div id="online-status-badge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                Waiting for Opponent...
+              <div class="flex items-center space-x-2">
+                <div id="online-status-badge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  Waiting for Opponent...
+                </div>
+                <button onclick="returnToLobby()" id="btn-back-lobby" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                  <i class="fa-solid fa-arrow-left mr-1"></i>Lobby
+                </button>
               </div>
             </div>
 
@@ -382,7 +387,7 @@
                 </div>
               </div>
               <div class="flex items-center space-x-3">
-                <div id="online-opp-captured" class="flex text-xs space-x-0.5"></div>
+                <div id="online-opp-captured" class="flex text-xs space-x-1 font-mono items-center"></div>
                 <div id="online-opp-clock" class="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg font-mono font-bold text-sm text-sky-400">10:00</div>
               </div>
             </div>
@@ -402,18 +407,22 @@
                 </div>
               </div>
               <div class="flex items-center space-x-3">
-                <div id="online-player-captured" class="flex text-xs space-x-0.5"></div>
+                <div id="online-player-captured" class="flex text-xs space-x-1 font-mono items-center"></div>
                 <div id="online-player-clock" class="bg-slate-950 border border-slate-800 px-3 py-1 rounded-lg font-mono font-bold text-sm text-sky-400">10:00</div>
               </div>
             </div>
 
-            <!-- Match Controls (No reset button in online mode) -->
+            <!-- Match Controls -->
             <div class="mt-4 flex space-x-3 w-full max-w-[480px]">
-              <button onclick="offerDraw()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl border border-slate-700 text-xs transition flex items-center justify-center space-x-2">
+              <button id="btn-abort-match" onclick="abortMatch()" class="hidden flex-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-ban"></i>
+                <span>Abort Match</span>
+              </button>
+              <button id="btn-offer-draw" onclick="offerDraw()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl border border-slate-700 text-xs transition flex items-center justify-center space-x-2">
                 <i class="fa-solid fa-handshake"></i>
                 <span>Offer Draw</span>
               </button>
-              <button onclick="resignMatch()" class="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+              <button id="btn-resign-match" onclick="resignMatch()" class="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
                 <i class="fa-solid fa-flag"></i>
                 <span>Resign</span>
               </button>
@@ -672,10 +681,9 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Enforce Session-only persistence (logout on tab close / window exit)
+    // Enforce Session-only persistence
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
-    // Piece Image CDN Resolver (jsDelivr)
     function getPieceImg(piece) {
       return `https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/${piece}.png`;
     }
@@ -702,13 +710,13 @@
     let onlineSelectedSquare = null;
     let pendingPromotionMove = null;
     let onlineTimerInterval = null;
+    let onlineWhiteTime = 600;
+    let onlineBlackTime = 600;
+    let onlineLastMoveTimestamp = null;
 
     // --- 2. INITIALIZATION & MAINTENANCE SETUP ---
-    
-    // Reset Maintenance Mode to OFF right now on startup
     db.ref('system/maintenance').set(false);
 
-    // Maintenance Listener
     db.ref('system/maintenance').on('value', (snap) => {
       isMaintenanceActive = snap.val() === true;
       applyMaintenanceState();
@@ -731,7 +739,6 @@
         modal.classList.remove('flex');
       }
 
-      // Sync Admin Switch UI
       const adminBtn = document.getElementById('admin-maint-btn');
       if (adminBtn) {
         adminBtn.innerText = isMaintenanceActive ? 'ON' : 'OFF';
@@ -741,11 +748,9 @@
       }
     }
 
-    // Auth State Monitor
     auth.onAuthStateChanged((user) => {
       currentUser = user;
       if (user) {
-        // If maintenance active and user is NOT admin -> block and sign out
         if (isMaintenanceActive && user.email !== 'zainisgo123@gmail.com') {
           auth.signOut();
           applyMaintenanceState();
@@ -762,7 +767,6 @@
       applyMaintenanceState();
     });
 
-    // Setup Presence Dot Indicator
     function setupPresence(uid) {
       const userPresRef = db.ref(`presence/${uid}`);
       const connectedRef = db.ref('.info/connected');
@@ -775,7 +779,6 @@
       });
     }
 
-    // Fetch Profile or Prompt Username Creation
     function fetchUserProfile(uid) {
       db.ref(`users/${uid}`).on('value', (snap) => {
         const data = snap.val();
@@ -922,7 +925,7 @@
       }
     }
 
-    // --- 5. ELO RATING FORMULA ($K=32$) ---
+    // --- 5. ELO FORMULA ($K=32$) ---
     function calculateEloChange(playerElo, oppElo, outcome) {
       const expected = 1 / (1 + Math.pow(10, (oppElo - playerElo) / 400));
       const K = 32;
@@ -930,7 +933,167 @@
       return { newElo, change: newElo - playerElo };
     }
 
-    // --- 6. PRACTICE VS AI ENGINE ---
+    // --- 6. ADVANCED AI ENGINE (300, 800, 1500 ELO) ---
+    const pieceValues = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
+
+    const pst = {
+      p: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [50, 50, 50, 50, 50, 50, 50, 50],
+        [10, 10, 20, 30, 30, 20, 10, 10],
+        [5, 5, 10, 27, 27, 10, 5, 5],
+        [0, 0, 0, 22, 22, 0, 0, 0],
+        [5, -5, -10, 0, 0, -10, -5, 5],
+        [5, 10, 10, -20, -20, 10, 10, 5],
+        [0, 0, 0, 0, 0, 0, 0, 0]
+      ],
+      n: [
+        [-50, -40, -30, -30, -30, -30, -40, -50],
+        [-40, -20, 0, 0, 0, 0, -20, -40],
+        [-30, 0, 10, 15, 15, 10, 0, -30],
+        [-30, 5, 15, 20, 20, 15, 5, -30],
+        [-30, 0, 15, 20, 20, 15, 0, -30],
+        [-30, 5, 10, 15, 15, 10, 5, -30],
+        [-40, -20, 0, 5, 5, 0, -20, -40],
+        [-50, -40, -30, -30, -30, -30, -40, -50]
+      ],
+      b: [
+        [-20, -10, -10, -10, -10, -10, -10, -20],
+        [-10, 0, 0, 0, 0, 0, 0, -10],
+        [-10, 0, 5, 10, 10, 5, 0, -10],
+        [-10, 5, 5, 10, 10, 5, 5, -10],
+        [-10, 0, 10, 10, 10, 10, 0, -10],
+        [-10, 10, 10, 10, 10, 10, 10, -10],
+        [-10, 5, 0, 0, 0, 0, 5, -10],
+        [-20, -10, -10, -10, -10, -10, -10, -20]
+      ],
+      r: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [5, 10, 10, 10, 10, 10, 10, 5],
+        [-5, 0, 0, 0, 0, 0, 0, -5],
+        [-5, 0, 0, 0, 0, 0, 0, -5],
+        [-5, 0, 0, 0, 0, 0, 0, -5],
+        [-5, 0, 0, 0, 0, 0, 0, -5],
+        [-5, 0, 0, 0, 0, 0, 0, -5],
+        [0, 0, 0, 5, 5, 0, 0, 0]
+      ],
+      q: [
+        [-20, -10, -10, -5, -5, -10, -10, -20],
+        [-10, 0, 0, 0, 0, 0, 0, -10],
+        [-10, 0, 5, 5, 5, 5, 0, -10],
+        [-5, 0, 5, 5, 5, 5, 0, -5],
+        [0, 0, 5, 5, 5, 5, 0, -5],
+        [-10, 5, 5, 5, 5, 5, 0, -10],
+        [-10, 0, 5, 0, 0, 0, 0, -10],
+        [-20, -10, -10, -5, -5, -10, -10, -20]
+      ],
+      k: [
+        [-30, -40, -40, -50, -50, -40, -40, -30],
+        [-30, -40, -40, -50, -50, -40, -40, -30],
+        [-30, -40, -40, -50, -50, -40, -40, -30],
+        [-30, -40, -40, -50, -50, -40, -40, -30],
+        [-20, -30, -30, -40, -40, -30, -30, -20],
+        [-10, -20, -20, -20, -20, -20, -20, -10],
+        [20, 20, 0, 0, 0, 0, 20, 20],
+        [20, 30, 10, 0, 0, 10, 30, 20]
+      ]
+    };
+
+    function evaluateBoard(game) {
+      let totalEval = 0;
+      const board = game.board();
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const piece = board[r][c];
+          if (piece) {
+            const pVal = pieceValues[piece.type] + (pst[piece.type] ? (piece.color === 'w' ? pst[piece.type][r][c] : pst[piece.type][7 - r][c]) : 0);
+            totalEval += piece.color === 'w' ? pVal : -pVal;
+          }
+        }
+      }
+      return totalEval;
+    }
+
+    function minimax(game, depth, alpha, beta, isMaximizing) {
+      if (depth === 0 || game.game_over()) {
+        return evaluateBoard(game);
+      }
+
+      const moves = game.moves({ verbose: true });
+      if (isMaximizing) {
+        let maxEval = -Infinity;
+        for (let move of moves) {
+          game.move(move);
+          let evalVal = minimax(game, depth - 1, alpha, beta, false);
+          game.undo();
+          maxEval = Math.max(maxEval, evalVal);
+          alpha = Math.max(alpha, evalVal);
+          if (beta <= alpha) break;
+        }
+        return maxEval;
+      } else {
+        let minEval = Infinity;
+        for (let move of moves) {
+          game.move(move);
+          let evalVal = minimax(game, depth - 1, alpha, beta, true);
+          game.undo();
+          minEval = Math.min(minEval, evalVal);
+          beta = Math.min(beta, evalVal);
+          if (beta <= alpha) break;
+        }
+        return minEval;
+      }
+    }
+
+    function getBestAIMove(difficulty) {
+      const moves = aiGame.moves({ verbose: true });
+      if (moves.length === 0) return null;
+
+      // Level 1: 300 Elo -> 80% Random, 20% Simple Capture
+      if (difficulty === 300) {
+        if (Math.random() < 0.8) {
+          return moves[Math.floor(Math.random() * moves.length)];
+        }
+        const captures = moves.filter(m => m.captured);
+        return captures.length > 0 ? captures[Math.floor(Math.random() * captures.length)] : moves[Math.floor(Math.random() * moves.length)];
+      }
+
+      // Level 2: 800 Elo -> Depth 1 evaluation with Piece Square Tables + Hanging piece prevention
+      if (difficulty === 800) {
+        let bestMove = null;
+        let bestVal = Infinity; // AI plays Black (minimizing White's evaluation)
+
+        for (let move of moves) {
+          aiGame.move(move);
+          let val = evaluateBoard(aiGame);
+          aiGame.undo();
+
+          if (val < bestVal) {
+            bestVal = val;
+            bestMove = move;
+          }
+        }
+        return bestMove || moves[Math.floor(Math.random() * moves.length)];
+      }
+
+      // Level 3: 1500 Elo -> Minimax Depth 2 with Alpha-Beta Pruning
+      let bestMove = null;
+      let bestVal = Infinity;
+
+      for (let move of moves) {
+        aiGame.move(move);
+        let val = minimax(aiGame, 2, -Infinity, Infinity, true);
+        aiGame.undo();
+
+        if (val < bestVal) {
+          bestVal = val;
+          bestMove = move;
+        }
+      }
+      return bestMove || moves[Math.floor(Math.random() * moves.length)];
+    }
+
+    // --- PRACTICE VS AI ENGINE ---
     function startAIGame() {
       aiGame = new Chess();
       aiPlayerTime = 600;
@@ -941,7 +1104,7 @@
       document.getElementById('ai-elo-display').innerText = `${diff} ELO`;
 
       document.getElementById('ai-move-history').innerHTML = '';
-      updateAIPieceCaptures();
+      updateCapturedPiecesDisplay(aiGame, 'ai-player-captured', 'ai-captured');
 
       const config = {
         position: 'start',
@@ -969,7 +1132,6 @@
         const validMove = moves.find(m => m.to === square);
 
         if (validMove) {
-          // Check for promotion
           if (validMove.flags.includes('p')) {
             pendingPromotionMove = { from: aiSelectedSquare, to: square, isAI: true };
             document.getElementById('promotion-modal').classList.remove('hidden');
@@ -981,7 +1143,6 @@
         } else {
           aiSelectedSquare = null;
           removeHighlights('ai-board');
-          // If clicking another white piece, select it
           const piece = aiGame.get(square);
           if (piece && piece.color === 'w') {
             handleAISquareClick(square);
@@ -996,43 +1157,27 @@
       aiSelectedSquare = null;
       removeHighlights('ai-board');
       updateAIMoveHistory();
-      updateAIPieceCaptures();
+      updateCapturedPiecesDisplay(aiGame, 'ai-player-captured', 'ai-captured');
 
       if (aiGame.game_over()) {
         handleAIGameOver();
         return;
       }
 
-      // AI Response Turn
-      setTimeout(makeAIMove, 500);
+      setTimeout(makeAIMove, 400);
     }
 
     function makeAIMove() {
       if (aiGame.game_over()) return;
 
       const diff = parseInt(document.getElementById('ai-difficulty').value);
-      const moves = aiGame.moves({ verbose: true });
-      if (moves.length === 0) return;
-
-      let chosenMove = null;
-
-      if (diff === 300) {
-        // Random Moves
-        chosenMove = moves[Math.floor(Math.random() * moves.length)];
-      } else if (diff === 800) {
-        // Prefer Captures
-        const captures = moves.filter(m => m.captured);
-        chosenMove = captures.length > 0 ? captures[Math.floor(Math.random() * captures.length)] : moves[Math.floor(Math.random() * moves.length)];
-      } else {
-        // Simple Minimax / Material Capture
-        const captures = moves.filter(m => m.captured);
-        chosenMove = captures.length > 0 ? captures[0] : moves[Math.floor(Math.random() * moves.length)];
-      }
+      const chosenMove = getBestAIMove(diff);
+      if (!chosenMove) return;
 
       aiGame.move(chosenMove);
       aiBoard.position(aiGame.fen());
       updateAIMoveHistory();
-      updateAIPieceCaptures();
+      updateCapturedPiecesDisplay(aiGame, 'ai-player-captured', 'ai-captured');
 
       if (aiGame.game_over()) {
         handleAIGameOver();
@@ -1040,7 +1185,10 @@
     }
 
     function startAITimer() {
+      clearInterval(aiTimerInterval);
       aiTimerInterval = setInterval(() => {
+        if (!aiGame || aiGame.game_over()) return;
+
         if (aiGame.turn() === 'w') {
           aiPlayerTime--;
           if (aiPlayerTime <= 0) handleAIGameOver('timeout_loss');
@@ -1096,22 +1244,58 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    function updateAIPieceCaptures() {
-      const history = aiGame.history({ verbose: true });
-      let wCap = [], bCap = [];
-      
-      history.forEach(m => {
-        if (m.captured) {
-          if (m.color === 'w') wCap.push(m.captured);
-          else bCap.push(m.captured);
+    // --- 7. CAPTURED PIECES UNICODE & ADVANTAGE SCORE ---
+    const pieceSymbols = {
+      w: { q: '♕', r: '♖', b: '♗', n: '♘', p: '♙' },
+      b: { q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' }
+    };
+    const valMap = { q: 9, r: 5, b: 3, n: 3, p: 1 };
+
+    function updateCapturedPiecesDisplay(gameObj, whiteContainerId, blackContainerId) {
+      if (!gameObj) return;
+
+      const board = gameObj.board();
+      const currentCounts = { w: { q: 0, r: 0, b: 0, n: 0, p: 0 }, b: { q: 0, r: 0, b: 0, n: 0, p: 0 } };
+      const initialCounts = { q: 1, r: 2, b: 2, n: 2, p: 8 };
+
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const piece = board[r][c];
+          if (piece && piece.type !== 'k') {
+            currentCounts[piece.color][piece.type]++;
+          }
         }
+      }
+
+      // White captures Black pieces; Black captures White pieces
+      let whiteCapStr = '', blackCapStr = '';
+      let whiteMat = 0, blackMat = 0;
+
+      ['q', 'r', 'b', 'n', 'p'].forEach(type => {
+        const whiteCapturedPiece = initialCounts[type] - currentCounts.b[type];
+        for (let i = 0; i < whiteCapturedPiece; i++) whiteCapStr += pieceSymbols.b[type];
+
+        const blackCapturedPiece = initialCounts[type] - currentCounts.w[type];
+        for (let i = 0; i < blackCapturedPiece; i++) blackCapStr += pieceSymbols.w[type];
+
+        whiteMat += currentCounts.w[type] * valMap[type];
+        blackMat += currentCounts.b[type] * valMap[type];
       });
 
-      document.getElementById('ai-player-captured').innerText = wCap.map(p => p.toUpperCase()).join(' ');
-      document.getElementById('ai-captured').innerText = bCap.map(p => p.toUpperCase()).join(' ');
+      const wContainer = document.getElementById(whiteContainerId);
+      const bContainer = document.getElementById(blackContainerId);
+
+      if (wContainer) {
+        let diffBadge = (whiteMat > blackMat) ? `<span class="text-emerald-400 font-bold ml-1.5">+${whiteMat - blackMat}</span>` : '';
+        wContainer.innerHTML = `<span>${whiteCapStr}</span>${diffBadge}`;
+      }
+      if (bContainer) {
+        let diffBadge = (blackMat > whiteMat) ? `<span class="text-emerald-400 font-bold ml-1.5">+${blackMat - whiteMat}</span>` : '';
+        bContainer.innerHTML = `<span>${blackCapStr}</span>${diffBadge}`;
+      }
     }
 
-    // --- 7. 1V1 ARENA MULTIPLAYER ---
+    // --- 8. 1V1 ARENA MULTIPLAYER & SYNCED CLOCK ---
     function createOnlineRoom() {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
       onlineRoomCode = code;
@@ -1119,11 +1303,14 @@
 
       const gameData = {
         fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-        white: { uid: currentUser.uid, name: userProfile.username, elo: userProfile.elo, time: 600 },
+        white: { uid: currentUser.uid, name: userProfile.username, elo: userProfile.elo },
         black: null,
         status: 'waiting',
         turn: 'w',
-        moves: []
+        moves: [],
+        whiteTime: 600,
+        blackTime: 600,
+        lastMoveTimestamp: firebase.database.ServerValue.TIMESTAMP
       };
 
       db.ref(`games/${code}`).set(gameData).then(() => {
@@ -1151,8 +1338,8 @@
           onlinePlayerColor = 'white';
         } else {
           onlinePlayerColor = 'black';
-          db.ref(`games/${code}/black`).set({ uid: currentUser.uid, name: userProfile.username, elo: userProfile.elo, time: 600 });
-          db.ref(`games/${code}/status`).set('active');
+          db.ref(`games/${code}/black`).set({ uid: currentUser.uid, name: userProfile.username, elo: userProfile.elo });
+          db.ref(`games/${code}`).update({ status: 'active', lastMoveTimestamp: firebase.database.ServerValue.TIMESTAMP });
         }
 
         enterOnlineGameView(code);
@@ -1188,7 +1375,6 @@
         onlineGame.load(gameData.fen);
         onlineBoard.position(gameData.fen);
 
-        // Update UI Badges & Opponent
         const isWhite = onlinePlayerColor === 'white';
         const oppData = isWhite ? gameData.black : gameData.white;
 
@@ -1202,13 +1388,77 @@
         document.getElementById('online-player-name').innerText = userProfile.username;
         document.getElementById('online-player-elo').innerText = `${userProfile.elo} ELO`;
 
-        // Render Moves
+        // Render Notation & Captured Pieces
         renderOnlineMoveHistory(gameData.moves || []);
-
-        // Game Over Check
-        if (gameData.status === 'completed') {
-          handleOnlineMatchFinished(gameData);
+        if (isWhite) {
+          updateCapturedPiecesDisplay(onlineGame, 'online-player-captured', 'online-opp-captured');
+        } else {
+          updateCapturedPiecesDisplay(onlineGame, 'online-opp-captured', 'online-player-captured');
         }
+
+        // Toggle Abort vs Resign button
+        const moveCount = (gameData.moves || []).length;
+        const abortBtn = document.getElementById('btn-abort-match');
+        const drawBtn = document.getElementById('btn-offer-draw');
+        const resignBtn = document.getElementById('btn-resign-match');
+
+        if (moveCount <= 1 && gameData.status === 'active') {
+          abortBtn.classList.remove('hidden');
+          drawBtn.classList.add('hidden');
+        } else {
+          abortBtn.classList.add('hidden');
+          drawBtn.classList.remove('hidden');
+        }
+
+        // Sync Clock State
+        onlineWhiteTime = gameData.whiteTime !== undefined ? gameData.whiteTime : 600;
+        onlineBlackTime = gameData.blackTime !== undefined ? gameData.blackTime : 600;
+        onlineLastMoveTimestamp = gameData.lastMoveTimestamp || Date.now();
+
+        startOnlineTimerSync(gameData.turn, gameData.status);
+
+        // Check completion state
+        if (gameData.status === 'completed') {
+          clearInterval(onlineTimerInterval);
+          document.getElementById('btn-back-lobby').classList.remove('hidden');
+          handleOnlineMatchFinished(gameData);
+        } else if (gameData.status === 'aborted') {
+          clearInterval(onlineTimerInterval);
+          alert("Match was aborted. No Elo rating change.");
+          returnToLobby();
+        }
+      });
+    }
+
+    function startOnlineTimerSync(turnColor, gameStatus) {
+      clearInterval(onlineTimerInterval);
+      if (gameStatus !== 'active') return;
+
+      onlineTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - onlineLastMoveTimestamp) / 1000);
+        let curWhite = onlineWhiteTime;
+        let curBlack = onlineBlackTime;
+
+        if (turnColor === 'w') {
+          curWhite = Math.max(0, onlineWhiteTime - elapsed);
+          if (curWhite <= 0) triggerTimeout('black');
+        } else {
+          curBlack = Math.max(0, onlineBlackTime - elapsed);
+          if (curBlack <= 0) triggerTimeout('white');
+        }
+
+        const isWhite = onlinePlayerColor === 'white';
+        document.getElementById('online-player-clock').innerText = formatTime(isWhite ? curWhite : curBlack);
+        document.getElementById('online-opp-clock').innerText = formatTime(isWhite ? curBlack : curWhite);
+      }, 1000);
+    }
+
+    function triggerTimeout(winnerColor) {
+      clearInterval(onlineTimerInterval);
+      db.ref(`games/${onlineRoomCode}`).update({
+        status: 'completed',
+        winner: winnerColor,
+        reason: 'timeout'
       });
     }
 
@@ -1259,16 +1509,19 @@
         const movesList = data.moves || [];
         movesList.push(move.san);
 
+        const elapsed = Math.floor((Date.now() - onlineLastMoveTimestamp) / 1000);
+        let newWhiteTime = data.whiteTime !== undefined ? data.whiteTime : 600;
+        let newBlackTime = data.blackTime !== undefined ? data.blackTime : 600;
+
+        if (data.turn === 'w') newWhiteTime = Math.max(0, newWhiteTime - elapsed);
+        else newBlackTime = Math.max(0, newBlackTime - elapsed);
+
         let status = 'active';
         let winner = null;
 
         if (onlineGame.game_over()) {
           status = 'completed';
-          if (onlineGame.in_checkmate()) {
-            winner = onlinePlayerColor;
-          } else {
-            winner = 'draw';
-          }
+          winner = onlineGame.in_checkmate() ? onlinePlayerColor : 'draw';
         }
 
         db.ref(`games/${onlineRoomCode}`).update({
@@ -1276,7 +1529,10 @@
           moves: movesList,
           turn: onlineGame.turn(),
           status: status,
-          winner: winner
+          winner: winner,
+          whiteTime: newWhiteTime,
+          blackTime: newBlackTime,
+          lastMoveTimestamp: firebase.database.ServerValue.TIMESTAMP
         });
       });
     }
@@ -1296,6 +1552,11 @@
         container.appendChild(row);
       }
       container.scrollTop = container.scrollHeight;
+    }
+
+    function abortMatch() {
+      if (!onlineRoomCode || !confirm("Abort this match? No Elo rating will be lost.")) return;
+      db.ref(`games/${onlineRoomCode}`).update({ status: 'aborted' });
     }
 
     function resignMatch() {
@@ -1327,7 +1588,6 @@
 
       const calc = calculateEloChange(oldElo, oppElo, score);
       
-      // Update DB Elo once
       db.ref(`users/${currentUser.uid}/elo`).set(calc.newElo);
 
       let title = isWinner ? "Victory!" : (isDraw ? "Draw!" : "Defeat");
@@ -1336,7 +1596,22 @@
       showGameOverBadge(isWinner, title, reason, oldElo, calc.newElo);
     }
 
-    // --- 8. HIGHLIGHTING & BOARD CLICK UTILS ---
+    function returnToLobby() {
+      if (onlineRoomCode) {
+        db.ref(`games/${onlineRoomCode}`).off();
+      }
+      onlineRoomCode = null;
+      onlineGame = null;
+      onlineBoard = null;
+      clearInterval(onlineTimerInterval);
+
+      document.getElementById('arena-game').classList.add('hidden');
+      document.getElementById('arena-setup').classList.remove('hidden');
+      document.getElementById('btn-back-lobby').classList.add('hidden');
+      closeGameOverModal();
+    }
+
+    // --- 9. HIGHLIGHTING & BOARD UTILS ---
     function bindSquareClicks(boardId, clickHandler) {
       $(`#${boardId}`).on('click', '.square-55d63', function () {
         const square = $(this).attr('data-square');
@@ -1375,7 +1650,7 @@
       pendingPromotionMove = null;
     }
 
-    // --- 9. GAME OVER CHESS.COM BADGE DISPLAY ---
+    // --- 10. GAME OVER CHESS.COM BADGE DISPLAY ---
     function showGameOverBadge(isWinner, title, reason, oldElo, newElo) {
       const card = document.getElementById('gameover-card');
       const iconBox = document.getElementById('gameover-icon-box');
@@ -1404,19 +1679,19 @@
     function closeGameOverModal() {
       document.getElementById('gameover-modal').classList.add('hidden');
       document.getElementById('gameover-modal').classList.remove('flex');
+      if (onlineRoomCode) {
+        returnToLobby();
+      }
     }
 
-    // --- 10. FRIENDS & PLAYER DIRECTORY ---
+    // --- 11. FRIENDS & PLAYER DIRECTORY ---
     function loadFriendsAndDirectory() {
-      // Listen for Presence changes
       db.ref('presence').on('value', (presSnap) => {
         const presenceData = presSnap.val() || {};
 
-        // Listen for Users
         db.ref('users').on('value', (usersSnap) => {
           const allUsers = usersSnap.val() || {};
 
-          // Render Player Directory (All Accounts)
           const dirContainer = document.getElementById('directory-list');
           dirContainer.innerHTML = '';
 
@@ -1448,7 +1723,6 @@
             dirContainer.appendChild(card);
           });
 
-          // Render Friends List
           db.ref(`friends/${currentUser.uid}`).on('value', (friendsSnap) => {
             const friends = friendsSnap.val() || {};
             const friendsContainer = document.getElementById('friends-list');
@@ -1506,14 +1780,13 @@
       createOnlineRoom();
     }
 
-    // --- 11. STRICT NUMERICAL LEADERBOARD ---
+    // --- 12. STRICT NUMERICAL LEADERBOARD ---
     function loadLeaderboard() {
       db.ref('users').on('value', (snap) => {
         const data = snap.val() || {};
         const tbody = document.getElementById('leaderboard-table-body');
         tbody.innerHTML = '';
 
-        // Strict Numerical Sorting: Number(p.elo)
         const players = Object.keys(data).map(uid => ({
           uid: uid,
           username: data[uid].username || 'Player',
@@ -1549,7 +1822,7 @@
       });
     }
 
-    // --- 12. ADMIN PANEL FOR zainisgo123@gmail.com ---
+    // --- 13. ADMIN PANEL FOR zainisgo123@gmail.com ---
     function loadAdminPanel() {
       db.ref('users').on('value', (snap) => {
         const users = snap.val() || {};
@@ -1603,7 +1876,6 @@
       });
     }
 
-    // Time Format Helper
     function formatTime(seconds) {
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;

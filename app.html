@@ -1467,6 +1467,13 @@
         if (!snap.exists()) return;
         const g = snap.val();
 
+        // Handle Room Declined State
+        if (g.status === 'declined') {
+          showNotification('Challenge was declined by opponent.', 'error');
+          returnToArenaLobby();
+          return;
+        }
+
         // Names & Status
         const isWhite = window.arenaMyColor === 'w';
         document.getElementById('arena-self-name').textContent = isWhite ? g.hostName : g.guestName;
@@ -1898,7 +1905,7 @@
                 </div>
                 <div class="flex gap-2">
                   <button onclick="acceptChallenge('${rId}', '${r.roomCode}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition">Accept</button>
-                  <button onclick="declineRequest('${rId}')" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-xs transition">Decline</button>
+                  <button onclick="declineRequest('${rId}', '${r.roomCode}')" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-xs transition">Decline</button>
                 </div>
               `;
             } else {
@@ -1947,7 +1954,7 @@
           <button onclick="acceptChallenge('${rId}', '${roomCode}'); document.getElementById('toast-invite-${rId}')?.remove();" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-md shadow-emerald-600/20">
             Accept Challenge
           </button>
-          <button onclick="declineRequest('${rId}'); document.getElementById('toast-invite-${rId}')?.remove();" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition">
+          <button onclick="declineRequest('${rId}', '${roomCode}'); document.getElementById('toast-invite-${rId}')?.remove();" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition">
             Decline
           </button>
         </div>
@@ -1974,7 +1981,10 @@
       });
     }
 
-    function declineRequest(reqId) {
+    function declineRequest(reqId, roomCode) {
+      if (roomCode) {
+        db.ref('games/' + roomCode).update({ status: 'declined' });
+      }
       db.ref('requests/' + reqId).remove();
     }
 

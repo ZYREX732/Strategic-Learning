@@ -142,7 +142,7 @@
     <!-- CONTENT PANELS -->
     <div class="flex-1 overflow-y-auto bg-slate-900 p-4 lg:p-6 flex flex-col items-center">
 
-      <!-- AUTH MODAL CONTAINER (FOR INITIAL LOGIN / REGISTRATION) -->
+      <!-- AUTH MODAL CONTAINER -->
       <div id="auth-modal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-6 relative overflow-hidden">
           
@@ -160,7 +160,7 @@
             <button id="auth-tab-register" onclick="toggleAuthTab('register')" class="py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition">Register</button>
           </div>
 
-          <!-- Dummy hidden inputs to stop aggressive auto-fill -->
+          <!-- Dummy hidden inputs -->
           <input type="text" class="hidden" tabindex="-1">
           <input type="password" class="hidden" tabindex="-1">
 
@@ -198,7 +198,7 @@
           <div class="space-y-2">
             <h3 class="text-xl font-bold text-white">System Maintenance Active</h3>
             <p class="text-xs text-slate-400 leading-relaxed">
-               our platform is undergoing scheduled database updates and rating adjustments. Matchmaking is currently suspended.
+              Our platform is undergoing scheduled database updates and rating adjustments. Matchmaking is currently suspended.
             </p>
           </div>
           <button onclick="handleExit()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg text-sm transition">
@@ -342,7 +342,7 @@
             </div>
           </div>
 
-          <!-- Player Directory (Filters out existing friends) -->
+          <!-- Player Directory -->
           <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 space-y-4">
             <h3 class="font-bold text-slate-200 border-b border-slate-700 pb-2 text-sm">Player Directory</h3>
             <div id="directory-container" class="space-y-2 max-h-80 overflow-y-auto pr-1 text-sm">
@@ -378,7 +378,7 @@
         </div>
       </section>
 
-      <!-- VIEW 5: ADMIN CONTROL PANEL -->
+      <!-- VIEW 5: MASTER ADMIN CONTROL PANEL -->
       <section id="view-admin" class="hidden w-full max-w-4xl space-y-6">
         <div class="border-b border-slate-800 pb-4 flex justify-between items-center">
           <div>
@@ -389,11 +389,12 @@
           </div>
         </div>
 
+        <!-- System Controls Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Maintenance Toggle -->
           <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 space-y-3">
             <h3 class="font-bold text-white text-sm">Maintenance Override Mode</h3>
-            <p class="text-xs text-slate-400">Lock general user access during updates.</p>
+            <p class="text-xs text-slate-400">Lock general user access during maintenance operations.</p>
             <button id="btn-toggle-maint" onclick="toggleMaintenanceMode()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-lg text-sm transition">
               Toggle Maintenance
             </button>
@@ -406,6 +407,32 @@
             <button onclick="purgeHackedAccounts()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-lg text-sm transition">
               Purge Extreme Ratings
             </button>
+          </div>
+        </div>
+
+        <!-- User Accounts Directory & Delete Management -->
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl overflow-hidden p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+            <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-users text-indigo-400"></i> Registered User Directory
+            </h3>
+            <span id="admin-user-count" class="text-xs font-mono bg-slate-900 px-2 py-0.5 rounded text-slate-400">0 accounts</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-900/80 text-xs font-semibold text-slate-400 border-b border-slate-700">
+                  <th class="p-3">Username</th>
+                  <th class="p-3">Email</th>
+                  <th class="p-3">Elo</th>
+                  <th class="p-3 text-right">Admin Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-user-table-body" class="divide-y divide-slate-700/50 text-sm">
+                <tr><td colspan="4" class="p-4 text-center text-xs text-slate-500">Loading user records...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -542,8 +569,8 @@
     let currentUser = null;
     let userProfile = null;
     let authMode = 'login';
-    let currentGame = null; // Chess instance
-    let board = null; // Chessboard.js instance
+    let currentGame = null;
+    let board = null;
     let activeRoomCode = null;
     let roomRef = null;
     let playerColor = 'w';
@@ -557,6 +584,7 @@
     let currentTurn = 'w';
     let isGameInitialized = false;
     let matchmakingListener = null;
+    let isUserInGame = false;
 
     // --- AUTH & INITIALIZATION ---
     auth.onAuthStateChanged(async (user) => {
@@ -629,7 +657,6 @@
     }
 
     async function checkMaintenanceAndInitialize() {
-      // Check maintenance mode
       const maintSnap = await db.ref('system/maintenance').once('value');
       const isMaint = maintSnap.val() === true;
       const isWhitelisted = MAINTENANCE_WHITELIST.includes(currentUser.email);
@@ -643,6 +670,7 @@
       fetchUserProfile();
       loadDirectoryAndFriends();
       listenForDirectRequests();
+      listenToMaintenanceState();
     }
 
     function setupPresence() {
@@ -654,16 +682,24 @@
           myPresenceRef.onDisconnect().remove();
           myPresenceRef.set({
             state: 'online',
+            inGame: isUserInGame,
+            username: userProfile ? userProfile.username : 'Player',
             last_changed: firebase.database.ServerValue.TIMESTAMP
           });
         }
       });
 
-      // Active player counter inside app.html
       db.ref('presence').on('value', (snap) => {
         const onlineCount = snap.numChildren();
         document.getElementById('active-online-count').innerText = onlineCount;
       });
+    }
+
+    function syncUserInGameStatus(inGameStatus) {
+      isUserInGame = inGameStatus;
+      if (currentUser) {
+        db.ref('presence/' + currentUser.uid + '/inGame').set(inGameStatus);
+      }
     }
 
     function fetchUserProfile() {
@@ -685,17 +721,15 @@
     function startMatchmakingQueue() {
       if (!currentUser || !userProfile) return;
       
+      syncUserInGameStatus(true);
       document.getElementById('btn-start-queue').classList.add('hidden');
       document.getElementById('btn-cancel-queue').classList.remove('hidden');
       document.getElementById('matchmaking-status-box').classList.remove('hidden');
       document.getElementById('searching-count-badge').innerText = "1 player searching";
 
       const myMatchRef = db.ref('matchmaking/' + currentUser.uid);
-      
-      // Cleanup on disconnect
       myMatchRef.onDisconnect().remove();
 
-      // Set search entry
       myMatchRef.set({
         uid: currentUser.uid,
         username: userProfile.username || 'Player',
@@ -704,7 +738,6 @@
         timestamp: firebase.database.ServerValue.TIMESTAMP
       });
 
-      // Listen globally to queue
       const globalQueueRef = db.ref('matchmaking');
       matchmakingListener = globalQueueRef.on('value', (snap) => {
         const queueData = snap.val() || {};
@@ -713,31 +746,22 @@
 
         Object.keys(queueData).forEach(uid => {
           const entry = queueData[uid];
-          // Filter out stale (>60s) or non-searching nodes
-          if (entry.status === 'searching' && (now - entry.timestamp < 60000)) {
+          if (entry && entry.status === 'searching' && (now - (entry.timestamp || 0) < 60000)) {
             searchingUsers.push(entry);
           }
         });
 
-        // Update real-time counter
         document.getElementById('searching-count-badge').innerText = `${searchingUsers.length} player${searchingUsers.length === 1 ? '' : 's'} searching`;
 
-        // Check for opponent
         const opponent = searchingUsers.find(u => u.uid !== currentUser.uid);
 
         if (opponent) {
-          // Deterministic lower UID creates room code
           if (currentUser.uid < opponent.uid) {
             const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             
-            // Mark both as matched
-            db.ref('matchmaking/' + currentUser.uid).update({ status: 'matched', roomCode: roomCode, side: 'w' });
-            db.ref('matchmaking/' + opponent.uid).update({ status: 'matched', roomCode: roomCode, side: 'b' });
-
-            // Create game node
             db.ref('games/' + roomCode).set({
               white: { uid: currentUser.uid, username: userProfile.username || 'Player', elo: userProfile.elo || 500 },
-              black: { uid: opponent.uid, username: opponent.username, elo: opponent.elo },
+              black: { uid: opponent.uid, username: opponent.username, elo: opponent.elo || 500 },
               fen: 'start',
               whiteTime: 600,
               blackTime: 600,
@@ -745,6 +769,8 @@
               status: 'active',
               createdAt: firebase.database.ServerValue.TIMESTAMP
             }).then(() => {
+              db.ref('matchmaking/' + opponent.uid).update({ status: 'matched', roomCode: roomCode, side: 'b' });
+              db.ref('matchmaking/' + currentUser.uid).remove();
               cancelMatchmakingQueue(false);
               join1v1Room(roomCode, 'w');
             });
@@ -752,12 +778,12 @@
         }
       });
 
-      // Also listen to my own node for matched status
       myMatchRef.on('value', (snap) => {
         const val = snap.val();
-        if (val && val.status === 'matched' && val.roomCode && currentUser.uid >= (val.opponentUid || '')) {
+        if (val && val.status === 'matched' && val.roomCode) {
           const code = val.roomCode;
           const side = val.side || 'b';
+          db.ref('matchmaking/' + currentUser.uid).remove();
           cancelMatchmakingQueue(false);
           join1v1Room(code, side);
         }
@@ -775,6 +801,7 @@
           db.ref('matchmaking/' + currentUser.uid).remove();
         }
       }
+      syncUserInGameStatus(false);
       document.getElementById('btn-start-queue').classList.remove('hidden');
       document.getElementById('btn-cancel-queue').classList.add('hidden');
       document.getElementById('matchmaking-status-box').classList.add('hidden');
@@ -792,6 +819,7 @@
         status: 'waiting',
         createdAt: firebase.database.ServerValue.TIMESTAMP
       }).then(() => {
+        alert(`Room Code Created: ${code}\n\nShare this code with your friend. The game clock will NOT start until your opponent joins.`);
         join1v1Room(code, 'w');
       });
     }
@@ -830,7 +858,9 @@
       isGameVsBot = false;
       isGameInitialized = false;
 
+      syncUserInGameStatus(true);
       switchTab('game');
+
       document.getElementById('btn-game-lobby').classList.add('hidden');
       document.getElementById('btn-game-abort').classList.remove('hidden');
       document.getElementById('btn-game-draw').classList.remove('hidden');
@@ -841,42 +871,58 @@
         const gameData = snap.val();
         if (!gameData) return;
 
+        if (gameData.status === 'busy') {
+          alert("Opponent is currently in a match.");
+          returnToLobby();
+          return;
+        }
+
         if (gameData.status === 'declined') {
           alert("Challenge was declined.");
           returnToLobby();
           return;
         }
 
-        if (!isGameInitialized) {
-          initChessBoard(side);
-          isGameInitialized = true;
-        }
-
-        // Setup Player Info
         const isWhite = side === 'w';
         const selfData = isWhite ? gameData.white : gameData.black;
         const oppData = isWhite ? gameData.black : gameData.white;
 
         document.getElementById('self-username').innerText = (selfData ? selfData.username : 'You') + ` (${selfData ? selfData.elo : 500})`;
-        document.getElementById('opp-username').innerText = oppData ? (oppData.username + ` (${oppData.elo})`) : 'Waiting for opponent...';
         document.getElementById('self-avatar').innerText = (selfData ? selfData.username : 'P').charAt(0).toUpperCase();
-        document.getElementById('opp-avatar').innerText = oppData ? oppData.username.charAt(0).toUpperCase() : '?';
 
-        // Board state
-        if (gameData.fen && gameData.fen !== currentGame.fen()) {
-          currentGame.load(gameData.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : gameData.fen);
-          board.position(currentGame.fen());
-          updateCapturedPieces();
+        if (gameData.status === 'waiting') {
+          document.getElementById('opp-username').innerText = `Waiting for opponent... (${roomCode})`;
+          document.getElementById('opp-avatar').innerText = '?';
+          stopClockTimer();
+          if (!isGameInitialized) {
+            initChessBoard(side);
+            isGameInitialized = true;
+          }
+          return;
         }
 
-        // Clocks & Turn
-        whiteTime = gameData.whiteTime !== undefined ? gameData.whiteTime : 600;
-        blackTime = gameData.blackTime !== undefined ? gameData.blackTime : 600;
-        currentTurn = gameData.turn || 'w';
-        updateClockDisplay();
-        startClockTimer();
+        if (gameData.status === 'active') {
+          document.getElementById('opp-username').innerText = oppData ? (oppData.username + ` (${oppData.elo})`) : 'Opponent';
+          document.getElementById('opp-avatar').innerText = oppData ? oppData.username.charAt(0).toUpperCase() : 'O';
 
-        // Game Over Check from Server
+          if (!isGameInitialized) {
+            initChessBoard(side);
+            isGameInitialized = true;
+          }
+
+          if (gameData.fen && gameData.fen !== currentGame.fen()) {
+            currentGame.load(gameData.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : gameData.fen);
+            board.position(currentGame.fen());
+            updateCapturedPieces();
+          }
+
+          whiteTime = gameData.whiteTime !== undefined ? gameData.whiteTime : 600;
+          blackTime = gameData.blackTime !== undefined ? gameData.blackTime : 600;
+          currentTurn = gameData.turn || 'w';
+          updateClockDisplay();
+          startClockTimer();
+        }
+
         if (gameData.status === 'ended') {
           stopClockTimer();
           showGameOverModal(gameData.winner === side ? 'win' : (gameData.winner === 'draw' ? 'draw' : 'loss'), gameData.reason || 'Game completed');
@@ -892,7 +938,9 @@
       playerColor = 'w';
       isGameInitialized = false;
 
+      syncUserInGameStatus(true);
       switchTab('game');
+
       document.getElementById('btn-game-lobby').classList.remove('hidden');
       document.getElementById('btn-game-abort').classList.add('hidden');
       document.getElementById('btn-game-draw').classList.add('hidden');
@@ -921,14 +969,11 @@
         let selectedMove = null;
 
         if (botElo === 300) {
-          // 300 ELO: Random move or simple capture
           const captures = moves.filter(m => m.captured);
           selectedMove = captures.length > 0 && Math.random() > 0.4 ? captures[Math.floor(Math.random() * captures.length)] : moves[Math.floor(Math.random() * moves.length)];
         } else if (botElo === 800) {
-          // 800 ELO: 1-ply Minimax + PST
           selectedMove = getBestMoveMinimax(1);
         } else {
-          // 1500 ELO: 2-ply Minimax + Alpha-Beta
           selectedMove = getBestMoveMinimax(2);
         }
 
@@ -997,7 +1042,7 @@
         currentGame.move(move);
         let value = minimax(depth - 1, -100000, 100000, false);
         currentGame.undo();
-        value += (Math.random() * 6 - 3); // tie-breaking noise
+        value += (Math.random() * 6 - 3);
         if (value > bestValue) {
           bestValue = value;
           bestMove = move;
@@ -1008,7 +1053,7 @@
 
     function minimax(depth, alpha, beta, isMaximizing) {
       if (depth === 0 || currentGame.game_over()) {
-        return -evaluateBoard(currentGame); // inverted for Black AI perspective
+        return -evaluateBoard(currentGame);
       }
       const moves = currentGame.moves({ verbose: true });
       if (isMaximizing) {
@@ -1049,7 +1094,6 @@
         pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
       });
 
-      // Bind click handlers directly to square elements
       $('#chess-board-dom').on('click', '.square-55d63', function () {
         const square = $(this).attr('data-square');
         handleSquareClick(square);
@@ -1063,7 +1107,6 @@
 
       const piece = currentGame.get(square);
 
-      // If clicked on own piece -> Highlight selection and legal moves
       if (piece && piece.color === playerColor) {
         selectedSquare = square;
         validMovesForSquare = currentGame.moves({ square: square, verbose: true });
@@ -1071,11 +1114,9 @@
         return;
       }
 
-      // If a piece was already selected -> Attempt Move
       if (selectedSquare) {
         const targetMove = validMovesForSquare.find(m => m.to === square);
         if (targetMove) {
-          // Pawn Promotion Check
           if (targetMove.flags.includes('p')) {
             pendingPromotionMove = targetMove;
             document.getElementById('modal-promotion').classList.remove('hidden');
@@ -1295,7 +1336,6 @@
       eloDeltaEl.className = delta >= 0 ? "font-mono font-bold text-emerald-400 text-sm" : "font-mono font-bold text-rose-400 text-sm";
       eloNewEl.innerText = newElo;
 
-      // Update User Record in Database
       const updates = { elo: newElo };
       if (result === 'win') updates.wins = (userProfile.wins || 0) + 1;
       if (result === 'loss') updates.losses = (userProfile.losses || 0) + 1;
@@ -1313,19 +1353,18 @@
       stopClockTimer();
       if (roomRef) roomRef.off();
       activeRoomCode = null;
+      syncUserInGameStatus(false);
       switchTab('arena');
     }
 
     // --- FRIENDS & DIRECTORY SYSTEM ---
 
     function loadDirectoryAndFriends() {
-      // Listen to Friends list
       db.ref('friends/' + currentUser.uid).on('value', (friendsSnap) => {
         const friendsData = friendsSnap.val() || {};
         const friendUids = Object.keys(friendsData);
         document.getElementById('friends-count').innerText = friendUids.length;
 
-        // Render Friends List
         const friendsContainer = document.getElementById('friends-container');
         if (friendUids.length === 0) {
           friendsContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">No friends added yet.</p>';
@@ -1335,7 +1374,8 @@
             db.ref('users/' + fUid).once('value', (uSnap) => {
               const uVal = uSnap.val() || { username: 'Player', elo: 500 };
               db.ref('presence/' + fUid).once('value', (pSnap) => {
-                const isOnline = pSnap.exists() && pSnap.val().state === 'online';
+                const pData = pSnap.val();
+                const isOnline = pSnap.exists() && pData.state === 'online';
                 const div = document.createElement('div');
                 div.className = "flex items-center justify-between p-2.5 bg-slate-900/60 rounded-lg border border-slate-700/50";
                 div.innerHTML = `
@@ -1361,7 +1401,6 @@
           });
         }
 
-        // Render Directory (Filtered)
         db.ref('users').on('value', (usersSnap) => {
           const allUsers = usersSnap.val() || {};
           const dirContainer = document.getElementById('directory-container');
@@ -1410,40 +1449,58 @@
     }
 
     function challengePlayer(targetUid, targetUsername) {
-      const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-      
-      db.ref('games/' + roomCode).set({
-        white: { uid: currentUser.uid, username: userProfile.username || 'Player', elo: userProfile.elo || 500 },
-        black: { uid: targetUid, username: targetUsername, elo: 500 },
-        fen: 'start',
-        whiteTime: 600,
-        blackTime: 600,
-        turn: 'w',
-        status: 'waiting',
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      });
+      db.ref('presence/' + targetUid).once('value', (pSnap) => {
+        const pVal = pSnap.val();
+        if (!pVal || pVal.state !== 'online') {
+          alert("Opponent is offline.");
+          return;
+        }
+        if (pVal.inGame) {
+          alert("Opponent is in match.");
+          return;
+        }
 
-      db.ref(`requests/${targetUid}/${roomCode}`).set({
-        fromUid: currentUser.uid,
-        fromUsername: userProfile.username || 'Player',
-        roomCode: roomCode,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-      }).then(() => {
-        join1v1Room(roomCode, 'w');
+        const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        
+        db.ref('games/' + roomCode).set({
+          white: { uid: currentUser.uid, username: userProfile.username || 'Player', elo: userProfile.elo || 500 },
+          black: { uid: targetUid, username: targetUsername, elo: 500 },
+          fen: 'start',
+          whiteTime: 600,
+          blackTime: 600,
+          turn: 'w',
+          status: 'waiting',
+          createdAt: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        db.ref(`requests/${targetUid}`).push({
+          fromUid: currentUser.uid,
+          fromUsername: userProfile.username || 'Player',
+          roomCode: roomCode,
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+          join1v1Room(roomCode, 'w');
+        });
       });
     }
 
     function listenForDirectRequests() {
       db.ref('requests/' + currentUser.uid).on('child_added', (snap) => {
         const req = snap.val();
+        const reqKey = snap.key;
         if (!req) return;
 
+        db.ref(`requests/${currentUser.uid}/${reqKey}`).remove();
+
+        if (isUserInGame) {
+          db.ref(`games/${req.roomCode}`).update({ status: 'busy' });
+          return;
+        }
+
         if (confirm(`Incoming 1v1 challenge from ${req.fromUsername}! Accept?`)) {
-          db.ref(`requests/${currentUser.uid}/${snap.key}`).remove();
           db.ref(`games/${req.roomCode}`).update({ status: 'active' });
           join1v1Room(req.roomCode, 'b');
         } else {
-          db.ref(`requests/${currentUser.uid}/${snap.key}`).remove();
           db.ref(`games/${req.roomCode}`).update({ status: 'declined' });
         }
       });
@@ -1467,7 +1524,6 @@
           });
         });
 
-        // Numeric Sort Descending
         playersList.sort((a, b) => b.elo - a.elo);
 
         const tbody = document.getElementById('leaderboard-table-body');
@@ -1489,13 +1545,28 @@
       });
     }
 
-    // --- ADMIN PANEL CONTROLS ---
+    // --- MASTER ADMIN CONTROL PANEL ---
+
+    function listenToMaintenanceState() {
+      db.ref('system/maintenance').on('value', (snap) => {
+        const isMaint = snap.val() === true;
+        const btn = document.getElementById('btn-toggle-maint');
+        if (btn) {
+          if (isMaint) {
+            btn.innerText = "Disable Maintenance Mode";
+            btn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-lg text-sm transition";
+          } else {
+            btn.innerText = "Enable Maintenance Mode";
+            btn.className = "px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-lg text-sm transition";
+          }
+        }
+      });
+    }
 
     function toggleMaintenanceMode() {
       db.ref('system/maintenance').once('value', (snap) => {
         const curr = snap.val() === true;
         db.ref('system/maintenance').set(!curr);
-        alert(`Maintenance mode is now ${!curr ? 'ENABLED' : 'DISABLED'}`);
       });
     }
 
@@ -1512,6 +1583,65 @@
         });
         alert(`Purged ${count} account(s).`);
       });
+    }
+
+    function loadAdminUserList() {
+      if (!currentUser) return;
+      if (currentUser.email !== 'zainisgo123@gmail.com' && (userProfile && userProfile.username !== 'ZYREX')) return;
+
+      db.ref('users').on('value', (snap) => {
+        const users = snap.val() || {};
+        const tbody = document.getElementById('admin-user-table-body');
+        const countBadge = document.getElementById('admin-user-count');
+        
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        
+        const uids = Object.keys(users);
+        if (countBadge) countBadge.innerText = `${uids.length} account${uids.length === 1 ? '' : 's'}`;
+
+        if (uids.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-xs text-slate-500">No registered users found.</td></tr>';
+          return;
+        }
+
+        uids.forEach(uid => {
+          const u = users[uid];
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-700/50 hover:bg-slate-800/40 transition';
+          tr.innerHTML = `
+            <td class="p-3 text-xs font-semibold text-slate-200">${u.username || 'Anonymous'}</td>
+            <td class="p-3 text-xs text-slate-400 font-mono">${u.email || 'N/A'}</td>
+            <td class="p-3 text-xs font-mono font-bold text-indigo-400">${u.elo || 500}</td>
+            <td class="p-3 text-right">
+              <div class="flex justify-end gap-2">
+                <button onclick="adminResetElo('${uid}')" class="px-2.5 py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 rounded text-xs font-medium transition">
+                  Reset Elo
+                </button>
+                <button onclick="adminDeleteAccount('${uid}', '${u.username || 'User'}')" class="px-2.5 py-1 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 rounded text-xs font-medium transition">
+                  Delete
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    function adminResetElo(uid) {
+      if (confirm("Reset this user's Elo rating to 500?")) {
+        db.ref(`users/${uid}/elo`).set(500);
+      }
+    }
+
+    function adminDeleteAccount(uid, username) {
+      if (confirm(`Are you sure you want to permanently delete user account "${username}"?`)) {
+        db.ref(`users/${uid}`).remove();
+        db.ref(`presence/${uid}`).remove();
+        db.ref(`friends/${uid}`).remove();
+        db.ref(`matchmaking/${uid}`).remove();
+      }
     }
 
     // --- TAB SWITCHER LOGIC ---
@@ -1532,6 +1662,7 @@
       if (activeBtn) activeBtn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-indigo-600 text-white transition";
 
       if (tabName === 'leaderboard') loadLeaderboard();
+      if (tabName === 'admin') loadAdminUserList();
       if (tabName === 'game' && board) {
         setTimeout(() => board.resize(), 100);
       }

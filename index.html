@@ -235,6 +235,7 @@
 
         let isMaintenanceMode = false;
         const ADMIN_EMAIL = "zainisgo123@gmail.com";
+        const ALLOWED_MAINTENANCE_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
 
         // Listen for maintenance mode
         db.ref('system/maintenance').on('value', (snapshot) => {
@@ -253,7 +254,7 @@
             if (!user) return;
             const userEmail = (user.email || "").toLowerCase();
 
-            if (isMaintenanceMode && userEmail !== ADMIN_EMAIL) {
+            if (isMaintenanceMode && !ALLOWED_MAINTENANCE_EMAILS.includes(userEmail)) {
                 document.getElementById('maintenance-modal').classList.remove('hidden');
             } else {
                 // Verified user, direct to app

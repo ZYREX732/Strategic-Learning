@@ -126,17 +126,6 @@
           <i class="fa-solid fa-shield-halved w-5"></i> Admin Control
         </button>
       </nav>
-
-      <!-- Online Player Counter Widget -->
-      <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700/40 text-xs text-slate-400 space-y-1">
-        <div class="flex justify-between items-center">
-          <span>Active Assessors:</span>
-          <span class="inline-flex items-center gap-1.5 font-bold text-emerald-400">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span id="active-online-count">0</span>
-          </span>
-        </div>
-      </div>
     </aside>
 
     <!-- CONTENT PANELS -->
@@ -219,31 +208,18 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Random Matchmaking Card -->
-          <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 flex flex-col justify-between space-y-6">
-            <div class="space-y-3">
-              <div class="w-10 h-10 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
-                <i class="fa-solid fa-bolt text-xl"></i>
-              </div>
-              <h3 class="text-lg font-bold text-white">Random Ranked Match</h3>
-              <p class="text-xs text-slate-400">Pair instantly with players of similar rating across the global pool.</p>
-            </div>
-
-            <div id="matchmaking-status-box" class="hidden bg-slate-900/80 p-3 rounded-lg border border-indigo-500/30 text-center space-y-2">
-              <div class="flex items-center justify-center gap-2 text-indigo-400 font-semibold text-sm">
-                <i class="fa-solid fa-spinner animate-spin"></i>
-                <span>Searching for opponent...</span>
-              </div>
-              <p id="searching-count-badge" class="text-xs text-slate-400">1 player searching</p>
-            </div>
-
+          <!-- Online Opponents Card -->
+          <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6 flex flex-col justify-between space-y-4">
             <div class="space-y-2">
-              <button id="btn-start-queue" onclick="startMatchmakingQueue()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg transition shadow-lg shadow-indigo-600/20 text-sm">
-                Find Match
-              </button>
-              <button id="btn-cancel-queue" onclick="cancelMatchmakingQueue()" class="hidden w-full py-3 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 font-bold rounded-lg transition text-sm">
-                Cancel Search
-              </button>
+              <div class="w-10 h-10 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
+                <i class="fa-solid fa-users text-xl"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white">Online Opponents</h3>
+              <p class="text-xs text-slate-400">Select an online player to send a direct 1v1 match challenge.</p>
+            </div>
+
+            <div id="online-opponents-container" class="space-y-2 max-h-56 overflow-y-auto pr-1 text-sm border-t border-slate-700/50 pt-3">
+              <p class="text-xs text-slate-500 text-center py-4">Loading active online players...</p>
             </div>
           </div>
 
@@ -583,7 +559,6 @@
     let whiteTime = 600, blackTime = 600;
     let currentTurn = 'w';
     let isGameInitialized = false;
-    let matchmakingListener = null;
     let isUserInGame = false;
 
     // --- AUTH & INITIALIZATION ---
@@ -648,7 +623,6 @@
     function handleExit() {
       if (currentUser) {
         db.ref('presence/' + currentUser.uid).remove();
-        cancelMatchmakingQueue();
       }
       auth.signOut();
       sessionStorage.clear();
@@ -668,6 +642,7 @@
 
       setupPresence();
       fetchUserProfile();
+      loadOnlineOpponentsList();
       loadDirectoryAndFriends();
       listenForDirectRequests();
       listenToMaintenanceState();
@@ -687,11 +662,6 @@
             last_changed: firebase.database.ServerValue.TIMESTAMP
           });
         }
-      });
-
-      db.ref('presence').on('value', (snap) => {
-        const onlineCount = snap.numChildren();
-        document.getElementById('active-online-count').innerText = onlineCount;
       });
     }
 
@@ -716,96 +686,55 @@
       });
     }
 
-    // --- MATCHMAKING & 1v1 ARENA SYSTEM ---
+    // --- LIVE ONLINE OPPONENTS DIRECTORY ---
 
-    function startMatchmakingQueue() {
-      if (!currentUser || !userProfile) return;
-      
-      syncUserInGameStatus(true);
-      document.getElementById('btn-start-queue').classList.add('hidden');
-      document.getElementById('btn-cancel-queue').classList.remove('hidden');
-      document.getElementById('matchmaking-status-box').classList.remove('hidden');
-      document.getElementById('searching-count-badge').innerText = "1 player searching";
+    function loadOnlineOpponentsList() {
+      db.ref('presence').on('value', (snap) => {
+        const presenceData = snap.val() || {};
+        const container = document.getElementById('online-opponents-container');
+        container.innerHTML = '';
 
-      const myMatchRef = db.ref('matchmaking/' + currentUser.uid);
-      myMatchRef.onDisconnect().remove();
+        let count = 0;
+        const uids = Object.keys(presenceData);
 
-      myMatchRef.set({
-        uid: currentUser.uid,
-        username: userProfile.username || 'Player',
-        elo: userProfile.elo || 500,
-        status: 'searching',
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-      });
-
-      const globalQueueRef = db.ref('matchmaking');
-      matchmakingListener = globalQueueRef.on('value', (snap) => {
-        const queueData = snap.val() || {};
-        const now = Date.now();
-        let searchingUsers = [];
-
-        Object.keys(queueData).forEach(uid => {
-          const entry = queueData[uid];
-          if (entry && entry.status === 'searching' && (now - (entry.timestamp || 0) < 60000)) {
-            searchingUsers.push(entry);
+        uids.forEach(uid => {
+          if (uid !== currentUser.uid && presenceData[uid].state === 'online') {
+            count++;
+            const pVal = presenceData[uid];
+            
+            db.ref('users/' + uid).once('value', (uSnap) => {
+              const uData = uSnap.val() || { username: pVal.username || 'Player', elo: 500 };
+              const isInMatch = pVal.inGame === true;
+              
+              const div = document.createElement('div');
+              div.className = "flex items-center justify-between p-2.5 bg-slate-900/60 rounded-lg border border-slate-700/50";
+              div.innerHTML = `
+                <div class="flex items-center gap-2.5">
+                  <span class="w-2.5 h-2.5 rounded-full ${isInMatch ? 'bg-amber-500' : 'bg-emerald-500 animate-pulse'}"></span>
+                  <div>
+                    <div class="font-bold text-slate-200 text-xs flex items-center gap-2">
+                      <span>${uData.username}</span>
+                      ${isInMatch ? '<span class="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">In Match</span>' : ''}
+                    </div>
+                    <div class="text-[10px] text-indigo-400 font-mono">Elo: ${uData.elo || 500}</div>
+                  </div>
+                </div>
+                <button onclick="challengePlayer('${uid}', '${uData.username}')" class="px-2.5 py-1 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/30 rounded text-[11px] font-medium transition">
+                  Challenge
+                </button>
+              `;
+              container.appendChild(div);
+            });
           }
         });
 
-        document.getElementById('searching-count-badge').innerText = `${searchingUsers.length} player${searchingUsers.length === 1 ? '' : 's'} searching`;
-
-        const opponent = searchingUsers.find(u => u.uid !== currentUser.uid);
-
-        if (opponent) {
-          if (currentUser.uid < opponent.uid) {
-            const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-            
-            db.ref('games/' + roomCode).set({
-              white: { uid: currentUser.uid, username: userProfile.username || 'Player', elo: userProfile.elo || 500 },
-              black: { uid: opponent.uid, username: opponent.username, elo: opponent.elo || 500 },
-              fen: 'start',
-              whiteTime: 600,
-              blackTime: 600,
-              turn: 'w',
-              status: 'active',
-              createdAt: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-              db.ref('matchmaking/' + opponent.uid).update({ status: 'matched', roomCode: roomCode, side: 'b' });
-              db.ref('matchmaking/' + currentUser.uid).remove();
-              cancelMatchmakingQueue(false);
-              join1v1Room(roomCode, 'w');
-            });
-          }
-        }
-      });
-
-      myMatchRef.on('value', (snap) => {
-        const val = snap.val();
-        if (val && val.status === 'matched' && val.roomCode) {
-          const code = val.roomCode;
-          const side = val.side || 'b';
-          db.ref('matchmaking/' + currentUser.uid).remove();
-          cancelMatchmakingQueue(false);
-          join1v1Room(code, side);
+        if (count === 0) {
+          container.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">No other players online right now.</p>';
         }
       });
     }
 
-    function cancelMatchmakingQueue(removeFromDb = true) {
-      if (matchmakingListener) {
-        db.ref('matchmaking').off('value', matchmakingListener);
-        matchmakingListener = null;
-      }
-      if (currentUser) {
-        db.ref('matchmaking/' + currentUser.uid).off();
-        if (removeFromDb) {
-          db.ref('matchmaking/' + currentUser.uid).remove();
-        }
-      }
-      syncUserInGameStatus(false);
-      document.getElementById('btn-start-queue').classList.remove('hidden');
-      document.getElementById('btn-cancel-queue').classList.add('hidden');
-      document.getElementById('matchmaking-status-box').classList.add('hidden');
-    }
+    // --- ROOM CREATION & JOIN ---
 
     function createPrivateRoom() {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -1640,7 +1569,6 @@
         db.ref(`users/${uid}`).remove();
         db.ref(`presence/${uid}`).remove();
         db.ref(`friends/${uid}`).remove();
-        db.ref(`matchmaking/${uid}`).remove();
       }
     }
 

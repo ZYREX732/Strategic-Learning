@@ -592,9 +592,8 @@
         let roomRef = null;
         let playerColor = 'w'; // 'w' or 'b'
         let clockInterval = null;
-        let whiteTime = 600;
-        let blackTime = 600;
-        let matchmakingListener = null;
+        let isSearchingMatch = false;
+        let isGameInitialized = false;
 
         // Piece Values & Unicode Icons
         const pieceUnicode = {
@@ -714,6 +713,7 @@
 
         // Logout
         function handleLogout() {
+            cancelMatchmakingQueue();
             if (currentUser) {
                 db.ref('presence/' + currentUser.uid).remove();
             }
@@ -748,6 +748,7 @@
         function startAiGame() {
             isVsAi = true;
             playerColor = selectedPlayerColor;
+            isGameInitialized = true;
             game = new Chess();
             
             // Set Player Info UI
@@ -893,7 +894,7 @@
         // ----------------------------------------------------
         function initBoard() {
             board = Chessboard('board', {
-                position: 'start',
+                position: game ? game.fen() : 'start',
                 draggable: false,
                 pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
             });
@@ -915,9 +916,6 @@
 
             // If a square is selected
             if (currentSquare) {
-                let moveObj = { from: currentSquare, to: sq, promotion: 'q' };
-                
-                // Check if move is legal
                 let moves = game.moves({ square: currentSquare, verbose: true });
                 let targetMove = moves.find(m => m.to === sq);
 
@@ -937,6 +935,7 @@
 
                     if (!isVsAi) {
                         syncOnlineMove();
+                        checkGameOver();
                     } else {
                         checkGameOver();
                         if (!game.game_over()) setTimeout(makeAiMove, 400);
@@ -977,6 +976,7 @@
 
                 if (!isVsAi) {
                     syncOnlineMove();
+                    checkGameOver();
                 } else {
                     checkGameOver();
                     if (!game.game_over()) setTimeout(makeAiMove, 400);
@@ -989,6 +989,7 @@
         }
 
         function updateGameUI() {
+            if (!game) return;
             // Update move history
             const history = game.history();
             const historyContainer = document.getElementById('move-history');
@@ -1013,6 +1014,7 @@
         }
 
         function renderCapturedPieces() {
+            if (!game) return;
             let capturedWhite = { 'q': 0, 'r': 0, 'b': 0, 'n': 0, 'p': 0 };
             let capturedBlack = { 'q': 0, 'r': 0, 'b': 0, 'n': 0, 'p': 0 };
             let scoreW = 0, scoreB = 0;
@@ -1082,34 +1084,34 @@
         }
 
         function checkGameOver() {
-            if (game.game_over()) {
-                let title = "Game Over";
-                let desc = "";
-                let score = 0.5;
+            if (!game || !game.game_over()) return;
 
-                if (game.in_checkmate()) {
-                    let winner = game.turn() === 'w' ? 'b' : 'w';
-                    if (winner === playerColor) {
-                        title = "Victory!";
-                        desc = "You checkmated your opponent!";
-                        score = 1;
-                    } else {
-                        title = "Defeat!";
-                        desc = "You were checkmated!";
-                        score = 0;
-                    }
-                } else if (game.in_draw()) {
-                    title = "Draw!";
-                    desc = "Game ended in a draw/stalemate.";
-                    score = 0.5;
+            let title = "Game Over";
+            let desc = "";
+            let score = 0.5;
+
+            if (game.in_checkmate()) {
+                let winner = game.turn() === 'w' ? 'b' : 'w';
+                if (winner === playerColor) {
+                    title = "Victory!";
+                    desc = "You checkmated your opponent!";
+                    score = 1;
+                } else {
+                    title = "Defeat!";
+                    desc = "You were checkmated!";
+                    score = 0;
                 }
-
-                let oppElo = isVsAi ? selectedBotLevel : 500;
-                let eloDelta = calculateEloChange(userProfile.elo, oppElo, score);
-                updateEloInDatabase(userProfile.elo + eloDelta);
-
-                showGameOverModal(title, desc, eloDelta);
+            } else if (game.in_draw()) {
+                title = "Draw!";
+                desc = "Game ended in a draw/stalemate.";
+                score = 0.5;
             }
+
+            let oppElo = isVsAi ? selectedBotLevel : 500;
+            let eloDelta = calculateEloChange(userProfile.elo, oppElo, score);
+            updateEloInDatabase(userProfile.elo + eloDelta);
+
+            showGameOverModal(title, desc, eloDelta);
         }
 
         function showGameOverModal(title, desc, delta) {
@@ -1129,6 +1131,7 @@
         }
 
         function returnToLobby() {
+            isGameInitialized = false;
             document.getElementById('gameover-modal').classList.add('hidden');
             if (roomRef) {
                 roomRef.off();
@@ -1161,7 +1164,7 @@
         }
 
         function handleAbortGame() {
-            if (game.history().length <= 1) {
+            if (game && game.history().length <= 1) {
                 showGameOverModal("Game Aborted", "Match aborted without rating changes.", 0);
             } else {
                 alert("Cannot abort match after move 1.");
@@ -1169,7 +1172,7 @@
         }
 
         // ----------------------------------------------------
-        // 1v1 REAL-TIME ARENA & MATCHMAKING
+        // 1v1 REAL-TIME ARENA & RANDOM MATCHMAKING ENGINE
         // ----------------------------------------------------
         function generateRoomCode() {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -1178,8 +1181,128 @@
             return code;
         }
 
+        function toggleMatchmakingQueue() {
+            if (isSearchingMatch) {
+                cancelMatchmakingQueue();
+            } else {
+                startMatchmakingQueue();
+            }
+        }
+
+        function cancelMatchmakingQueue() {
+            isSearchingMatch = false;
+
+            // Turn off node listeners
+            db.ref(`matchmaking/${currentUser.uid}`).off();
+            db.ref('matchmaking').off();
+
+            // Clear node in Firebase
+            db.ref(`matchmaking/${currentUser.uid}`).remove();
+
+            const statusBox = document.getElementById('matchmaking-status-box');
+            const btn = document.getElementById('btn-start-queue');
+            if (statusBox) statusBox.classList.add('hidden');
+            if (btn) btn.innerHTML = `<i class="fa-solid fa-magnifying-glass mr-1.5"></i> Find Random Match`;
+        }
+
+        async function startMatchmakingQueue() {
+            isSearchingMatch = true;
+
+            const statusBox = document.getElementById('matchmaking-status-box');
+            const btn = document.getElementById('btn-start-queue');
+            if (statusBox) statusBox.classList.remove('hidden');
+            if (btn) btn.innerHTML = `<i class="fa-solid fa-xmark mr-1.5"></i> Cancel Queue`;
+
+            const myMMRef = db.ref(`matchmaking/${currentUser.uid}`);
+            myMMRef.onDisconnect().remove();
+
+            await myMMRef.set({
+                uid: currentUser.uid,
+                username: userProfile.username,
+                elo: userProfile.elo,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            if (!isSearchingMatch) return;
+
+            // 1. Listen to personal node for match assignment
+            myMMRef.on('value', (snap) => {
+                if (!isSearchingMatch) return;
+                const val = snap.val();
+                if (val && val.status === 'matched') {
+                    const matchedRoom = val.roomCode;
+                    const matchedColor = val.color;
+
+                    cancelMatchmakingQueue(); // Reset queue UI state
+
+                    currentRoomCode = matchedRoom;
+                    playerColor = matchedColor;
+                    isVsAi = false;
+                    isGameInitialized = false;
+                    roomRef = db.ref(`games/${currentRoomCode}`);
+                    listenToRoom();
+                }
+            });
+
+            // 2. Continuous real-time pool monitor
+            db.ref('matchmaking').on('value', async (snap) => {
+                if (!isSearchingMatch) return;
+                const pool = snap.val() || {};
+                const now = Date.now();
+
+                // Exclude self, stale entries (>60s), or already matched entries
+                let candidates = Object.values(pool).filter(u => 
+                    u.uid !== currentUser.uid && 
+                    !u.status && 
+                    (u.timestamp && (now - u.timestamp < 60000))
+                );
+
+                const countEl = document.getElementById('searching-count');
+                if (countEl) countEl.innerText = candidates.length;
+
+                if (candidates.length > 0 && isSearchingMatch) {
+                    let opponent = candidates[0];
+
+                    // Deterministic initiator pairing (lower UID creates room to prevent race conditions)
+                    if (currentUser.uid < opponent.uid) {
+                        let roomCode = generateRoomCode();
+
+                        // Create room node
+                        await db.ref(`games/${roomCode}`).set({
+                            code: roomCode,
+                            white: currentUser.uid,
+                            whiteName: userProfile.username,
+                            whiteElo: userProfile.elo,
+                            black: opponent.uid,
+                            blackName: opponent.username,
+                            blackElo: opponent.elo,
+                            status: 'active',
+                            fen: 'start',
+                            createdAt: firebase.database.ServerValue.TIMESTAMP
+                        });
+
+                        // Signal opponent
+                        await db.ref(`matchmaking/${opponent.uid}`).update({
+                            status: 'matched',
+                            roomCode: roomCode,
+                            color: 'b'
+                        });
+
+                        // Signal self
+                        await db.ref(`matchmaking/${currentUser.uid}`).update({
+                            status: 'matched',
+                            roomCode: roomCode,
+                            color: 'w'
+                        });
+                    }
+                }
+            });
+        }
+
         async function hostPrivateRoom() {
+            cancelMatchmakingQueue();
             isVsAi = false;
+            isGameInitialized = false;
             currentRoomCode = generateRoomCode();
             playerColor = 'w';
 
@@ -1201,6 +1324,7 @@
         }
 
         async function joinPrivateRoom() {
+            cancelMatchmakingQueue();
             const code = document.getElementById('join-code-input').value.trim().toUpperCase();
             if (code.length !== 6) {
                 alert("Enter a valid 6-character room code.");
@@ -1220,6 +1344,7 @@
             }
 
             isVsAi = false;
+            isGameInitialized = false;
             currentRoomCode = code;
             playerColor = 'b';
             roomRef = db.ref(`games/${currentRoomCode}`);
@@ -1242,95 +1367,9 @@
             document.getElementById('host-waiting-card').classList.add('hidden');
         }
 
-        // Single Node Matchmaking Signaling
-        async function toggleMatchmakingQueue() {
-            const mmRef = db.ref(`matchmaking/${currentUser.uid}`);
-            const statusBox = document.getElementById('matchmaking-status-box');
-            const btn = document.getElementById('btn-start-queue');
-
-            if (matchmakingListener) {
-                // Cancel queue search
-                mmRef.remove();
-                mmRef.off();
-                matchmakingListener = null;
-                statusBox.classList.add('hidden');
-                btn.innerHTML = `<i class="fa-solid fa-magnifying-glass mr-1.5"></i> Find Random Match`;
-                return;
-            }
-
-            // Start queue searching
-            statusBox.classList.remove('hidden');
-            btn.innerHTML = `<i class="fa-solid fa-xmark mr-1.5"></i> Cancel Queue`;
-
-            await mmRef.set({
-                uid: currentUser.uid,
-                username: userProfile.username,
-                elo: userProfile.elo,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-
-            // Listen for matches targeting us
-            matchmakingListener = mmRef.on('value', async (snap) => {
-                const val = snap.val();
-                if (val && val.status === 'matched') {
-                    mmRef.off();
-                    mmRef.remove();
-                    matchmakingListener = null;
-                    statusBox.classList.add('hidden');
-                    btn.innerHTML = `<i class="fa-solid fa-magnifying-glass mr-1.5"></i> Find Random Match`;
-
-                    currentRoomCode = val.roomCode;
-                    playerColor = val.color;
-                    isVsAi = false;
-                    roomRef = db.ref(`games/${currentRoomCode}`);
-                    listenToRoom();
-                    return;
-                }
-            });
-
-            // Scan global matchmaking pool for available opponent
-            db.ref('matchmaking').once('value', async (snap) => {
-                const pool = snap.val() || {};
-                const now = Date.now();
-                let candidates = Object.values(pool).filter(u => u.uid !== currentUser.uid && !u.status);
-
-                document.getElementById('searching-count').innerText = candidates.length;
-
-                if (candidates.length > 0) {
-                    let opponent = candidates[0];
-                    let roomCode = generateRoomCode();
-
-                    // Create match
-                    await db.ref(`games/${roomCode}`).set({
-                        code: roomCode,
-                        white: opponent.uid,
-                        whiteName: opponent.username,
-                        whiteElo: opponent.elo,
-                        black: currentUser.uid,
-                        blackName: userProfile.username,
-                        blackElo: userProfile.elo,
-                        status: 'active',
-                        fen: 'start'
-                    });
-
-                    // Signal opponent
-                    await db.ref(`matchmaking/${opponent.uid}`).update({
-                        status: 'matched',
-                        roomCode: roomCode,
-                        color: 'w'
-                    });
-
-                    // Signal self
-                    await db.ref(`matchmaking/${currentUser.uid}`).update({
-                        status: 'matched',
-                        roomCode: roomCode,
-                        color: 'b'
-                    });
-                }
-            });
-        }
-
         function listenToRoom() {
+            if (!roomRef) return;
+
             roomRef.on('value', (snap) => {
                 const roomData = snap.val();
                 if (!roomData) return;
@@ -1343,31 +1382,43 @@
 
                 if (roomData.status === 'active') {
                     document.getElementById('host-waiting-card').classList.add('hidden');
-                    
-                    // Setup Game UI
-                    game = new Chess(roomData.fen === 'start' ? undefined : roomData.fen);
-                    
-                    const isWhite = playerColor === 'w';
-                    document.getElementById('top-player-name').innerText = isWhite ? roomData.blackName : roomData.whiteName;
-                    document.getElementById('top-player-elo').innerText = `${isWhite ? roomData.blackElo : roomData.whiteElo} Elo`;
-                    
-                    document.getElementById('bottom-player-name').innerText = userProfile.username;
-                    document.getElementById('bottom-player-elo').innerText = `${userProfile.elo} Elo`;
 
-                    document.getElementById('btn-abort-game').classList.remove('hidden');
-                    document.getElementById('btn-offer-draw').classList.remove('hidden');
+                    if (!isGameInitialized) {
+                        // First time initializing room board
+                        isGameInitialized = true;
+                        game = new Chess(roomData.fen === 'start' ? undefined : roomData.fen);
 
-                    navigateTo('game');
-                    initBoard();
-                    board.orientation(isWhite ? 'white' : 'black');
+                        const isWhite = playerColor === 'w';
+                        document.getElementById('top-player-name').innerText = isWhite ? roomData.blackName : roomData.whiteName;
+                        document.getElementById('top-player-elo').innerText = `${isWhite ? roomData.blackElo : roomData.whiteElo} Elo`;
 
-                    // Check draw offers
+                        document.getElementById('bottom-player-name').innerText = userProfile.username;
+                        document.getElementById('bottom-player-elo').innerText = `${userProfile.elo} Elo`;
+
+                        document.getElementById('btn-abort-game').classList.remove('hidden');
+                        document.getElementById('btn-offer-draw').classList.remove('hidden');
+
+                        navigateTo('game');
+                        initBoard();
+                        board.orientation(isWhite ? 'white' : 'black');
+                    } else {
+                        // Smoothly update positions without re-rendering DOM elements
+                        if (game && roomData.fen && roomData.fen !== game.fen()) {
+                            game.load(roomData.fen);
+                            board.position(roomData.fen);
+                            updateGameUI();
+                            checkGameOver();
+                        }
+                    }
+
+                    // Handle incoming draw offers
                     if (roomData.drawOfferedBy && roomData.drawOfferedBy !== playerColor) {
                         if (confirm("Opponent has offered a draw. Accept?")) {
                             roomRef.update({ status: 'draw' });
                         }
                     }
 
+                    // Handle resignation
                     if (roomData.status === 'resigned') {
                         let score = roomData.winner === playerColor ? 1 : 0;
                         let delta = calculateEloChange(userProfile.elo, 500, score);
@@ -1442,7 +1493,6 @@
                 const container = document.getElementById('directory-list');
 
                 let filtered = Object.values(allUsers).filter(u => {
-                    // Filter out current user and existing friends (e.g. "eli")
                     if (u.uid === currentUser.uid) return false;
                     if (existingFriends[u.uid]) return false;
                     if (query && !u.username.toLowerCase().includes(query)) return false;
@@ -1497,6 +1547,7 @@
         }
 
         async function sendDirectChallenge(fUid, fUsername) {
+            cancelMatchmakingQueue();
             let roomCode = generateRoomCode();
             await db.ref(`requests/${fUid}/${roomCode}`).set({
                 fromUid: currentUser.uid,
@@ -1507,6 +1558,7 @@
             });
 
             isVsAi = false;
+            isGameInitialized = false;
             currentRoomCode = roomCode;
             playerColor = 'w';
             roomRef = db.ref(`games/${currentRoomCode}`);
@@ -1561,8 +1613,10 @@
         }
 
         async function acceptDirectChallenge(roomCode, reqKey) {
+            cancelMatchmakingQueue();
             await db.ref(`requests/${currentUser.uid}/${reqKey}`).remove();
             isVsAi = false;
+            isGameInitialized = false;
             currentRoomCode = roomCode;
             playerColor = 'b';
             roomRef = db.ref(`games/${currentRoomCode}`);

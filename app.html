@@ -572,6 +572,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
         const ADMIN_EMAIL = "zainisgo123@gmail.com";
+        const ALLOWED_MAINTENANCE_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
 
         // Global State Variables
         let currentUser = null;
@@ -613,7 +614,8 @@
             // Session check for maintenance mode
             db.ref('system/maintenance').on('value', (snap) => {
                 isMaintenanceMode = !!snap.val();
-                if (isMaintenanceMode && currentUser.email !== ADMIN_EMAIL) {
+                const userEmail = (currentUser.email || "").toLowerCase();
+                if (isMaintenanceMode && !ALLOWED_MAINTENANCE_EMAILS.includes(userEmail)) {
                     document.getElementById('maintenance-modal').classList.remove('hidden');
                 } else {
                     document.getElementById('maintenance-modal').classList.add('hidden');

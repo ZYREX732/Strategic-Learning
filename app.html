@@ -66,6 +66,27 @@
     </div>
   </div>
 
+  <!-- Change Username Modal -->
+  <div id="usernameModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="text-center">
+        <div class="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Update Handle</h3>
+        <p class="text-xs text-slate-400 mt-1">Change your display name in the Lab directory.</p>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">New Handle</label>
+        <input type="text" id="newUsernameInput" maxlength="20" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition text-sm" placeholder="e.g. TacticalMaster">
+      </div>
+      <div class="flex space-x-2 pt-2">
+        <button onclick="closeUsernameModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl text-sm transition border border-slate-700">Cancel</button>
+        <button onclick="saveUsername()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Navigation Bar -->
   <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/60 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,7 +103,7 @@
           </div>
         </div>
 
-        <!-- Dynamic Navigation Tabs (Includes Admin Panel Top Tab) -->
+        <!-- Dynamic Navigation Tabs -->
         <nav id="navTabs" class="hidden sm:flex items-center space-x-1">
           <button onclick="switchTab('game')" id="tab-game" class="nav-tab px-3.5 py-2 rounded-lg text-sm font-medium transition text-indigo-400 bg-slate-700/50">
             <i class="fa-solid fa-gamepad mr-1.5"></i>Play
@@ -96,6 +117,9 @@
           <button onclick="switchTab('friends')" id="tab-friends" class="nav-tab px-3.5 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 transition">
             <i class="fa-solid fa-user-group mr-1.5"></i>Friends
           </button>
+          <button onclick="switchTab('messages')" id="tab-messages" class="nav-tab px-3.5 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 transition">
+            <i class="fa-solid fa-comments mr-1.5"></i>Messages
+          </button>
           <button onclick="switchTab('admin')" id="tab-admin" class="hidden nav-tab px-3.5 py-2 rounded-lg text-sm font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition">
             <i class="fa-solid fa-shield-halved mr-1.5"></i>Admin Panel
           </button>
@@ -108,7 +132,12 @@
               ?
             </div>
             <div class="text-left leading-none">
-              <div class="text-sm font-semibold text-slate-200" id="userUsername">Loading...</div>
+              <div class="flex items-center space-x-1.5">
+                <span class="text-sm font-semibold text-slate-200" id="userUsername">Loading...</span>
+                <button onclick="openUsernameModal()" class="text-xs text-indigo-400 hover:text-indigo-300 transition" title="Change Username">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+              </div>
               <div class="text-xs text-emerald-400 font-mono mt-0.5"><span id="userElo">500</span> ELO</div>
             </div>
           </div>
@@ -282,9 +311,26 @@
             <span><i class="fa-solid fa-list-ol text-indigo-400 mr-2"></i>Move Log</span>
             <span id="moveCountBadge" class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full font-mono">0 moves</span>
           </h3>
-          <div id="moveLog" class="h-44 overflow-y-auto bg-slate-900/80 rounded-xl p-3 font-mono text-xs text-slate-300 space-y-1 border border-slate-800">
+          <div id="moveLog" class="h-32 overflow-y-auto bg-slate-900/80 rounded-xl p-3 font-mono text-xs text-slate-300 space-y-1 border border-slate-800">
             <div class="text-slate-500 italic text-center py-4">Moves will appear here...</div>
           </div>
+        </div>
+
+        <!-- In-Game Match Live Chat Card (Auto-deletes when match concludes) -->
+        <div id="inGameChatCard" class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 backdrop-blur-md">
+          <h3 class="text-base font-bold text-white mb-2 flex items-center justify-between">
+            <span><i class="fa-solid fa-comments text-emerald-400 mr-2"></i>Match Chat</span>
+            <span class="text-[10px] text-slate-500 font-normal uppercase tracking-wider">Auto-deletes on game end</span>
+          </h3>
+          <div id="gameChatBox" class="h-28 overflow-y-auto bg-slate-900/80 rounded-xl p-2.5 font-sans text-xs text-slate-300 space-y-1.5 border border-slate-800 mb-2.5">
+            <div class="text-slate-500 italic text-center py-4">Chat is enabled during 1v1 Arena games.</div>
+          </div>
+          <form onsubmit="sendGameChatMessage(event)" class="flex space-x-2">
+            <input type="text" id="gameChatInput" placeholder="Send move note or chat..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded-xl transition text-xs">
+              Send
+            </button>
+          </form>
         </div>
 
       </div>
@@ -383,6 +429,42 @@
           <div id="directoryList" class="space-y-3 max-h-96 overflow-y-auto">
             <div class="text-slate-500 text-sm text-center py-6">Loading directory users...</div>
           </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MESSAGES SECTION (Direct Chat with Friends) -->
+    <div id="section-messages" class="hidden space-y-6">
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 backdrop-blur-md grid grid-cols-1 md:grid-cols-3 gap-6 h-[520px]">
+        
+        <!-- Left Friends Sidebar -->
+        <div class="border-r border-slate-700/60 pr-4 flex flex-col h-full">
+          <h3 class="text-base font-bold text-white mb-3 flex items-center">
+            <i class="fa-solid fa-user-group text-indigo-400 mr-2"></i>Conversations
+          </h3>
+          <div id="dmFriendsList" class="flex-1 overflow-y-auto space-y-2">
+            <div class="text-slate-500 text-sm py-6 text-center">Loading friends...</div>
+          </div>
+        </div>
+
+        <!-- Active Chat Window -->
+        <div class="md:col-span-2 flex flex-col h-full">
+          <div id="dmHeader" class="border-b border-slate-700/60 pb-3 mb-3 flex items-center justify-between">
+            <span class="font-bold text-white text-base" id="dmTargetName">Select a friend to start chatting</span>
+            <span class="text-xs text-slate-500 font-mono" id="dmTargetStatus"></span>
+          </div>
+          
+          <div id="dmMessagesBox" class="flex-1 overflow-y-auto bg-slate-900/80 rounded-xl p-4 space-y-3 border border-slate-800 mb-3 font-sans text-xs">
+            <div class="text-slate-500 italic text-center py-12">Select a friend from the left list to view your direct conversation.</div>
+          </div>
+
+          <form onsubmit="sendDirectMessage(event)" class="flex space-x-2">
+            <input type="text" id="dmInput" placeholder="Type a message..." disabled class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm">
+            <button type="submit" id="dmSendBtn" disabled class="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-semibold px-5 rounded-xl transition text-sm flex items-center">
+              <i class="fa-solid fa-paper-plane mr-1.5"></i>Send
+            </button>
+          </form>
         </div>
 
       </div>
@@ -516,6 +598,7 @@
     let clockInterval = null;
     let currentLastMove = null; // Stores last move { from, to }
     let gameOverTimeout = null; // Auto-dismiss timer reference
+    let activeDmTargetUid = null; // Target UID for direct messages
 
     // Piece-Square Evaluation Tables for AI Engine
     const PST = {
@@ -667,6 +750,32 @@
       document.getElementById('bottomUsername').innerText = userData.username || 'You';
       document.getElementById('bottomEloDisplay').innerText = (userData.elo || 500) + ' ELO';
       document.getElementById('bottomAvatar').innerText = (userData.username || 'Y').charAt(0).toUpperCase();
+    }
+
+    // --- USERNAME CHANGE MODAL LOGIC ---
+    function openUsernameModal() {
+      if (!userData) return;
+      document.getElementById('newUsernameInput').value = userData.username || '';
+      document.getElementById('usernameModal').classList.remove('hidden');
+    }
+
+    function closeUsernameModal() {
+      document.getElementById('usernameModal').classList.add('hidden');
+    }
+
+    function saveUsername() {
+      const newName = document.getElementById('newUsernameInput').value.trim();
+      if (!newName) {
+        alert("Handle cannot be empty.");
+        return;
+      }
+      if (currentUser) {
+        db.ref('users/' + currentUser.uid).update({ username: newName }).then(() => {
+          userData.username = newName;
+          updateUserDisplay();
+          closeUsernameModal();
+        });
+      }
     }
 
     // --- 3. PRESENCE & REMOTE SYSTEM CONTROL ---
@@ -1125,7 +1234,7 @@
       return val;
     }
 
-    // --- 7. 1v1 ARENA MULTIPLAYER LOGIC ---
+    // --- 7. 1v1 ARENA MULTIPLAYER & IN-GAME CHAT LOGIC ---
     function setGameMode(mode) {
       gameMode = mode;
       document.querySelectorAll('.mode-btn').forEach(b => {
@@ -1162,6 +1271,7 @@
         alert("Arena Room Created!\nRoom Code: " + code + "\n\nWaiting for opponent to join...");
         switchTab('game');
         listenToGame(code);
+        listenToGameChat(code);
       });
     }
 
@@ -1194,6 +1304,7 @@
           db.ref('presence/' + currentUser.uid).update({ inGame: true });
           switchTab('game');
           listenToGame(code);
+          listenToGameChat(code);
         });
       });
     }
@@ -1238,7 +1349,6 @@
         if (gameData.status === 'resigned') {
           stopClockTimer();
           isGameActive = false;
-          // Resignation fix: gameData.winner matches 'w' or 'b'
           const isWinner = (gameData.winner === playerColor);
           handleMatchConclusion(isWinner ? 'win' : 'loss', 'Resignation');
         } else if (gameData.status === 'draw') {
@@ -1249,9 +1359,142 @@
       });
     }
 
-    // --- 8. DIRECT CHALLENGES & ONLINE OPPONENTS ---
+    // Live In-Game Chat Listener
+    function listenToGameChat(code) {
+      const chatBox = document.getElementById('gameChatBox');
+      const chatRef = db.ref('games/' + code + '/chat');
+
+      // Purge chat automatically on disconnect
+      chatRef.onDisconnect().remove();
+
+      chatRef.on('value', snapshot => {
+        const msgs = snapshot.val() || {};
+        const keys = Object.keys(msgs);
+
+        if (keys.length === 0) {
+          chatBox.innerHTML = '<div class="text-slate-500 italic text-center py-4">Chat is enabled during 1v1 Arena games.</div>';
+          return;
+        }
+
+        chatBox.innerHTML = '';
+        keys.forEach(k => {
+          const m = msgs[k];
+          const isSelf = m.senderUid === currentUser.uid;
+          const div = document.createElement('div');
+          div.className = `p-1.5 rounded-lg max-w-[85%] ${isSelf ? 'bg-indigo-600/30 text-indigo-200 ml-auto text-right' : 'bg-slate-800 text-slate-200 mr-auto text-left'}`;
+          div.innerHTML = `<span class="font-bold text-[10px] block opacity-75">${m.senderName}</span>${m.text}`;
+          chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+    }
+
+    function sendGameChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('gameChatInput');
+      const text = input.value.trim();
+      if (!text || !currentRoomCode) return;
+
+      db.ref('games/' + currentRoomCode + '/chat').push({
+        senderUid: currentUser.uid,
+        senderName: userData.username,
+        text: text,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      input.value = '';
+    }
+
+    // --- 8. DIRECT MESSAGING SYSTEM (FRIENDS CHAT) ---
+    function loadDmFriendsList() {
+      if (!currentUser) return;
+      const listDiv = document.getElementById('dmFriendsList');
+
+      db.ref('friends/' + currentUser.uid).once('value', fSnap => {
+        const friendsMap = fSnap.val() || {};
+        const friendUids = Object.keys(friendsMap);
+
+        if (friendUids.length === 0) {
+          listDiv.innerHTML = '<div class="text-slate-500 text-xs py-6 text-center">No friends added yet. Add friends from Directory to message them.</div>';
+          return;
+        }
+
+        listDiv.innerHTML = '';
+        friendUids.forEach(fUid => {
+          db.ref('users/' + fUid).once('value', uSnap => {
+            const u = uSnap.val() || {};
+            const card = document.createElement('div');
+            card.className = "flex items-center space-x-2.5 bg-slate-900/80 hover:bg-slate-800 p-2.5 rounded-xl cursor-pointer transition border border-slate-800";
+            card.onclick = () => openDirectChat(fUid, u.username || 'Student');
+            card.innerHTML = `
+              <div class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                ${(u.username || 'S').charAt(0).toUpperCase()}
+              </div>
+              <div class="truncate">
+                <div class="text-xs font-semibold text-slate-200 truncate">${u.username || 'Student'}</div>
+                <div class="text-[10px] text-slate-500">${u.elo || 500} ELO</div>
+              </div>
+            `;
+            listDiv.appendChild(card);
+          });
+        });
+      });
+    }
+
+    function getConversationId(uid1, uid2) {
+      return [uid1, uid2].sort().join('_');
+    }
+
+    function openDirectChat(targetUid, targetUsername) {
+      activeDmTargetUid = targetUid;
+      document.getElementById('dmTargetName').innerText = targetUsername;
+      document.getElementById('dmInput').disabled = false;
+      document.getElementById('dmSendBtn').disabled = false;
+
+      const convId = getConversationId(currentUser.uid, targetUid);
+      const msgsBox = document.getElementById('dmMessagesBox');
+
+      db.ref('directMessages/' + convId).on('value', snapshot => {
+        const msgs = snapshot.val() || {};
+        const keys = Object.keys(msgs);
+
+        if (keys.length === 0) {
+          msgsBox.innerHTML = '<div class="text-slate-500 italic text-center py-10">No messages yet. Send a greeting!</div>';
+          return;
+        }
+
+        msgsBox.innerHTML = '';
+        keys.forEach(k => {
+          const m = msgs[k];
+          const isSelf = m.senderUid === currentUser.uid;
+          const div = document.createElement('div');
+          div.className = `p-2.5 rounded-xl max-w-[75%] ${isSelf ? 'bg-indigo-600 text-white ml-auto text-right' : 'bg-slate-800 text-slate-200 mr-auto text-left'}`;
+          div.innerHTML = `<span class="font-semibold text-[10px] block opacity-75">${m.senderName}</span>${m.text}`;
+          msgsBox.appendChild(div);
+        });
+        msgsBox.scrollTop = msgsBox.scrollHeight;
+      });
+    }
+
+    function sendDirectMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('dmInput');
+      const text = input.value.trim();
+      if (!text || !activeDmTargetUid || !currentUser) return;
+
+      const convId = getConversationId(currentUser.uid, activeDmTargetUid);
+      db.ref('directMessages/' + convId).push({
+        senderUid: currentUser.uid,
+        senderName: userData.username,
+        text: text,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      input.value = '';
+    }
+
+    // --- 9. DIRECT CHALLENGES & ONLINE OPPONENTS ---
     function listenToDirectChallenges() {
-      // Direct challenge listener filtering out stale past sessions
       db.ref('requests/' + currentUser.uid)
         .orderByChild('timestamp')
         .startAt(sessionStartTime)
@@ -1262,7 +1505,6 @@
           const accept = confirm(`Direct Match Challenge from ${req.fromUsername} (${req.fromElo} ELO).\n\nAccept challenge?`);
           if (accept) {
             db.ref('requests/' + currentUser.uid + '/' + snapshot.key).update({ status: 'accepted' });
-            // Join matched room
             document.getElementById('joinRoomCode').value = req.roomCode;
             joinRoom();
           } else {
@@ -1274,7 +1516,6 @@
     function challengeOpponent(targetUid, targetUsername) {
       if (!currentUser) return;
 
-      // Check if target opponent is in match
       db.ref('presence/' + targetUid).once('value', snapshot => {
         const presence = snapshot.val();
         if (presence && presence.inGame) {
@@ -1294,7 +1535,6 @@
           timestamp: firebase.database.ServerValue.TIMESTAMP
         });
 
-        // Create waiting game room for challenge
         currentRoomCode = roomCode;
         gameMode = 'online';
         playerColor = 'w';
@@ -1315,6 +1555,7 @@
         alert(`Challenge transmitted to ${targetUsername}! Waiting for opponent...`);
         switchTab('game');
         listenToGame(roomCode);
+        listenToGameChat(roomCode);
       });
     }
 
@@ -1355,7 +1596,7 @@
       });
     }
 
-    // --- 9. CLOCK TIMERS & MATCH CONTROLS ---
+    // --- 10. CLOCK TIMERS & MATCH CONTROLS ---
     function resetClocks() {
       whiteTime = 600;
       blackTime = 600;
@@ -1427,7 +1668,6 @@
           isGameActive = false;
           handleMatchConclusion('loss', 'Resignation');
         } else if (currentRoomCode) {
-          // Store winning color so winner gets +16 Elo and resigning player gets -16 Elo
           db.ref('games/' + currentRoomCode).update({
             status: 'resigned',
             winner: playerColor === 'w' ? 'b' : 'w'
@@ -1508,6 +1748,12 @@
         gameOverTimeout = null;
       }
       document.getElementById('gameOverModal').classList.add('hidden');
+
+      // Auto-delete live match chat when both leave / return to lobby
+      if (currentRoomCode) {
+        db.ref('games/' + currentRoomCode + '/chat').remove();
+      }
+
       initGame();
     }
 
@@ -1523,7 +1769,7 @@
       updateBoardUI();
     }
 
-    // --- 10. FRIENDS & STUDENT DIRECTORY SYSTEM ---
+    // --- 11. FRIENDS & STUDENT DIRECTORY SYSTEM ---
     function loadFriendsAndDirectory() {
       if (!currentUser) return;
 
@@ -1628,7 +1874,7 @@
       });
     }
 
-    // --- 11. LEADERBOARD SYSTEM ---
+    // --- 12. LEADERBOARD SYSTEM ---
     function loadLeaderboard() {
       const body = document.getElementById('leaderboardBody');
       body.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-slate-500">Loading directory scores...</td></tr>';
@@ -1641,7 +1887,6 @@
           elo: Number(users[uid].elo) || 500
         }));
 
-        // Strict Numerical Sorting on Elo
         list.sort((a, b) => b.elo - a.elo);
 
         body.innerHTML = '';
@@ -1661,7 +1906,7 @@
       });
     }
 
-    // --- 12. MASTER CONTROL ADMIN PANEL ---
+    // --- 13. MASTER CONTROL ADMIN PANEL ---
     function loadAdminPanel() {
       if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
 
@@ -1739,7 +1984,7 @@
       }
     }
 
-    // --- 13. UI TAB NAVIGATION CONTROLLER ---
+    // --- 14. UI TAB NAVIGATION CONTROLLER ---
     function switchTab(tab) {
       document.querySelectorAll('.nav-tab').forEach(t => {
         t.classList.remove('text-indigo-400', 'bg-slate-700/50', 'bg-rose-500/20', 'text-rose-400');
@@ -1756,7 +2001,7 @@
         }
       }
 
-      ['game', 'arena', 'leaderboard', 'friends', 'admin'].forEach(s => {
+      ['game', 'arena', 'leaderboard', 'friends', 'messages', 'admin'].forEach(s => {
         document.getElementById('section-' + s).classList.add('hidden');
       });
 
@@ -1775,6 +2020,8 @@
         loadLeaderboard();
       } else if (tab === 'friends') {
         loadFriendsAndDirectory();
+      } else if (tab === 'messages') {
+        loadDmFriendsList();
       } else if (tab === 'admin') {
         loadAdminPanel();
       }

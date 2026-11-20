@@ -274,8 +274,8 @@
             </div>
             <!-- Captured Pieces for Opponent & Advantage -->
             <div class="flex items-center space-x-2">
-              <div id="oppCaptured" class="text-sm font-semibold text-slate-400 tracking-wider"></div>
-              <div id="oppAdvantage" class="text-xs font-bold text-emerald-400"></div>
+              <div id="oppCaptured" class="text-sm font-semibold text-slate-300 tracking-wider flex items-center gap-1"></div>
+              <div id="oppAdvantage" class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hidden"></div>
               <div id="oppTimer" class="px-3 py-1 rounded-lg bg-slate-900 font-mono text-sm font-bold text-slate-300 border border-slate-800">10:00</div>
             </div>
           </div>
@@ -296,8 +296,8 @@
             </div>
             <!-- Captured Pieces for Player & Advantage -->
             <div class="flex items-center space-x-2">
-              <div id="userCaptured" class="text-sm font-semibold text-slate-400 tracking-wider"></div>
-              <div id="userAdvantage" class="text-xs font-bold text-emerald-400"></div>
+              <div id="userCaptured" class="text-sm font-semibold text-slate-300 tracking-wider flex items-center gap-1"></div>
+              <div id="userAdvantage" class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hidden"></div>
               <div id="userTimer" class="px-3 py-1 rounded-lg bg-slate-900 font-mono text-sm font-bold text-slate-300 border border-slate-800">10:00</div>
             </div>
           </div>
@@ -889,7 +889,7 @@
       }
     }
 
-    // Calculate Captured Pieces & Relative Advantage Score
+    // Calculate Captured Piece Counts & Material Advantage Difference
     function updateCapturedAndAdvantage() {
       const boardState = game.board();
       const currentCounts = { p: 0, n: 0, b: 0, r: 0, q: 0, P: 0, N: 0, B: 0, R: 0, Q: 0 };
@@ -905,36 +905,76 @@
         }
       }
 
-      let whiteCapturedStr = '';
-      let blackCapturedStr = '';
-      let whiteScore = 0;
-      let blackScore = 0;
-
-      ['P', 'N', 'B', 'R', 'Q'].forEach(type => {
-        const lost = initialCounts[type] - currentCounts[type];
-        for (let i = 0; i < lost; i++) blackCapturedStr += pieceSymbols[type] + ' ';
-      });
-
+      // Pieces lost by Black (Captured by White)
+      let whiteCapturedParts = [];
+      let whiteTotalCount = 0;
       ['p', 'n', 'b', 'r', 'q'].forEach(type => {
         const lost = initialCounts[type] - currentCounts[type];
-        for (let i = 0; i < lost; i++) whiteCapturedStr += pieceSymbols[type] + ' ';
+        if (lost > 0) {
+          whiteCapturedParts.push(`${pieceSymbols[type]}${lost > 1 ? '×' + lost : ''}`);
+          whiteTotalCount += lost;
+        }
       });
 
+      // Pieces lost by White (Captured by Black)
+      let blackCapturedParts = [];
+      let blackTotalCount = 0;
+      ['P', 'N', 'B', 'R', 'Q'].forEach(type => {
+        const lost = initialCounts[type] - currentCounts[type];
+        if (lost > 0) {
+          blackCapturedParts.push(`${pieceSymbols[type]}${lost > 1 ? '×' + lost : ''}`);
+          blackTotalCount += lost;
+        }
+      });
+
+      // Material Values for Advantage Calculation
+      let whiteScore = 0;
+      let blackScore = 0;
       ['P', 'N', 'B', 'R', 'Q'].forEach(t => whiteScore += currentCounts[t] * (pieceValues[t.toLowerCase()] / 100));
       ['p', 'n', 'b', 'r', 'q'].forEach(t => blackScore += currentCounts[t] * (pieceValues[t] / 100));
 
-      const diff = whiteScore - blackScore;
+      const diff = whiteScore - blackScore; // > 0 White leading, < 0 Black leading
+
+      const whiteCapturedHTML = whiteCapturedParts.join(' ') + (whiteTotalCount > 0 ? ` <span class="text-[10px] text-slate-500 font-normal">(${whiteTotalCount})</span>` : '');
+      const blackCapturedHTML = blackCapturedParts.join(' ') + (blackTotalCount > 0 ? ` <span class="text-[10px] text-slate-500 font-normal">(${blackTotalCount})</span>` : '');
+
+      const userAdvantageEl = document.getElementById('userAdvantage');
+      const oppAdvantageEl = document.getElementById('oppAdvantage');
 
       if (playerColor === 'w') {
-        document.getElementById('userCaptured').innerText = whiteCapturedStr;
-        document.getElementById('oppCaptured').innerText = blackCapturedStr;
-        document.getElementById('userAdvantage').innerText = diff > 0 ? `+${diff}` : '';
-        document.getElementById('oppAdvantage').innerText = diff < 0 ? `+${Math.abs(diff)}` : '';
+        // User is White, Opponent is Black
+        document.getElementById('userCaptured').innerHTML = whiteCapturedHTML;
+        document.getElementById('oppCaptured').innerHTML = blackCapturedHTML;
+
+        if (diff > 0) {
+          userAdvantageEl.innerText = `+${diff}`;
+          userAdvantageEl.classList.remove('hidden');
+          oppAdvantageEl.classList.add('hidden');
+        } else if (diff < 0) {
+          oppAdvantageEl.innerText = `+${Math.abs(diff)}`;
+          oppAdvantageEl.classList.remove('hidden');
+          userAdvantageEl.classList.add('hidden');
+        } else {
+          userAdvantageEl.classList.add('hidden');
+          oppAdvantageEl.classList.add('hidden');
+        }
       } else {
-        document.getElementById('userCaptured').innerText = blackCapturedStr;
-        document.getElementById('oppCaptured').innerText = whiteCapturedStr;
-        document.getElementById('userAdvantage').innerText = diff < 0 ? `+${Math.abs(diff)}` : '';
-        document.getElementById('oppAdvantage').innerText = diff > 0 ? `+${diff}` : '';
+        // User is Black, Opponent is White
+        document.getElementById('userCaptured').innerHTML = blackCapturedHTML;
+        document.getElementById('oppCaptured').innerHTML = whiteCapturedHTML;
+
+        if (diff < 0) {
+          userAdvantageEl.innerText = `+${Math.abs(diff)}`;
+          userAdvantageEl.classList.remove('hidden');
+          oppAdvantageEl.classList.add('hidden');
+        } else if (diff > 0) {
+          oppAdvantageEl.innerText = `+${diff}`;
+          oppAdvantageEl.classList.remove('hidden');
+          userAdvantageEl.classList.add('hidden');
+        } else {
+          userAdvantageEl.classList.add('hidden');
+          oppAdvantageEl.classList.add('hidden');
+        }
       }
     }
 
@@ -989,7 +1029,6 @@
       }
     }
 
-    // Move Ordering for Alpha-Beta Optimization (Captures & Checks First)
     function orderMoves(moves) {
       return moves.sort((a, b) => {
         let scoreA = 0;
@@ -1002,19 +1041,16 @@
       });
     }
 
-    // Novice Bot (300 Elo): Checks for 1-ply checkmates/free captures, else random
     function getBeginnerMove() {
       const moves = game.moves({ verbose: true });
       if (moves.length === 0) return null;
 
-      // Check for immediate mate
       for (let m of moves) {
         game.move(m);
         if (game.in_checkmate()) { game.undo(); return m; }
         game.undo();
       }
 
-      // Check for free captures
       const captures = moves.filter(m => m.captured);
       if (captures.length > 0 && Math.random() < 0.75) {
         return captures[Math.floor(Math.random() * captures.length)];
@@ -1023,12 +1059,11 @@
       return moves[Math.floor(Math.random() * moves.length)];
     }
 
-    // Tactician Bot (800 Elo): 2-ply Minimax + PST Positional Eval
     function getIntermediateMove() {
       const moves = orderMoves(game.moves({ verbose: true }));
       if (moves.length === 0) return null;
       let bestMove = moves[0];
-      let bestEval = Infinity; // Bot is Black ('b')
+      let bestEval = Infinity;
 
       for (let move of moves) {
         game.move(move);
@@ -1042,7 +1077,6 @@
       return bestMove;
     }
 
-    // Grandmaster Bot (1500+ Elo): 3-ply Minimax + Alpha-Beta + Quiescence Search + Positional Tables
     function getMasterMove() {
       const moves = orderMoves(game.moves({ verbose: true }));
       if (moves.length === 0) return null;
@@ -1061,7 +1095,6 @@
       return bestMove;
     }
 
-    // Quiescence Search to resolve capture sequences and avoid tactical blunders
     function quiescenceSearch(gameObj, alpha, beta, isMaximizing) {
       let standPat = evaluateBoard(gameObj.board());
       if (isMaximizing) {

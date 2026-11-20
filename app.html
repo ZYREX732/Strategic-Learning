@@ -46,14 +46,11 @@
 
     /* Custom Square Highlights for Move Selection */
     .highlight-selected {
-      box-shadow: inset 0 0 0 4px #6366f1 !important;
-      background-color: rgba(99, 102, 241, 0.35) !important;
+      box-shadow: inset 0 0 0 3px rgba(99, 102, 241, 0.8) !important;
+      background-color: rgba(99, 102, 241, 0.25) !important;
     }
-    .highlight-valid {
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.7) 25%, transparent 28%) !important;
-    }
-    .highlight-capture {
-      background: radial-gradient(circle, rgba(239, 68, 68, 0.8) 85%, transparent 88%) !important;
+    .highlight-move {
+      background: radial-gradient(circle, rgba(128, 128, 128, 0.7) 25%, transparent 28%) !important;
     }
   </style>
 </head>
@@ -170,7 +167,7 @@
               <button onclick="startAiGame('beginner')" class="w-full p-3 bg-slate-800/80 hover:bg-slate-800 rounded-xl text-left border border-slate-700/50 hover:border-indigo-500/50 transition-all group flex items-center justify-between">
                 <div>
                   <div class="font-bold text-sm text-slate-200 group-hover:text-indigo-400">Novice Bot</div>
-                  <div class="text-xs text-slate-400">300 Elo • Basic tactics</div>
+                  <div class="text-xs text-slate-400">300 Elo • Basic Tactics</div>
                 </div>
                 <span class="px-2 py-1 rounded bg-slate-700 text-[10px] font-bold text-slate-300">300</span>
               </button>
@@ -178,7 +175,7 @@
               <button onclick="startAiGame('intermediate')" class="w-full p-3 bg-slate-800/80 hover:bg-slate-800 rounded-xl text-left border border-slate-700/50 hover:border-indigo-500/50 transition-all group flex items-center justify-between">
                 <div>
                   <div class="font-bold text-sm text-slate-200 group-hover:text-indigo-400">Tactician Bot</div>
-                  <div class="text-xs text-slate-400">800 Elo • Minimax 1-ply</div>
+                  <div class="text-xs text-slate-400">800 Elo • Minimax + PST</div>
                 </div>
                 <span class="px-2 py-1 rounded bg-indigo-500/20 text-[10px] font-bold text-indigo-300 border border-indigo-500/30">800</span>
               </button>
@@ -186,7 +183,7 @@
               <button onclick="startAiGame('master')" class="w-full p-3 bg-slate-800/80 hover:bg-slate-800 rounded-xl text-left border border-slate-700/50 hover:border-indigo-500/50 transition-all group flex items-center justify-between">
                 <div>
                   <div class="font-bold text-sm text-slate-200 group-hover:text-indigo-400">Grandmaster Bot</div>
-                  <div class="text-xs text-slate-400">1500 Elo • Alpha-Beta Search</div>
+                  <div class="text-xs text-slate-400">1500+ Elo • Quiescence Search</div>
                 </div>
                 <span class="px-2 py-1 rounded bg-purple-500/20 text-[10px] font-bold text-purple-300 border border-purple-500/30">1500</span>
               </button>
@@ -200,7 +197,6 @@
               1v1 Multiplayer Arena
             </h3>
             <div class="space-y-3">
-
               <!-- Private Match Code -->
               <div class="pt-2 border-t border-slate-800">
                 <label class="block text-xs text-slate-400 mb-1">Custom Room Code</label>
@@ -216,7 +212,6 @@
 
         <!-- PANEL: FRIENDS & ONLINE DIRECTORY -->
         <div id="panelFriends" class="hidden space-y-4">
-
           <!-- Add Friend Input -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Add Researcher</h3>
@@ -247,7 +242,6 @@
               <div class="text-xs text-slate-500 py-2 text-center">Scanning online users...</div>
             </div>
           </div>
-
         </div>
 
         <!-- PANEL: LEADERBOARD -->
@@ -308,11 +302,10 @@
             </div>
           </div>
 
-          <!-- In-Game Action Controls -->
+          <!-- In-Game Action Controls (Draw & Resign) -->
           <div id="gameControls" class="w-full max-w-[560px] mt-4 flex gap-2">
-            <button id="abortBtn" onclick="abortMatch()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all border border-slate-700">Abort</button>
-            <button onclick="offerDraw()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all border border-slate-700">Offer Draw</button>
-            <button onclick="resignMatch()" class="flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-xs rounded-xl border border-red-500/20 transition-all">Resign</button>
+            <button onclick="offerDraw()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all border border-slate-700">Offer Draw</button>
+            <button onclick="resignMatch()" class="flex-1 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-xs rounded-xl border border-red-500/20 transition-all">Resign</button>
           </div>
 
           <!-- Status Indicator -->
@@ -496,16 +489,16 @@
     // Click-to-move tracking
     let selectedSquare = null;
 
-    // PST Tables for AI Engine
+    // Enhanced Positional PST Tables for AI Engine
     const pstPawn = [
-      0,  0,  0,  0,  0,  0,  0,  0,
-      50, 50, 50, 50, 50, 50, 50, 50,
-      10, 10, 20, 30, 30, 20, 10, 10,
-       5,  5, 10, 25, 25, 10,  5,  5,
-       0,  0,  0, 20, 20,  0,  0,  0,
-       5, -5,-10,  0,  0,-10, -5,  5,
-       5, 10, 10,-20,-20, 10, 10,  5,
-       0,  0,  0,  0,  0,  0,  0,  0
+        0,  0,  0,  0,  0,  0,  0,  0,
+       50, 50, 50, 50, 50, 50, 50, 50,
+       10, 10, 20, 30, 30, 20, 10, 10,
+        5,  5, 10, 27, 27, 10,  5,  5,
+        0,  0,  0, 25, 25,  0,  0,  0,
+        5, -5,-10,  0,  0,-10, -5,  5,
+        5, 10, 10,-20,-20, 10, 10,  5,
+        0,  0,  0,  0,  0,  0,  0,  0
     ];
 
     const pstKnight = [
@@ -519,20 +512,63 @@
       -50,-40,-30,-30,-30,-30,-40,-50
     ];
 
+    const pstBishop = [
+      -20,-10,-10,-10,-10,-10,-10,-20,
+      -10,  0,  0,  0,  0,  0,  0,-10,
+      -10,  0,  5, 10, 10,  5,  0,-10,
+      -10,  5,  5, 10, 10,  5,  5,-10,
+      -10,  0, 10, 10, 10, 10,  0,-10,
+      -10, 10, 10, 10, 10, 10, 10,-10,
+      -10,  5,  0,  0,  0,  0,  5,-10,
+      -20,-10,-10,-10,-10,-10,-10,-20
+    ];
+
+    const pstRook = [
+        0,  0,  0,  0,  0,  0,  0,  0,
+        5, 10, 10, 10, 10, 10, 10,  5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+       -5,  0,  0,  0,  0,  0,  0, -5,
+        0,  0,  0,  5,  5,  0,  0,  0
+    ];
+
+    const pstQueen = [
+      -20,-10,-10, -5, -5,-10,-10,-20,
+      -10,  0,  0,  0,  0,  0,  0,-10,
+      -10,  0,  5,  5,  5,  5,  0,-10,
+       -5,  0,  5,  5,  5,  5,  0, -5,
+        0,  0,  5,  5,  5,  5,  0, -5,
+      -10,  5,  5,  5,  5,  5,  0,-10,
+      -10,  0,  5,  0,  0,  0,  0,-10,
+      -20,-10,-10, -5, -5,-10,-10,-20
+    ];
+
+    const pstKing = [
+      -30,-40,-40,-50,-50,-40,-40,-30,
+      -30,-40,-40,-50,-50,-40,-40,-30,
+      -30,-40,-40,-50,-50,-40,-40,-30,
+      -30,-40,-40,-50,-50,-40,-40,-30,
+      -20,-30,-30,-40,-40,-30,-30,-20,
+      -10,-20,-20,-20,-20,-20,-20,-10,
+       20, 20,  0,  0,  0,  0, 20, 20,
+       20, 30, 10,  0,  0, 10, 30, 20
+    ];
+
     // Piece Unicode Icons for Display
     const pieceSymbols = {
       'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚',
       'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔'
     };
 
-    // Piece Values for Material Evaluation
-    const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+    // Piece Values for Engine Evaluation
+    const pieceValues = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
 
     // =========================================================================
     // 2. LIFECYCLE & AUTHENTICATION
     // =========================================================================
     window.addEventListener('DOMContentLoaded', () => {
-      // Clear session if window/tab was completely closed
       auth.onAuthStateChanged((user) => {
         if (user) {
           currentUser = user;
@@ -582,7 +618,6 @@
         });
       } else {
         if (!username) return alert("Please enter a username.");
-        // Check username uniqueness
         database.ref('users').orderByChild('username').equalTo(username).once('value', snapshot => {
           if (snapshot.exists()) {
             alert("Username already taken. Please choose another.");
@@ -613,7 +648,6 @@
           document.getElementById('userElo').innerText = currentUserProfile.elo + " Elo";
           document.getElementById('userName').innerText = currentUserProfile.username;
 
-          // Check if Admin
           if (currentUser.email === 'zainisgo123@gmail.com') {
             document.getElementById('adminBtn').classList.remove('hidden');
             loadAdminUserList();
@@ -760,16 +794,14 @@
     }
 
     function removeHighlights() {
-      $('#myBoard .square-55d63').removeClass('highlight-selected highlight-valid highlight-capture');
+      $('#myBoard .square-55d63').removeClass('highlight-selected highlight-move');
     }
 
     function handleSquareClick(square) {
-      // Ignore clicks if game is over or not user's turn
       if (game.game_over()) return;
       if (gameMode === 'pvp' && game.turn() !== playerColor) return;
       if (gameMode === 'ai' && game.turn() !== playerColor) return;
 
-      // First click: select piece
       if (!selectedSquare) {
         const piece = game.get(square);
         if (piece && piece.color === game.turn()) {
@@ -777,7 +809,6 @@
           highlightSquareAndMoves(square);
         }
       } else {
-        // Second click: move piece or reselect
         if (selectedSquare === square) {
           selectedSquare = null;
           removeHighlights();
@@ -792,10 +823,8 @@
           return;
         }
 
-        // Attempt move
         const moveObj = { from: selectedSquare, to: square, promotion: 'q' };
         
-        // Check for Pawn Promotion
         const movingPiece = game.get(selectedSquare);
         if (movingPiece && movingPiece.type === 'p') {
           if ((movingPiece.color === 'w' && square[1] === '8') || (movingPiece.color === 'b' && square[1] === '1')) {
@@ -809,17 +838,14 @@
       }
     }
 
+    // Displays a 70% Opaque Grey Dot on Target Squares
     function highlightSquareAndMoves(square) {
       removeHighlights();
       $(`#myBoard .square-${square}`).addClass('highlight-selected');
 
       const moves = game.moves({ square: square, verbose: true });
       moves.forEach(m => {
-        if (m.captured) {
-          $(`#myBoard .square-${m.to}`).addClass('highlight-capture');
-        } else {
-          $(`#myBoard .square-${m.to}`).addClass('highlight-valid');
-        }
+        $(`#myBoard .square-${m.to}`).addClass('highlight-move');
       });
     }
 
@@ -844,7 +870,6 @@
       selectedSquare = null;
       removeHighlights();
       updateCapturedAndAdvantage();
-      updateAbortButtonState();
 
       if (gameMode === 'pvp' && roomRef) {
         roomRef.update({
@@ -858,23 +883,9 @@
 
       checkGameEndConditions();
 
-      // Trigger AI Move if playing vs Bot
       if (gameMode === 'ai' && !game.game_over() && game.turn() !== playerColor) {
-        document.getElementById('gameStatusText').innerText = "Bot is thinking...";
-        setTimeout(makeAiMove, 400);
-      }
-    }
-
-    // Update Abort Button State (Allowed ONLY if total plies <= 2)
-    function updateAbortButtonState() {
-      const moveHistory = game.history();
-      const abortBtn = document.getElementById('abortBtn');
-      if (moveHistory.length > 2) {
-        abortBtn.disabled = true;
-        abortBtn.classList.add('opacity-40', 'cursor-not-allowed');
-      } else {
-        abortBtn.disabled = false;
-        abortBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+        document.getElementById('gameStatusText').innerText = "Bot is calculating optimal response...";
+        setTimeout(makeAiMove, 250);
       }
     }
 
@@ -899,25 +910,18 @@
       let whiteScore = 0;
       let blackScore = 0;
 
-      // Black captured pieces (lost by White)
       ['P', 'N', 'B', 'R', 'Q'].forEach(type => {
         const lost = initialCounts[type] - currentCounts[type];
-        for (let i = 0; i < lost; i++) {
-          blackCapturedStr += pieceSymbols[type] + ' ';
-        }
+        for (let i = 0; i < lost; i++) blackCapturedStr += pieceSymbols[type] + ' ';
       });
 
-      // White captured pieces (lost by Black)
       ['p', 'n', 'b', 'r', 'q'].forEach(type => {
         const lost = initialCounts[type] - currentCounts[type];
-        for (let i = 0; i < lost; i++) {
-          whiteCapturedStr += pieceSymbols[type] + ' ';
-        }
+        for (let i = 0; i < lost; i++) whiteCapturedStr += pieceSymbols[type] + ' ';
       });
 
-      // Calculate Scores
-      ['P', 'N', 'B', 'R', 'Q'].forEach(t => whiteScore += currentCounts[t] * pieceValues[t.toLowerCase()]);
-      ['p', 'n', 'b', 'r', 'q'].forEach(t => blackScore += currentCounts[t] * pieceValues[t]);
+      ['P', 'N', 'B', 'R', 'Q'].forEach(t => whiteScore += currentCounts[t] * (pieceValues[t.toLowerCase()] / 100));
+      ['p', 'n', 'b', 'r', 'q'].forEach(t => blackScore += currentCounts[t] * (pieceValues[t] / 100));
 
       const diff = whiteScore - blackScore;
 
@@ -935,7 +939,7 @@
     }
 
     // =========================================================================
-    // 5. AI BOT ENGINE (3 LEVELS)
+    // 5. ENHANCED HARDER AI BOT ENGINE (3 LEVELS)
     // =========================================================================
     function startAiGame(difficulty) {
       gameMode = 'ai';
@@ -948,11 +952,10 @@
       board.position('start');
       removeHighlights();
 
-      // Configure Bot Display Profile
       let botName = "Novice Bot";
       let botElo = "300 Elo";
       if (difficulty === 'intermediate') { botName = "Tactician Bot"; botElo = "800 Elo"; }
-      if (difficulty === 'master') { botName = "Grandmaster Bot"; botElo = "1500 Elo"; }
+      if (difficulty === 'master') { botName = "Grandmaster Bot"; botElo = "1500+ Elo"; }
 
       document.getElementById('oppName').innerText = botName;
       document.getElementById('oppElo').innerText = botElo;
@@ -960,7 +963,6 @@
 
       resetClocks();
       startClock();
-      updateAbortButtonState();
       document.getElementById('gameStatusText').innerText = "Game active against " + botName + ".";
     }
 
@@ -980,7 +982,6 @@
         game.move(bestMove);
         board.position(game.fen());
         updateCapturedAndAdvantage();
-        updateAbortButtonState();
         checkGameEndConditions();
         if (!game.game_over()) {
           document.getElementById('gameStatusText').innerText = "Your turn to move.";
@@ -988,27 +989,50 @@
       }
     }
 
-    // 300 Elo Bot: Random or Simple Captures
+    // Move Ordering for Alpha-Beta Optimization (Captures & Checks First)
+    function orderMoves(moves) {
+      return moves.sort((a, b) => {
+        let scoreA = 0;
+        let scoreB = 0;
+        if (a.captured) scoreA += 10 * pieceValues[a.captured] - pieceValues[a.piece];
+        if (b.captured) scoreB += 10 * pieceValues[b.captured] - pieceValues[b.piece];
+        if (a.san.includes('+')) scoreA += 50;
+        if (b.san.includes('+')) scoreB += 50;
+        return scoreB - scoreA;
+      });
+    }
+
+    // Novice Bot (300 Elo): Checks for 1-ply checkmates/free captures, else random
     function getBeginnerMove() {
       const moves = game.moves({ verbose: true });
       if (moves.length === 0) return null;
+
+      // Check for immediate mate
+      for (let m of moves) {
+        game.move(m);
+        if (game.in_checkmate()) { game.undo(); return m; }
+        game.undo();
+      }
+
+      // Check for free captures
       const captures = moves.filter(m => m.captured);
-      if (captures.length > 0 && Math.random() < 0.6) {
+      if (captures.length > 0 && Math.random() < 0.75) {
         return captures[Math.floor(Math.random() * captures.length)];
       }
+
       return moves[Math.floor(Math.random() * moves.length)];
     }
 
-    // 800 Elo Bot: 1-ply Minimax + PST
+    // Tactician Bot (800 Elo): 2-ply Minimax + PST Positional Eval
     function getIntermediateMove() {
-      const moves = game.moves({ verbose: true });
+      const moves = orderMoves(game.moves({ verbose: true }));
       if (moves.length === 0) return null;
       let bestMove = moves[0];
-      let bestEval = Infinity; // Bot plays Black ('b')
+      let bestEval = Infinity; // Bot is Black ('b')
 
       for (let move of moves) {
         game.move(move);
-        let evaluation = evaluateBoard(game.board());
+        let evaluation = minimax(game, 2, -100000, 100000, true);
         game.undo();
         if (evaluation < bestEval) {
           bestEval = evaluation;
@@ -1018,16 +1042,16 @@
       return bestMove;
     }
 
-    // 1500 Elo Bot: 2-ply Minimax + Alpha-Beta Pruning + PST
+    // Grandmaster Bot (1500+ Elo): 3-ply Minimax + Alpha-Beta + Quiescence Search + Positional Tables
     function getMasterMove() {
-      const moves = game.moves({ verbose: true });
+      const moves = orderMoves(game.moves({ verbose: true }));
       if (moves.length === 0) return null;
       let bestMove = moves[0];
       let bestEval = Infinity;
 
       for (let move of moves) {
         game.move(move);
-        let evaluation = minimax(game, 2, -10000, 10000, true);
+        let evaluation = minimax(game, 3, -100000, 100000, true);
         game.undo();
         if (evaluation < bestEval) {
           bestEval = evaluation;
@@ -1037,14 +1061,45 @@
       return bestMove;
     }
 
+    // Quiescence Search to resolve capture sequences and avoid tactical blunders
+    function quiescenceSearch(gameObj, alpha, beta, isMaximizing) {
+      let standPat = evaluateBoard(gameObj.board());
+      if (isMaximizing) {
+        if (standPat >= beta) return beta;
+        if (standPat > alpha) alpha = standPat;
+      } else {
+        if (standPat <= alpha) return alpha;
+        if (standPat < beta) beta = standPat;
+      }
+
+      const captureMoves = orderMoves(gameObj.moves({ verbose: true })).filter(m => m.captured);
+      for (let move of captureMoves) {
+        gameObj.move(move);
+        let score = quiescenceSearch(gameObj, alpha, beta, !isMaximizing);
+        gameObj.undo();
+
+        if (isMaximizing) {
+          if (score >= beta) return beta;
+          if (score > alpha) alpha = score;
+        } else {
+          if (score <= alpha) return alpha;
+          if (score < beta) beta = score;
+        }
+      }
+      return isMaximizing ? alpha : beta;
+    }
+
     function minimax(gameObj, depth, alpha, beta, isMaximizing) {
-      if (depth === 0 || gameObj.game_over()) {
+      if (depth === 0) {
+        return quiescenceSearch(gameObj, alpha, beta, isMaximizing);
+      }
+      if (gameObj.game_over()) {
         return evaluateBoard(gameObj.board());
       }
 
-      const moves = gameObj.moves({ verbose: true });
+      const moves = orderMoves(gameObj.moves({ verbose: true }));
       if (isMaximizing) {
-        let maxEval = -10000;
+        let maxEval = -100000;
         for (let move of moves) {
           gameObj.move(move);
           let evaluation = minimax(gameObj, depth - 1, alpha, beta, false);
@@ -1055,7 +1110,7 @@
         }
         return maxEval;
       } else {
-        let minEval = 10000;
+        let minEval = 100000;
         for (let move of moves) {
           gameObj.move(move);
           let evaluation = minimax(gameObj, depth - 1, alpha, beta, true);
@@ -1074,12 +1129,17 @@
         for (let c = 0; c < 8; c++) {
           const piece = boardState[r][c];
           if (piece) {
-            let val = pieceValues[piece.type] * 10;
+            let val = pieceValues[piece.type];
             let pstVal = 0;
             const idx = r * 8 + c;
+            const flippedIdx = (7 - r) * 8 + c;
 
-            if (piece.type === 'p') pstVal = pstPawn[idx];
-            if (piece.type === 'n') pstVal = pstKnight[idx];
+            if (piece.type === 'p') pstVal = piece.color === 'w' ? pstPawn[idx] : pstPawn[flippedIdx];
+            if (piece.type === 'n') pstVal = piece.color === 'w' ? pstKnight[idx] : pstKnight[flippedIdx];
+            if (piece.type === 'b') pstVal = piece.color === 'w' ? pstBishop[idx] : pstBishop[flippedIdx];
+            if (piece.type === 'r') pstVal = piece.color === 'w' ? pstRook[idx] : pstRook[flippedIdx];
+            if (piece.type === 'q') pstVal = piece.color === 'w' ? pstQueen[idx] : pstQueen[flippedIdx];
+            if (piece.type === 'k') pstVal = piece.color === 'w' ? pstKing[idx] : pstKing[flippedIdx];
 
             const score = val + pstVal;
             totalEval += piece.color === 'w' ? score : -score;
@@ -1111,7 +1171,6 @@
       roomRef.once('value', snapshot => {
         const data = snapshot.val();
         if (isHost) {
-          // Clock starts PAUSED in waiting state
           const newRoom = {
             hostUid: currentUser.uid,
             hostName: currentUserProfile.username,
@@ -1150,12 +1209,10 @@
         const data = snapshot.val();
         if (!data) return;
 
-        // Synchronize state
         game.load(data.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : data.fen);
         board.orientation(playerColor === 'w' ? 'white' : 'black');
         board.position(game.fen());
 
-        // Update Opponent Info Display
         if (playerColor === 'w') {
           document.getElementById('oppName').innerText = data.guestName || "Waiting for opponent...";
           document.getElementById('oppElo').innerText = data.guestElo ? data.guestElo + " Elo" : "---- Elo";
@@ -1168,9 +1225,7 @@
         blackTime = data.blackTime || 600;
         updateClockDisplay();
         updateCapturedAndAdvantage();
-        updateAbortButtonState();
 
-        // Start clock timer ONLY when status becomes active
         if (data.status === 'active') {
           startClock();
           document.getElementById('gameStatusText').innerText = "Match Active! " + (game.turn() === playerColor ? "Your turn" : "Opponent's turn");
@@ -1179,7 +1234,6 @@
           document.getElementById('gameStatusText').innerText = "Waiting for an opponent to join (Code: " + currentRoomCode + ")...";
         }
 
-        // Handle Resignation / Abort updates
         if (data.status === 'ended') {
           clearInterval(clockInterval);
           showGameOverModal(data.winner === currentUser.uid ? 'Victory' : 'Defeat', data.reason || 'Game Ended', data.eloDelta || 0);
@@ -1191,7 +1245,6 @@
     // 7. DIRECT CHALLENGES & ONLINE DIRECTORY
     // =========================================================================
     function listenToChallengeRequests() {
-      // Filter out stale challenge requests from previous sessions
       database.ref('requests/' + currentUser.uid)
         .orderByChild('timestamp')
         .startAt(sessionStartTime)
@@ -1199,7 +1252,6 @@
           const req = snapshot.val();
           if (!req || req.status !== 'pending') return;
 
-          // Check if user is currently busy in a match
           database.ref('presence/' + currentUser.uid + '/inGame').once('value', inGameSnap => {
             if (inGameSnap.val() === true) {
               snapshot.ref.update({ status: 'busy' });
@@ -1214,7 +1266,6 @@
     }
 
     function challengePlayer(targetUid) {
-      // Busy check on opponent before issuing challenge
       database.ref('presence/' + targetUid + '/inGame').once('value', snapshot => {
         if (snapshot.val() === true) {
           alert("Opponent is currently in a match.");
@@ -1266,7 +1317,7 @@
             let onlineCount = 0;
             Object.keys(presences).forEach(uid => {
               if (uid === currentUser.uid) return;
-              if (myFriends[uid]) return; // Exclude friends from directory per requirement
+              if (myFriends[uid]) return;
 
               const u = allUsers[uid];
               if (u) {
@@ -1384,7 +1435,6 @@
         const users = snapshot.val() || {};
         const userArray = Object.keys(users).map(k => ({ uid: k, ...users[k] }));
 
-        // Strict numerical Elo sorting
         userArray.sort((a, b) => Number(b.elo) - Number(a.elo));
 
         const listEl = document.getElementById('leaderboardList');
@@ -1456,19 +1506,6 @@
       clearInterval(clockInterval);
       const won = gameMode === 'pvp' ? (playerColor !== lostColor) : (lostColor === 'b');
       handleGameEnd(won ? 'Victory' : 'Defeat', 'Time Out');
-    }
-
-    function abortMatch() {
-      if (game.history().length > 2) {
-        return alert("Abort is only permitted within the first 2 plies (1 full move). Use Resign instead.");
-      }
-      if (confirm("Are you sure you want to abort the match?")) {
-        clearInterval(clockInterval);
-        if (roomRef) roomRef.update({ status: 'ended', reason: 'Aborted' });
-        setPlayerInGameStatus(false);
-        alert("Match aborted.");
-        switchTab('play');
-      }
     }
 
     function offerDraw() {

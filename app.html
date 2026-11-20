@@ -25,13 +25,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* Custom Board Target Highlights: 70% opaque grey dot */
+    /* Custom Board Target Indicators: Only 70% opaque grey dot, NO square background fill */
     .highlight-move {
       background: radial-gradient(circle, rgba(128, 128, 128, 0.7) 25%, transparent 28%) !important;
     }
-    /* Last Move Highlight: Highlights source and destination squares */
+    /* Last Move Highlight: Pale Yellow Translucent Highlight */
     .highlight-last-move {
-      background-color: rgba(255, 255, 0, 0.3) !important;
+      background-color: rgba(254, 240, 138, 0.45) !important;
     }
     /* Scrollbar Styling */
     ::-webkit-scrollbar {
@@ -82,27 +82,27 @@
           </div>
         </div>
 
-        <!-- Dynamic Navigation Tabs -->
-        <nav id="navTabs" class="hidden md:flex space-x-1">
-          <button onclick="switchTab('game')" id="tab-game" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium transition text-indigo-400 bg-slate-700/50">
-            <i class="fa-solid fa-gamepad mr-2"></i>Play
+        <!-- Dynamic Navigation Tabs (Includes Admin Panel Top Tab) -->
+        <nav id="navTabs" class="hidden sm:flex items-center space-x-1">
+          <button onclick="switchTab('game')" id="tab-game" class="nav-tab px-3.5 py-2 rounded-lg text-sm font-medium transition text-indigo-400 bg-slate-700/50">
+            <i class="fa-solid fa-gamepad mr-1.5"></i>Play
           </button>
-          <button onclick="switchTab('arena')" id="tab-arena" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 transition">
-            <i class="fa-solid fa-network-wired mr-2"></i>1v1 Arena
+          <button onclick="switchTab('arena')" id="tab-arena" class="nav-tab px-3.5 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 transition">
+            <i class="fa-solid fa-network-wired mr-1.5"></i>1v1 Arena
           </button>
-          <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 transition">
-            <i class="fa-solid fa-trophy mr-2"></i>Leaderboard
+          <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="nav-tab px-3.5 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 transition">
+            <i class="fa-solid fa-trophy mr-1.5"></i>Leaderboard
           </button>
-          <button onclick="switchTab('friends')" id="tab-friends" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 transition">
-            <i class="fa-solid fa-user-group mr-2"></i>Friends & Directory
+          <button onclick="switchTab('friends')" id="tab-friends" class="nav-tab px-3.5 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 transition">
+            <i class="fa-solid fa-user-group mr-1.5"></i>Friends
           </button>
-          <button onclick="switchTab('admin')" id="tab-admin" class="hidden nav-tab px-4 py-2 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition">
-            <i class="fa-solid fa-shield-halved mr-2"></i>Admin Panel
+          <button onclick="switchTab('admin')" id="tab-admin" class="hidden nav-tab px-3.5 py-2 rounded-lg text-sm font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition">
+            <i class="fa-solid fa-shield-halved mr-1.5"></i>Admin Panel
           </button>
         </nav>
 
         <!-- User Identity & Actions -->
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-3">
           <div id="userInfoDisplay" class="hidden items-center space-x-3 bg-slate-900/60 border border-slate-700/50 rounded-xl px-3 py-1.5">
             <div class="w-8 h-8 rounded-lg bg-indigo-600/30 text-indigo-400 flex items-center justify-center font-bold text-sm" id="userAvatar">
               ?
@@ -186,7 +186,7 @@
                 <span id="topCapturedPieces" class="text-xs text-slate-400 tracking-wider"></span>
                 <span id="topScoreBadge" class="hidden text-xs font-bold bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-500/30"></span>
               </div>
-              <div class="text-xs text-slate-400" id="topEloDisplay">300 ELO</div>
+              <div class="text-xs text-slate-400" id="topEloDisplay">800 ELO</div>
             </div>
           </div>
           <div class="bg-slate-900 border border-slate-700/60 px-3 py-1.5 rounded-lg font-mono text-lg font-bold text-amber-400" id="topClock">
@@ -388,7 +388,7 @@
       </div>
     </div>
 
-    <!-- ADMIN PANEL SECTION -->
+    <!-- ADMIN PANEL SECTION (Direct Top Nav Tab) -->
     <div id="section-admin" class="hidden space-y-6">
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 backdrop-blur-md">
         <div class="flex items-center justify-between mb-6">
@@ -450,7 +450,7 @@
 
   </main>
 
-  <!-- Game Over Modal -->
+  <!-- Game Over Modal (Auto-Dismisses after 3 Seconds) -->
   <div id="gameOverModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl space-y-4">
       <div id="gameOverBadge" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto text-3xl bg-indigo-500/10 text-indigo-400">
@@ -515,6 +515,7 @@
     let blackTime = 600;
     let clockInterval = null;
     let currentLastMove = null; // Stores last move { from, to }
+    let gameOverTimeout = null; // Auto-dismiss timer reference
 
     // Piece-Square Evaluation Tables for AI Engine
     const PST = {
@@ -709,7 +710,7 @@
     // --- 4. BOARD MANAGEMENT & SQUARE HIGHLIGHTING ---
     function initBoard() {
       const config = {
-        draggable: false, // Click-to-move interface only
+        draggable: false, // Click-to-move interface strictly
         position: 'start',
         pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
       };
@@ -885,7 +886,7 @@
       const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
       const pieceSymbols = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛' };
 
-      // Helper function to render captured string e.g. "♟×2 (2)"
+      // Helper function to render captured string e.g. "♟×2"
       function formatCaptured(arr) {
         const counts = {};
         let totalVal = 0;
@@ -1052,7 +1053,6 @@
         return 0; // Draw
       }
 
-      // Order moves
       moves.sort((a, b) => (b.captured ? 10 : 0) - (a.captured ? 10 : 0));
 
       if (isMaximizing) {
@@ -1238,8 +1238,8 @@
         if (gameData.status === 'resigned') {
           stopClockTimer();
           isGameActive = false;
-          const winner = gameData.winner;
-          const isWinner = winner === currentUser.uid;
+          // Resignation fix: gameData.winner matches 'w' or 'b'
+          const isWinner = (gameData.winner === playerColor);
           handleMatchConclusion(isWinner ? 'win' : 'loss', 'Resignation');
         } else if (gameData.status === 'draw') {
           stopClockTimer();
@@ -1427,6 +1427,7 @@
           isGameActive = false;
           handleMatchConclusion('loss', 'Resignation');
         } else if (currentRoomCode) {
+          // Store winning color so winner gets +16 Elo and resigning player gets -16 Elo
           db.ref('games/' + currentRoomCode).update({
             status: 'resigned',
             winner: playerColor === 'w' ? 'b' : 'w'
@@ -1493,9 +1494,19 @@
       }
 
       modal.classList.remove('hidden');
+
+      // Auto-dismiss notification modal after 3 seconds
+      if (gameOverTimeout) clearTimeout(gameOverTimeout);
+      gameOverTimeout = setTimeout(() => {
+        closeGameOverModal();
+      }, 3000);
     }
 
     function closeGameOverModal() {
+      if (gameOverTimeout) {
+        clearTimeout(gameOverTimeout);
+        gameOverTimeout = null;
+      }
       document.getElementById('gameOverModal').classList.add('hidden');
       initGame();
     }
@@ -1731,14 +1742,18 @@
     // --- 13. UI TAB NAVIGATION CONTROLLER ---
     function switchTab(tab) {
       document.querySelectorAll('.nav-tab').forEach(t => {
-        t.classList.remove('text-indigo-400', 'bg-slate-700/50');
+        t.classList.remove('text-indigo-400', 'bg-slate-700/50', 'bg-rose-500/20', 'text-rose-400');
         t.classList.add('text-slate-400');
       });
 
       const activeTabBtn = document.getElementById('tab-' + tab);
       if (activeTabBtn) {
         activeTabBtn.classList.remove('text-slate-400');
-        activeTabBtn.classList.add('text-indigo-400', 'bg-slate-700/50');
+        if (tab === 'admin') {
+          activeTabBtn.classList.add('text-rose-400', 'bg-rose-500/20');
+        } else {
+          activeTabBtn.classList.add('text-indigo-400', 'bg-slate-700/50');
+        }
       }
 
       ['game', 'arena', 'leaderboard', 'friends', 'admin'].forEach(s => {

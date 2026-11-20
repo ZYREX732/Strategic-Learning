@@ -456,7 +456,7 @@
         <!-- Action Control Buttons -->
         <div class="w-full max-w-[500px] flex gap-3">
           <button id="btn-game-abort" onclick="handleAbortGame()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-medium text-xs rounded-lg transition">
-            Abort (Move &le; 1)
+            Abort (Move &le; 2)
           </button>
           <button id="btn-game-draw" onclick="handleOfferDraw()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-medium text-xs rounded-lg transition">
             Offer Draw
@@ -560,6 +560,7 @@
     let currentTurn = 'w';
     let isGameInitialized = false;
     let isUserInGame = false;
+    const sessionStartTime = Date.now();
 
     // --- AUTH & INITIALIZATION ---
     auth.onAuthStateChanged(async (user) => {
@@ -843,6 +844,7 @@
             currentGame.load(gameData.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : gameData.fen);
             board.position(currentGame.fen());
             updateCapturedPieces();
+            updateAbortButtonState();
           }
 
           whiteTime = gameData.whiteTime !== undefined ? gameData.whiteTime : 600;
@@ -886,6 +888,7 @@
       currentTurn = 'w';
       updateClockDisplay();
       startClockTimer();
+      updateAbortButtonState();
     }
 
     function makeBotMove() {
@@ -911,6 +914,7 @@
           board.position(currentGame.fen());
           currentTurn = 'w';
           updateCapturedPieces();
+          updateAbortButtonState();
           checkGameState();
         }
       }, 400);
@@ -1029,6 +1033,7 @@
       });
 
       $(window).resize(() => board.resize());
+      updateAbortButtonState();
     }
 
     function handleSquareClick(square) {
@@ -1077,6 +1082,7 @@
       removeHighlights();
       selectedSquare = null;
       updateCapturedPieces();
+      updateAbortButtonState();
 
       if (isGameVsBot) {
         currentTurn = 'b';
@@ -1140,6 +1146,20 @@
       document.getElementById('opp-captured').innerHTML = oppCap.join(' ') + (oppDiff > 0 ? ` <span class="text-emerald-400 font-bold">+${oppDiff}</span>` : '');
     }
 
+    function updateAbortButtonState() {
+      const abortBtn = document.getElementById('btn-game-abort');
+      if (!abortBtn) return;
+      
+      const moveCount = currentGame ? currentGame.history().length : 0;
+      if (moveCount > 2) {
+        abortBtn.classList.add('opacity-40', 'cursor-not-allowed');
+        abortBtn.setAttribute('disabled', 'true');
+      } else {
+        abortBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+        abortBtn.removeAttribute('disabled');
+      }
+    }
+
     // --- TIMERS & GAME OVER HANDLERS ---
 
     function startClockTimer() {
@@ -1199,14 +1219,17 @@
     }
 
     function handleAbortGame() {
-      if (currentGame.history().length <= 2) {
-        if (!isGameVsBot && activeRoomCode) {
-          roomRef.update({ status: 'ended', winner: 'draw', reason: 'Match aborted' });
-        } else {
-          returnToLobby();
-        }
+      const moveCount = currentGame ? currentGame.history().length : 0;
+      
+      if (moveCount > 2) {
+        alert("Cannot abort after 2 moves have been played. Please use Resign instead.");
+        return;
+      }
+
+      if (!isGameVsBot && activeRoomCode) {
+        roomRef.update({ status: 'ended', winner: 'draw', reason: 'Match aborted' });
       } else {
-        alert("Cannot abort after move 1. Use Resign instead.");
+        returnToLobby();
       }
     }
 
@@ -1414,25 +1437,28 @@
     }
 
     function listenForDirectRequests() {
-      db.ref('requests/' + currentUser.uid).on('child_added', (snap) => {
-        const req = snap.val();
-        const reqKey = snap.key;
-        if (!req) return;
+      db.ref('requests/' + currentUser.uid)
+        .orderByChild('timestamp')
+        .startAt(sessionStartTime)
+        .on('child_added', (snap) => {
+          const req = snap.val();
+          const reqKey = snap.key;
+          if (!req) return;
 
-        db.ref(`requests/${currentUser.uid}/${reqKey}`).remove();
+          db.ref(`requests/${currentUser.uid}/${reqKey}`).remove();
 
-        if (isUserInGame) {
-          db.ref(`games/${req.roomCode}`).update({ status: 'busy' });
-          return;
-        }
+          if (isUserInGame) {
+            db.ref(`games/${req.roomCode}`).update({ status: 'busy' });
+            return;
+          }
 
-        if (confirm(`Incoming 1v1 challenge from ${req.fromUsername}! Accept?`)) {
-          db.ref(`games/${req.roomCode}`).update({ status: 'active' });
-          join1v1Room(req.roomCode, 'b');
-        } else {
-          db.ref(`games/${req.roomCode}`).update({ status: 'declined' });
-        }
-      });
+          if (confirm(`Incoming 1v1 challenge from ${req.fromUsername}! Accept?`)) {
+            db.ref(`games/${req.roomCode}`).update({ status: 'active' });
+            join1v1Room(req.roomCode, 'b');
+          } else {
+            db.ref(`games/${req.roomCode}`).update({ status: 'declined' });
+          }
+        });
     }
 
     // --- LEADERBOARD SYSTEM ---

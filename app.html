@@ -710,10 +710,29 @@
       return db.ref('users/' + targetUid + '/coins').set(safeBal);
     }
 
+    // ================= FOOLPROOF ADMIN ACCESS CHECK =================
+    function checkAdminAccess() {
+      if (currentUser && currentUser.email && currentUser.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        const tab = document.getElementById('tab-admin');
+        const mobTab = document.getElementById('mob-tab-admin');
+        if (tab) tab.classList.remove('hidden');
+        if (mobTab) mobTab.classList.remove('hidden');
+        loadAdminUserTable();
+        return true;
+      } else {
+        const tab = document.getElementById('tab-admin');
+        const mobTab = document.getElementById('mob-tab-admin');
+        if (tab) tab.classList.add('hidden');
+        if (mobTab) mobTab.classList.add('hidden');
+        return false;
+      }
+    }
+
     // ================= INITIALIZATION & AUTH =================
     auth.onAuthStateChanged((user) => {
       if (user) {
         currentUser = user;
+        checkAdminAccess();
         listenUserData(user.uid);
         listenSystemMaintenance();
         initChessboard();
@@ -737,16 +756,7 @@
         }
         updateUIHeader();
         renderInventory();
-        
-        // Show Admin Tab strictly for ADMIN_EMAIL
-        if (currentUser && currentUser.email === ADMIN_EMAIL) {
-          document.getElementById('tab-admin').classList.remove('hidden');
-          document.getElementById('mob-tab-admin').classList.remove('hidden');
-          loadAdminUserTable();
-        } else {
-          document.getElementById('tab-admin').classList.add('hidden');
-          document.getElementById('mob-tab-admin').classList.add('hidden');
-        }
+        checkAdminAccess();
       });
     }
 
@@ -756,8 +766,9 @@
         updateAdminMaintenanceButtonUI(isMaintenance);
 
         if (isMaintenance) {
-          const userEmail = currentUser ? currentUser.email : "";
-          if (!WHITELISTED_MAINTENANCE_EMAILS.includes(userEmail)) {
+          const userEmail = (currentUser && currentUser.email) ? currentUser.email.trim().toLowerCase() : "";
+          const isWhitelisted = WHITELISTED_MAINTENANCE_EMAILS.some(e => e.toLowerCase() === userEmail);
+          if (!isWhitelisted) {
             document.getElementById('maintenance-modal').classList.remove('hidden');
           } else {
             document.getElementById('maintenance-modal').classList.add('hidden');
@@ -822,7 +833,9 @@
 
       const config = {
         draggable: false, // Click-to-move piece controls only
-        position: 'start'
+        position: 'start',
+        // EXPLICIT CDN PIECE THEME SO PIECE IMAGES RENDER RELIABLY
+        pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
       };
 
       board = Chessboard('myBoard', config);
@@ -842,7 +855,7 @@
     function handleSquareClick(square) {
       if (game.game_over()) return;
 
-      // Check turn turn match
+      // Check turn match
       if (vsBot && game.turn() !== playerColor) return;
 
       if (!selectedSquare) {
@@ -1409,7 +1422,7 @@
     }
 
     function adminToggleMaintenance() {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/maintenance').get().then((snap) => {
         const currentVal = snap.val() === true;
         db.ref('system/maintenance').set(!currentVal);
@@ -1417,12 +1430,12 @@
     }
 
     function adminForceGlobalReload() {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/forceReload').set(Date.now());
     }
 
     function adminPurgeHighElo() {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users').once('value', (snap) => {
         snap.forEach(child => {
           const user = child.val();
@@ -1435,7 +1448,7 @@
     }
 
     function loadAdminUserTable() {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users').on('value', (snap) => {
         const tbody = document.getElementById('admin-user-table');
         tbody.innerHTML = "";
@@ -1466,7 +1479,7 @@
     }
 
     function adminGrantCoins(uid) {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const amt = prompt("Enter CogniCoins amount to grant:", "1000");
       if (amt) {
         safeAddCoins(uid, parseInt(amt) || 0);
@@ -1474,17 +1487,17 @@
     }
 
     function adminResetCoins(uid) {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       safeSetCoins(uid, 0);
     }
 
     function adminResetElo(uid) {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users/' + uid + '/elo').set(1200);
     }
 
     function adminDeleteUser(uid) {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       if (confirm("Are you sure you want to delete user " + uid + "?")) {
         db.ref('users/' + uid).remove();
       }

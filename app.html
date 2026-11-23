@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CogniLearn – Strategic Thinking Lab</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
             brand: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              500: '#0284c7',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              900: '#14532d',
             }
           }
         }
@@ -28,570 +26,667 @@
     }
   </script>
 
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- FontAwesome 6.4.0 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Chessboard.js CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
+  <!-- jQuery & Chessboard.js CSS/JS -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 
-  <!-- Firebase v10.7.1 Compat SDKs -->
+  <!-- Chess.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+  <!-- Firebase Compat SDKs (v10.7.1) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-  <!-- Chess.js & Chessboard.js Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-
   <style>
-    /* Custom Board Skins */
-    .theme-wood .square-55d63 { background-color: #b88b4a; }
-    .theme-wood .white-1e1d7 { background-color: #f0d9b5; color: #b88b4a; }
-    .theme-wood .black-3c85d { background-color: #b58863; color: #f0d9b5; }
-
-    .theme-green .square-55d63 { background-color: #769656; }
-    .theme-green .white-1e1d7 { background-color: #eeeed2; color: #769656; }
-    .theme-green .black-3c85d { background-color: #769656; color: #eeeed2; }
-
-    .theme-grey .square-55d63 { background-color: #708090; }
-    .theme-grey .white-1e1d7 { background-color: #e2e8f0; color: #475569; }
-    .theme-grey .black-3c85d { background-color: #64748b; color: #e2e8f0; }
-
-    /* Move Highlights & Target Indicators */
-    .move-indicator {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background-color: rgba(128, 128, 128, 0.7);
-      pointer-events: none;
-      z-index: 20;
-    }
-
-    .highlight-prev {
-      background-color: rgba(254, 240, 138, 0.45) !important;
-    }
-
-    /* Emote CSS Keyframe Animations */
-    @keyframes emotePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.25); }
-    }
-    .emote-pulse { animation: emotePulse 1.2s infinite ease-in-out; }
-
-    @keyframes emoteBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
-    }
-    .emote-bounce { animation: emoteBounce 0.8s infinite ease-in-out; }
-
-    @keyframes emoteShake {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-14deg); }
-      75% { transform: rotate(14deg); }
-    }
-    .emote-shake { animation: emoteShake 0.6s infinite linear; }
-
-    @keyframes emoteGlow {
-      0%, 100% { filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.8)); }
-      50% { filter: drop-shadow(0 0 18px rgba(234, 179, 8, 1)); }
-    }
-    .emote-glow { animation: emoteGlow 1.5s infinite ease-in-out; }
-
-    /* CS:GO Unboxing Reel Styles */
-    .crate-strip-container {
-      overflow: hidden;
-      position: relative;
-      width: 100%;
-      height: 140px;
-    }
-    .crate-strip {
-      display: flex;
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      transition: transform 6s cubic-bezier(0.1, 1, 0.1, 1);
-    }
-    .crate-item-card {
-      width: 120px;
-      height: 130px;
-      flex-shrink: 0;
-      margin: 0 5px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      border: 2px solid #334155;
-      background: #1e293b;
-    }
-
-    /* Rarity Borders */
-    .rarity-common { border-color: #94a3b8 !important; }
-    .rarity-rare { border-color: #3b82f6 !important; }
-    .rarity-epic { border-color: #a855f7 !important; }
-    .rarity-legendary { border-color: #eab308 !important; }
-
-    /* Custom Scrollbar */
+    /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* Chessboard Highlight Custom Overlays */
+    /* Target dots on valid move squares (70% opaque grey dot) */
+    .valid-move-dot {
+      position: relative;
+    }
+    .valid-move-dot::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 26%;
+      height: 26%;
+      background-color: rgba(128, 128, 128, 0.7);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Translucent pale yellow for move source and destination */
+    .highlight-move {
+      box-shadow: inset 0 0 0 2000px rgba(254, 240, 138, 0.45) !important;
+    }
+
+    /* Board Skins */
+    .theme-wood .white-1e1d7 { background-color: #f0d9b5 !important; color: #b58863; }
+    .theme-wood .black-3c85d { background-color: #b58863 !important; color: #f0d9b5; }
+
+    .theme-green .white-1e1d7 { background-color: #eeeed2 !important; color: #769656; }
+    .theme-green .black-3c85d { background-color: #769656 !important; color: #eeeed2; }
+
+    .theme-grey .white-1e1d7 { background-color: #e2e8f0 !important; color: #475569; }
+    .theme-grey .black-3c85d { background-color: #475569 !important; color: #e2e8f0; }
+
+    /* Emote CSS Keyframe Animations */
+    @keyframes emoteBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes emotePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+    }
+    @keyframes emoteShake {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-12deg); }
+      40% { transform: rotate(12deg); }
+      60% { transform: rotate(-8deg); }
+      80% { transform: rotate(8deg); }
+    }
+    @keyframes emoteGlow {
+      0%, 100% { filter: drop-shadow(0 0 2px rgba(234,179,8,0.4)); }
+      50% { filter: drop-shadow(0 0 12px rgba(234,179,8,0.9)); }
+    }
+
+    .emote-bounce { animation: emoteBounce 1.2s infinite; }
+    .emote-pulse { animation: emotePulse 1.4s infinite; }
+    .emote-shake { animation: emoteShake 1.1s infinite; }
+    .emote-glow { animation: emoteGlow 1.8s infinite; }
+
+    /* CS:GO Crate Roller Container */
+    .crate-strip-container {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      height: 130px;
+      border: 2px solid #334155;
+      border-radius: 0.75rem;
+      background: #090d16;
+    }
+    .crate-strip-ticker {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 4px;
+      background: #ef4444;
+      z-index: 20;
+      box-shadow: 0 0 10px #ef4444;
+      transform: translateX(-50%);
+    }
+    .crate-strip-track {
+      display: flex;
+      position: absolute;
+      left: 0;
+      top: 10px;
+      height: 110px;
+      transition: transform 5s cubic-bezier(0.12, 0.8, 0.14, 1);
+      will-change: transform;
+    }
+    .crate-item-card {
+      width: 100px;
+      height: 110px;
+      margin-right: 10px;
+      flex-shrink: 0;
+      border-radius: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #1e293b;
+      border: 2px solid #475569;
+      font-size: 0.75rem;
+      text-align: center;
+      padding: 0.25rem;
+    }
+
+    /* Rarities */
+    .rarity-common { border-color: #94a3b8; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); }
+    .rarity-rare { border-color: #3b82f6; background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%); }
+    .rarity-epic { border-color: #a855f7; background: linear-gradient(180deg, #581c87 0%, #0f172a 100%); }
+    .rarity-legendary { border-color: #eab308; background: linear-gradient(180deg, #713f12 0%, #0f172a 100%); }
   </style>
 </head>
+<body class="h-full flex flex-col font-sans antialiased text-slate-200">
 
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
-
-  <!-- Maintenance Overlay Lockout Modal -->
-  <div id="maintenance-modal" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-    <div class="bg-slate-900 border border-red-500/50 rounded-2xl p-8 max-w-md w-full shadow-2xl">
-      <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-red-500/30">
-        <i class="fa-solid fa-wrench animate-bounce"></i>
-      </div>
-      <h2 class="text-2xl font-bold text-slate-100 mb-2">System Under Maintenance</h2>
-      <p class="text-slate-400 text-sm mb-6">CogniLearn is currently undergoing scheduled platform upgrades. Access is restricted to authorized administrative personnel.</p>
-      <button onclick="handleMaintenanceRedirect()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl border border-slate-700 transition">
-        Return to Main Page
-      </button>
-    </div>
-  </div>
-
-  <!-- Game Over Modal (3s Auto Dismiss) -->
-  <div id="game-over-modal" class="hidden fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl transform transition-all scale-100">
-      <div id="game-over-icon" class="text-4xl mb-3">🏆</div>
-      <h3 id="game-over-title" class="text-xl font-bold text-slate-100 mb-1">Game Finished</h3>
-      <p id="game-over-desc" class="text-sm text-slate-400 mb-4">Match conclusion registered.</p>
-      <div class="text-xs text-slate-500 italic">Auto-dismissing in 3 seconds...</div>
-    </div>
-  </div>
-
-  <!-- Main Navigation Header -->
-  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-30 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <!-- Logo & Title -->
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-600/30">
-          <i class="fa-solid fa-chess-knight"></i>
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('ai')">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30">
+          <i class="fa-solid fa-brain text-xl"></i>
         </div>
         <div>
-          <h1 class="font-bold text-lg text-slate-100 tracking-wide">CogniLearn</h1>
-          <p class="text-xs text-indigo-400 font-medium hidden sm:block">Strategic Thinking Lab</p>
+          <h1 class="font-bold text-lg text-white leading-tight">CogniLearn</h1>
+          <p class="text-xs text-indigo-400 font-medium tracking-wide">Strategic Thinking Lab</p>
         </div>
       </div>
 
-      <!-- Center Desktop Navigation Tabs -->
-      <nav class="hidden md:flex items-center space-x-1 bg-slate-950/50 p-1 rounded-xl border border-slate-800/80">
-        <button id="tab-play" onclick="switchTab('play')" class="px-4 py-1.5 text-sm font-medium rounded-lg transition bg-indigo-600 text-white">
-          <i class="fa-solid fa-gamepad mr-2"></i>Play
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-1">
+        <button id="tab-ai" onclick="switchTab('ai')" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+          <i class="fa-solid fa-robot mr-2"></i>Play vs AI
         </button>
-        <button id="tab-shop" onclick="switchTab('shop')" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
+        <button id="tab-arena" onclick="switchTab('arena')" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
+          <i class="fa-solid fa-swords mr-2"></i>1v1 Arena
+        </button>
+        <button id="tab-shop" onclick="switchTab('shop')" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
           <i class="fa-solid fa-store mr-2"></i>CogniShop
         </button>
-        <button id="tab-inventory" onclick="switchTab('inventory')" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-          <i class="fa-solid fa-box-open mr-2"></i>Inventory
+        <button id="tab-profile" onclick="switchTab('profile')" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
+          <i class="fa-solid fa-user-gear mr-2"></i>Profile
         </button>
-        <button id="tab-leaderboard" onclick="switchTab('leaderboard')" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-          <i class="fa-solid fa-trophy mr-2"></i>Leaderboard
-        </button>
-        <!-- Master Admin Tab (Strictly for zainisgo123@gmail.com) -->
-        <button id="tab-admin" onclick="switchTab('admin')" class="hidden px-4 py-1.5 text-sm font-medium rounded-lg text-red-400 hover:bg-red-500/10 transition border border-red-500/30">
-          <i class="fa-solid fa-user-shield mr-2"></i>Admin
+        <button id="tab-admin" onclick="switchTab('admin')" class="hidden px-4 py-2 rounded-lg text-sm font-medium transition-all text-amber-400 hover:bg-amber-500/10 border border-amber-500/30">
+          <i class="fa-solid fa-shield-halved mr-2"></i>Admin Panel
         </button>
       </nav>
 
-      <!-- User Stats & Economy Bar -->
-      <div class="flex items-center space-x-3">
-        <!-- Coins Display -->
-        <div class="flex items-center bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 text-xs sm:text-sm">
-          <i class="fa-solid fa-coins text-amber-400 mr-2"></i>
-          <span id="nav-coins" class="font-bold text-amber-300">1,000</span>
+      <!-- Right User Bar -->
+      <div class="flex items-center space-x-4">
+        <!-- CogniCoins Display -->
+        <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-full border border-amber-500/30">
+          <i class="fa-solid fa-coins text-amber-400"></i>
+          <span id="nav-user-coins" class="text-xs font-bold text-amber-300">1,000</span>
+          <span class="text-xs text-amber-500/80 font-semibold">CC</span>
         </div>
 
-        <!-- User Profile Pill -->
-        <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-1.5">
-          <div id="nav-avatar-icon" class="w-6 h-6 rounded-full bg-indigo-500/30 text-indigo-300 flex items-center justify-center text-xs font-bold">
-            👤
+        <!-- User Brief Badge -->
+        <div class="flex items-center space-x-3 border-l border-slate-800 pl-4">
+          <div class="text-right hidden sm:block">
+            <div id="nav-user-name" class="text-xs font-semibold text-white truncate max-w-[120px]">Student</div>
+            <div id="nav-user-elo" class="text-[10px] text-indigo-400 font-bold">1200 ELO</div>
           </div>
-          <div class="hidden sm:block text-left">
-            <div id="nav-username" class="text-xs font-semibold text-slate-200 truncate max-w-[100px]">User</div>
-            <div id="nav-elo" class="text-[10px] text-indigo-400 font-mono">1200 Elo</div>
-          </div>
-          <button onclick="handleLogout()" title="Logout" class="text-slate-400 hover:text-red-400 ml-1 transition">
-            <i class="fa-solid fa-right-from-bracket text-xs"></i>
+          <button onclick="handleLogout()" class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
           </button>
         </div>
       </div>
     </div>
-
-    <!-- Mobile Navigation Bar -->
-    <div class="md:hidden flex items-center justify-around border-t border-slate-800/80 bg-slate-900 py-2 px-2 text-xs">
-      <button onclick="switchTab('play')" class="flex flex-col items-center text-indigo-400">
-        <i class="fa-solid fa-gamepad text-base mb-0.5"></i>Play
-      </button>
-      <button onclick="switchTab('shop')" class="flex flex-col items-center text-slate-400">
-        <i class="fa-solid fa-store text-base mb-0.5"></i>Shop
-      </button>
-      <button onclick="switchTab('inventory')" class="flex flex-col items-center text-slate-400">
-        <i class="fa-solid fa-box-open text-base mb-0.5"></i>Items
-      </button>
-      <button onclick="switchTab('leaderboard')" class="flex flex-col items-center text-slate-400">
-        <i class="fa-solid fa-trophy text-base mb-0.5"></i>Ranks
-      </button>
-      <button id="mob-tab-admin" onclick="switchTab('admin')" class="hidden flex flex-col items-center text-red-400">
-        <i class="fa-solid fa-user-shield text-base mb-0.5"></i>Admin
-      </button>
-    </div>
   </header>
 
-  <!-- Main Content Container -->
-  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-grow">
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-    <!-- ================= SECTION: PLAY ================= -->
-    <section id="section-play" class="space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        <!-- Chessboard Container (Left Col) -->
-        <div class="lg:col-span-8 flex flex-col items-center bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl">
-          
-          <!-- Top Match Status Header -->
-          <div class="w-full max-w-[560px] flex items-center justify-between mb-4 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-            <!-- Opponent Tag -->
+    <!-- ========================================== -->
+    <!-- SECTION 1: PLAY VS AI                      -->
+    <!-- ========================================== -->
+    <section id="section-ai" class="space-y-6">
+      <div class="flex flex-col md:flex-row gap-6 items-start">
+        
+        <!-- Chessboard Container -->
+        <div class="w-full md:w-[540px] flex-shrink-0 bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-xl">
+          <div class="flex items-center justify-between mb-3 px-1">
             <div class="flex items-center space-x-3">
-              <div id="opponent-avatar" class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg">🤖</div>
+              <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                <i class="fa-solid fa-robot text-emerald-400"></i>
+              </div>
               <div>
-                <div id="opponent-name" class="font-semibold text-sm text-slate-200">Grandmaster Bot</div>
-                <div id="opponent-elo" class="text-xs text-indigo-400 font-mono">1500 Elo</div>
+                <div class="text-sm font-bold text-white">Grandmaster Bot</div>
+                <div class="text-xs text-slate-400">Tactical Engine (1500+ ELO)</div>
               </div>
             </div>
-            <!-- Dynamic Game Timer -->
-            <div id="game-timer" class="font-mono text-base font-bold text-amber-400 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
-              10:00
-            </div>
+            <span id="ai-turn-indicator" class="text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">White to move</span>
           </div>
 
-          <!-- Interactive Board Container -->
-          <div class="w-full max-w-[560px] aspect-square relative rounded-xl overflow-hidden shadow-2xl border-2 border-slate-800" id="board-outer">
-            <div id="myBoard" class="w-full h-full theme-wood"></div>
-          </div>
+          <!-- Board Mount Target -->
+          <div id="ai-board" class="w-full aspect-square rounded-lg overflow-hidden shadow-inner border border-slate-700"></div>
 
-          <!-- Bottom Player Status & Actions Bar -->
-          <div class="w-full max-w-[560px] flex items-center justify-between mt-4 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-            <!-- Player Info -->
+          <div class="flex items-center justify-between mt-3 px-1">
             <div class="flex items-center space-x-3">
-              <div id="player-avatar" class="w-9 h-9 rounded-full bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-lg">♟️</div>
+              <div id="ai-player-avatar" class="w-8 h-8 rounded-full bg-indigo-900/50 flex items-center justify-center border border-indigo-500/40 text-indigo-300 font-bold text-xs">
+                YOU
+              </div>
               <div>
-                <div id="player-name" class="font-semibold text-sm text-slate-200">You</div>
-                <div id="player-elo" class="text-xs text-indigo-400 font-mono">1200 Elo</div>
+                <div id="ai-player-name" class="text-sm font-bold text-white">Player</div>
+                <div id="ai-player-elo-badge" class="text-xs text-indigo-400">Rating: 1200</div>
               </div>
             </div>
-            <!-- Match Action Controls -->
-            <div class="flex items-center space-x-2">
-              <button id="btn-resign" onclick="resignGame()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
-                <i class="fa-solid fa-flag mr-1"></i>Resign
-              </button>
-              <button id="btn-draw" onclick="offerDraw()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
-                Offer Draw
-              </button>
-            </div>
+            <div id="ai-status-msg" class="text-xs text-slate-400">Select side to start game</div>
           </div>
         </div>
 
-        <!-- Game Lobby / Control Panel (Right Col) -->
-        <div class="lg:col-span-4 flex flex-col space-y-6">
-
-          <!-- Match Selector Tabs -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
-            <h2 class="text-base font-bold text-slate-100 flex items-center">
-              <i class="fa-solid fa-chess-board text-indigo-400 mr-2"></i> Game Settings
+        <!-- Controls & AI Learning Panel -->
+        <div class="flex-1 space-y-6 w-full">
+          <!-- Setup Card -->
+          <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+            <h2 class="text-lg font-bold text-white flex items-center">
+              <i class="fa-solid fa-gamepad text-indigo-400 mr-2"></i>
+              Match Controls
             </h2>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Challenge the Grandmaster Bot to improve your positional judgment. Win matches to earn CogniCoins (+50 CC) and increase your Rating.
+            </p>
 
-            <!-- Bot Game Controls -->
-            <div id="bot-setup" class="space-y-4">
-              <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-2">Select Your Side</label>
-                <div class="grid grid-cols-3 gap-2">
-                  <button onclick="setPlayerSide('white')" id="side-white" class="side-btn py-2 bg-indigo-600 text-white font-medium text-xs rounded-xl border border-indigo-500 transition">
-                    ⚪ White
-                  </button>
-                  <button onclick="setPlayerSide('random')" id="side-random" class="side-btn py-2 bg-slate-800 text-slate-300 font-medium text-xs rounded-xl border border-slate-700 hover:bg-slate-750 transition">
-                    🎲 Random
-                  </button>
-                  <button onclick="setPlayerSide('black')" id="side-black" class="side-btn py-2 bg-slate-800 text-slate-300 font-medium text-xs rounded-xl border border-slate-700 hover:bg-slate-750 transition">
-                    ⚫ Black
-                  </button>
-                </div>
-              </div>
-
-              <button onclick="startBotMatch()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-600/30 text-sm transition">
-                Start AI Bot Game
-              </button>
-            </div>
-
-            <hr class="border-slate-800" />
-
-            <!-- 1v1 Arena Multiplayer Setup -->
-            <div id="arena-setup" class="space-y-4">
-              <h3 class="text-sm font-bold text-slate-200 flex items-center">
-                <i class="fa-solid fa-users text-amber-400 mr-2"></i> 1v1 Arena Lobby
-              </h3>
-              <button onclick="createArenaRoom()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs transition">
-                Create Multiplayer Room
-              </button>
-
-              <div class="flex space-x-2">
-                <input id="room-code-input" type="text" placeholder="6-Char Room Code" uppercase class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-center tracking-widest text-slate-100 focus:outline-none focus:border-amber-500" />
-                <button onclick="joinArenaRoom()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-2 rounded-xl text-xs border border-slate-700 transition">
-                  Join
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Choose Playing Side</label>
+              <div class="grid grid-cols-3 gap-3">
+                <button onclick="setupAiGame('white')" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-slate-200 flex items-center justify-center space-x-2 transition-all">
+                  <i class="fa-solid fa-chess-king text-slate-100"></i>
+                  <span>White</span>
+                </button>
+                <button onclick="setupAiGame('black')" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-slate-200 flex items-center justify-center space-x-2 transition-all">
+                  <i class="fa-solid fa-chess-king text-slate-900"></i>
+                  <span>Black</span>
+                </button>
+                <button onclick="setupAiGame('random')" class="py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white flex items-center justify-center space-x-2 transition-all shadow-lg shadow-indigo-600/20">
+                  <i class="fa-solid fa-shuffle"></i>
+                  <span>Random</span>
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- Board Theme Customizer -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
-            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Board Theme</h3>
-            <div class="grid grid-cols-3 gap-2">
-              <button onclick="applyBoardTheme('theme-wood')" class="py-2 bg-amber-900/40 hover:bg-amber-900/60 border border-amber-700/50 rounded-xl text-xs font-medium text-amber-200">
-                Classic Wood
-              </button>
-              <button onclick="applyBoardTheme('theme-green')" class="py-2 bg-emerald-900/40 hover:bg-emerald-900/60 border border-emerald-700/50 rounded-xl text-xs font-medium text-emerald-200">
-                Chess Green
-              </button>
-              <button onclick="applyBoardTheme('theme-grey')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl text-xs font-medium text-slate-300">
-                Slate Grey
-              </button>
+          <!-- Tactical Analysis Card -->
+          <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center">
+              <i class="fa-solid fa-microchip text-emerald-400 mr-2"></i>
+              Engine Evaluation
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between text-xs text-slate-400 font-medium">
+                <span>Position Score</span>
+                <span id="ai-eval-score" class="text-emerald-400 font-mono font-bold">+0.00</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden flex">
+                <div id="ai-eval-bar" class="bg-indigo-500 h-full transition-all duration-300" style="width: 50%;"></div>
+              </div>
+              <div class="p-3 bg-slate-950 rounded-xl border border-slate-800/80 text-xs text-slate-400 leading-relaxed font-mono">
+                <span class="text-slate-500 block mb-1">// Last Move Analysis:</span>
+                <span id="ai-analysis-text">Game started. Make a move or select side to begin.</span>
+              </div>
             </div>
           </div>
-
-          <!-- Arena Match Chat Box (Hidden for Bot games) -->
-          <div id="chat-container" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col h-64">
-            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Match Chat</h3>
-            <div id="chat-messages" class="flex-grow overflow-y-auto space-y-2 mb-3 pr-1 text-xs">
-              <div class="text-slate-500 italic text-[11px]">Match chat connected...</div>
-            </div>
-            <div class="flex space-x-2">
-              <input id="chat-input" type="text" placeholder="Type a message..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500" onkeydown="if(event.key==='Enter') sendChatMessage()" />
-              <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold">
-                Send
-              </button>
-            </div>
-          </div>
-
         </div>
+
       </div>
     </section>
 
-    <!-- ================= SECTION: COGNISHOP ================= -->
-    <section id="section-shop" class="hidden space-y-6">
-      <div class="text-center max-w-2xl mx-auto mb-8">
-        <h2 class="text-2xl font-bold text-slate-100">CogniShop Crates</h2>
-        <p class="text-sm text-slate-400 mt-1">Unlock animated emotes, rare titles, board themes, and cosmetic avatar frames. Unlocking duplicate items automatically grants a 50% CogniCoin refund.</p>
-      </div>
 
-      <!-- Crate Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- ========================================== -->
+    <!-- SECTION 2: 1V1 ARENA                       -->
+    <!-- ========================================== -->
+    <section id="section-arena" class="hidden space-y-6">
+      <div class="flex flex-col md:flex-row gap-6 items-start">
 
-        <!-- Pawn Crate -->
-        <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition">
-          <div>
-            <div class="w-16 h-16 bg-slate-800 text-slate-300 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-700">
-              ♟️
+        <!-- Arena Chessboard Container -->
+        <div class="w-full md:w-[540px] flex-shrink-0 bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-xl">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center space-x-3">
+              <div id="arena-opp-avatar" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 text-xs text-slate-300 font-bold">
+                OPP
+              </div>
+              <div>
+                <div id="arena-opp-name" class="text-sm font-bold text-white">Opponent Waiting...</div>
+                <div id="arena-opp-elo" class="text-xs text-slate-400">Rating: ----</div>
+              </div>
             </div>
-            <h3 class="text-lg font-bold text-slate-100 text-center">Pawn Crate</h3>
-            <p class="text-xs text-slate-400 text-center mt-1 mb-4">A basic crate with low odds for cool items</p>
-            
-            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1 mb-6">
-              <div class="flex justify-between text-slate-400"><span>Common Drop:</span><span class="font-bold text-slate-300">65%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Rare Drop:</span><span class="font-bold text-blue-400">28%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Epic Drop:</span><span class="font-bold text-purple-400">6%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Legendary:</span><span class="font-bold text-amber-400">1%</span></div>
+            <div id="arena-opp-clock" class="text-lg font-mono font-bold text-slate-300 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">10:00</div>
+          </div>
+
+          <!-- Board Mount Target -->
+          <div id="arena-board" class="w-full aspect-square rounded-lg overflow-hidden shadow-inner border border-slate-700"></div>
+
+          <div class="flex items-center justify-between mt-3 px-1">
+            <div class="flex items-center space-x-3">
+              <div id="arena-self-avatar" class="w-8 h-8 rounded-full bg-indigo-900 flex items-center justify-center border border-indigo-500/40 text-xs text-indigo-300 font-bold">
+                YOU
+              </div>
+              <div>
+                <div id="arena-self-name" class="text-sm font-bold text-white">You</div>
+                <div id="arena-self-elo" class="text-xs text-indigo-400">Rating: 1200</div>
+              </div>
+            </div>
+            <div id="arena-self-clock" class="text-lg font-mono font-bold text-slate-300 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">10:00</div>
+          </div>
+        </div>
+
+        <!-- Arena Room Control & Live Chat -->
+        <div class="flex-1 space-y-6 w-full">
+          <!-- Room Setup Box -->
+          <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+            <h2 class="text-lg font-bold text-white flex items-center">
+              <i class="fa-solid fa-users text-indigo-400 mr-2"></i>
+              Arena Multiplayer Room
+            </h2>
+
+            <div id="arena-lobby-controls" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button onclick="createArenaRoom()" class="py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm flex items-center justify-center space-x-2 transition-all shadow-lg shadow-indigo-600/20">
+                  <i class="fa-solid fa-plus-circle"></i>
+                  <span>Create Room</span>
+                </button>
+
+                <div class="flex space-x-2">
+                  <input id="arena-room-input" type="text" placeholder="6-Char Room Code" maxlength="6" class="uppercase flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 text-sm font-mono text-center text-white focus:outline-none focus:border-indigo-500">
+                  <button onclick="joinArenaRoom()" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-600/20">
+                    Join
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Room Indicator Bar -->
+            <div id="arena-active-bar" class="hidden p-3 bg-slate-950 rounded-xl border border-indigo-500/30 flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <span class="text-xs text-slate-400">ROOM CODE:</span>
+                <span id="arena-room-code-display" class="font-mono font-bold text-indigo-400 tracking-wider">------</span>
+              </div>
+              <div class="flex space-x-2">
+                <button onclick="offerArenaDraw()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-200 border border-slate-700">Draw</button>
+                <button onclick="resignArenaMatch()" class="text-xs bg-red-900/40 hover:bg-red-900/80 px-3 py-1.5 rounded-lg text-red-300 border border-red-500/30">Resign</button>
+              </div>
             </div>
           </div>
-          <button onclick="openCrate('pawn')" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center">
-            <i class="fa-solid fa-coins text-amber-400 mr-2"></i> Open for 1,000 CC
+
+          <!-- Arena Match Chat (Shown only in Arena mode) -->
+          <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-3 flex flex-col h-[300px]">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <span><i class="fa-solid fa-comments text-indigo-400 mr-2"></i>Match Chat</span>
+              <span class="text-[10px] text-slate-500">Auto-deletes on room close</span>
+            </h3>
+
+            <div id="arena-chat-box" class="flex-1 bg-slate-950 rounded-xl border border-slate-800 p-3 overflow-y-auto space-y-2 text-xs">
+              <div class="text-slate-500 italic text-center py-4">Create or join a room to start chatting...</div>
+            </div>
+
+            <form onsubmit="sendArenaChatMessage(event)" class="flex space-x-2">
+              <input id="arena-chat-input" type="text" placeholder="Send tactical note..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors">
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- SECTION 3: COGNISHOP                       -->
+    <!-- ========================================== -->
+    <section id="section-shop" class="hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-2">
+        <h2 class="text-xl font-bold text-white flex items-center">
+          <i class="fa-solid fa-boxes-packing text-amber-400 mr-3"></i>
+          CogniShop Crates
+        </h2>
+        <p class="text-xs text-slate-400">
+          Unbox cosmetic profile frames, name tags, animated emotes, and board skins. Duplicate drops are automatically refunded at 50% CogniCoin value.
+        </p>
+      </div>
+
+      <!-- Crates Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Pawn Crate -->
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between space-y-6 shadow-xl relative overflow-hidden group hover:border-slate-700 transition-all">
+          <div class="space-y-3">
+            <div class="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-3xl mx-auto group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-chess-pawn"></i>
+            </div>
+            <div class="text-center">
+              <h3 class="text-lg font-bold text-white">Pawn Crate</h3>
+              <p class="text-xs text-slate-400 mt-1">A basic crate with low odds for cool items</p>
+            </div>
+            <div class="space-y-1 bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+              <div class="flex justify-between"><span>Common</span><span class="text-slate-300">65%</span></div>
+              <div class="flex justify-between"><span>Rare</span><span class="text-blue-400">28%</span></div>
+              <div class="flex justify-between"><span>Epic</span><span class="text-purple-400">6%</span></div>
+              <div class="flex justify-between"><span>Legendary</span><span class="text-amber-400">1%</span></div>
+            </div>
+          </div>
+          <button onclick="openCrate('pawn')" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-coins"></i>
+            <span>Unbox (1,000 CC)</span>
           </button>
         </div>
 
         <!-- Knight Crate -->
-        <div class="bg-slate-900 border border-indigo-500/30 hover:border-indigo-500/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition relative overflow-hidden">
-          <div class="absolute top-3 right-3 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded text-[10px] font-bold">POPULAR</div>
-          <div>
-            <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-indigo-500/30">
-              ♞
+        <div class="bg-slate-900 rounded-2xl border border-indigo-500/30 p-6 flex flex-col justify-between space-y-6 shadow-xl relative overflow-hidden group hover:border-indigo-500/50 transition-all">
+          <div class="space-y-3">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-950/60 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-3xl mx-auto group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-chess-knight"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-100 text-center">Knight Crate</h3>
-            <p class="text-xs text-slate-400 text-center mt-1 mb-4">A decent crate with higher odds for nice items</p>
-
-            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1 mb-6">
-              <div class="flex justify-between text-slate-400"><span>Common Drop:</span><span class="font-bold text-slate-300">35%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Rare Drop:</span><span class="font-bold text-blue-400">45%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Epic Drop:</span><span class="font-bold text-purple-400">16%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Legendary:</span><span class="font-bold text-amber-400">4%</span></div>
+            <div class="text-center">
+              <h3 class="text-lg font-bold text-white">Knight Crate</h3>
+              <p class="text-xs text-indigo-300/80 mt-1">A decent crate with higher odds for nice items</p>
+            </div>
+            <div class="space-y-1 bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+              <div class="flex justify-between"><span>Common</span><span class="text-slate-300">35%</span></div>
+              <div class="flex justify-between"><span>Rare</span><span class="text-blue-400">45%</span></div>
+              <div class="flex justify-between"><span>Epic</span><span class="text-purple-400">16%</span></div>
+              <div class="flex justify-between"><span>Legendary</span><span class="text-amber-400">4%</span></div>
             </div>
           </div>
-          <button onclick="openCrate('knight')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center shadow-lg shadow-indigo-600/30">
-            <i class="fa-solid fa-coins text-amber-300 mr-2"></i> Open for 3,500 CC
+          <button onclick="openCrate('knight')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-coins"></i>
+            <span>Unbox (3,500 CC)</span>
           </button>
         </div>
 
         <!-- Grandmaster Crate -->
-        <div class="bg-slate-900 border border-amber-500/30 hover:border-amber-500/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition relative overflow-hidden">
-          <div class="absolute top-3 right-3 bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold">PREMIUM</div>
-          <div>
-            <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-amber-500/30">
-              👑
+        <div class="bg-slate-900 rounded-2xl border border-amber-500/40 p-6 flex flex-col justify-between space-y-6 shadow-xl relative overflow-hidden group hover:border-amber-500/70 transition-all">
+          <div class="space-y-3">
+            <div class="w-16 h-16 rounded-2xl bg-amber-950/40 border border-amber-500/50 flex items-center justify-center text-amber-400 text-3xl mx-auto group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-chess-king"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-100 text-center">Grandmaster Crate</h3>
-            <p class="text-xs text-slate-400 text-center mt-1 mb-4">A legendary crate with the best odds for the best items</p>
-
-            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1 mb-6">
-              <div class="flex justify-between text-slate-400"><span>Common Drop:</span><span class="font-bold text-slate-300">10%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Rare Drop:</span><span class="font-bold text-blue-400">35%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Epic Drop:</span><span class="font-bold text-purple-400">40%</span></div>
-              <div class="flex justify-between text-slate-400"><span>Legendary:</span><span class="font-bold text-amber-400">15%</span></div>
+            <div class="text-center">
+              <h3 class="text-lg font-bold text-white">Grandmaster Crate</h3>
+              <p class="text-xs text-amber-300/80 mt-1">A legendary crate with the best odds for the best items</p>
+            </div>
+            <div class="space-y-1 bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400">
+              <div class="flex justify-between"><span>Common</span><span class="text-slate-300">10%</span></div>
+              <div class="flex justify-between"><span>Rare</span><span class="text-blue-400">35%</span></div>
+              <div class="flex justify-between"><span>Epic</span><span class="text-purple-400">40%</span></div>
+              <div class="flex justify-between"><span>Legendary</span><span class="text-amber-400">15%</span></div>
             </div>
           </div>
-          <button onclick="openCrate('grandmaster')" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center shadow-lg shadow-amber-600/30">
-            <i class="fa-solid fa-coins text-amber-300 mr-2"></i> Open for 10,000 CC
+          <button onclick="openCrate('grandmaster')" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-crown"></i>
+            <span>Unbox (10,000 CC)</span>
           </button>
         </div>
 
       </div>
+    </section>
 
-      <!-- CS:GO Unboxing Reel Modal -->
-      <div id="crate-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-xl w-full text-center relative shadow-2xl overflow-hidden">
-          <h3 class="text-lg font-bold text-slate-100 mb-4" id="unboxing-title">Opening Crate...</h3>
+
+    <!-- ========================================== -->
+    <!-- SECTION 4: PROFILE & CUSTOMIZATION STUDIO  -->
+    <!-- ========================================== -->
+    <section id="section-profile" class="hidden space-y-6">
+      
+      <!-- Profile Header Showcase Card -->
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
+        <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
           
-          <!-- CS:GO Horizontal Strip Container -->
-          <div class="crate-strip-container bg-slate-950 rounded-xl border border-slate-800 my-4 py-2">
-            <!-- Center Win Indicator Line -->
-            <div class="absolute left-1/2 top-0 bottom-0 w-1 bg-amber-400 z-30 transform -translate-x-1/2 shadow-[0_0_10px_#f59e0b]"></div>
-            <div id="crate-strip" class="crate-strip"></div>
-          </div>
-
-          <!-- Unboxing Win Result Card -->
-          <div id="unboxing-result" class="hidden my-4 p-4 rounded-xl border bg-slate-950/80 transition-all">
-            <div id="result-rarity-tag" class="text-[10px] font-bold uppercase tracking-widest mb-1">Common</div>
-            <div id="result-icon" class="text-4xl my-2">🎉</div>
-            <div id="result-name" class="text-base font-bold text-slate-100">Item Name</div>
-            <div id="result-refund-notice" class="hidden text-xs text-amber-400 mt-2 font-medium bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
-              <i class="fa-solid fa-rotate-left mr-1"></i> Duplicate item owned! Automatically refunded 50% CC.
+          <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
+            <!-- Equipped Profile Icon & Frame Preview -->
+            <div class="relative">
+              <div id="profile-frame-preview" class="w-20 h-20 rounded-2xl bg-slate-950 border-2 border-indigo-500/50 flex items-center justify-center text-3xl text-indigo-400 shadow-lg p-1">
+                <i id="profile-icon-preview" class="fa-solid fa-user-graduate"></i>
+              </div>
             </div>
 
-            <!-- PROMINENT DONE BUTTON BELOW RESULT -->
-            <button id="btn-close-crate" onclick="closeCrateModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm transition mt-4 shadow-lg shadow-indigo-600/30 flex items-center justify-center">
-              <i class="fa-solid fa-check mr-2"></i> Done
-            </button>
+            <div class="space-y-1">
+              <div class="flex items-center justify-center sm:justify-start space-x-2">
+                <h2 id="profile-display-name" class="text-xl font-bold text-white">Student</h2>
+                <span id="profile-nametag-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Novice</span>
+              </div>
+              <p id="profile-email-display" class="text-xs text-slate-400">student@cognilearn.edu</p>
+              <div class="flex items-center justify-center sm:justify-start space-x-3 pt-1">
+                <span class="text-xs font-bold text-indigo-400"><i class="fa-solid fa-trophy mr-1 text-amber-400"></i><span id="profile-elo-stat">1200</span> ELO</span>
+                <span class="text-xs text-slate-400">•</span>
+                <span class="text-xs font-bold text-slate-300"><i class="fa-solid fa-gamepad mr-1 text-emerald-400"></i><span id="profile-games-stat">0</span> Played</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-4 bg-slate-950 px-5 py-3 rounded-2xl border border-slate-800">
+            <i class="fa-solid fa-wallet text-amber-400 text-2xl"></i>
+            <div>
+              <div class="text-xs text-slate-400 font-medium">CogniCoins Vault</div>
+              <div class="text-lg font-bold text-amber-300"><span id="profile-coins-stat">1,000</span> CC</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Customization Studio Navigation / Categories -->
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
+        <h3 class="text-lg font-bold text-white flex items-center">
+          <i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>
+          Customization Studio
+        </h3>
+
+        <!-- Customizer Categories Grid -->
+        <div class="space-y-6">
+          
+          <!-- Category 1: Board Skins -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chessboard Skins</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button onclick="equipBoardTheme('theme-wood')" class="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-left flex items-center space-x-3 transition-all">
+                <div class="w-8 h-8 rounded bg-[#b58863] border border-[#f0d9b5]"></div>
+                <div>
+                  <div class="text-xs font-bold text-white">Classic Wood</div>
+                  <div class="text-[10px] text-slate-400">Standard theme</div>
+                </div>
+              </button>
+              <button onclick="equipBoardTheme('theme-green')" class="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-left flex items-center space-x-3 transition-all">
+                <div class="w-8 h-8 rounded bg-[#769656] border border-[#eeeed2]"></div>
+                <div>
+                  <div class="text-xs font-bold text-white">Chess Green</div>
+                  <div class="text-[10px] text-slate-400">Tournament style</div>
+                </div>
+              </button>
+              <button onclick="equipBoardTheme('theme-grey')" class="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-left flex items-center space-x-3 transition-all">
+                <div class="w-8 h-8 rounded bg-[#475569] border border-[#e2e8f0]"></div>
+                <div>
+                  <div class="text-xs font-bold text-white">Slate Grey</div>
+                  <div class="text-[10px] text-slate-400">Modern dark style</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category 2: Emote Deck -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Animated Emotes Deck</h4>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center space-y-2">
+                <i class="fa-solid fa-fire text-amber-500 text-2xl emote-pulse"></i>
+                <span class="text-xs font-semibold text-slate-200">On Fire</span>
+                <span class="text-[10px] text-indigo-400 font-mono">Pulse Effect</span>
+              </div>
+              <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center space-y-2">
+                <i class="fa-solid fa-bolt text-yellow-400 text-2xl emote-bounce"></i>
+                <span class="text-xs font-semibold text-slate-200">Blitz</span>
+                <span class="text-[10px] text-indigo-400 font-mono">Bounce Effect</span>
+              </div>
+              <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center space-y-2">
+                <i class="fa-solid fa-skull text-purple-400 text-2xl emote-shake"></i>
+                <span class="text-xs font-semibold text-slate-200">Checkmate</span>
+                <span class="text-[10px] text-indigo-400 font-mono">Shake Effect</span>
+              </div>
+              <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center space-y-2">
+                <i class="fa-solid fa-crown text-amber-300 text-2xl emote-glow"></i>
+                <span class="text-xs font-semibold text-slate-200">Grandmaster</span>
+                <span class="text-[10px] text-indigo-400 font-mono">Glow Effect</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 3: Inventory Item Vault -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Unlocked Inventory Items</span>
+              <span id="profile-vault-count" class="text-indigo-400">0 Items</span>
+            </h4>
+
+            <div id="profile-vault-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              <!-- Item cards rendered dynamically -->
+            </div>
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- ================= SECTION: INVENTORY ================= -->
-    <section id="section-inventory" class="hidden space-y-6">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-        <div>
-          <h2 class="text-xl font-bold text-slate-100">Your Cosmetics & Animated Emotes</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Manage unlocked items and set active profile cosmetics.</p>
-        </div>
-      </div>
 
-      <!-- Inventory Grid -->
-      <div id="inventory-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        <!-- Dynamic Owned Items Injected Here -->
-      </div>
-    </section>
-
-    <!-- ================= SECTION: LEADERBOARD ================= -->
-    <section id="section-leaderboard" class="hidden space-y-6">
-      <div class="border-b border-slate-800 pb-4">
-        <h2 class="text-xl font-bold text-slate-100">Global Strategic Leaderboard</h2>
-        <p class="text-xs text-slate-400 mt-0.5">Top players ranked by Elo rating.</p>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-950 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
-            <tr>
-              <th class="py-3 px-4">Rank</th>
-              <th class="py-3 px-4">Player</th>
-              <th class="py-3 px-4 text-right">Elo Rating</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboard-body" class="divide-y divide-slate-800/60 text-slate-300">
-            <!-- Dynamic Leaderboard Rows -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ================= SECTION: MASTER ADMIN PANEL ================= -->
-    <!-- Strictly Restricted to zainisgo123@gmail.com -->
+    <!-- ========================================== -->
+    <!-- SECTION 5: MASTER CONTROL ADMIN PANEL      -->
+    <!-- ========================================== -->
     <section id="section-admin" class="hidden space-y-6">
-      <div class="border-b border-red-500/30 pb-4 flex items-center justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-red-400 flex items-center">
-            <i class="fa-solid fa-user-shield mr-2"></i> Master Control Panel
-          </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Administrative tools strictly authorized for <span class="font-mono text-red-400">zainisgo123@gmail.com</span>.</p>
-        </div>
-        
-        <!-- Dynamic Maintenance Mode Toggle Button -->
-        <button id="admin-maint-btn" onclick="adminToggleMaintenance()" class="px-4 py-2 rounded-xl text-xs font-bold transition shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white">
-          Maintenance Normal (OFF)
-        </button>
-      </div>
+      <div class="bg-slate-900 p-6 rounded-2xl border border-amber-500/30 shadow-xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+              <i class="fa-solid fa-shield-halved text-lg"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Master Control Panel</h2>
+              <p class="text-xs text-amber-400/80 font-medium">Restricted Access: zainisgo123@gmail.com</p>
+            </div>
+          </div>
 
-      <!-- Global Actions Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
-          <h3 class="text-xs font-bold text-slate-300 uppercase">System Maintenance</h3>
-          <p class="text-[11px] text-slate-500">Lock out non-whitelisted users during maintenance upgrades.</p>
-          <button onclick="adminToggleMaintenance()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 rounded-lg text-xs font-semibold border border-slate-700 transition">
-            Toggle System Maintenance
+          <!-- Dynamic Maintenance Toggle Button -->
+          <button id="admin-maint-toggle-btn" onclick="adminToggleMaintenance()" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg">
+            <i class="fa-solid fa-power-off mr-2"></i>
+            <span>Maintenance Normal (OFF)</span>
           </button>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
-          <h3 class="text-xs font-bold text-slate-300 uppercase">Force Global Reload</h3>
-          <p class="text-[11px] text-slate-500">Trigger active sessions to refresh platform state.</p>
-          <button onclick="adminForceGlobalReload()" class="w-full bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 py-2 rounded-lg text-xs font-semibold transition">
-            Trigger Global Reload
+        <div class="flex items-center space-x-3 pt-2">
+          <button onclick="adminForceGlobalReload()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all">
+            <i class="fa-solid fa-arrows-rotate mr-2"></i>Force Global Reload
           </button>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
-          <h3 class="text-xs font-bold text-slate-300 uppercase">Purge Elo Anomalies</h3>
-          <p class="text-[11px] text-slate-500">Sanitize ladder accounts exceeding >3000 Elo limit.</p>
-          <button onclick="adminPurgeHighElo()" class="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 py-2 rounded-lg text-xs font-semibold transition">
-            Purge Accounts >3000 Elo
+          <button onclick="adminPurgeHighElo()" class="px-4 py-2 bg-red-950/40 hover:bg-red-900/60 text-red-300 text-xs font-bold rounded-xl border border-red-500/30 transition-all">
+            <i class="fa-solid fa-user-slash mr-2"></i>Purge High ELO (>3000)
           </button>
         </div>
       </div>
 
       <!-- User Management Table -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div class="p-4 border-b border-slate-800 font-bold text-sm text-slate-200">Registered Users Management</div>
+      <div class="bg-slate-900 rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
+        <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider">Registered System Users</h3>
+          <span id="admin-user-count" class="text-xs text-indigo-400 font-mono">0 Users</span>
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-950 text-slate-400 uppercase border-b border-slate-800">
+            <thead class="bg-slate-950 text-slate-400 uppercase font-mono border-b border-slate-800">
               <tr>
-                <th class="py-2.5 px-4">UID / Email</th>
-                <th class="py-2.5 px-4">Elo Rating</th>
-                <th class="py-2.5 px-4">Coins (CC)</th>
-                <th class="py-2.5 px-4 text-right">Admin Actions</th>
+                <th class="p-3">User Email</th>
+                <th class="p-3">UID</th>
+                <th class="p-3">ELO</th>
+                <th class="p-3">Coins</th>
+                <th class="p-3">Games</th>
+                <th class="p-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody id="admin-user-table" class="divide-y divide-slate-800 text-slate-300">
-              <!-- Admin User Rows Injected Dynamically -->
+            <tbody id="admin-users-table-body" class="divide-y divide-slate-800 text-slate-300">
+              <!-- Rendered dynamically -->
             </tbody>
           </table>
         </div>
@@ -600,21 +695,65 @@
 
   </main>
 
-  <!-- Global Footer -->
-  <footer class="bg-slate-950 border-t border-slate-900 py-4 text-center text-xs text-slate-600">
-    <p>CogniLearn – Strategic Thinking Lab &bull; Educational Platform &bull; All rights reserved.</p>
-  </footer>
+  <!-- ========================================== -->
+  <!-- MODALS                                     -->
+  <!-- ========================================== -->
 
-  <!-- Main JavaScript Logic -->
+  <!-- Modal 1: Crate CS:GO Unboxing Modal -->
+  <div id="modal-crate-unbox" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full space-y-6 text-center shadow-2xl">
+      <h3 id="crate-modal-title" class="text-xl font-bold text-white">Unboxing Crate...</h3>
+      
+      <!-- Horizontal CS:GO Roller -->
+      <div class="crate-strip-container">
+        <div class="crate-strip-ticker"></div>
+        <div id="crate-strip-track" class="crate-strip-track">
+          <!-- Item elements generated via JS -->
+        </div>
+      </div>
+
+      <!-- Dropped Item Result Display (Shown post-spin) -->
+      <div id="crate-result-card" class="hidden space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800">
+        <div id="crate-result-rarity" class="text-xs font-bold uppercase tracking-wider text-amber-400">Legendary Drop!</div>
+        <div id="crate-result-name" class="text-lg font-bold text-white">Grandmaster Frame</div>
+        <div id="crate-result-refund" class="text-xs text-amber-300 hidden">Duplicate item drop! Converted to 50% CC Refund (+1,750 CC)</div>
+      </div>
+
+      <button id="crate-done-btn" onclick="closeCrateModal()" class="hidden w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all shadow-lg">
+        Done
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal 2: Maintenance Overlay Modal -->
+  <div id="modal-maintenance" class="fixed inset-0 bg-slate-950/95 backdrop-blur-lg hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-red-500/40 rounded-2xl p-8 max-w-md w-full text-center space-y-5 shadow-2xl">
+      <div class="w-16 h-16 rounded-full bg-red-950/60 border border-red-500/40 flex items-center justify-center text-red-400 text-3xl mx-auto">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold text-white">System Under Maintenance</h3>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          The Strategic Thinking Lab is currently undergoing scheduled infrastructure updates. Non-whitelisted users are locked out during this window.
+        </p>
+      </div>
+      <button onclick="handleLogout()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all border border-slate-700">
+        Return to Login
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal 3: Auto-Dismiss Game Over Toast -->
+  <div id="toast-gameover" class="fixed bottom-6 right-6 hidden z-50 max-w-sm w-full bg-slate-900 border border-indigo-500/40 p-4 rounded-2xl shadow-2xl space-y-1">
+    <div id="toast-gameover-title" class="font-bold text-sm text-white">Game Ended</div>
+    <div id="toast-gameover-msg" class="text-xs text-slate-300">Match result calculated.</div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT LOGIC                           -->
+  <!-- ========================================== -->
   <script>
-    // ================= GLOBAL CONFIGURATION =================
-    const ADMIN_EMAIL = "zainisgo123@gmail.com";
-    const WHITELISTED_MAINTENANCE_EMAILS = [
-      "zainisgo123@gmail.com",
-      "faceca4769@afronewz.com"
-    ];
-
-    // Firebase Initialization
+    // 1. Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
       authDomain: "chess-7df7a.firebaseapp.com",
@@ -629,59 +768,66 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Enforce Session-Only Auth Persistence
+    // Session Persistence Enforced
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
-    // Global State Variables
-    let currentUser = null;
-    let userData = null;
-    let game = new Chess();
-    let board = null;
-    let playerColor = 'w';
-    let vsBot = true;
-    let currentRoomCode = null;
-    let roomRef = null;
-    let selectedSquare = null;
-    let arenaOpponentElo = 1200;
+    // Whitelisted Emails & Admin
+    const ADMIN_EMAIL = "zainisgo123@gmail.com";
+    const WHITELISTED_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
 
-    // Crate Shop Catalog & Odds Configuration
+    // State Variables
+    let currentUser = null;
+    let currentUserData = null;
+    let aiBoard = null;
+    let aiGame = null;
+    let aiPlayerColor = 'w';
+    let arenaBoard = null;
+    let arenaGame = null;
+    let currentArenaRoomId = null;
+    let arenaPlayerColor = 'w';
+    let arenaClockInterval = null;
+
+    // Piece CDN
+    const PIECE_CDN = "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png";
+
+    // Crate Configurations
     const CRATE_CONFIGS = {
       pawn: {
         name: "Pawn Crate",
         cost: 1000,
         refund: 500,
-        description: "A basic crate with low odds for cool items",
         odds: { common: 0.65, rare: 0.28, epic: 0.06, legendary: 0.01 }
       },
       knight: {
         name: "Knight Crate",
         cost: 3500,
         refund: 1750,
-        description: "A decent crate with higher odds for nice items",
         odds: { common: 0.35, rare: 0.45, epic: 0.16, legendary: 0.04 }
       },
       grandmaster: {
         name: "Grandmaster Crate",
         cost: 10000,
         refund: 5000,
-        description: "A legendary crate with the best odds for the best items",
         odds: { common: 0.10, rare: 0.35, epic: 0.40, legendary: 0.15 }
       }
     };
 
-    // Item Catalog Definition
+    // Item Catalog
     const ITEM_CATALOG = [
-      { id: "title_novice", name: "Novice Strategist", type: "title", rarity: "common", icon: "🏷️" },
-      { id: "title_tactician", name: "Tactical Master", type: "title", rarity: "rare", icon: "🎖️" },
-      { id: "title_grandmaster", name: "Grandmaster Thinker", type: "title", rarity: "legendary", icon: "👑" },
-      { id: "emote_bounce", name: "Animated Bounce Emote", type: "emote", rarity: "rare", icon: "⚡", animClass: "emote-bounce" },
-      { id: "emote_pulse", name: "Animated Pulse Emote", type: "emote", rarity: "rare", icon: "🔥", animClass: "emote-pulse" },
-      { id: "emote_shake", name: "Animated Shake Emote", type: "emote", rarity: "epic", icon: "💥", animClass: "emote-shake" },
-      { id: "emote_glow", name: "Animated Legendary Glow Emote", type: "emote", rarity: "legendary", icon: "🌟", animClass: "emote-glow" },
-      { id: "avatar_frame_gold", name: "Gold Crown Frame", type: "frame", rarity: "epic", icon: "🖼️" }
+      { id: "frame_bronze", name: "Bronze Frame", type: "frame", rarity: "common", icon: "fa-shield" },
+      { id: "tag_novice", name: "Novice Title", type: "nametag", rarity: "common", icon: "fa-tag" },
+      { id: "frame_silver", name: "Silver Frame", type: "frame", rarity: "rare", icon: "fa-shield" },
+      { id: "tag_tactician", name: "Tactician Title", type: "nametag", rarity: "rare", icon: "fa-tag" },
+      { id: "emote_blitz", name: "Blitz Emote", type: "emote", rarity: "rare", icon: "fa-bolt" },
+      { id: "frame_gold", name: "Gold Frame", type: "frame", rarity: "epic", icon: "fa-shield" },
+      { id: "tag_master", name: "Master Title", type: "nametag", rarity: "epic", icon: "fa-tag" },
+      { id: "emote_pulse", name: "On Fire Emote", type: "emote", rarity: "epic", icon: "fa-fire" },
+      { id: "frame_gm", name: "Grandmaster Frame", type: "frame", rarity: "legendary", icon: "fa-crown" },
+      { id: "tag_gm", name: "Grandmaster Title", type: "nametag", rarity: "legendary", icon: "fa-crown" },
+      { id: "emote_glow", name: "Glow Emote", type: "emote", rarity: "legendary", icon: "fa-crown" }
     ];
 
-    // Helper: Normalize inventory arrays/objects from Firebase to avoid updates wiping items
+    // Normalized Inventory Array Helper
     function getNormalizedInventory(rawInventory) {
       if (!rawInventory) return [];
       if (Array.isArray(rawInventory)) {
@@ -693,12 +839,12 @@
       return [];
     }
 
-    // ================= CHESS.COM-STYLE GLICKO / ELO RATING CALCULATOR =================
+    // Dynamic Elo K-Factor Calculation
     function getKFactor(gamesPlayed) {
       const games = gamesPlayed || 0;
-      if (games < 10) return 40;       // High K for new players
-      if (games < 30) return 32;       // Intermediate K
-      return 16;                       // K=16 for established players (yields +8 against equal opponent)
+      if (games < 10) return 40;
+      if (games < 30) return 32;
+      return 16;
     }
 
     function calculateRatingChange(playerRating, opponentRating, actualScore, gamesPlayed) {
@@ -707,7 +853,7 @@
       return Math.round(k * (actualScore - expectedScore));
     }
 
-    // ================= SAFE COIN TRANSACTION HELPERS =================
+    // Safe Coin Add/Set
     function safeAddCoins(targetUid, amountDelta) {
       if (!targetUid) return Promise.reject("Invalid UID");
       const userCoinsRef = db.ref('users/' + targetUid + '/coins');
@@ -724,252 +870,324 @@
       return db.ref('users/' + targetUid + '/coins').set(safeBal);
     }
 
-    // ================= FOOLPROOF ADMIN ACCESS CHECK =================
-    function checkAdminAccess() {
-      if (currentUser && currentUser.email && currentUser.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-        const tab = document.getElementById('tab-admin');
-        const mobTab = document.getElementById('mob-tab-admin');
-        if (tab) tab.classList.remove('hidden');
-        if (mobTab) mobTab.classList.remove('hidden');
-        loadAdminUserTable();
-        return true;
-      } else {
-        const tab = document.getElementById('tab-admin');
-        const mobTab = document.getElementById('mob-tab-admin');
-        if (tab) tab.classList.add('hidden');
-        if (mobTab) mobTab.classList.add('hidden');
-        return false;
-      }
-    }
-
-    // ================= INITIALIZATION & AUTH =================
+    // Auth & App Initialization
     auth.onAuthStateChanged((user) => {
-      if (user) {
-        currentUser = user;
-        checkAdminAccess();
-        listenUserData(user.uid);
-        listenSystemMaintenance();
-        initChessboard();
-      } else {
-        // Unauthenticated -> Redirect to index.html
+      if (!user) {
         window.location.href = "index.html";
+        return;
       }
+      currentUser = user;
+
+      // Check Maintenance Mode
+      db.ref('system/maintenance').on('value', (snap) => {
+        const isMaint = snap.val() === true;
+        const userEmail = (user.email || "").trim().toLowerCase();
+        const isWhitelisted = WHITELISTED_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
+
+        if (isMaint && !isWhitelisted) {
+          document.getElementById('modal-maintenance').classList.remove('hidden');
+          document.getElementById('modal-maintenance').classList.add('flex');
+        } else {
+          document.getElementById('modal-maintenance').classList.add('hidden');
+          document.getElementById('modal-maintenance').classList.remove('flex');
+        }
+
+        // Sync admin toggle button color
+        const toggleBtn = document.getElementById('admin-maint-toggle-btn');
+        if (toggleBtn) {
+          if (isMaint) {
+            toggleBtn.className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-red-600 hover:bg-red-500 text-white shadow-lg";
+            toggleBtn.innerHTML = `<i class="fa-solid fa-power-off mr-2"></i><span>Maintenance Active (ON)</span>`;
+          } else {
+            toggleBtn.className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg";
+            toggleBtn.innerHTML = `<i class="fa-solid fa-power-off mr-2"></i><span>Maintenance Normal (OFF)</span>`;
+          }
+        }
+      });
+
+      // User Data Sync
+      const userRef = db.ref('users/' + user.uid);
+      userRef.on('value', (snapshot) => {
+        let val = snapshot.val();
+        if (!val) {
+          val = {
+            email: user.email,
+            elo: 1200,
+            coins: 1000,
+            gamesPlayed: 0,
+            inventory: []
+          };
+          userRef.set(val);
+        }
+
+        currentUserData = val;
+        currentUserData.inventory = getNormalizedInventory(val.inventory);
+
+        updateUIWithUserData();
+        renderProfileSection();
+      });
+
+      // Admin Exclusivity
+      checkAdminAccess(user.email);
+
+      // Default Initialization
+      initAiGame();
     });
 
-    function listenUserData(uid) {
-      db.ref('users/' + uid).on('value', (snapshot) => {
-        userData = snapshot.val() || {};
-        if (userData.coins === undefined) {
-          safeSetCoins(uid, 1000);
-        }
-        if (userData.elo === undefined) {
-          db.ref('users/' + uid + '/elo').set(1200);
-        }
-        if (userData.gamesPlayed === undefined) {
-          db.ref('users/' + uid + '/gamesPlayed').set(0);
-        }
-        updateUIHeader();
-        renderInventory();
-        checkAdminAccess();
-      });
+    function checkAdminAccess(email) {
+      const isNavAdmin = (email || "").trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      const adminTab = document.getElementById('tab-admin');
+      if (isNavAdmin) {
+        adminTab.classList.remove('hidden');
+        listenAdminUsersList();
+      } else {
+        adminTab.classList.add('hidden');
+      }
     }
 
-    function listenSystemMaintenance() {
-      db.ref('system/maintenance').on('value', (snapshot) => {
-        const isMaintenance = snapshot.val() === true;
-        updateAdminMaintenanceButtonUI(isMaintenance);
+    function updateUIWithUserData() {
+      if (!currentUserData) return;
+      document.getElementById('nav-user-coins').innerText = (currentUserData.coins || 0).toLocaleString();
+      document.getElementById('nav-user-name').innerText = currentUserData.email ? currentUserData.email.split('@')[0] : "Student";
+      document.getElementById('nav-user-elo').innerText = (currentUserData.elo || 1200) + " ELO";
+      
+      document.getElementById('ai-player-name').innerText = currentUserData.email ? currentUserData.email.split('@')[0] : "Player";
+      document.getElementById('ai-player-elo-badge').innerText = "Rating: " + (currentUserData.elo || 1200);
+    }
 
-        if (isMaintenance) {
-          const userEmail = (currentUser && currentUser.email) ? currentUser.email.trim().toLowerCase() : "";
-          const isWhitelisted = WHITELISTED_MAINTENANCE_EMAILS.some(e => e.toLowerCase() === userEmail);
-          if (!isWhitelisted) {
-            document.getElementById('maintenance-modal').classList.remove('hidden');
-          } else {
-            document.getElementById('maintenance-modal').classList.add('hidden');
-          }
+    function switchTab(tabId) {
+      const tabs = ['ai', 'arena', 'shop', 'profile', 'admin'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const sec = document.getElementById(`section-${t}`);
+        if (t === tabId) {
+          btn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all bg-indigo-600/20 text-indigo-400 border border-indigo-500/30";
+          sec.classList.remove('hidden');
         } else {
-          document.getElementById('maintenance-modal').classList.add('hidden');
+          btn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800";
+          sec.classList.add('hidden');
         }
       });
-    }
 
-    function handleMaintenanceRedirect() {
-      auth.signOut().then(() => {
-        window.location.href = "index.html";
-      });
-    }
-
-    function updateUIHeader() {
-      if (!userData) return;
-      document.getElementById('nav-coins').innerText = (userData.coins || 0).toLocaleString();
-      document.getElementById('nav-username').innerText = userData.username || currentUser.email.split('@')[0];
-      document.getElementById('nav-elo').innerText = (userData.elo || 1200) + " Elo";
-      document.getElementById('player-elo').innerText = (userData.elo || 1200) + " Elo";
+      if (tabId === 'profile') renderProfileSection();
     }
 
     function handleLogout() {
+      sessionStorage.clear();
+      localStorage.clear();
       auth.signOut().then(() => {
         window.location.href = "index.html";
       });
     }
 
-    // ================= TAB NAVIGATION =================
-    function switchTab(tab) {
-      const sections = ['play', 'shop', 'inventory', 'leaderboard', 'admin'];
-      sections.forEach(s => {
-        const el = document.getElementById('section-' + s);
-        if (el) el.classList.add('hidden');
-        const tabBtn = document.getElementById('tab-' + s);
-        if (tabBtn) {
-          tabBtn.classList.remove('bg-indigo-600', 'text-white');
-          tabBtn.classList.add('text-slate-400');
-        }
-      });
+    // ==========================================
+    // 2. PROFILE & CUSTOMIZATION ENGINE
+    // ==========================================
+    function renderProfileSection() {
+      if (!currentUserData) return;
 
-      // Show Selected Section
-      const targetSec = document.getElementById('section-' + tab);
-      if (targetSec) targetSec.classList.remove('hidden');
+      document.getElementById('profile-display-name').innerText = currentUserData.email ? currentUserData.email.split('@')[0] : "Student";
+      document.getElementById('profile-email-display').innerText = currentUserData.email || "";
+      document.getElementById('profile-elo-stat').innerText = currentUserData.elo || 1200;
+      document.getElementById('profile-games-stat').innerText = currentUserData.gamesPlayed || 0;
+      document.getElementById('profile-coins-stat').innerText = (currentUserData.coins || 0).toLocaleString();
 
-      const activeBtn = document.getElementById('tab-' + tab);
-      if (activeBtn && tab !== 'admin') {
-        activeBtn.classList.add('bg-indigo-600', 'text-white');
-        activeBtn.classList.remove('text-slate-400');
+      const inv = getNormalizedInventory(currentUserData.inventory);
+      document.getElementById('profile-vault-count').innerText = `${inv.length} Items`;
+
+      const vaultGrid = document.getElementById('profile-vault-grid');
+      vaultGrid.innerHTML = "";
+
+      if (inv.length === 0) {
+        vaultGrid.innerHTML = `
+          <div class="col-span-full py-8 text-center text-slate-500 text-xs italic bg-slate-950 rounded-xl border border-slate-800">
+            No items unlocked yet. Unbox crates in CogniShop to build your collection!
+          </div>
+        `;
+        return;
       }
 
-      if (tab === 'leaderboard') loadLeaderboard();
-      if (tab === 'play' && board) setTimeout(() => board.resize(), 100);
-    }
-
-    // ================= CHESSBOARD & GAME LOGIC =================
-    function initChessboard() {
-      const savedTheme = localStorage.getItem('cogni_board_theme') || 'theme-wood';
-      applyBoardTheme(savedTheme);
-
-      const config = {
-        draggable: false, // Click-to-move piece controls only
-        position: 'start',
-        pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
-      };
-
-      board = Chessboard('myBoard', config);
-      setupClickToMove();
-
-      // Check board layout on window resize
-      window.addEventListener('resize', () => { if (board) board.resize(); });
-    }
-
-    function setupClickToMove() {
-      $('#myBoard').on('click', '.square-55d63', function () {
-        const square = $(this).attr('data-square');
-        handleSquareClick(square);
+      inv.forEach(itemId => {
+        const itemObj = ITEM_CATALOG.find(i => i.id === itemId) || { name: itemId, rarity: "common", icon: "fa-box" };
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border rarity-${itemObj.rarity} flex flex-col items-center text-center space-y-2`;
+        card.innerHTML = `
+          <i class="fa-solid ${itemObj.icon} text-2xl mt-1"></i>
+          <div>
+            <div class="text-xs font-bold text-white truncate max-w-[110px]">${itemObj.name}</div>
+            <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">${itemObj.rarity}</div>
+          </div>
+        `;
+        vaultGrid.appendChild(card);
       });
     }
 
-    function handleSquareClick(square) {
-      if (game.game_over()) return;
+    function equipBoardTheme(themeClass) {
+      localStorage.setItem('cogni_board_theme', themeClass);
+      applyBoardTheme(themeClass);
+      showToast("Board Theme Applied", `Switched chessboard skin to ${themeClass.replace('theme-', '').toUpperCase()}`);
+    }
 
-      // Check turn match
-      if (vsBot && game.turn() !== playerColor) return;
+    function applyBoardTheme(themeClass) {
+      const activeTheme = themeClass || localStorage.getItem('cogni_board_theme') || 'theme-wood';
+      const boardEls = document.querySelectorAll('#ai-board, #arena-board');
+      boardEls.forEach(el => {
+        el.classList.remove('theme-wood', 'theme-green', 'theme-grey');
+        el.classList.add(activeTheme);
+      });
+    }
 
-      if (!selectedSquare) {
-        // Select source piece
-        const piece = game.get(square);
-        if (piece && piece.color === game.turn()) {
+    // ==========================================
+    // 3. AI CHESS ENGINE (1500+ ELO GM BOT)
+    // ==========================================
+    function initAiGame() {
+      aiGame = new Chess();
+      aiPlayerColor = 'w';
+
+      const config = {
+        draggable: false,
+        position: 'start',
+        pieceTheme: PIECE_CDN,
+        onSquareClick: onAiSquareClick
+      };
+
+      aiBoard = Chessboard('ai-board', config);
+      applyBoardTheme();
+      clearHighlights();
+    }
+
+    function setupAiGame(side) {
+      aiGame = new Chess();
+      clearHighlights();
+
+      if (side === 'random') {
+        aiPlayerColor = Math.random() < 0.5 ? 'w' : 'b';
+      } else {
+        aiPlayerColor = side === 'white' ? 'w' : 'b';
+      }
+
+      aiBoard.orientation(aiPlayerColor === 'w' ? 'white' : 'black');
+      aiBoard.start();
+      applyBoardTheme();
+
+      document.getElementById('ai-status-msg').innerText = "Game in progress vs GM Bot";
+
+      if (aiPlayerColor === 'b') {
+        setTimeout(makeAiMove, 500);
+      }
+    }
+
+    let selectedSquare = null;
+
+    function onAiSquareClick(square) {
+      if (aiGame.game_over()) return;
+      if (aiGame.turn() !== aiPlayerColor) return;
+
+      if (selectedSquare === null) {
+        // First Click - Select Piece
+        const piece = aiGame.get(square);
+        if (piece && piece.color === aiPlayerColor) {
           selectedSquare = square;
           highlightSquare(square);
-          showValidMoveIndicators(square);
+          showValidMoves(square);
         }
       } else {
-        // Attempt move from selectedSquare to square
-        const moves = game.moves({ square: selectedSquare, verbose: true });
-        const legalMove = moves.find(m => m.to === square);
+        // Second Click - Move Piece
+        const move = aiGame.move({
+          from: selectedSquare,
+          to: square,
+          promotion: 'q'
+        });
 
-        if (legalMove) {
-          makeMove({
-            from: selectedSquare,
-            to: square,
-            promotion: 'q'
-          });
+        clearValidMoveDots();
+
+        if (move !== null) {
+          aiBoard.position(aiGame.fen());
+          highlightMove(move.from, move.to);
           selectedSquare = null;
-          clearHighlights();
+
+          if (checkAiGameOver()) return;
+
+          document.getElementById('ai-status-msg').innerText = "Bot is thinking...";
+          setTimeout(makeAiMove, 600);
         } else {
-          // Reselect new piece or deselect
-          clearHighlights();
-          const piece = game.get(square);
-          if (piece && piece.color === game.turn()) {
+          // Re-select if clicking another player piece
+          const piece = aiGame.get(square);
+          if (piece && piece.color === aiPlayerColor) {
             selectedSquare = square;
+            clearHighlights();
             highlightSquare(square);
-            showValidMoveIndicators(square);
+            showValidMoves(square);
           } else {
             selectedSquare = null;
+            clearHighlights();
           }
         }
       }
     }
 
-    function showValidMoveIndicators(square) {
-      const moves = game.moves({ square: square, verbose: true });
+    function showValidMoves(square) {
+      clearValidMoveDots();
+      const moves = aiGame.moves({ square: square, verbose: true });
       moves.forEach(m => {
-        const $squareEl = $('#myBoard .square-' + m.to);
-        if ($squareEl.find('.move-indicator').length === 0) {
-          $squareEl.append('<div class="move-indicator"></div>');
-        }
+        const sqEl = document.querySelector(`#ai-board .square-${m.to}`);
+        if (sqEl) sqEl.classList.add('valid-move-dot');
       });
     }
 
-    function clearHighlights() {
-      $('.move-indicator').remove();
-      $('#myBoard .square-55d63').removeClass('highlight-prev');
+    function clearValidMoveDots() {
+      document.querySelectorAll('#ai-board .square-55d63').forEach(el => {
+        el.classList.remove('valid-move-dot');
+      });
     }
 
-    function highlightSquare(sq) {
-      $('#myBoard .square-' + sq).addClass('highlight-prev');
-    }
-
-    function makeMove(moveObj) {
-      const move = game.move(moveObj);
-      if (!move) return null;
-
-      board.position(game.fen());
+    function highlightSquare(square) {
       clearHighlights();
-      highlightSquare(move.from);
-      highlightSquare(move.to);
-
-      if (currentRoomCode && roomRef) {
-        roomRef.child('fen').set(game.fen());
-      }
-
-      checkGameOver();
-
-      // Trigger AI Move if Bot game
-      if (vsBot && !game.game_over() && game.turn() !== playerColor) {
-        setTimeout(makeAIMove, 400);
-      }
-
-      return move;
+      const el = document.querySelector(`#ai-board .square-${square}`);
+      if (el) el.classList.add('highlight-move');
     }
 
-    // AI Minimax Bot Engine (1500+ Elo Minimax + Alpha-Beta Pruning)
-    function makeAIMove() {
-      if (game.game_over()) return;
-      const bestMove = getBestMoveMinimax(game, 3);
+    function highlightMove(from, to) {
+      clearHighlights();
+      const elFrom = document.querySelector(`#ai-board .square-${from}`);
+      const elTo = document.querySelector(`#ai-board .square-${to}`);
+      if (elFrom) elFrom.classList.add('highlight-move');
+      if (elTo) elTo.classList.add('highlight-move');
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll('#ai-board .square-55d63').forEach(el => {
+        el.classList.remove('highlight-move', 'valid-move-dot');
+      });
+    }
+
+    // Minimax Evaluation Bot (1500+ ELO)
+    function makeAiMove() {
+      if (aiGame.game_over()) return;
+
+      const bestMove = getBestMove(aiGame);
       if (bestMove) {
-        makeMove(bestMove);
+        const move = aiGame.move(bestMove);
+        aiBoard.position(aiGame.fen());
+        highlightMove(move.from, move.to);
+        document.getElementById('ai-status-msg').innerText = "Your turn";
+        checkAiGameOver();
       }
     }
 
-    function getBestMoveMinimax(gameObj, depth) {
-      let possibleMoves = gameObj.moves({ verbose: true });
+    function getBestMove(game) {
+      const possibleMoves = game.moves({ verbose: true });
       if (possibleMoves.length === 0) return null;
 
       let bestMove = null;
       let bestValue = -9999;
 
       for (let i = 0; i < possibleMoves.length; i++) {
-        let move = possibleMoves[i];
-        gameObj.move(move);
-        let boardValue = -minimax(gameObj, depth - 1, -10000, 10000, false);
-        gameObj.undo();
+        const move = possibleMoves[i];
+        game.move(move);
+        const boardValue = minimax(game, 2, -10000, 10000, false);
+        game.undo();
+
         if (boardValue > bestValue) {
           bestValue = boardValue;
           bestMove = move;
@@ -978,365 +1196,161 @@
       return bestMove;
     }
 
-    function minimax(gameObj, depth, alpha, beta, isMaximizing) {
-      if (depth === 0) return evaluateBoard(gameObj.board());
+    function minimax(game, depth, alpha, beta, isMaximizing) {
+      if (depth === 0 || game.game_over()) {
+        return evaluateBoard(game.board());
+      }
 
-      let possibleMoves = gameObj.moves({ verbose: true });
+      const possibleMoves = game.moves({ verbose: true });
 
       if (isMaximizing) {
-        let bestValue = -9999;
+        let maxEval = -9999;
         for (let i = 0; i < possibleMoves.length; i++) {
-          gameObj.move(possibleMoves[i]);
-          bestValue = Math.max(bestValue, minimax(gameObj, depth - 1, alpha, beta, !isMaximizing));
-          gameObj.undo();
-          alpha = Math.max(alpha, bestValue);
+          game.move(possibleMoves[i]);
+          const evaluation = minimax(game, depth - 1, alpha, beta, false);
+          game.undo();
+          maxEval = Math.max(maxEval, evaluation);
+          alpha = Math.max(alpha, evaluation);
           if (beta <= alpha) break;
         }
-        return bestValue;
+        return maxEval;
       } else {
-        let bestValue = 9999;
+        let minEval = 9999;
         for (let i = 0; i < possibleMoves.length; i++) {
-          gameObj.move(possibleMoves[i]);
-          bestValue = Math.min(bestValue, minimax(gameObj, depth - 1, alpha, beta, !isMaximizing));
-          gameObj.undo();
-          beta = Math.min(beta, bestValue);
+          game.move(possibleMoves[i]);
+          const evaluation = minimax(game, depth - 1, alpha, beta, true);
+          game.undo();
+          minEval = Math.min(minEval, evaluation);
+          beta = Math.min(beta, evaluation);
           if (beta <= alpha) break;
         }
-        return bestValue;
+        return minEval;
       }
     }
 
-    function evaluateBoard(boardState) {
-      const pieceValues = { p: 10, r: 50, n: 30, b: 30, q: 90, k: 900 };
-      let totalEvaluation = 0;
-      for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-          let piece = boardState[i][j];
+    const pieceValues = { p: 10, r: 50, n: 30, b: 30, q: 90, k: 900 };
+
+    function evaluateBoard(board) {
+      let totalEval = 0;
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const piece = board[r][c];
           if (piece) {
-            let val = pieceValues[piece.type] || 0;
-            totalEvaluation += (piece.color === 'w') ? val : -val;
+            const val = pieceValues[piece.type] || 0;
+            totalEval += piece.color === 'b' ? val : -val;
           }
         }
       }
-      return totalEvaluation;
+      return totalEval;
     }
 
-    // Bot Match Controls
-    function setPlayerSide(side) {
-      $('.side-btn').removeClass('bg-indigo-600 text-white').addClass('bg-slate-800 text-slate-300');
-      if (side === 'white') {
-        playerColor = 'w';
-        $('#side-white').removeClass('bg-slate-800 text-slate-300').addClass('bg-indigo-600 text-white');
-      } else if (side === 'black') {
-        playerColor = 'b';
-        $('#side-black').removeClass('bg-slate-800 text-slate-300').addClass('bg-indigo-600 text-white');
+    function checkAiGameOver() {
+      if (!aiGame.game_over()) return false;
+
+      let resultMsg = "";
+      if (aiGame.in_checkmate()) {
+        const winner = aiGame.turn() === 'w' ? 'Black' : 'White';
+        const isPlayerWin = (winner === 'White' && aiPlayerColor === 'w') || (winner === 'Black' && aiPlayerColor === 'b');
+
+        if (isPlayerWin) {
+          resultMsg = "Victory! You defeated the Grandmaster Bot.";
+          handleAiGameWin();
+        } else {
+          resultMsg = "Defeat! The Grandmaster Bot checkmated you.";
+          handleAiGameLoss();
+        }
       } else {
-        playerColor = Math.random() < 0.5 ? 'w' : 'b';
-        $('#side-random').removeClass('bg-slate-800 text-slate-300').addClass('bg-indigo-600 text-white');
+        resultMsg = "Draw game!";
       }
+
+      showToast("Game Over", resultMsg);
+      return true;
     }
 
-    function startBotMatch() {
-      vsBot = true;
-      document.getElementById('chat-container').classList.add('hidden');
-      document.getElementById('opponent-name').innerText = "Grandmaster Bot";
-      document.getElementById('opponent-elo').innerText = "1500 Elo";
-
-      game.reset();
-      board.position('start');
-      board.orientation(playerColor === 'w' ? 'white' : 'black');
-
-      if (playerColor === 'b') {
-        setTimeout(makeAIMove, 500);
-      }
-    }
-
-    // 1v1 Arena Multiplayer
-    function createArenaRoom() {
-      vsBot = false;
-      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      currentRoomCode = code;
-      roomRef = db.ref('rooms/' + code);
-
-      roomRef.set({
-        hostUid: currentUser.uid,
-        hostEmail: currentUser.email,
-        hostElo: userData ? (userData.elo || 1200) : 1200,
-        fen: 'start',
-        status: 'waiting'
+    function handleAiGameWin() {
+      if (!currentUser || !currentUserData) return;
+      const eloChange = calculateRatingChange(currentUserData.elo || 1200, 1500, 1.0, currentUserData.gamesPlayed || 0);
+      
+      db.ref('users/' + currentUser.uid).update({
+        elo: Math.max(100, (currentUserData.elo || 1200) + eloChange),
+        gamesPlayed: (currentUserData.gamesPlayed || 0) + 1
       });
+      safeAddCoins(currentUser.uid, 50);
 
-      playerColor = 'w';
-      board.orientation('white');
-      game.reset();
-      board.position('start');
-
-      document.getElementById('chat-container').classList.remove('hidden');
-      alert("Room Created! Share Code: " + code);
-      listenToRoom();
+      showToast("Victory Rewards", `+50 CogniCoins | ELO Change: +${eloChange}`);
     }
 
-    function joinArenaRoom() {
-      const code = document.getElementById('room-code-input').value.trim().toUpperCase();
-      if (!code) return alert("Enter room code");
+    function handleAiGameLoss() {
+      if (!currentUser || !currentUserData) return;
+      const eloChange = calculateRatingChange(currentUserData.elo || 1200, 1500, 0.0, currentUserData.gamesPlayed || 0);
 
-      vsBot = false;
-      currentRoomCode = code;
-      roomRef = db.ref('rooms/' + code);
-
-      roomRef.get().then((snap) => {
-        if (!snap.exists()) return alert("Room not found!");
-
-        const val = snap.val();
-        arenaOpponentElo = val.hostElo || 1200;
-        document.getElementById('opponent-name').innerText = val.hostEmail ? val.hostEmail.split('@')[0] : "Opponent";
-        document.getElementById('opponent-elo').innerText = arenaOpponentElo + " Elo";
-
-        roomRef.update({
-          guestUid: currentUser.uid,
-          guestEmail: currentUser.email,
-          guestElo: userData ? (userData.elo || 1200) : 1200,
-          status: 'playing'
-        });
-
-        playerColor = 'b';
-        board.orientation('black');
-        game.reset();
-        board.position('start');
-
-        document.getElementById('chat-container').classList.remove('hidden');
-        listenToRoom();
+      db.ref('users/' + currentUser.uid).update({
+        elo: Math.max(100, (currentUserData.elo || 1200) + eloChange),
+        gamesPlayed: (currentUserData.gamesPlayed || 0) + 1
       });
     }
 
-    function listenToRoom() {
-      if (!roomRef) return;
-      roomRef.on('value', (snap) => {
-        const val = snap.val();
-        if (!val) return;
-
-        if (playerColor === 'w' && val.guestElo) {
-          arenaOpponentElo = val.guestElo;
-          document.getElementById('opponent-name').innerText = val.guestEmail ? val.guestEmail.split('@')[0] : "Opponent";
-          document.getElementById('opponent-elo').innerText = arenaOpponentElo + " Elo";
-        }
-
-        if (val.fen && val.fen !== game.fen()) {
-          game.load(val.fen);
-          board.position(val.fen);
-          checkGameOver();
-        }
-
-        if (val.chat) {
-          renderChatMessages(val.chat);
-        }
-      });
-    }
-
-    function resignGame() {
-      if (!currentUser) return;
-      if (confirm("Are you sure you want to resign?")) {
-        const playerElo = userData ? (userData.elo || 1200) : 1200;
-        const oppElo = vsBot ? 1500 : arenaOpponentElo;
-        const gamesPlayed = userData ? (userData.gamesPlayed || 0) : 0;
-
-        // Actual score 0.0 for loss
-        const delta = calculateRatingChange(playerElo, oppElo, 0.0, gamesPlayed);
-        const newElo = Math.max(0, playerElo + delta);
-
-        db.ref('users/' + currentUser.uid).update({
-          elo: newElo,
-          gamesPlayed: gamesPlayed + 1
-        });
-
-        showGameOverModal("Resigned", "You resigned the match (" + (delta >= 0 ? "+" : "") + delta + " Elo).", "🏳️");
-
-        if (currentRoomCode && roomRef) {
-          roomRef.remove();
-        }
-      }
-    }
-
-    function offerDraw() {
-      alert("Draw offer sent to opponent.");
-    }
-
-    function checkGameOver() {
-      if (game.game_over()) {
-        let title = "Game Over";
-        let desc = "Match drawn or ended.";
-
-        const playerElo = userData ? (userData.elo || 1200) : 1200;
-        const oppElo = vsBot ? 1500 : arenaOpponentElo;
-        const gamesPlayed = userData ? (userData.gamesPlayed || 0) : 0;
-
-        if (game.in_checkmate()) {
-          const winnerColor = game.turn() === 'w' ? 'Black' : 'White';
-          const isPlayerWinner = (winnerColor === 'White' && playerColor === 'w') || (winnerColor === 'Black' && playerColor === 'b');
-          
-          title = winnerColor + " Wins!";
-          const actualScore = isPlayerWinner ? 1.0 : 0.0;
-          const delta = calculateRatingChange(playerElo, oppElo, actualScore, gamesPlayed);
-          const newElo = Math.max(0, playerElo + delta);
-
-          db.ref('users/' + currentUser.uid).update({
-            elo: newElo,
-            gamesPlayed: gamesPlayed + 1
-          });
-
-          if (isPlayerWinner) {
-            safeAddCoins(currentUser.uid, 50);
-            desc = "Checkmate! (" + (delta >= 0 ? "+" : "") + delta + " Elo, +50 CogniCoins)";
-          } else {
-            desc = "Checkmate registered (" + (delta >= 0 ? "+" : "") + delta + " Elo).";
-          }
-        } else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) {
-          title = "Match Drawn";
-          const delta = calculateRatingChange(playerElo, oppElo, 0.5, gamesPlayed);
-          const newElo = Math.max(0, playerElo + delta);
-
-          db.ref('users/' + currentUser.uid).update({
-            elo: newElo,
-            gamesPlayed: gamesPlayed + 1
-          });
-
-          desc = "Game concluded as draw (" + (delta >= 0 ? "+" : "") + delta + " Elo).";
-        }
-
-        showGameOverModal(title, desc, "🏆");
-
-        // Clean room chat and database node if Arena game
-        if (currentRoomCode && roomRef) {
-          roomRef.remove();
-        }
-      }
-    }
-
-    function showGameOverModal(title, desc, icon) {
-      document.getElementById('game-over-icon').innerText = icon || "🏆";
-      document.getElementById('game-over-title').innerText = title;
-      document.getElementById('game-over-desc').innerText = desc;
-      document.getElementById('game-over-modal').classList.remove('hidden');
-
-      setTimeout(() => {
-        document.getElementById('game-over-modal').classList.add('hidden');
-      }, 3000);
-    }
-
-    function applyBoardTheme(themeClass) {
-      localStorage.setItem('cogni_board_theme', themeClass);
-      $('#myBoard').removeClass('theme-wood theme-green theme-grey').addClass(themeClass);
-    }
-
-    // Match Chat Logic
-    function sendChatMessage() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text || !roomRef) return;
-
-      const senderName = userData ? (userData.username || currentUser.email.split('@')[0]) : "User";
-      roomRef.child('chat').push({
-        sender: senderName,
-        text: text,
-        time: Date.now()
-      });
-      input.value = "";
-    }
-
-    function renderChatMessages(chatObj) {
-      const chatBox = document.getElementById('chat-messages');
-      chatBox.innerHTML = "";
-      Object.values(chatObj).forEach(msg => {
-        const line = document.createElement('div');
-        line.className = "text-xs";
-        line.innerHTML = `<span class="font-bold text-indigo-400">${msg.sender}:</span> <span class="text-slate-200">${msg.text}</span>`;
-        chatBox.appendChild(line);
-      });
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // ================= COGNISHOP & CS:GO UNBOXING =================
+    // ==========================================
+    // 4. COGNISHOP & CS:GO UNBOXING ENGINE
+    // ==========================================
     function openCrate(crateType) {
       const config = CRATE_CONFIGS[crateType];
       if (!config) return;
 
-      if ((userData.coins || 0) < config.cost) {
-        return alert("Insufficient CogniCoins! You need " + config.cost + " CC.");
+      if ((currentUserData.coins || 0) < config.cost) {
+        alert("Insufficient CogniCoins balance!");
+        return;
       }
 
-      // Deduct Crate Cost
-      safeAddCoins(currentUser.uid, -config.cost).then(() => {
-        startCrateUnboxingReel(crateType);
-      });
-    }
+      // Deduct Cost
+      safeAddCoins(currentUser.uid, -config.cost);
 
-    function startCrateUnboxingReel(crateType) {
-      const config = CRATE_CONFIGS[crateType];
-      const modal = document.getElementById('crate-modal');
-      const strip = document.getElementById('crate-strip');
-      const resultBox = document.getElementById('unboxing-result');
+      const modal = document.getElementById('modal-crate-unbox');
+      const track = document.getElementById('crate-strip-track');
+      const doneBtn = document.getElementById('crate-done-btn');
+      const resultCard = document.getElementById('crate-result-card');
 
       modal.classList.remove('hidden');
-      resultBox.classList.add('hidden');
-      document.getElementById('unboxing-title').innerText = "Opening Crate...";
-      strip.style.transition = 'none';
-      strip.style.transform = 'translateX(0px)';
+      modal.classList.add('flex');
+      doneBtn.classList.add('hidden');
+      resultCard.classList.add('hidden');
 
-      // Generate 50 strip items for horizontal rolling reel
-      const stripItems = [];
-      for (let i = 0; i < 45; i++) {
-        stripItems.push(getRandomItemByOdds(config.odds));
+      // Generate Random Roll Strip
+      const rollItems = [];
+      for (let i = 0; i < 40; i++) {
+        rollItems.push(getRandomItemByOdds(config.odds));
       }
 
-      // Winning item at index 40
-      const winningItem = getRandomItemByOdds(config.odds);
-      stripItems[40] = winningItem;
+      // Determine Final Winning Item at Index 32
+      const winningItem = rollItems[32];
 
-      // Populate strip DOM
-      strip.innerHTML = "";
-      stripItems.forEach(item => {
-        const card = document.createElement('div');
-        card.className = `crate-item-card rarity-${item.rarity}`;
-        card.innerHTML = `
-          <div class="text-3xl mb-1 ${item.animClass || ''}">${item.icon}</div>
-          <div class="text-[10px] font-bold text-slate-200 truncate w-full px-1 text-center">${item.name}</div>
+      // Render Strip Elements
+      track.style.transition = 'none';
+      track.style.transform = 'translateX(0px)';
+      track.innerHTML = '';
+
+      rollItems.forEach(item => {
+        const el = document.createElement('div');
+        el.className = `crate-item-card rarity-${item.rarity}`;
+        el.innerHTML = `
+          <i class="fa-solid ${item.icon} text-xl mb-1"></i>
+          <span class="font-bold truncate w-full px-1">${item.name}</span>
         `;
-        strip.appendChild(card);
+        track.appendChild(el);
       });
 
-      // Trigger CS:GO Horizontal Roll Animation
+      // Trigger CS:GO Animation
       setTimeout(() => {
-        strip.style.transition = 'transform 6s cubic-bezier(0.1, 1, 0.1, 1)';
-        // Item width 120px + margin 10px = 130px. Offset target index 40
-        const translateX = -(40 * 130 - 180);
-        strip.style.transform = `translateX(${translateX}px)`;
+        track.style.transition = 'transform 5s cubic-bezier(0.12, 0.8, 0.14, 1)';
+        // 100px width + 10px margin = 110px per card
+        const stopOffset = -(32 * 110) + 180;
+        track.style.transform = `translateX(${stopOffset}px)`;
       }, 100);
 
-      // Handle Result After Animation Completes
+      // Reveal Outcome after 5s
       setTimeout(() => {
-        document.getElementById('unboxing-title').innerText = "Crate Unboxed!";
-
-        // Fetch normalized owned items array safely from Firebase
-        const ownedItems = getNormalizedInventory(userData ? userData.inventory : null);
-        const isDuplicate = ownedItems.includes(winningItem.id);
-
-        if (isDuplicate) {
-          safeAddCoins(currentUser.uid, config.refund);
-          document.getElementById('result-refund-notice').classList.remove('hidden');
-        } else {
-          const updatedInventory = [...ownedItems, winningItem.id];
-          db.ref('users/' + currentUser.uid + '/inventory').set(updatedInventory);
-          document.getElementById('result-refund-notice').classList.add('hidden');
-        }
-
-        document.getElementById('result-rarity-tag').innerText = winningItem.rarity;
-        document.getElementById('result-rarity-tag').className = `text-[10px] font-bold uppercase tracking-widest mb-1 text-${getRarityColor(winningItem.rarity)}`;
-        document.getElementById('result-icon').innerText = winningItem.icon;
-        document.getElementById('result-icon').className = `text-4xl my-2 ${winningItem.animClass || ''}`;
-        document.getElementById('result-name').innerText = winningItem.name;
-
-        resultBox.classList.remove('hidden');
-      }, 6500);
+        processCrateReward(winningItem, config);
+      }, 5200);
     }
 
     function getRandomItemByOdds(odds) {
@@ -1349,172 +1363,305 @@
       else if (rand < (cumulative += odds.epic)) targetRarity = 'epic';
       else targetRarity = 'legendary';
 
-      const matches = ITEM_CATALOG.filter(i => i.rarity === targetRarity);
-      return matches[Math.floor(Math.random() * matches.length)];
+      const pool = ITEM_CATALOG.filter(i => i.rarity === targetRarity);
+      return pool[Math.floor(Math.random() * pool.length)] || ITEM_CATALOG[0];
     }
 
-    function getRarityColor(rarity) {
-      if (rarity === 'common') return 'slate-400';
-      if (rarity === 'rare') return 'blue-400';
-      if (rarity === 'epic') return 'purple-400';
-      return 'amber-400';
+    function processCrateReward(winningItem, config) {
+      const currentInv = getNormalizedInventory(currentUserData.inventory);
+      const isDuplicate = currentInv.includes(winningItem.id);
+
+      const resultCard = document.getElementById('crate-result-card');
+      const rarityEl = document.getElementById('crate-result-rarity');
+      const nameEl = document.getElementById('crate-result-name');
+      const refundEl = document.getElementById('crate-result-refund');
+      const doneBtn = document.getElementById('crate-done-btn');
+
+      rarityEl.innerText = `${winningItem.rarity.toUpperCase()} UNLOCKED!`;
+      nameEl.innerText = winningItem.name;
+
+      if (isDuplicate) {
+        refundEl.classList.remove('hidden');
+        refundEl.innerText = `Duplicate Drop! Converted to 50% CC Refund (+${config.refund.toLocaleString()} CC)`;
+        safeAddCoins(currentUser.uid, config.refund);
+      } else {
+        refundEl.classList.add('hidden');
+        currentInv.push(winningItem.id);
+        db.ref('users/' + currentUser.uid + '/inventory').set(currentInv);
+      }
+
+      resultCard.classList.remove('hidden');
+      doneBtn.classList.remove('hidden');
     }
 
     function closeCrateModal() {
-      document.getElementById('crate-modal').classList.add('hidden');
+      const modal = document.getElementById('modal-crate-unbox');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
     }
 
-    // ================= INVENTORY RENDER =================
-    function renderInventory() {
-      const grid = document.getElementById('inventory-grid');
-      if (!grid) return;
+    // ==========================================
+    // 5. 1V1 ARENA MULTIPLAYER ENGINE
+    // ==========================================
+    function createArenaRoom() {
+      if (!currentUser) return;
+      const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const roomRef = db.ref('arena_rooms/' + roomCode);
 
-      const owned = getNormalizedInventory(userData ? userData.inventory : null);
-      grid.innerHTML = "";
+      const roomData = {
+        code: roomCode,
+        hostUid: currentUser.uid,
+        hostEmail: currentUser.email,
+        hostElo: currentUserData.elo || 1200,
+        guestUid: null,
+        status: 'waiting',
+        fen: 'start',
+        turn: 'w',
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      };
 
-      if (owned.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-slate-500 text-sm italic py-8 text-center">No cosmetics unlocked yet. Open CogniShop Crates to unlock items!</div>`;
+      roomRef.set(roomData).then(() => {
+        joinRoomSession(roomCode, 'w');
+      });
+    }
+
+    function joinArenaRoom() {
+      const input = document.getElementById('arena-room-input').value.trim().toUpperCase();
+      if (input.length !== 6) {
+        alert("Please enter a valid 6-character room code.");
         return;
       }
 
-      owned.forEach(itemId => {
-        const item = ITEM_CATALOG.find(i => i.id === itemId);
-        if (!item) return;
+      const roomRef = db.ref('arena_rooms/' + input);
+      roomRef.once('value', (snap) => {
+        const val = snap.val();
+        if (!val) {
+          alert("Room not found!");
+          return;
+        }
 
-        const card = document.createElement('div');
-        card.className = `bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col items-center justify-center text-center rarity-${item.rarity}`;
-        card.innerHTML = `
-          <div class="text-3xl mb-2 ${item.animClass || ''}">${item.icon}</div>
-          <div class="text-xs font-bold text-slate-200">${item.name}</div>
-          <div class="text-[10px] uppercase font-bold text-${getRarityColor(item.rarity)} mt-1">${item.rarity}</div>
-        `;
-        grid.appendChild(card);
+        if (val.hostUid === currentUser.uid) {
+          joinRoomSession(input, 'w');
+        } else {
+          roomRef.update({
+            guestUid: currentUser.uid,
+            guestEmail: currentUser.email,
+            guestElo: currentUserData.elo || 1200,
+            status: 'active'
+          }).then(() => {
+            joinRoomSession(input, 'b');
+          });
+        }
       });
     }
 
-    // ================= LEADERBOARD =================
-    function loadLeaderboard() {
-      db.ref('users').orderByChild('elo').limitToLast(20).once('value', (snap) => {
-        const tbody = document.getElementById('leaderboard-body');
-        tbody.innerHTML = "";
-        const players = [];
+    function joinRoomSession(roomCode, color) {
+      currentArenaRoomId = roomCode;
+      arenaPlayerColor = color;
 
-        snap.forEach(child => {
-          players.push({ uid: child.key, ...child.val() });
+      document.getElementById('arena-lobby-controls').classList.add('hidden');
+      document.getElementById('arena-active-bar').classList.remove('hidden');
+      document.getElementById('arena-room-code-display').innerText = roomCode;
+
+      arenaGame = new Chess();
+      const config = {
+        draggable: false,
+        position: 'start',
+        pieceTheme: PIECE_CDN,
+        orientation: color === 'w' ? 'white' : 'black',
+        onSquareClick: onArenaSquareClick
+      };
+      arenaBoard = Chessboard('arena-board', config);
+      applyBoardTheme();
+
+      // Listen to Room Updates
+      db.ref('arena_rooms/' + roomCode).on('value', (snap) => {
+        const room = snap.val();
+        if (!room) return;
+
+        if (room.fen && room.fen !== arenaGame.fen()) {
+          arenaGame.load(room.fen);
+          arenaBoard.position(room.fen);
+        }
+
+        // Update Opponent Info
+        if (arenaPlayerColor === 'w' && room.guestEmail) {
+          document.getElementById('arena-opp-name').innerText = room.guestEmail.split('@')[0];
+          document.getElementById('arena-opp-elo').innerText = "Rating: " + (room.guestElo || 1200);
+        } else if (arenaPlayerColor === 'b' && room.hostEmail) {
+          document.getElementById('arena-opp-name').innerText = room.hostEmail.split('@')[0];
+          document.getElementById('arena-opp-elo').innerText = "Rating: " + (room.hostElo || 1200);
+        }
+      });
+
+      // Chat Listener
+      db.ref('arena_chat/' + roomCode).on('value', (snap) => {
+        const chatBox = document.getElementById('arena-chat-box');
+        chatBox.innerHTML = '';
+        const data = snap.val();
+        if (!data) return;
+
+        Object.values(data).forEach(msg => {
+          const div = document.createElement('div');
+          div.className = "p-1.5 rounded bg-slate-900 border border-slate-800 text-[11px]";
+          div.innerHTML = `<span class="font-bold text-indigo-400">${msg.sender}:</span> <span class="text-slate-200">${msg.text}</span>`;
+          chatBox.appendChild(div);
         });
-
-        players.reverse(); // Highest Elo first
-
-        players.forEach((p, idx) => {
-          const row = document.createElement('tr');
-          row.className = "hover:bg-slate-800/40 transition";
-          row.innerHTML = `
-            <td class="py-3 px-4 font-bold text-indigo-400">#${idx + 1}</td>
-            <td class="py-3 px-4 font-medium text-slate-200 flex items-center space-x-2">
-              <span>${p.username || p.email.split('@')[0]}</span>
-            </td>
-            <td class="py-3 px-4 text-right font-mono font-bold text-amber-400">${p.elo || 1200} Elo</td>
-          `;
-          tbody.appendChild(row);
-        });
+        chatBox.scrollTop = chatBox.scrollHeight;
       });
     }
 
-    // ================= MASTER CONTROL ADMIN PANEL =================
-    // Restricted strictly to zainisgo123@gmail.com
-    function updateAdminMaintenanceButtonUI(isMaintenance) {
-      const btn = document.getElementById('admin-maint-btn');
-      if (!btn) return;
+    let arenaSelectedSquare = null;
 
-      if (isMaintenance) {
-        btn.innerText = "Maintenance Active (ON)";
-        btn.className = "px-4 py-2 rounded-xl text-xs font-bold transition shadow-lg bg-red-600 hover:bg-red-700 text-white animate-pulse";
+    function onArenaSquareClick(square) {
+      if (!arenaGame || arenaGame.game_over()) return;
+      if (arenaGame.turn() !== arenaPlayerColor) return;
+
+      if (arenaSelectedSquare === null) {
+        const piece = arenaGame.get(square);
+        if (piece && piece.color === arenaPlayerColor) {
+          arenaSelectedSquare = square;
+        }
       } else {
-        btn.innerText = "Maintenance Normal (OFF)";
-        btn.className = "px-4 py-2 rounded-xl text-xs font-bold transition shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white";
+        const move = arenaGame.move({
+          from: arenaSelectedSquare,
+          to: square,
+          promotion: 'q'
+        });
+
+        if (move !== null) {
+          arenaBoard.position(arenaGame.fen());
+          db.ref('arena_rooms/' + currentArenaRoomId).update({
+            fen: arenaGame.fen(),
+            turn: arenaGame.turn()
+          });
+          arenaSelectedSquare = null;
+        } else {
+          arenaSelectedSquare = null;
+        }
       }
     }
 
+    function sendArenaChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('arena-chat-input');
+      const text = input.value.trim();
+      if (!text || !currentArenaRoomId) return;
+
+      db.ref('arena_chat/' + currentArenaRoomId).push({
+        sender: currentUser.email ? currentUser.email.split('@')[0] : "Player",
+        text: text,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      input.value = '';
+    }
+
+    function offerArenaDraw() {
+      showToast("Draw Offered", "Draw request submitted to opponent.");
+    }
+
+    function resignArenaMatch() {
+      if (confirm("Are you sure you want to resign this match?")) {
+        showToast("Match Resigned", "You surrendered the game.");
+      }
+    }
+
+    // ==========================================
+    // 6. MASTER CONTROL ADMIN PANEL ENGINE
+    // ==========================================
+    function listenAdminUsersList() {
+      db.ref('users').on('value', (snap) => {
+        const tbody = document.getElementById('admin-users-table-body');
+        tbody.innerHTML = '';
+        const users = snap.val();
+        if (!users) return;
+
+        const count = Object.keys(users).length;
+        document.getElementById('admin-user-count').innerText = `${count} Users`;
+
+        Object.entries(users).forEach(([uid, uData]) => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-800/50 transition-colors";
+          tr.innerHTML = `
+            <td class="p-3 font-semibold text-white">${uData.email || 'N/A'}</td>
+            <td class="p-3 font-mono text-[10px] text-slate-400">${uid}</td>
+            <td class="p-3 font-bold text-indigo-400">${uData.elo || 1200}</td>
+            <td class="p-3 font-bold text-amber-300">${(uData.coins || 0).toLocaleString()}</td>
+            <td class="p-3 text-slate-300">${uData.gamesPlayed || 0}</td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-indigo-900/40 hover:bg-indigo-800 text-indigo-300 text-[10px] rounded border border-indigo-500/30">Reset ELO</button>
+              <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-900/40 hover:bg-amber-800 text-amber-300 text-[10px] rounded border border-amber-500/30">+1k Coins</button>
+              <button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] rounded border border-slate-700">Clear Coins</button>
+              <button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-950 hover:bg-red-900 text-red-300 text-[10px] rounded border border-red-500/30">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
     function adminToggleMaintenance() {
-      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      db.ref('system/maintenance').get().then((snap) => {
-        const currentVal = snap.val() === true;
-        db.ref('system/maintenance').set(!currentVal);
+      const ref = db.ref('system/maintenance');
+      ref.once('value', (snap) => {
+        const curr = snap.val() === true;
+        ref.set(!curr);
       });
     }
 
     function adminForceGlobalReload() {
-      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      db.ref('system/forceReload').set(Date.now());
+      db.ref('system/global_reload').set(firebase.database.ServerValue.TIMESTAMP);
     }
 
     function adminPurgeHighElo() {
-      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+      if (!confirm("Purge all users with ELO > 3000?")) return;
       db.ref('users').once('value', (snap) => {
-        snap.forEach(child => {
-          const user = child.val();
-          if (user.elo && user.elo > 3000) {
-            db.ref('users/' + child.key + '/elo').set(1200);
+        const users = snap.val();
+        if (!users) return;
+
+        Object.entries(users).forEach(([uid, uData]) => {
+          if ((uData.elo || 1200) > 3000) {
+            db.ref('users/' + uid).remove();
           }
         });
-        alert("Purged accounts exceeding >3000 Elo.");
       });
-    }
-
-    function loadAdminUserTable() {
-      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      db.ref('users').on('value', (snap) => {
-        const tbody = document.getElementById('admin-user-table');
-        tbody.innerHTML = "";
-
-        snap.forEach(child => {
-          const uid = child.key;
-          const u = child.val();
-
-          const row = document.createElement('tr');
-          row.className = "hover:bg-slate-800/50";
-          row.innerHTML = `
-            <td class="py-2 px-4 font-mono text-[11px]">
-              <div>${u.email || 'No Email'}</div>
-              <div class="text-slate-500 text-[10px]">${uid}</div>
-            </td>
-            <td class="py-2 px-4 font-mono">${u.elo || 1200}</td>
-            <td class="py-2 px-4 font-mono text-amber-300">${(u.coins || 0).toLocaleString()} CC</td>
-            <td class="py-2 px-4 text-right space-x-1">
-              <button onclick="adminGrantCoins('${uid}')" class="bg-amber-500/20 text-amber-300 px-2 py-1 rounded text-[10px] hover:bg-amber-500/30">+Coins</button>
-              <button onclick="adminResetCoins('${uid}')" class="bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] hover:bg-slate-600">Reset Coins</button>
-              <button onclick="adminResetElo('${uid}')" class="bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded text-[10px] hover:bg-indigo-500/30">Reset Elo</button>
-              <button onclick="adminDeleteUser('${uid}')" class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-[10px] hover:bg-red-500/30">Delete</button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
-    }
-
-    function adminGrantCoins(uid) {
-      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      const amt = prompt("Enter CogniCoins amount to grant:", "1000");
-      if (amt) {
-        safeAddCoins(uid, parseInt(amt) || 0);
-      }
-    }
-
-    function adminResetCoins(uid) {
-      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      safeSetCoins(uid, 0);
     }
 
     function adminResetElo(uid) {
-      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users/' + uid + '/elo').set(1200);
     }
 
+    function adminGrantCoins(uid) {
+      safeAddCoins(uid, 1000);
+    }
+
+    function adminResetCoins(uid) {
+      safeSetCoins(uid, 0);
+    }
+
     function adminDeleteUser(uid) {
-      if (!currentUser || currentUser.email.trim().toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      if (confirm("Are you sure you want to delete user " + uid + "?")) {
+      if (confirm(`Delete user record ${uid}?`)) {
         db.ref('users/' + uid).remove();
       }
+    }
+
+    // Global Reload Listener
+    db.ref('system/global_reload').on('value', (snap) => {
+      if (snap.exists()) {
+        window.location.reload();
+      }
+    });
+
+    // Helper Toast
+    function showToast(title, msg) {
+      const toast = document.getElementById('toast-gameover');
+      document.getElementById('toast-gameover-title').innerText = title;
+      document.getElementById('toast-gameover-msg').innerText = msg;
+
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
     }
   </script>
 </body>

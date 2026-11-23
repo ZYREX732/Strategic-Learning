@@ -49,13 +49,6 @@
 
     .theme-grey .white-1e39d { background-color: #e2e8f0 !important; color: #64748b !important; }
     .theme-grey .black-3c85d { background-color: #64748b !important; color: #e2e8f0 !important; }
-
-    /* Roulette Wheel Rotation Animation */
-    @keyframes spinWheel {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(1440deg); }
-    }
-    .spinning { animation: spinWheel 3s cubic-bezier(0.15, 0.85, 0.35, 1) forwards; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between">
@@ -216,7 +209,7 @@
             </div>
             <h3 class="text-xl font-bold text-emerald-400 mb-2">Probability & Risk Lab</h3>
             <p class="text-xs text-slate-400 leading-relaxed">
-              Analyze odds under uncertainty. Test your risk management in Cogni-Blackjack, Rocket Crash, Roulette, and Live Match Wagering.
+              Analyze odds under uncertainty. Test your risk management in Cogni-Blackjack, Rocket Crash, and Live Match Wagering.
             </p>
           </div>
         </div>
@@ -361,16 +354,13 @@
       <!-- SECTION 2: GAMBLING / RISK LAB -->
       <section id="section-gambling" class="hidden flex-1 flex flex-col space-y-4">
         
-        <!-- Mini-Game Selection Tabs -->
+        <!-- Mini-Game Selection Tabs (Roulette Removed) -->
         <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl flex space-x-2 overflow-x-auto">
           <button onclick="setGamblingGame('blackjack')" id="gtab-blackjack" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 whitespace-nowrap">
             <i class="fa-solid fa-spade"></i><span>Cogni-Blackjack</span>
           </button>
           <button onclick="setGamblingGame('rocket')" id="gtab-rocket" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 whitespace-nowrap">
             <i class="fa-solid fa-rocket"></i><span>CogniRocket (Crash)</span>
-          </button>
-          <button onclick="setGamblingGame('roulette')" id="gtab-roulette" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 whitespace-nowrap">
-            <i class="fa-solid fa-compact-disc"></i><span>Strategic Roulette</span>
           </button>
           <button onclick="setGamblingGame('wagering')" id="gtab-wagering" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 whitespace-nowrap">
             <i class="fa-solid fa-chess-board"></i><span>Arena Match Wagering</span>
@@ -417,7 +407,7 @@
           </div>
         </div>
 
-        <!-- GAMBLING GAME 2: ROCKET CRASH -->
+        <!-- GAMBLING GAME 2: ROCKET CRASH (EXPLOIT PATCHED) -->
         <div id="game-rocket" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-between min-h-[480px]">
           <div class="text-center">
             <h3 class="text-xl font-bold text-indigo-400">CogniRocket (Multiplier Crash)</h3>
@@ -447,49 +437,7 @@
           </div>
         </div>
 
-        <!-- GAMBLING GAME 3: ROULETTE -->
-        <div id="game-roulette" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-between min-h-[480px]">
-          <div class="text-center">
-            <h3 class="text-xl font-bold text-red-400">Strategic Roulette</h3>
-            <p class="text-xs text-slate-400 mt-1">European 0-36 Wheel. Test your statistical risk assessment.</p>
-          </div>
-
-          <!-- Animated Wheel Visual -->
-          <div class="relative w-40 h-40 rounded-full border-4 border-amber-500 flex items-center justify-center bg-slate-950">
-            <div id="rouletteWheel" class="w-36 h-36 rounded-full border-2 border-dashed border-slate-700 flex items-center justify-center text-2xl font-black text-amber-400 font-mono">
-              <span id="rouletteResultDisplay">36</span>
-            </div>
-          </div>
-
-          <!-- Betting Grid Options -->
-          <div class="w-full max-w-md space-y-3">
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="placeRouletteBet('red')" id="rbet-red" class="bg-red-600/20 hover:bg-red-600/40 border border-red-500 text-red-300 py-2 rounded-lg text-xs font-bold">
-                Red (1:1 Payout)
-              </button>
-              <button onclick="placeRouletteBet('black')" id="rbet-black" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 py-2 rounded-lg text-xs font-bold">
-                Black (1:1 Payout)
-              </button>
-              <button onclick="placeRouletteBet('even')" id="rbet-even" class="bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500 text-indigo-300 py-2 rounded-lg text-xs font-bold">
-                Even (1:1 Payout)
-              </button>
-              <button onclick="placeRouletteBet('odd')" id="rbet-odd" class="bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500 text-purple-300 py-2 rounded-lg text-xs font-bold">
-                Odd (1:1 Payout)
-              </button>
-            </div>
-
-            <div class="flex items-center space-x-2">
-              <span class="text-xs text-slate-400 font-medium">Bet Amount:</span>
-              <input type="number" id="rouletteBetInput" value="50" min="10" step="10" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-amber-300 font-bold">
-            </div>
-
-            <button onclick="spinRoulette()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-sm transition">
-              Spin Wheel
-            </button>
-          </div>
-        </div>
-
-        <!-- GAMBLING GAME 4: MATCH WAGERING -->
+        <!-- GAMBLING GAME 3: MATCH WAGERING -->
         <div id="game-wagering" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between min-h-[480px]">
           <div>
             <h3 class="text-xl font-bold text-amber-400 mb-1">Live Arena Match Wagering</h3>
@@ -714,7 +662,6 @@
     let activeGamblingGame = "blackjack";
     let bjDeck = [], bjPlayerHand = [], bjDealerHand = [], bjInGame = false, bjCurrentBet = 0;
     let rocketInterval = null, rocketMultiplier = 1.00, rocketCrashPoint = 0, rocketRunning = false, rocketBet = 0;
-    let rouletteBetType = null;
 
     // Direct Messages State
     let activeDMFriendUid = null;
@@ -1233,7 +1180,7 @@
     // --- GAMBLING MINI-GAMES ---
     function setGamblingGame(gameType) {
       activeGamblingGame = gameType;
-      const games = ["blackjack", "rocket", "roulette", "wagering"];
+      const games = ["blackjack", "rocket", "wagering"];
       games.forEach(g => {
         const btn = document.getElementById("gtab-" + g);
         const view = document.getElementById("game-" + g);
@@ -1357,33 +1304,43 @@
       alert(msg);
     }
 
-    // GAMBLING 2: ROCKET CRASH LOGIC
+    // GAMBLING 2: ROCKET CRASH LOGIC (STRICT LOCKOUT SECURITY IMPLEMENTED)
     function startRocketGame() {
+      if (rocketRunning) return; // STRICT GUARD LOCK
+
       const bet = parseInt(document.getElementById("rocketBetInput").value);
       if (isNaN(bet) || bet <= 0 || currentUserData.coins < bet) {
         alert("Insufficient CogniCoins!");
         return;
       }
 
-      db.ref("users/" + currentUser.uid + "/coins").transaction(c => c - bet);
-      rocketBet = bet;
-      rocketMultiplier = 1.00;
-      rocketCrashPoint = (Math.random() * 5 + 1.1).toFixed(2);
-      rocketRunning = true;
+      rocketRunning = true; // LOCK IMMEDIATELY BEFORE ANY ASYNC OPS
 
+      // UI LOCKOUTS
+      document.getElementById("rocketStartBtn").disabled = true;
       document.getElementById("rocketStartBtn").classList.add("hidden");
+      document.getElementById("rocketCashoutBtn").disabled = false;
       document.getElementById("rocketCashoutBtn").classList.remove("hidden");
       document.getElementById("rocketStatusText").textContent = "Rocket Ascending...";
 
+      db.ref("users/" + currentUser.uid + "/coins").transaction(c => Math.max(0, (c || 0) - bet));
+      rocketBet = bet;
+      rocketMultiplier = 1.00;
+      rocketCrashPoint = parseFloat((Math.random() * 5 + 1.05).toFixed(2));
+
+      if (rocketInterval) clearInterval(rocketInterval);
       rocketInterval = setInterval(() => {
+        if (!rocketRunning) return;
         rocketMultiplier += 0.05;
         document.getElementById("rocketMultiplier").textContent = rocketMultiplier.toFixed(2) + "x";
 
         if (rocketMultiplier >= rocketCrashPoint) {
           clearInterval(rocketInterval);
+          rocketInterval = null;
           rocketRunning = false;
-          document.getElementById("rocketMultiplier").textContent = "CRASHED @ " + rocketCrashPoint + "x";
+          document.getElementById("rocketMultiplier").textContent = "CRASHED @ " + rocketCrashPoint.toFixed(2) + "x";
           document.getElementById("rocketStatusText").textContent = "Better luck next time!";
+          document.getElementById("rocketStartBtn").disabled = false;
           document.getElementById("rocketStartBtn").classList.remove("hidden");
           document.getElementById("rocketCashoutBtn").classList.add("hidden");
         }
@@ -1391,62 +1348,26 @@
     }
 
     function cashoutRocket() {
-      if (!rocketRunning) return;
-      clearInterval(rocketInterval);
-      rocketRunning = false;
+      if (!rocketRunning) return; // PREVENT DOUBLE CASHOUT / SPAM
+      rocketRunning = false; // LOCK IMMEDIATELY
+
+      if (rocketInterval) {
+        clearInterval(rocketInterval);
+        rocketInterval = null;
+      }
+
+      document.getElementById("rocketCashoutBtn").disabled = true;
+      document.getElementById("rocketCashoutBtn").classList.add("hidden");
+      document.getElementById("rocketStartBtn").disabled = false;
+      document.getElementById("rocketStartBtn").classList.remove("hidden");
+
       const winAmount = Math.floor(rocketBet * rocketMultiplier);
       db.ref("users/" + currentUser.uid + "/coins").transaction(c => (c || 0) + winAmount);
-      
-      document.getElementById("rocketStatusText").textContent = "Cashed out at " + rocketMultiplier.toFixed(2) + "x (+ " + winAmount + " CC)!";
-      document.getElementById("rocketStartBtn").classList.remove("hidden");
-      document.getElementById("rocketCashoutBtn").classList.add("hidden");
+
+      document.getElementById("rocketStatusText").textContent = "Cashed out at " + rocketMultiplier.toFixed(2) + "x (+" + winAmount.toLocaleString() + " CC)!";
     }
 
-    // GAMBLING 3: ROULETTE LOGIC
-    function placeRouletteBet(type) {
-      rouletteBetType = type;
-      alert("Bet selected: " + type.toUpperCase());
-    }
-
-    function spinRoulette() {
-      if (!rouletteBetType) {
-        alert("Select a bet option first!");
-        return;
-      }
-      const bet = parseInt(document.getElementById("rouletteBetInput").value);
-      if (isNaN(bet) || bet <= 0 || currentUserData.coins < bet) {
-        alert("Insufficient CogniCoins!");
-        return;
-      }
-
-      db.ref("users/" + currentUser.uid + "/coins").transaction(c => c - bet);
-      const wheel = document.getElementById("rouletteWheel");
-      wheel.classList.add("spinning");
-
-      setTimeout(() => {
-        wheel.classList.remove("spinning");
-        const number = Math.floor(Math.random() * 37);
-        document.getElementById("rouletteResultDisplay").textContent = number;
-
-        const isRed = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(number);
-        let win = false;
-
-        if (rouletteBetType === 'red' && isRed) win = true;
-        if (rouletteBetType === 'black' && !isRed && number !== 0) win = true;
-        if (rouletteBetType === 'even' && number !== 0 && number % 2 === 0) win = true;
-        if (rouletteBetType === 'odd' && number % 2 !== 0) win = true;
-
-        if (win) {
-          const payout = bet * 2;
-          db.ref("users/" + currentUser.uid + "/coins").transaction(c => (c || 0) + payout);
-          alert("Landed on " + number + "! You won " + payout + " CC!");
-        } else {
-          alert("Landed on " + number + ". Better luck next time!");
-        }
-      }, 3000);
-    }
-
-    // GAMBLING 4: MATCH WAGERING
+    // GAMBLING 3: MATCH WAGERING
     function loadLiveWageringMatches() {
       db.ref("games").on("value", (snap) => {
         const list = document.getElementById("liveWagerMatchesList");
@@ -1727,4 +1648,4 @@
     }
   </script>
 </body>
-</html> 
+</html>

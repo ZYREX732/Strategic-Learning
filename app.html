@@ -477,18 +477,20 @@
           </div>
 
           <!-- Unboxing Win Result Card -->
-          <div id="unboxing-result" class="hidden my-4 p-4 rounded-xl border bg-slate-950/80 animate-fade-in">
+          <div id="unboxing-result" class="hidden my-4 p-4 rounded-xl border bg-slate-950/80 transition-all">
             <div id="result-rarity-tag" class="text-[10px] font-bold uppercase tracking-widest mb-1">Common</div>
             <div id="result-icon" class="text-4xl my-2">🎉</div>
             <div id="result-name" class="text-base font-bold text-slate-100">Item Name</div>
             <div id="result-refund-notice" class="hidden text-xs text-amber-400 mt-2 font-medium bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
               <i class="fa-solid fa-rotate-left mr-1"></i> Duplicate item owned! Automatically refunded 50% CC.
             </div>
+
+            <!-- PROMINENT DONE BUTTON BELOW RESULT -->
+            <button id="btn-close-crate" onclick="closeCrateModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm transition mt-4 shadow-lg shadow-indigo-600/30 flex items-center justify-center">
+              <i class="fa-solid fa-check mr-2"></i> Done
+            </button>
           </div>
 
-          <button id="btn-close-crate" onclick="closeCrateModal()" class="hidden w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-sm transition mt-2">
-            Collect Item
-          </button>
         </div>
       </div>
     </section>
@@ -679,6 +681,18 @@
       { id: "avatar_frame_gold", name: "Gold Crown Frame", type: "frame", rarity: "epic", icon: "🖼️" }
     ];
 
+    // Helper: Normalize inventory arrays/objects from Firebase to avoid updates wiping items
+    function getNormalizedInventory(rawInventory) {
+      if (!rawInventory) return [];
+      if (Array.isArray(rawInventory)) {
+        return rawInventory.filter(id => typeof id === 'string' && id.trim().length > 0);
+      }
+      if (typeof rawInventory === 'object') {
+        return Object.values(rawInventory).filter(id => typeof id === 'string' && id.trim().length > 0);
+      }
+      return [];
+    }
+
     // ================= CHESS.COM-STYLE GLICKO / ELO RATING CALCULATOR =================
     function getKFactor(gamesPlayed) {
       const games = gamesPlayed || 0;
@@ -834,7 +848,6 @@
       const config = {
         draggable: false, // Click-to-move piece controls only
         position: 'start',
-        // EXPLICIT CDN PIECE THEME SO PIECE IMAGES RENDER RELIABLY
         pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
       };
 
@@ -1262,11 +1275,10 @@
       const modal = document.getElementById('crate-modal');
       const strip = document.getElementById('crate-strip');
       const resultBox = document.getElementById('unboxing-result');
-      const closeBtn = document.getElementById('btn-close-crate');
 
       modal.classList.remove('hidden');
       resultBox.classList.add('hidden');
-      closeBtn.classList.add('hidden');
+      document.getElementById('unboxing-title').innerText = "Opening Crate...";
       strip.style.transition = 'none';
       strip.style.transform = 'translateX(0px)';
 
@@ -1302,15 +1314,18 @@
 
       // Handle Result After Animation Completes
       setTimeout(() => {
-        // Grant Item / Handle Duplicate 50% Refund
-        const ownedItems = userData.inventory || [];
+        document.getElementById('unboxing-title').innerText = "Crate Unboxed!";
+
+        // Fetch normalized owned items array safely from Firebase
+        const ownedItems = getNormalizedInventory(userData ? userData.inventory : null);
         const isDuplicate = ownedItems.includes(winningItem.id);
 
         if (isDuplicate) {
           safeAddCoins(currentUser.uid, config.refund);
           document.getElementById('result-refund-notice').classList.remove('hidden');
         } else {
-          db.ref('users/' + currentUser.uid + '/inventory').set([...ownedItems, winningItem.id]);
+          const updatedInventory = [...ownedItems, winningItem.id];
+          db.ref('users/' + currentUser.uid + '/inventory').set(updatedInventory);
           document.getElementById('result-refund-notice').classList.add('hidden');
         }
 
@@ -1321,7 +1336,6 @@
         document.getElementById('result-name').innerText = winningItem.name;
 
         resultBox.classList.remove('hidden');
-        closeBtn.classList.remove('hidden');
       }, 6500);
     }
 
@@ -1355,7 +1369,7 @@
       const grid = document.getElementById('inventory-grid');
       if (!grid) return;
 
-      const owned = userData ? (userData.inventory || []) : [];
+      const owned = getNormalizedInventory(userData ? userData.inventory : null);
       grid.innerHTML = "";
 
       if (owned.length === 0) {

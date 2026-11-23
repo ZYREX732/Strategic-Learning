@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CogniLearn – Strategic Thinking Lab</title>
 
   <!-- Tailwind CSS CDN -->
@@ -14,13 +14,13 @@
         extend: {
           colors: {
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
             }
           }
         }
@@ -28,733 +28,591 @@
     }
   </script>
 
-  <!-- FontAwesome 6.4.0 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- JQuery (Required by Chessboard.js) -->
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <!-- Chessboard.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
 
-  <!-- Chess.js 0.10.3 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-
-  <!-- Chessboard.js 1.0.0 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-
-  <!-- Firebase 10.7.1 Compat SDKs -->
+  <!-- Firebase v10.7.1 Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
+  <!-- Chess.js & Chessboard.js Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+
   <style>
-    /* Board Theme Styling */
-    .theme-wood .white-1e1d7 { background-color: #f0d9b5 !important; color: #b58863; }
-    .theme-wood .black-3c85d { background-color: #b58863 !important; color: #f0d9b5; }
-    
-    .theme-green .white-1e1d7 { background-color: #eeeed2 !important; color: #769656; }
-    .theme-green .black-3c85d { background-color: #769656 !important; color: #eeeed2; }
+    /* Custom Board Skins */
+    .theme-wood .square-55d63 { background-color: #b88b4a; }
+    .theme-wood .white-1e1d7 { background-color: #f0d9b5; color: #b88b4a; }
+    .theme-wood .black-3c85d { background-color: #b58863; color: #f0d9b5; }
 
-    .theme-grey .white-1e1d7 { background-color: #e2e8f0 !important; color: #64748b; }
-    .theme-grey .black-3c85d { background-color: #64748b !important; color: #e2e8f0; }
+    .theme-green .square-55d63 { background-color: #769656; }
+    .theme-green .white-1e1d7 { background-color: #eeeed2; color: #769656; }
+    .theme-green .black-3c85d { background-color: #769656; color: #eeeed2; }
 
-    /* Move target dot styling: 70% opaque grey dot */
-    .highlight-move-dot {
+    .theme-grey .square-55d63 { background-color: #708090; }
+    .theme-grey .white-1e1d7 { background-color: #e2e8f0; color: #475569; }
+    .theme-grey .black-3c85d { background-color: #64748b; color: #e2e8f0; }
+
+    /* Move Highlights & Target Indicators */
+    .move-indicator {
       position: absolute;
-      width: 28%;
-      height: 28%;
-      top: 36%;
-      left: 36%;
-      background-color: rgba(128, 128, 128, 0.7);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
+      background-color: rgba(128, 128, 128, 0.7);
       pointer-events: none;
-      z-index: 10;
+      z-index: 20;
     }
 
-    /* Move source/dest highlight: pale translucent yellow */
-    .highlight-last-move {
+    .highlight-prev {
       background-color: rgba(254, 240, 138, 0.45) !important;
     }
 
-    /* CS:GO Crate Roller Animations */
-    .crate-strip-container {
-      transition: transform 4.5s cubic-bezier(0.1, 0.85, 0.15, 1);
-    }
-
-    /* Animated Emote Effects */
-    @keyframes emoteBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
+    /* Emote CSS Keyframe Animations */
     @keyframes emotePulse {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
+      50% { transform: scale(1.25); }
     }
+    .emote-pulse { animation: emotePulse 1.2s infinite ease-in-out; }
+
+    @keyframes emoteBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .emote-bounce { animation: emoteBounce 0.8s infinite ease-in-out; }
+
     @keyframes emoteShake {
       0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-10deg); }
-      75% { transform: rotate(10deg); }
+      25% { transform: rotate(-14deg); }
+      75% { transform: rotate(14deg); }
     }
+    .emote-shake { animation: emoteShake 0.6s infinite linear; }
+
     @keyframes emoteGlow {
-      0%, 100% { filter: drop-shadow(0 0 4px #fbbf24); }
-      50% { filter: drop-shadow(0 0 12px #f59e0b); }
+      0%, 100% { filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.8)); }
+      50% { filter: drop-shadow(0 0 18px rgba(234, 179, 8, 1)); }
+    }
+    .emote-glow { animation: emoteGlow 1.5s infinite ease-in-out; }
+
+    /* CS:GO Unboxing Reel Styles */
+    .crate-strip-container {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      height: 140px;
+    }
+    .crate-strip {
+      display: flex;
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      transition: transform 6s cubic-bezier(0.1, 1, 0.1, 1);
+    }
+    .crate-item-card {
+      width: 120px;
+      height: 130px;
+      flex-shrink: 0;
+      margin: 0 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 2px solid #334155;
+      background: #1e293b;
     }
 
-    .emote-bounce { animation: emoteBounce 1.2s infinite ease-in-out; display: inline-block; }
-    .emote-pulse { animation: emotePulse 1.4s infinite ease-in-out; display: inline-block; }
-    .emote-shake { animation: emoteShake 0.8s infinite ease-in-out; display: inline-block; }
-    .emote-glow { animation: emoteGlow 1.5s infinite ease-in-out; display: inline-block; }
+    /* Rarity Borders */
+    .rarity-common { border-color: #94a3b8 !important; }
+    .rarity-rare { border-color: #3b82f6 !important; }
+    .rarity-epic { border-color: #a855f7 !important; }
+    .rarity-legendary { border-color: #eab308 !important; }
 
-    /* Custom Scrollbars */
+    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
-  <!-- Maintenance Mode Overlay -->
-  <div id="maintenanceModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-red-500/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
-      <div class="w-16 h-16 bg-red-500/10 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-        <i class="fa-solid fa-screwdriver-wrench"></i>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Maintenance Overlay Lockout Modal -->
+  <div id="maintenance-modal" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+    <div class="bg-slate-900 border border-red-500/50 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+      <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-red-500/30">
+        <i class="fa-solid fa-wrench animate-bounce"></i>
       </div>
       <h2 class="text-2xl font-bold text-slate-100 mb-2">System Under Maintenance</h2>
-      <p class="text-slate-400 text-sm mb-6">CogniLearn Strategic Lab is currently undergoing scheduled platform upgrades.</p>
-      <button onclick="logout()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-4 rounded-xl transition text-sm">
-        <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Return to Main Page
+      <p class="text-slate-400 text-sm mb-6">CogniLearn is currently undergoing scheduled platform upgrades. Access is restricted to authorized administrative personnel.</p>
+      <button onclick="handleMaintenanceRedirect()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl border border-slate-700 transition">
+        Return to Main Page
       </button>
     </div>
   </div>
 
-  <!-- Main Top Navigation Header -->
-  <header class="bg-slate-900/80 border-b border-slate-800 backdrop-blur sticky top-0 z-40">
+  <!-- Game Over Modal (3s Auto Dismiss) -->
+  <div id="game-over-modal" class="hidden fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl transform transition-all scale-100">
+      <div id="game-over-icon" class="text-4xl mb-3">🏆</div>
+      <h3 id="game-over-title" class="text-xl font-bold text-slate-100 mb-1">Game Finished</h3>
+      <p id="game-over-desc" class="text-sm text-slate-400 mb-4">Match conclusion registered.</p>
+      <div class="text-xs text-slate-500 italic">Auto-dismissing in 3 seconds...</div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-30 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      
-      <!-- Brand Logo -->
+      <!-- Logo & Title -->
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-600/30">
-          <i class="fa-solid fa-brain"></i>
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-600/30">
+          <i class="fa-solid fa-chess-knight"></i>
         </div>
         <div>
-          <div class="font-extrabold text-lg leading-tight tracking-wide bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">
-            CogniLearn
-          </div>
-          <div class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Strategic Thinking Lab</div>
+          <h1 class="font-bold text-lg text-slate-100 tracking-wide">CogniLearn</h1>
+          <p class="text-xs text-indigo-400 font-medium hidden sm:block">Strategic Thinking Lab</p>
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
-      <nav class="hidden md:flex items-center space-x-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800/80">
-        <button onclick="switchTab('chess')" id="tab-chess" class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 bg-indigo-600 text-white shadow">
-          <i class="fa-solid fa-chess"></i>
-          <span>Strategic Chess</span>
+      <!-- Center Desktop Navigation Tabs -->
+      <nav class="hidden md:flex items-center space-x-1 bg-slate-950/50 p-1 rounded-xl border border-slate-800/80">
+        <button id="tab-play" onclick="switchTab('play')" class="px-4 py-1.5 text-sm font-medium rounded-lg transition bg-indigo-600 text-white">
+          <i class="fa-solid fa-gamepad mr-2"></i>Play
         </button>
-        <button onclick="switchTab('shop')" id="tab-shop" class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900">
-          <i class="fa-solid fa-box-open"></i>
-          <span>Crate Shop</span>
+        <button id="tab-shop" onclick="switchTab('shop')" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
+          <i class="fa-solid fa-store mr-2"></i>CogniShop
         </button>
-        <button onclick="switchTab('social')" id="tab-social" class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900">
-          <i class="fa-solid fa-users"></i>
-          <span>Friends & DMs</span>
+        <button id="tab-inventory" onclick="switchTab('inventory')" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
+          <i class="fa-solid fa-box-open mr-2"></i>Inventory
         </button>
-        <button onclick="switchTab('admin')" id="tab-admin" class="hidden px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-amber-400 hover:bg-amber-500/10">
-          <i class="fa-solid fa-user-shield"></i>
-          <span>Master Control</span>
+        <button id="tab-leaderboard" onclick="switchTab('leaderboard')" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
+          <i class="fa-solid fa-trophy mr-2"></i>Leaderboard
+        </button>
+        <!-- Master Admin Tab (Strictly for zainisgo123@gmail.com) -->
+        <button id="tab-admin" onclick="switchTab('admin')" class="hidden px-4 py-1.5 text-sm font-medium rounded-lg text-red-400 hover:bg-red-500/10 transition border border-red-500/30">
+          <i class="fa-solid fa-user-shield mr-2"></i>Admin
         </button>
       </nav>
 
-      <!-- User Stats & Profile Controls -->
+      <!-- User Stats & Economy Bar -->
       <div class="flex items-center space-x-3">
-        <!-- Coin Economy Indicator -->
-        <div class="bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-xl flex items-center space-x-2">
-          <i class="fa-solid fa-coins text-emerald-400 text-xs"></i>
-          <span id="userCoins" class="text-xs font-bold text-emerald-300">0</span>
-          <span class="text-[10px] text-emerald-500/80 uppercase font-bold">CC</span>
-          <button onclick="claimFaucet()" title="Daily/Bankruptcy Faucet (+250 CC, Cap 100k)" class="ml-1 text-[11px] bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-1.5 py-0.5 rounded transition">
-            <i class="fa-solid fa-plus"></i>
+        <!-- Coins Display -->
+        <div class="flex items-center bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 text-xs sm:text-sm">
+          <i class="fa-solid fa-coins text-amber-400 mr-2"></i>
+          <span id="nav-coins" class="font-bold text-amber-300">1,000</span>
+        </div>
+
+        <!-- User Profile Pill -->
+        <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-1.5">
+          <div id="nav-avatar-icon" class="w-6 h-6 rounded-full bg-indigo-500/30 text-indigo-300 flex items-center justify-center text-xs font-bold">
+            👤
+          </div>
+          <div class="hidden sm:block text-left">
+            <div id="nav-username" class="text-xs font-semibold text-slate-200 truncate max-w-[100px]">User</div>
+            <div id="nav-elo" class="text-[10px] text-indigo-400 font-mono">1200 Elo</div>
+          </div>
+          <button onclick="handleLogout()" title="Logout" class="text-slate-400 hover:text-red-400 ml-1 transition">
+            <i class="fa-solid fa-right-from-bracket text-xs"></i>
           </button>
         </div>
-
-        <!-- User Profile Card -->
-        <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl flex items-center space-x-2">
-          <div class="text-right">
-            <div class="flex items-center space-x-1">
-              <span id="navHandle" class="text-xs font-bold text-slate-200 max-w-[100px] truncate">Player</span>
-              <button onclick="openUsernameModal()" class="text-slate-500 hover:text-indigo-400 transition text-[10px]">
-                <i class="fa-solid fa-pen"></i>
-              </button>
-            </div>
-            <div class="text-[10px] text-indigo-400 font-semibold flex items-center justify-end space-x-1">
-              <i class="fa-solid fa-trophy text-[9px]"></i>
-              <span id="userElo">1200</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Logout Button -->
-        <button onclick="logout()" title="Logout Session" class="w-9 h-9 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-red-400 rounded-xl flex items-center justify-center transition">
-          <i class="fa-solid fa-power-off text-sm"></i>
-        </button>
       </div>
+    </div>
+
+    <!-- Mobile Navigation Bar -->
+    <div class="md:hidden flex items-center justify-around border-t border-slate-800/80 bg-slate-900 py-2 px-2 text-xs">
+      <button onclick="switchTab('play')" class="flex flex-col items-center text-indigo-400">
+        <i class="fa-solid fa-gamepad text-base mb-0.5"></i>Play
+      </button>
+      <button onclick="switchTab('shop')" class="flex flex-col items-center text-slate-400">
+        <i class="fa-solid fa-store text-base mb-0.5"></i>Shop
+      </button>
+      <button onclick="switchTab('inventory')" class="flex flex-col items-center text-slate-400">
+        <i class="fa-solid fa-box-open text-base mb-0.5"></i>Items
+      </button>
+      <button onclick="switchTab('leaderboard')" class="flex flex-col items-center text-slate-400">
+        <i class="fa-solid fa-trophy text-base mb-0.5"></i>Ranks
+      </button>
+      <button id="mob-tab-admin" onclick="switchTab('admin')" class="hidden flex flex-col items-center text-red-400">
+        <i class="fa-solid fa-user-shield text-base mb-0.5"></i>Admin
+      </button>
     </div>
   </header>
 
-  <!-- Mobile Navigation Bar -->
-  <div class="md:hidden bg-slate-900 border-b border-slate-800 px-2 py-2 flex justify-around text-xs">
-    <button onclick="switchTab('chess')" id="mob-tab-chess" class="px-3 py-1.5 rounded-lg text-indigo-400 font-semibold bg-indigo-500/10">Chess</button>
-    <button onclick="switchTab('shop')" id="mob-tab-shop" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Crates</button>
-    <button onclick="switchTab('social')" id="mob-tab-social" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Social</button>
-    <button onclick="switchTab('admin')" id="mob-tab-admin" class="hidden px-3 py-1.5 rounded-lg text-amber-400 font-semibold">Admin</button>
-  </div>
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-grow">
 
-  <!-- Main View Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+    <!-- ================= SECTION: PLAY ================= -->
+    <section id="section-play" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- SECTION 1: STRATEGIC THINKING LAB (CHESS) -->
-    <section id="section-chess" class="space-y-6">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-        <div class="flex space-x-2">
-          <button onclick="switchChessSubTab('bot')" id="subtab-bot" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700">
-            <i class="fa-solid fa-robot mr-1.5"></i>Practice vs GM Bot
-          </button>
-          <button onclick="switchChessSubTab('arena')" id="subtab-arena" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
-            <i class="fa-solid fa-swords mr-1.5"></i>1v1 Online Arena
-          </button>
-          <button onclick="switchChessSubTab('settings')" id="subtab-settings" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
-            <i class="fa-solid fa-palette mr-1.5"></i>Board Themes
-          </button>
-        </div>
-        <div class="hidden sm:block text-xs text-slate-400">
-          Max Balance Cap: <span class="font-bold text-emerald-400">100,000 CC</span>
-        </div>
-      </div>
-
-      <!-- BOT PRACTICE MODE -->
-      <div id="chess-view-bot" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col items-center">
-          <div class="w-full max-w-[560px] flex items-center justify-between mb-3 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+        <!-- Chessboard Container (Left Col) -->
+        <div class="lg:col-span-8 flex flex-col items-center bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl">
+          
+          <!-- Top Match Status Header -->
+          <div class="w-full max-w-[560px] flex items-center justify-between mb-4 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+            <!-- Opponent Tag -->
             <div class="flex items-center space-x-3">
-              <div class="w-9 h-9 bg-purple-600/20 text-purple-400 rounded-lg flex items-center justify-center font-bold">
-                <i class="fa-solid fa-microchip"></i>
-              </div>
+              <div id="opponent-avatar" class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg">🤖</div>
               <div>
-                <div class="text-xs font-bold text-slate-200">CogniBot GM (Engine)</div>
-                <div class="text-[10px] text-purple-400 font-semibold">1500+ Minimax Elo</div>
+                <div id="opponent-name" class="font-semibold text-sm text-slate-200">Grandmaster Bot</div>
+                <div id="opponent-elo" class="text-xs text-indigo-400 font-mono">1500 Elo</div>
               </div>
             </div>
-            <div id="botThinking" class="hidden text-xs text-purple-400 font-semibold flex items-center space-x-1.5">
-              <i class="fa-solid fa-spinner fa-spin"></i>
-              <span>Analyzing...</span>
+            <!-- Dynamic Game Timer -->
+            <div id="game-timer" class="font-mono text-base font-bold text-amber-400 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+              10:00
             </div>
           </div>
 
-          <div class="w-full max-w-[560px] aspect-square relative" id="boardWrapper">
-            <div id="botBoard" class="w-full h-full rounded-lg overflow-hidden shadow-2xl"></div>
+          <!-- Interactive Board Container -->
+          <div class="w-full max-w-[560px] aspect-square relative rounded-xl overflow-hidden shadow-2xl border-2 border-slate-800" id="board-outer">
+            <div id="myBoard" class="w-full h-full theme-wood"></div>
           </div>
 
-          <div class="w-full max-w-[560px] flex items-center justify-between mt-3 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+          <!-- Bottom Player Status & Actions Bar -->
+          <div class="w-full max-w-[560px] flex items-center justify-between mt-4 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+            <!-- Player Info -->
             <div class="flex items-center space-x-3">
-              <div class="w-9 h-9 bg-indigo-600/20 text-indigo-400 rounded-lg flex items-center justify-center font-bold">
-                <i class="fa-solid fa-user"></i>
-              </div>
+              <div id="player-avatar" class="w-9 h-9 rounded-full bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-lg">♟️</div>
               <div>
-                <div id="botPlayerHandle" class="text-xs font-bold text-slate-200">Player</div>
-                <div class="text-[10px] text-slate-400">Side: <span id="botPlayerSide" class="text-indigo-400 font-semibold">White</span></div>
+                <div id="player-name" class="font-semibold text-sm text-slate-200">You</div>
+                <div id="player-elo" class="text-xs text-indigo-400 font-mono">1200 Elo</div>
               </div>
             </div>
-            <div class="text-xs text-slate-400">
-              Reward: <span class="text-emerald-400 font-bold">+50 CC</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="lg:col-span-4 space-y-4">
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-            <h3 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
-              <i class="fa-solid fa-sliders text-indigo-400"></i>
-              <span>Match Controls</span>
-            </h3>
-
-            <div>
-              <label class="block text-xs text-slate-400 mb-2 font-medium">Choose Playing Side</label>
-              <div class="grid grid-cols-3 gap-2">
-                <button onclick="selectBotSide('white')" id="side-white" class="py-2.5 rounded-xl border border-indigo-500 bg-indigo-500/20 text-indigo-300 font-semibold text-xs transition flex items-center justify-center space-x-1">
-                  <i class="fa-solid fa-chess-king"></i>
-                  <span>White</span>
-                </button>
-                <button onclick="selectBotSide('black')" id="side-black" class="py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-semibold text-xs transition flex items-center justify-center space-x-1">
-                  <i class="fa-solid fa-chess-king text-slate-600"></i>
-                  <span>Black</span>
-                </button>
-                <button onclick="selectBotSide('random')" id="side-random" class="py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-semibold text-xs transition flex items-center justify-center space-x-1">
-                  <i class="fa-solid fa-shuffle"></i>
-                  <span>Random</span>
-                </button>
-              </div>
-            </div>
-
-            <button onclick="startBotGame()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2">
-              <i class="fa-solid fa-play"></i>
-              <span>Start New Bot Game</span>
-            </button>
-
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-300">
-              <div class="text-slate-500 text-[10px] uppercase font-bold mb-1">Status</div>
-              <div id="botGameStatus" class="font-medium">Ready to play. Click 'Start New Bot Game'.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 1v1 ONLINE ARENA MODE -->
-      <div id="chess-view-arena" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div id="arenaSetupPanel" class="lg:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-2xl mx-auto w-full space-y-6">
-          <div class="text-center space-y-1">
-            <h2 class="text-xl font-bold text-slate-100">1v1 Strategic Arena</h2>
-            <p class="text-xs text-slate-400">Play ranked 1v1 chess against online players with real-time room codes.</p>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
-              <div class="font-bold text-sm text-slate-200 flex items-center space-x-2">
-                <i class="fa-solid fa-plus-circle text-indigo-400"></i>
-                <span>Create Match</span>
-              </div>
-              <div>
-                <label class="block text-[11px] text-slate-400 mb-1">Clock Duration</label>
-                <select id="arenaTimerSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-semibold focus:outline-none focus:border-indigo-500">
-                  <option value="5">5 Minutes (Blitz)</option>
-                  <option value="10" selected>10 Minutes (Rapid)</option>
-                  <option value="15">15 Minutes (Classical)</option>
-                </select>
-              </div>
-              <button onclick="createArenaRoom()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30">
-                Create Room
+            <!-- Match Action Controls -->
+            <div class="flex items-center space-x-2">
+              <button id="btn-resign" onclick="resignGame()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                <i class="fa-solid fa-flag mr-1"></i>Resign
               </button>
-            </div>
-
-            <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
-              <div class="font-bold text-sm text-slate-200 flex items-center space-x-2">
-                <i class="fa-solid fa-right-to-bracket text-emerald-400"></i>
-                <span>Join Match</span>
-              </div>
-              <div>
-                <label class="block text-[11px] text-slate-400 mb-1">6-Character Room Code</label>
-                <input type="text" id="arenaJoinCode" uppercase placeholder="e.g. X8K2M1" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono tracking-wider focus:outline-none focus:border-emerald-500">
-              </div>
-              <button onclick="joinArenaRoom()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-emerald-600/30">
-                Join Match
+              <button id="btn-draw" onclick="offerDraw()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                Offer Draw
               </button>
             </div>
           </div>
         </div>
 
-        <div id="arenaGamePanel" class="hidden lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
-          <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col items-center">
-            <div class="w-full max-w-[560px] flex items-center justify-between mb-3 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-              <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 bg-red-600/20 text-red-400 rounded-lg flex items-center justify-center font-bold">
-                  <i class="fa-solid fa-user-ninja"></i>
-                </div>
-                <div>
-                  <div id="arenaOpponentHandle" class="text-xs font-bold text-slate-200">Waiting...</div>
-                  <div class="text-[10px] text-slate-400">Elo: <span id="arenaOpponentElo">1200</span></div>
+        <!-- Game Lobby / Control Panel (Right Col) -->
+        <div class="lg:col-span-4 flex flex-col space-y-6">
+
+          <!-- Match Selector Tabs -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
+            <h2 class="text-base font-bold text-slate-100 flex items-center">
+              <i class="fa-solid fa-chess-board text-indigo-400 mr-2"></i> Game Settings
+            </h2>
+
+            <!-- Bot Game Controls -->
+            <div id="bot-setup" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-2">Select Your Side</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button onclick="setPlayerSide('white')" id="side-white" class="side-btn py-2 bg-indigo-600 text-white font-medium text-xs rounded-xl border border-indigo-500 transition">
+                    ⚪ White
+                  </button>
+                  <button onclick="setPlayerSide('random')" id="side-random" class="side-btn py-2 bg-slate-800 text-slate-300 font-medium text-xs rounded-xl border border-slate-700 hover:bg-slate-750 transition">
+                    🎲 Random
+                  </button>
+                  <button onclick="setPlayerSide('black')" id="side-black" class="side-btn py-2 bg-slate-800 text-slate-300 font-medium text-xs rounded-xl border border-slate-700 hover:bg-slate-750 transition">
+                    ⚫ Black
+                  </button>
                 </div>
               </div>
-              <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-sm font-mono font-bold text-slate-300" id="arenaOpponentClock">
-                10:00
-              </div>
+
+              <button onclick="startBotMatch()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-600/30 text-sm transition">
+                Start AI Bot Game
+              </button>
             </div>
 
-            <div class="w-full max-w-[560px] aspect-square relative">
-              <div id="arenaBoard" class="w-full h-full rounded-lg overflow-hidden shadow-2xl"></div>
-            </div>
+            <hr class="border-slate-800" />
 
-            <div class="w-full max-w-[560px] flex items-center justify-between mt-3 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-              <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 bg-emerald-600/20 text-emerald-400 rounded-lg flex items-center justify-center font-bold">
-                  <i class="fa-solid fa-user"></i>
-                </div>
-                <div>
-                  <div id="arenaSelfHandle" class="text-xs font-bold text-slate-200">You</div>
-                  <div class="text-[10px] text-slate-400">Elo: <span id="arenaSelfElo">1200</span></div>
-                </div>
-              </div>
-              <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-sm font-mono font-bold text-slate-300" id="arenaSelfClock">
-                10:00
+            <!-- 1v1 Arena Multiplayer Setup -->
+            <div id="arena-setup" class="space-y-4">
+              <h3 class="text-sm font-bold text-slate-200 flex items-center">
+                <i class="fa-solid fa-users text-amber-400 mr-2"></i> 1v1 Arena Lobby
+              </h3>
+              <button onclick="createArenaRoom()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                Create Multiplayer Room
+              </button>
+
+              <div class="flex space-x-2">
+                <input id="room-code-input" type="text" placeholder="6-Char Room Code" uppercase class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-center tracking-widest text-slate-100 focus:outline-none focus:border-amber-500" />
+                <button onclick="joinArenaRoom()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-2 rounded-xl text-xs border border-slate-700 transition">
+                  Join
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="lg:col-span-4 space-y-4">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-[10px] text-slate-500 uppercase font-bold">Room Code</div>
-                  <div id="arenaActiveCode" class="text-base font-mono font-extrabold text-indigo-400">------</div>
-                </div>
-                <button onclick="leaveArenaRoom()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-semibold transition">
-                  Leave
-                </button>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
-                <button onclick="offerDraw()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 rounded-xl transition">
-                  <i class="fa-solid fa-handshake mr-1.5"></i>Offer Draw
-                </button>
-                <button onclick="resignArenaMatch()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold py-2 rounded-xl transition">
-                  <i class="fa-solid fa-flag mr-1.5"></i>Resign
-                </button>
-              </div>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col h-[320px]">
-              <div class="text-xs font-bold text-slate-300 mb-2 flex items-center justify-between">
-                <span><i class="fa-solid fa-comments text-indigo-400 mr-1.5"></i>Match Chat</span>
-                <span class="text-[9px] text-slate-500">Auto-Deletes On Exit</span>
-              </div>
-              <div id="arenaChatBox" class="flex-grow overflow-y-auto space-y-2 pr-1 text-xs mb-3">
-                <div class="text-slate-500 italic text-[11px]">Match room initialized.</div>
-              </div>
-              <form onsubmit="sendArenaChat(event)" class="flex gap-2">
-                <input type="text" id="arenaChatInput" placeholder="Send message..." class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">
-                  <i class="fa-solid fa-paper-plane"></i>
-                </button>
-              </form>
+          <!-- Board Theme Customizer -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Board Theme</h3>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="applyBoardTheme('theme-wood')" class="py-2 bg-amber-900/40 hover:bg-amber-900/60 border border-amber-700/50 rounded-xl text-xs font-medium text-amber-200">
+                Classic Wood
+              </button>
+              <button onclick="applyBoardTheme('theme-green')" class="py-2 bg-emerald-900/40 hover:bg-emerald-900/60 border border-emerald-700/50 rounded-xl text-xs font-medium text-emerald-200">
+                Chess Green
+              </button>
+              <button onclick="applyBoardTheme('theme-grey')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl text-xs font-medium text-slate-300">
+                Slate Grey
+              </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- BOARD THEMES / SETTINGS VIEW -->
-      <div id="chess-view-settings" class="hidden max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-        <div>
-          <h2 class="text-lg font-bold text-slate-100">Board Customizer</h2>
-          <p class="text-xs text-slate-400">Select your preferred board aesthetic.</p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <button onclick="applyBoardTheme('theme-wood')" class="bg-slate-950 border-2 border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl text-center space-y-3 transition">
-            <div class="w-16 h-16 mx-auto rounded-lg overflow-hidden border border-slate-700 grid grid-cols-2 grid-rows-2">
-              <div class="bg-[#f0d9b5]"></div><div class="bg-[#b58863]"></div><div class="bg-[#b58863]"></div><div class="bg-[#f0d9b5]"></div>
+          <!-- Arena Match Chat Box (Hidden for Bot games) -->
+          <div id="chat-container" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col h-64">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Match Chat</h3>
+            <div id="chat-messages" class="flex-grow overflow-y-auto space-y-2 mb-3 pr-1 text-xs">
+              <div class="text-slate-500 italic text-[11px]">Match chat connected...</div>
             </div>
-            <div class="text-xs font-bold text-slate-200">Classic Wood</div>
-          </button>
-
-          <button onclick="applyBoardTheme('theme-green')" class="bg-slate-950 border-2 border-slate-800 hover:border-emerald-500/50 p-4 rounded-2xl text-center space-y-3 transition">
-            <div class="w-16 h-16 mx-auto rounded-lg overflow-hidden border border-slate-700 grid grid-cols-2 grid-rows-2">
-              <div class="bg-[#eeeed2]"></div><div class="bg-[#769656]"></div><div class="bg-[#769656]"></div><div class="bg-[#eeeed2]"></div>
+            <div class="flex space-x-2">
+              <input id="chat-input" type="text" placeholder="Type a message..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500" onkeydown="if(event.key==='Enter') sendChatMessage()" />
+              <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold">
+                Send
+              </button>
             </div>
-            <div class="text-xs font-bold text-slate-200">Chess Green</div>
-          </button>
+          </div>
 
-          <button onclick="applyBoardTheme('theme-grey')" class="bg-slate-950 border-2 border-slate-800 hover:border-slate-500/50 p-4 rounded-2xl text-center space-y-3 transition">
-            <div class="w-16 h-16 mx-auto rounded-lg overflow-hidden border border-slate-700 grid grid-cols-2 grid-rows-2">
-              <div class="bg-[#e2e8f0]"></div><div class="bg-[#64748b]"></div><div class="bg-[#64748b]"></div><div class="bg-[#e2e8f0]"></div>
-            </div>
-            <div class="text-xs font-bold text-slate-200">Slate Grey</div>
-          </button>
         </div>
       </div>
     </section>
 
-    <!-- SECTION 2: COGNISHOP CRATE LAB -->
+    <!-- ================= SECTION: COGNISHOP ================= -->
     <section id="section-shop" class="hidden space-y-6">
-      
-      <!-- Crate Header -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-3">
-        <div class="inline-flex items-center space-x-2 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full text-indigo-400 text-xs font-bold">
-          <i class="fa-solid fa-box-open"></i>
-          <span>CogniShop Mystery Crates</span>
-        </div>
-        <h2 class="text-2xl font-black text-slate-100">Unbox Animated Emotes, Cosmetics & Flair</h2>
-        <p class="text-xs text-slate-400 max-w-lg mx-auto">
-          Spin crates for Profile Icons, Frames, Name Tags, Board Skins, Piece Sets, and Animated Emotes! 
-          <span class="text-amber-400 font-bold">Duplicates automatically refund 50% CC!</span>
-        </p>
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        <h2 class="text-2xl font-bold text-slate-100">CogniShop Crates</h2>
+        <p class="text-sm text-slate-400 mt-1">Unlock animated emotes, rare titles, board themes, and cosmetic avatar frames. Unlocking duplicate items automatically grants a 50% CogniCoin refund.</p>
       </div>
 
       <!-- Crate Cards Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        <!-- Pawn Crate (1,000 CC) -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-slate-700 transition">
-          <div class="space-y-4 text-center">
-            <div class="w-20 h-20 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-center text-4xl text-slate-300 mx-auto shadow-inner group-hover:scale-105 transition">
-              <i class="fa-solid fa-chess-pawn"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-extrabold text-slate-100">Pawn Crate</h3>
-              <p class="text-[11px] text-slate-400">Starter crate for icons, badges & emotes.</p>
-            </div>
 
-            <!-- Odds Breakdown -->
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] space-y-1 text-left">
-              <div class="font-bold text-slate-400 uppercase tracking-wider mb-1">Drop Odds</div>
-              <div class="flex justify-between"><span class="text-slate-400">🟢 Common:</span><span class="font-mono text-slate-200">65%</span></div>
-              <div class="flex justify-between"><span class="text-indigo-400">🔵 Rare:</span><span class="font-mono text-slate-200">28%</span></div>
-              <div class="flex justify-between"><span class="text-purple-400">🟣 Epic:</span><span class="font-mono text-slate-200">6%</span></div>
-              <div class="flex justify-between"><span class="text-amber-400">🟡 Legendary:</span><span class="font-mono text-slate-200">1%</span></div>
-            </div>
-          </div>
-
-          <button onclick="openCrateModal('pawn')" class="w-full bg-slate-800 hover:bg-indigo-600 text-slate-100 font-bold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2">
-            <i class="fa-solid fa-coins text-emerald-400"></i>
-            <span>Unbox for 1,000 CC</span>
-          </button>
-        </div>
-
-        <!-- Knight Crate (3,500 CC) -->
-        <div class="bg-slate-900 border border-indigo-500/30 rounded-2xl p-6 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-indigo-500/60 transition shadow-lg shadow-indigo-500/5">
-          <div class="space-y-4 text-center">
-            <div class="w-20 h-20 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl flex items-center justify-center text-4xl text-indigo-400 mx-auto shadow-inner group-hover:scale-105 transition">
-              <i class="fa-solid fa-chess-knight"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-extrabold text-slate-100">Knight Crate</h3>
-              <p class="text-[11px] text-slate-400">Higher chance for name tags & board skins.</p>
-            </div>
-
-            <!-- Odds Breakdown -->
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] space-y-1 text-left">
-              <div class="font-bold text-slate-400 uppercase tracking-wider mb-1">Drop Odds</div>
-              <div class="flex justify-between"><span class="text-slate-400">🟢 Common:</span><span class="font-mono text-slate-200">35%</span></div>
-              <div class="flex justify-between"><span class="text-indigo-400">🔵 Rare:</span><span class="font-mono text-slate-200">45%</span></div>
-              <div class="flex justify-between"><span class="text-purple-400">🟣 Epic:</span><span class="font-mono text-slate-200">16%</span></div>
-              <div class="flex justify-between"><span class="text-amber-400">🟡 Legendary:</span><span class="font-mono text-slate-200">4%</span></div>
-            </div>
-          </div>
-
-          <button onclick="openCrateModal('knight')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
-            <i class="fa-solid fa-coins text-emerald-400"></i>
-            <span>Unbox for 3,500 CC</span>
-          </button>
-        </div>
-
-        <!-- Grandmaster Crate (10,000 CC) -->
-        <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-amber-500 transition shadow-xl shadow-amber-500/10">
-          <div class="space-y-4 text-center">
-            <div class="w-20 h-20 bg-amber-950/40 border border-amber-500/30 rounded-2xl flex items-center justify-center text-4xl text-amber-400 mx-auto shadow-inner group-hover:scale-105 transition">
-              <i class="fa-solid fa-chess-king"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-extrabold text-slate-100">Grandmaster Crate</h3>
-              <p class="text-[11px] text-slate-400">Elite crate for Epics & 15% Legendary rate!</p>
-            </div>
-
-            <!-- Odds Breakdown -->
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] space-y-1 text-left">
-              <div class="font-bold text-slate-400 uppercase tracking-wider mb-1">Drop Odds</div>
-              <div class="flex justify-between"><span class="text-slate-400">🟢 Common:</span><span class="font-mono text-slate-200">10%</span></div>
-              <div class="flex justify-between"><span class="text-indigo-400">🔵 Rare:</span><span class="font-mono text-slate-200">35%</span></div>
-              <div class="flex justify-between"><span class="text-purple-400">🟣 Epic:</span><span class="font-mono text-slate-200">40%</span></div>
-              <div class="flex justify-between"><span class="text-amber-400">🟡 Legendary:</span><span class="font-mono text-slate-200">15%</span></div>
-            </div>
-          </div>
-
-          <button onclick="openCrateModal('grandmaster')" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/20">
-            <i class="fa-solid fa-coins text-slate-950"></i>
-            <span>Unbox for 10,000 CC</span>
-          </button>
-        </div>
-
-      </div>
-
-      <!-- Inventory Preview Section -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-        <h3 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
-          <i class="fa-solid fa-box-archive text-indigo-400"></i>
-          <span>Your Owned Cosmetics Collection</span>
-        </h3>
-        <div id="userInventoryDisplay" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-          <div class="text-center py-6 text-xs text-slate-500 col-span-full">Loading inventory...</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 3: FRIENDS & DIRECT MESSAGES -->
-    <section id="section-social" class="hidden space-y-6">
-      <div class="flex border-b border-slate-800 pb-4 space-x-2">
-        <button onclick="switchSocialSubTab('list')" id="subtab-friends" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700">
-          <i class="fa-solid fa-user-group mr-1.5"></i>Friends List
-        </button>
-        <button onclick="switchSocialSubTab('messages')" id="subtab-messages" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
-          <i class="fa-solid fa-envelope mr-1.5"></i>Direct Messages
-        </button>
-      </div>
-
-      <div id="social-view-list" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-          <h3 class="text-sm font-bold text-slate-200">Add Friend</h3>
-          <div class="flex gap-2">
-            <input type="text" id="addFriendInput" placeholder="Enter Exact Handle..." class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-            <button onclick="sendFriendRequest()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs transition">
-              <i class="fa-solid fa-user-plus"></i>
-            </button>
-          </div>
-          <div id="friendSearchMsg" class="text-[11px] text-slate-400"></div>
-        </div>
-
-        <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-          <h3 class="text-sm font-bold text-slate-200">Your Friends</h3>
-          <div id="friendsListContainer" class="space-y-2">
-            <div class="text-center py-8 text-xs text-slate-500">No friends added yet.</div>
-          </div>
-        </div>
-      </div>
-
-      <div id="social-view-messages" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Conversations</h3>
-          <div id="dmContactsContainer" class="space-y-1">
-            <div class="text-center py-6 text-xs text-slate-500">No active conversations.</div>
-          </div>
-        </div>
-
-        <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col h-[480px]">
-          <div id="dmHeader" class="text-xs font-bold text-slate-200 pb-3 border-b border-slate-800 flex items-center justify-between">
-            <span>Select a friend to message</span>
-          </div>
-          <div id="dmChatMessages" class="flex-grow overflow-y-auto space-y-3 py-4 pr-1 text-xs">
-            <div class="text-center text-slate-500 text-xs py-12">No conversation selected.</div>
-          </div>
-          <form onsubmit="sendDirectMessage(event)" class="flex gap-2 pt-2 border-t border-slate-800">
-            <input type="text" id="dmChatInput" placeholder="Write message..." disabled class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 disabled:opacity-50">
-            <button type="submit" id="dmSendBtn" disabled class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition disabled:opacity-50">
-              <i class="fa-solid fa-paper-plane"></i>
-            </button>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 4: MASTER CONTROL ADMIN PANEL (zainisgo123@gmail.com ONLY) -->
-    <section id="section-admin" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <!-- Pawn Crate -->
+        <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition">
           <div>
-            <h2 class="text-xl font-black text-amber-400 flex items-center space-x-2">
-              <i class="fa-solid fa-user-shield"></i>
-              <span>Master Control Panel</span>
-            </h2>
-            <p class="text-xs text-slate-400">Superuser administrative suite for platform governance and coin regulation.</p>
+            <div class="w-16 h-16 bg-slate-800 text-slate-300 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-slate-700">
+              ♟️
+            </div>
+            <h3 class="text-lg font-bold text-slate-100 text-center">Pawn Crate</h3>
+            <p class="text-xs text-slate-400 text-center mt-1 mb-4">A basic crate with low odds for cool items</p>
+            
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1 mb-6">
+              <div class="flex justify-between text-slate-400"><span>Common Drop:</span><span class="font-bold text-slate-300">65%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Rare Drop:</span><span class="font-bold text-blue-400">28%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Epic Drop:</span><span class="font-bold text-purple-400">6%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Legendary:</span><span class="font-bold text-amber-400">1%</span></div>
+            </div>
           </div>
-          <button id="adminMaintToggleBtn" onclick="toggleMaintenanceMode()" class="px-4 py-2 rounded-xl font-bold text-xs shadow-lg transition flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span id="adminMaintText">Maintenance Normal (OFF)</span>
+          <button onclick="openCrate('pawn')" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center">
+            <i class="fa-solid fa-coins text-amber-400 mr-2"></i> Open for 1,000 CC
           </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button onclick="triggerGlobalReload()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 p-4 rounded-xl text-left transition flex items-center justify-between">
-            <div>
-              <div class="text-xs font-bold text-slate-100">Force Global Client Reload</div>
-              <div class="text-[10px] text-slate-400">Triggers immediate page refresh for all active sessions.</div>
+        <!-- Knight Crate -->
+        <div class="bg-slate-900 border border-indigo-500/30 hover:border-indigo-500/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition relative overflow-hidden">
+          <div class="absolute top-3 right-3 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded text-[10px] font-bold">POPULAR</div>
+          <div>
+            <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-indigo-500/30">
+              ♞
             </div>
-            <i class="fa-solid fa-arrows-rotate text-indigo-400 text-lg"></i>
-          </button>
+            <h3 class="text-lg font-bold text-slate-100 text-center">Knight Crate</h3>
+            <p class="text-xs text-slate-400 text-center mt-1 mb-4">A decent crate with higher odds for nice items</p>
 
-          <button onclick="purgeAbnormalRatings()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 p-4 rounded-xl text-left transition flex items-center justify-between">
-            <div>
-              <div class="text-xs font-bold text-slate-100">Purge High Elo (&gt;3000)</div>
-              <div class="text-[10px] text-slate-400">Resets exploit or abnormal ratings back to standard 1200.</div>
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1 mb-6">
+              <div class="flex justify-between text-slate-400"><span>Common Drop:</span><span class="font-bold text-slate-300">35%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Rare Drop:</span><span class="font-bold text-blue-400">45%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Epic Drop:</span><span class="font-bold text-purple-400">16%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Legendary:</span><span class="font-bold text-amber-400">4%</span></div>
             </div>
-            <i class="fa-solid fa-filter text-amber-400 text-lg"></i>
+          </div>
+          <button onclick="openCrate('knight')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center shadow-lg shadow-indigo-600/30">
+            <i class="fa-solid fa-coins text-amber-300 mr-2"></i> Open for 3,500 CC
           </button>
         </div>
 
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Registered Accounts Directory</h3>
-            <span class="text-[11px] text-emerald-400 font-semibold">Strict 100k CC Cap Enforced</span>
+        <!-- Grandmaster Crate -->
+        <div class="bg-slate-900 border border-amber-500/30 hover:border-amber-500/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition relative overflow-hidden">
+          <div class="absolute top-3 right-3 bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold">PREMIUM</div>
+          <div>
+            <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-amber-500/30">
+              👑
+            </div>
+            <h3 class="text-lg font-bold text-slate-100 text-center">Grandmaster Crate</h3>
+            <p class="text-xs text-slate-400 text-center mt-1 mb-4">A legendary crate with the best odds for the best items</p>
+
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1 mb-6">
+              <div class="flex justify-between text-slate-400"><span>Common Drop:</span><span class="font-bold text-slate-300">10%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Rare Drop:</span><span class="font-bold text-blue-400">35%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Epic Drop:</span><span class="font-bold text-purple-400">40%</span></div>
+              <div class="flex justify-between text-slate-400"><span>Legendary:</span><span class="font-bold text-amber-400">15%</span></div>
+            </div>
+          </div>
+          <button onclick="openCrate('grandmaster')" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center shadow-lg shadow-amber-600/30">
+            <i class="fa-solid fa-coins text-amber-300 mr-2"></i> Open for 10,000 CC
+          </button>
+        </div>
+
+      </div>
+
+      <!-- CS:GO Unboxing Reel Modal -->
+      <div id="crate-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-xl w-full text-center relative shadow-2xl overflow-hidden">
+          <h3 class="text-lg font-bold text-slate-100 mb-4" id="unboxing-title">Opening Crate...</h3>
+          
+          <!-- CS:GO Horizontal Strip Container -->
+          <div class="crate-strip-container bg-slate-950 rounded-xl border border-slate-800 my-4 py-2">
+            <!-- Center Win Indicator Line -->
+            <div class="absolute left-1/2 top-0 bottom-0 w-1 bg-amber-400 z-30 transform -translate-x-1/2 shadow-[0_0_10px_#f59e0b]"></div>
+            <div id="crate-strip" class="crate-strip"></div>
           </div>
 
-          <div class="overflow-x-auto border border-slate-800 rounded-xl">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800">
-                <tr>
-                  <th class="p-3">User Handle / UID</th>
-                  <th class="p-3">Email</th>
-                  <th class="p-3">Elo Rating</th>
-                  <th class="p-3">CogniCoins (CC)</th>
-                  <th class="p-3 text-right">Admin Actions</th>
-                </tr>
-              </thead>
-              <tbody id="adminUsersTable" class="divide-y divide-slate-800/80 bg-slate-900/50">
-                <tr>
-                  <td colspan="5" class="p-4 text-center text-slate-500">Loading directory...</td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- Unboxing Win Result Card -->
+          <div id="unboxing-result" class="hidden my-4 p-4 rounded-xl border bg-slate-950/80 animate-fade-in">
+            <div id="result-rarity-tag" class="text-[10px] font-bold uppercase tracking-widest mb-1">Common</div>
+            <div id="result-icon" class="text-4xl my-2">🎉</div>
+            <div id="result-name" class="text-base font-bold text-slate-100">Item Name</div>
+            <div id="result-refund-notice" class="hidden text-xs text-amber-400 mt-2 font-medium bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Duplicate item owned! Automatically refunded 50% CC.
+            </div>
           </div>
+
+          <button id="btn-close-crate" onclick="closeCrateModal()" class="hidden w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-sm transition mt-2">
+            Collect Item
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION: INVENTORY ================= -->
+    <section id="section-inventory" class="hidden space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-100">Your Cosmetics & Animated Emotes</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Manage unlocked items and set active profile cosmetics.</p>
+        </div>
+      </div>
+
+      <!-- Inventory Grid -->
+      <div id="inventory-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <!-- Dynamic Owned Items Injected Here -->
+      </div>
+    </section>
+
+    <!-- ================= SECTION: LEADERBOARD ================= -->
+    <section id="section-leaderboard" class="hidden space-y-6">
+      <div class="border-b border-slate-800 pb-4">
+        <h2 class="text-xl font-bold text-slate-100">Global Strategic Leaderboard</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Top players ranked by Elo rating.</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-950 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
+            <tr>
+              <th class="py-3 px-4">Rank</th>
+              <th class="py-3 px-4">Player</th>
+              <th class="py-3 px-4 text-right">Elo Rating</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body" class="divide-y divide-slate-800/60 text-slate-300">
+            <!-- Dynamic Leaderboard Rows -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= SECTION: MASTER ADMIN PANEL ================= -->
+    <!-- Strictly Restricted to zainisgo123@gmail.com -->
+    <section id="section-admin" class="hidden space-y-6">
+      <div class="border-b border-red-500/30 pb-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-red-400 flex items-center">
+            <i class="fa-solid fa-user-shield mr-2"></i> Master Control Panel
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Administrative tools strictly authorized for <span class="font-mono text-red-400">zainisgo123@gmail.com</span>.</p>
+        </div>
+        
+        <!-- Dynamic Maintenance Mode Toggle Button -->
+        <button id="admin-maint-btn" onclick="adminToggleMaintenance()" class="px-4 py-2 rounded-xl text-xs font-bold transition shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white">
+          Maintenance Normal (OFF)
+        </button>
+      </div>
+
+      <!-- Global Actions Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
+          <h3 class="text-xs font-bold text-slate-300 uppercase">System Maintenance</h3>
+          <p class="text-[11px] text-slate-500">Lock out non-whitelisted users during maintenance upgrades.</p>
+          <button onclick="adminToggleMaintenance()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 rounded-lg text-xs font-semibold border border-slate-700 transition">
+            Toggle System Maintenance
+          </button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
+          <h3 class="text-xs font-bold text-slate-300 uppercase">Force Global Reload</h3>
+          <p class="text-[11px] text-slate-500">Trigger active sessions to refresh platform state.</p>
+          <button onclick="adminForceGlobalReload()" class="w-full bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 py-2 rounded-lg text-xs font-semibold transition">
+            Trigger Global Reload
+          </button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
+          <h3 class="text-xs font-bold text-slate-300 uppercase">Purge Elo Anomalies</h3>
+          <p class="text-[11px] text-slate-500">Sanitize ladder accounts exceeding >3000 Elo limit.</p>
+          <button onclick="adminPurgeHighElo()" class="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 py-2 rounded-lg text-xs font-semibold transition">
+            Purge Accounts >3000 Elo
+          </button>
+        </div>
+      </div>
+
+      <!-- User Management Table -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="p-4 border-b border-slate-800 font-bold text-sm text-slate-200">Registered Users Management</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950 text-slate-400 uppercase border-b border-slate-800">
+              <tr>
+                <th class="py-2.5 px-4">UID / Email</th>
+                <th class="py-2.5 px-4">Elo Rating</th>
+                <th class="py-2.5 px-4">Coins (CC)</th>
+                <th class="py-2.5 px-4 text-right">Admin Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-user-table" class="divide-y divide-slate-800 text-slate-300">
+              <!-- Admin User Rows Injected Dynamically -->
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- CRATE SPINNER MODAL (CS:GO Horizontal Rolling Strip) -->
-  <div id="crateModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-2xl w-full space-y-6 shadow-2xl relative">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 id="crateModalTitle" class="text-lg font-black text-slate-100">Opening Crate...</h3>
-          <p class="text-xs text-slate-400">Good luck! Unboxing live reward item...</p>
-        </div>
-        <button id="closeCrateModalBtn" onclick="closeCrateModal()" class="text-slate-500 hover:text-slate-200 transition text-sm">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
+  <!-- Global Footer -->
+  <footer class="bg-slate-950 border-t border-slate-900 py-4 text-center text-xs text-slate-600">
+    <p>CogniLearn – Strategic Thinking Lab &bull; Educational Platform &bull; All rights reserved.</p>
+  </footer>
 
-      <div class="w-full bg-slate-950 border-2 border-indigo-500/50 rounded-xl h-36 relative overflow-hidden flex items-center shadow-inner">
-        <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-amber-400 z-20 shadow-[0_0_12px_rgba(251,191,36,0.8)] pointer-events-none"></div>
-
-        <div id="crateStrip" class="flex items-center space-x-3 absolute left-0 crate-strip-container pl-[280px]">
-          <!-- Dynamic Items Injected via JS -->
-        </div>
-      </div>
-
-      <div id="crateResultBox" class="hidden text-center space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
-        <div id="resultRarityTag" class="inline-block px-3 py-1 rounded-full text-[10px] font-extrabold uppercase"></div>
-        <h4 id="resultItemName" class="text-xl font-black text-slate-100">Item Name</h4>
-        <p id="resultDuplicateText" class="text-xs text-emerald-400 font-bold"></p>
-        <button onclick="closeCrateModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2 rounded-xl text-xs transition">Collect Reward</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- USERNAME CHANGE MODAL -->
-  <div id="usernameModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4">
-      <h3 class="text-sm font-bold text-slate-100">Update Profile Handle</h3>
-      <input type="text" id="newHandleInput" placeholder="New Username Handle" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-      <div class="flex justify-end space-x-2">
-        <button onclick="closeUsernameModal()" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200">Cancel</button>
-        <button onclick="saveUsernameHandle()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- GAME OVER MODAL -->
-  <div id="gameOverModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full text-center space-y-3 shadow-2xl">
-      <div id="goModalIcon" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto text-2xl"></div>
-      <h3 id="goModalTitle" class="text-lg font-bold text-slate-100">Match Complete</h3>
-      <p id="goModalDesc" class="text-xs text-slate-400"></p>
-      <div class="text-[10px] text-slate-500">Closing automatically in 3 seconds...</div>
-    </div>
-  </div>
-
-  <!-- JAVASCRIPT APPLICATION CORE -->
+  <!-- Main JavaScript Logic -->
   <script>
-    // System Constants
+    // ================= GLOBAL CONFIGURATION =================
     const ADMIN_EMAIL = "zainisgo123@gmail.com";
-    const WHITELISTED_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
-    const MAX_COIN_LIMIT = 100000;
+    const WHITELISTED_MAINTENANCE_EMAILS = [
+      "zainisgo123@gmail.com",
+      "faceca4769@afronewz.com"
+    ];
 
-    // Firebase Configuration
+    // Firebase Initialization
     const firebaseConfig = {
       apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
       authDomain: "chess-7df7a.firebaseapp.com",
@@ -765,887 +623,871 @@
       appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
     };
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
 
+    // Enforce Session-Only Auth Persistence
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
-    // Global State
+    // Global State Variables
     let currentUser = null;
-    let currentUserData = null;
-    let sessionStartTime = Date.now();
-    let currentBoardTheme = localStorage.getItem("cogni_board_theme") || "theme-wood";
-    let isSpinningCrate = false;
+    let userData = null;
+    let game = new Chess();
+    let board = null;
+    let playerColor = 'w';
+    let vsBot = true;
+    let currentRoomCode = null;
+    let roomRef = null;
+    let selectedSquare = null;
+    let arenaOpponentElo = 1200;
 
-    // Chess State
-    let botGame = null;
-    let botBoard = null;
-    let botPlayerColor = 'w';
-    let arenaGame = null;
-    let arenaBoard = null;
-    let activeArenaRoom = null;
-    let arenaPlayerColor = 'w';
-    let activeDMTarget = null;
-
-    // CRATE CONFIGURATIONS & ANIMATED EMOTES
+    // Crate Shop Catalog & Odds Configuration
     const CRATE_CONFIGS = {
       pawn: {
         name: "Pawn Crate",
         cost: 1000,
         refund: 500,
+        description: "A basic crate with low odds for cool items",
         odds: { common: 0.65, rare: 0.28, epic: 0.06, legendary: 0.01 }
       },
       knight: {
         name: "Knight Crate",
         cost: 3500,
         refund: 1750,
+        description: "A decent crate with higher odds for nice items",
         odds: { common: 0.35, rare: 0.45, epic: 0.16, legendary: 0.04 }
       },
       grandmaster: {
         name: "Grandmaster Crate",
         cost: 10000,
         refund: 5000,
+        description: "A legendary crate with the best odds for the best items",
         odds: { common: 0.10, rare: 0.35, epic: 0.40, legendary: 0.15 }
       }
     };
 
-    const COSMETICS_CATALOG = [
-      // Common
-      { id: "icon_pawn_novice", name: "Pawn Novice Icon", type: "Profile Icon", rarity: "common", icon: "fa-chess-pawn", anim: "" },
-      { id: "icon_rook_tower", name: "Rook Tower Icon", type: "Profile Icon", rarity: "common", icon: "fa-chess-rook", anim: "" },
-      { id: "frame_wooden_ring", name: "Wooden Ring Frame", type: "Avatar Frame", rarity: "common", icon: "fa-circle-notch", anim: "" },
-      { id: "title_learner", name: "[Learner] Title", type: "Name Tag", rarity: "common", icon: "fa-tag", anim: "" },
-      { id: "emote_tea", name: "Sipping Tea ☕", type: "Animated Emote", rarity: "common", icon: "fa-mug-hot", anim: "emote-pulse" },
-      { id: "emote_thinking", name: "Thinking 🧠", type: "Animated Emote", rarity: "common", icon: "fa-brain", anim: "emote-pulse" },
-
-      // Rare
-      { id: "icon_knight_shield", name: "Knight Shield Icon", type: "Profile Icon", rarity: "rare", icon: "fa-chess-knight", anim: "" },
-      { id: "icon_bishop_cross", name: "Bishop Cross Icon", type: "Profile Icon", rarity: "rare", icon: "fa-chess-bishop", anim: "" },
-      { id: "frame_iron_border", name: "Iron Border Frame", type: "Avatar Frame", rarity: "rare", icon: "fa-shield-halved", anim: "" },
-      { id: "title_tactician", name: "[Tactician] Title", type: "Name Tag", rarity: "rare", icon: "fa-bolt", anim: "" },
-      { id: "emote_flex", name: "Crown Flex 👑", type: "Animated Emote", rarity: "rare", icon: "fa-crown", anim: "emote-bounce" },
-      { id: "skin_board_green", name: "Chess Green Skin", type: "Board Skin", rarity: "rare", icon: "fa-border-all", anim: "" },
-
-      // Epic
-      { id: "icon_queen_crown", name: "Queen Crown Icon", type: "Profile Icon", rarity: "epic", icon: "fa-chess-queen", anim: "" },
-      { id: "frame_indigo_aura", name: "Glowing Indigo Aura", type: "Avatar Frame", rarity: "epic", icon: "fa-dharmachakra", anim: "emote-spin" },
-      { id: "title_mastermind", name: "[🧠 Mastermind] Title", type: "Name Tag", rarity: "epic", icon: "fa-wand-magic-sparkles", anim: "" },
-      { id: "emote_checkmate", name: "Checkmate Flex ⚡", type: "Animated Emote", rarity: "epic", icon: "fa-hand-fist", anim: "emote-shake" },
-      { id: "skin_board_cyber", name: "Cyber Neon Board Skin", type: "Board Skin", rarity: "epic", icon: "fa-microchip", anim: "" },
-      { id: "pieces_neon_glow", name: "Neon Glow Piece Set", type: "Piece Set", rarity: "epic", icon: "fa-cubes", anim: "" },
-
-      // Legendary
-      { id: "icon_golden_brain", name: "Golden Brain Icon", type: "Profile Icon", rarity: "legendary", icon: "fa-brain", anim: "emote-glow" },
-      { id: "frame_gold_flame", name: "Animated Gold Flame Frame", type: "Avatar Frame", rarity: "legendary", icon: "fa-fire", anim: "emote-bounce" },
-      { id: "title_sovereign", name: "[✨ Sovereign] Title", type: "Name Tag", rarity: "legendary", icon: "fa-gem", anim: "emote-glow" },
-      { id: "emote_gold_trophy", name: "Golden Trophy 🏆", type: "Animated Emote", rarity: "legendary", icon: "fa-trophy", anim: "emote-glow" },
-      { id: "skin_board_gold", name: "Midnight Gold Board Skin", type: "Board Skin", rarity: "legendary", icon: "fa-star", anim: "" },
-      { id: "pieces_imperial_gold", name: "Imperial Gold Piece Set", type: "Piece Set", rarity: "legendary", icon: "fa-crown", anim: "" }
+    // Item Catalog Definition
+    const ITEM_CATALOG = [
+      { id: "title_novice", name: "Novice Strategist", type: "title", rarity: "common", icon: "🏷️" },
+      { id: "title_tactician", name: "Tactical Master", type: "title", rarity: "rare", icon: "🎖️" },
+      { id: "title_grandmaster", name: "Grandmaster Thinker", type: "title", rarity: "legendary", icon: "👑" },
+      { id: "emote_bounce", name: "Animated Bounce Emote", type: "emote", rarity: "rare", icon: "⚡", animClass: "emote-bounce" },
+      { id: "emote_pulse", name: "Animated Pulse Emote", type: "emote", rarity: "rare", icon: "🔥", animClass: "emote-pulse" },
+      { id: "emote_shake", name: "Animated Shake Emote", type: "emote", rarity: "epic", icon: "💥", animClass: "emote-shake" },
+      { id: "emote_glow", name: "Animated Legendary Glow Emote", type: "emote", rarity: "legendary", icon: "🌟", animClass: "emote-glow" },
+      { id: "avatar_frame_gold", name: "Gold Crown Frame", type: "frame", rarity: "epic", icon: "🖼️" }
     ];
 
+    // ================= CHESS.COM-STYLE GLICKO / ELO RATING CALCULATOR =================
+    function getKFactor(gamesPlayed) {
+      const games = gamesPlayed || 0;
+      if (games < 10) return 40;       // High K for new players
+      if (games < 30) return 32;       // Intermediate K
+      return 16;                       // K=16 for established players (yields +8 against equal opponent)
+    }
+
+    function calculateRatingChange(playerRating, opponentRating, actualScore, gamesPlayed) {
+      const expectedScore = 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400));
+      const k = getKFactor(gamesPlayed);
+      return Math.round(k * (actualScore - expectedScore));
+    }
+
+    // ================= SAFE COIN TRANSACTION HELPERS =================
     function safeAddCoins(targetUid, amountDelta) {
       if (!targetUid) return Promise.reject("Invalid UID");
-      const userRef = db.ref('users/' + targetUid + '/coins');
-      return userRef.transaction((currentBalance) => {
-        const curr = currentBalance !== null ? currentBalance : 1000;
-        const newBal = curr + amountDelta;
-        return Math.min(MAX_COIN_LIMIT, Math.max(0, Math.floor(newBal)));
+      const userCoinsRef = db.ref('users/' + targetUid + '/coins');
+      return userCoinsRef.transaction((current) => {
+        const currBal = (current !== null) ? current : 1000;
+        const newBal = currBal + amountDelta;
+        return Math.max(0, Math.floor(newBal));
       });
     }
 
     function safeSetCoins(targetUid, absoluteAmount) {
       if (!targetUid) return Promise.reject("Invalid UID");
-      const safeBal = Math.min(MAX_COIN_LIMIT, Math.max(0, Math.floor(absoluteAmount)));
+      const safeBal = Math.max(0, Math.floor(absoluteAmount));
       return db.ref('users/' + targetUid + '/coins').set(safeBal);
     }
 
+    // ================= INITIALIZATION & AUTH =================
     auth.onAuthStateChanged((user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
-      currentUser = user;
-
-      const userRef = db.ref('users/' + user.uid);
-      userRef.on('value', (snap) => {
-        const data = snap.val();
-        if (!data) {
-          const defaultData = {
-            handle: user.displayName || user.email.split('@')[0],
-            email: user.email,
-            elo: 1200,
-            coins: 1000,
-            inventory: { icon_pawn_novice: true },
-            createdAt: Date.now()
-          };
-          userRef.set(defaultData);
-          currentUserData = defaultData;
-        } else {
-          if (data.coins > MAX_COIN_LIMIT) {
-            safeSetCoins(user.uid, MAX_COIN_LIMIT);
-            data.coins = MAX_COIN_LIMIT;
-          }
-          currentUserData = data;
-        }
-        updateUIHeader();
-        renderUserInventory();
-      });
-
-      // STRICT ADMIN VISIBILITY LOCK
-      if (user.email === ADMIN_EMAIL) {
-        document.getElementById('tab-admin').classList.remove('hidden');
-        document.getElementById('mob-tab-admin').classList.remove('hidden');
-        listenAdminUsers();
+      if (user) {
+        currentUser = user;
+        listenUserData(user.uid);
+        listenSystemMaintenance();
+        initChessboard();
       } else {
-        document.getElementById('tab-admin').classList.add('hidden');
-        document.getElementById('mob-tab-admin').classList.add('hidden');
+        // Unauthenticated -> Redirect to index.html
+        window.location.href = "index.html";
       }
-
-      db.ref('system/maintenance').on('value', (snap) => {
-        const isMaint = snap.val() === true;
-        const toggleBtn = document.getElementById('adminMaintToggleBtn');
-        const toggleText = document.getElementById('adminMaintText');
-        if (isMaint) {
-          toggleBtn.className = "px-4 py-2 rounded-xl font-bold text-xs shadow-lg transition flex items-center space-x-2 bg-red-600 hover:bg-red-500 text-white";
-          toggleText.innerText = "Maintenance Active (ON)";
-        } else {
-          toggleBtn.className = "px-4 py-2 rounded-xl font-bold text-xs shadow-lg transition flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white";
-          toggleText.innerText = "Maintenance Normal (OFF)";
-        }
-
-        if (isMaint && !WHITELISTED_EMAILS.includes(user.email)) {
-          document.getElementById('maintenanceModal').classList.remove('hidden');
-        } else {
-          document.getElementById('maintenanceModal').classList.add('hidden');
-        }
-      });
-
-      db.ref('system/globalReloadTimestamp').on('value', (snap) => {
-        const ts = snap.val();
-        if (ts && ts > sessionStartTime) window.location.reload();
-      });
-
-      db.ref('presence/' + user.uid).set({ online: true, inGame: false });
-      db.ref('presence/' + user.uid).onDisconnect().remove();
-
-      initBotChess();
-      applyBoardTheme(currentBoardTheme);
     });
 
-    function logout() {
-      localStorage.clear();
-      if (currentUser) db.ref('presence/' + currentUser.uid).remove();
-      auth.signOut().then(() => { window.location.href = "index.html"; });
+    function listenUserData(uid) {
+      db.ref('users/' + uid).on('value', (snapshot) => {
+        userData = snapshot.val() || {};
+        if (userData.coins === undefined) {
+          safeSetCoins(uid, 1000);
+        }
+        if (userData.elo === undefined) {
+          db.ref('users/' + uid + '/elo').set(1200);
+        }
+        if (userData.gamesPlayed === undefined) {
+          db.ref('users/' + uid + '/gamesPlayed').set(0);
+        }
+        updateUIHeader();
+        renderInventory();
+        
+        // Show Admin Tab strictly for ADMIN_EMAIL
+        if (currentUser && currentUser.email === ADMIN_EMAIL) {
+          document.getElementById('tab-admin').classList.remove('hidden');
+          document.getElementById('mob-tab-admin').classList.remove('hidden');
+          loadAdminUserTable();
+        } else {
+          document.getElementById('tab-admin').classList.add('hidden');
+          document.getElementById('mob-tab-admin').classList.add('hidden');
+        }
+      });
+    }
+
+    function listenSystemMaintenance() {
+      db.ref('system/maintenance').on('value', (snapshot) => {
+        const isMaintenance = snapshot.val() === true;
+        updateAdminMaintenanceButtonUI(isMaintenance);
+
+        if (isMaintenance) {
+          const userEmail = currentUser ? currentUser.email : "";
+          if (!WHITELISTED_MAINTENANCE_EMAILS.includes(userEmail)) {
+            document.getElementById('maintenance-modal').classList.remove('hidden');
+          } else {
+            document.getElementById('maintenance-modal').classList.add('hidden');
+          }
+        } else {
+          document.getElementById('maintenance-modal').classList.add('hidden');
+        }
+      });
+    }
+
+    function handleMaintenanceRedirect() {
+      auth.signOut().then(() => {
+        window.location.href = "index.html";
+      });
     }
 
     function updateUIHeader() {
-      if (!currentUserData) return;
-      document.getElementById('userCoins').innerText = (currentUserData.coins || 0).toLocaleString();
-      document.getElementById('userElo').innerText = currentUserData.elo || 1200;
-      document.getElementById('navHandle').innerText = currentUserData.handle || "Player";
-      document.getElementById('botPlayerHandle').innerText = currentUserData.handle || "Player";
-      document.getElementById('arenaSelfHandle').innerText = currentUserData.handle || "You";
-      document.getElementById('arenaSelfElo').innerText = currentUserData.elo || 1200;
+      if (!userData) return;
+      document.getElementById('nav-coins').innerText = (userData.coins || 0).toLocaleString();
+      document.getElementById('nav-username').innerText = userData.username || currentUser.email.split('@')[0];
+      document.getElementById('nav-elo').innerText = (userData.elo || 1200) + " Elo";
+      document.getElementById('player-elo').innerText = (userData.elo || 1200) + " Elo";
     }
 
-    function claimFaucet() {
-      if (!currentUser || !currentUserData) return;
-      if (currentUserData.coins >= MAX_COIN_LIMIT) return alert("Coin limit reached! Maximum balance is 100,000 CC.");
-      safeAddCoins(currentUser.uid, 250).then(() => alert("Claimed +250 CC Daily/Bankruptcy Faucet!"));
+    function handleLogout() {
+      auth.signOut().then(() => {
+        window.location.href = "index.html";
+      });
     }
 
+    // ================= TAB NAVIGATION =================
     function switchTab(tab) {
-      if (tab === 'admin' && currentUser.email !== ADMIN_EMAIL) return; // Strict Guard
-
-      ['chess', 'shop', 'social', 'admin'].forEach(t => {
-        document.getElementById('section-' + t).classList.add('hidden');
-        const btn = document.getElementById('tab-' + t);
-        if (btn) btn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900";
+      const sections = ['play', 'shop', 'inventory', 'leaderboard', 'admin'];
+      sections.forEach(s => {
+        const el = document.getElementById('section-' + s);
+        if (el) el.classList.add('hidden');
+        const tabBtn = document.getElementById('tab-' + s);
+        if (tabBtn) {
+          tabBtn.classList.remove('bg-indigo-600', 'text-white');
+          tabBtn.classList.add('text-slate-400');
+        }
       });
 
-      document.getElementById('section-' + tab).classList.remove('hidden');
+      // Show Selected Section
+      const targetSec = document.getElementById('section-' + tab);
+      if (targetSec) targetSec.classList.remove('hidden');
+
       const activeBtn = document.getElementById('tab-' + tab);
-      if (activeBtn) {
-        if (tab === 'admin') activeBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 bg-amber-500 text-slate-950 font-bold shadow";
-        else activeBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 bg-indigo-600 text-white shadow";
+      if (activeBtn && tab !== 'admin') {
+        activeBtn.classList.add('bg-indigo-600', 'text-white');
+        activeBtn.classList.remove('text-slate-400');
       }
 
-      if (tab === 'chess') setTimeout(() => { if (botBoard) botBoard.resize(); if (arenaBoard) arenaBoard.resize(); }, 50);
-      else if (tab === 'social') loadFriendsList();
+      if (tab === 'leaderboard') loadLeaderboard();
+      if (tab === 'play' && board) setTimeout(() => board.resize(), 100);
     }
 
-    function switchChessSubTab(sub) {
-      ['bot', 'arena', 'settings'].forEach(s => {
-        document.getElementById('chess-view-' + s).classList.add('hidden');
-        const btn = document.getElementById('subtab-' + s);
-        if (btn) btn.className = "px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200";
-      });
-      document.getElementById('chess-view-' + sub).classList.remove('hidden');
-      document.getElementById('subtab-' + sub).className = "px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700";
-      setTimeout(() => { if (sub === 'bot' && botBoard) botBoard.resize(); if (sub === 'arena' && arenaBoard) arenaBoard.resize(); }, 50);
+    // ================= CHESSBOARD & GAME LOGIC =================
+    function initChessboard() {
+      const savedTheme = localStorage.getItem('cogni_board_theme') || 'theme-wood';
+      applyBoardTheme(savedTheme);
+
+      const config = {
+        draggable: false, // Click-to-move piece controls only
+        position: 'start'
+      };
+
+      board = Chessboard('myBoard', config);
+      setupClickToMove();
+
+      // Check board layout on window resize
+      window.addEventListener('resize', () => { if (board) board.resize(); });
     }
 
-    // CRATE SPINNER & UNBOXING LOGIC
-    function openCrateModal(crateKey) {
-      if (isSpinningCrate) return;
-      const crate = CRATE_CONFIGS[crateKey];
-      if (!crate) return;
-
-      if (currentUserData.coins < crate.cost) return alert(`Insufficient coins! Unboxing requires ${crate.cost.toLocaleString()} CC.`);
-
-      safeAddCoins(currentUser.uid, -crate.cost); // Deduct CC
-
-      isSpinningCrate = true;
-      document.getElementById('closeCrateModalBtn').classList.add('hidden');
-      document.getElementById('crateResultBox').classList.add('hidden');
-      document.getElementById('crateModalTitle').innerText = `Opening ${crate.name}...`;
-
-      const modal = document.getElementById('crateModal');
-      modal.classList.remove('hidden');
-
-      // 1. Calculate Win Rarity
-      const rand = Math.random();
-      let wonRarity = "common";
-      if (rand < crate.odds.legendary) wonRarity = "legendary";
-      else if (rand < crate.odds.legendary + crate.odds.epic) wonRarity = "epic";
-      else if (rand < crate.odds.legendary + crate.odds.epic + crate.odds.rare) wonRarity = "rare";
-
-      const possibleItems = COSMETICS_CATALOG.filter(i => i.rarity === wonRarity);
-      const winningItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
-
-      // 2. Generate Strip Array (50 Items, Winner @ Index 40)
-      const stripContainer = document.getElementById('crateStrip');
-      stripContainer.style.transition = 'none';
-      stripContainer.style.transform = 'translateX(0px)';
-
-      let stripHTML = '';
-      for (let i = 0; i < 50; i++) {
-        let item = (i === 40) ? winningItem : COSMETICS_CATALOG[Math.floor(Math.random() * COSMETICS_CATALOG.length)];
-        let borderColor = item.rarity === 'legendary' ? 'border-amber-400 bg-amber-500/10' :
-                          item.rarity === 'epic' ? 'border-purple-400 bg-purple-500/10' :
-                          item.rarity === 'rare' ? 'border-indigo-400 bg-indigo-500/10' : 'border-slate-700 bg-slate-900';
-
-        stripHTML += `
-          <div class="w-28 h-28 rounded-xl border ${borderColor} flex flex-col items-center justify-center p-2 text-center flex-shrink-0 space-y-1">
-            <i class="fa-solid ${item.icon} text-2xl ${item.anim}"></i>
-            <div class="text-[10px] font-bold truncate max-w-full text-slate-200">${item.name}</div>
-          </div>
-        `;
-      }
-      stripContainer.innerHTML = stripHTML;
-
-      // 3. Trigger Roll
-      setTimeout(() => {
-        const scrollDistance = (40 * 124) - 150 + Math.floor(Math.random() * 40 - 20);
-        stripContainer.style.transition = 'transform 4.5s cubic-bezier(0.1, 0.85, 0.15, 1)';
-        stripContainer.style.transform = `translateX(-${scrollDistance}px)`;
-      }, 50);
-
-      // 4. Reveal & Duplicate Refund
-      setTimeout(() => {
-        isSpinningCrate = false;
-        document.getElementById('closeCrateModalBtn').classList.remove('hidden');
-
-        const alreadyOwned = currentUserData.inventory && currentUserData.inventory[winningItem.id] === true;
-        let duplicateText = "";
-
-        if (alreadyOwned) {
-          safeAddCoins(currentUser.uid, crate.refund); // 50% Refund
-          duplicateText = `Duplicate Owned! Refunded 50% CC (+${crate.refund.toLocaleString()} CC)`;
-        } else {
-          db.ref('users/' + currentUser.uid + '/inventory/' + winningItem.id).set(true);
-          duplicateText = "New Cosmetic Unlocked! Added to your Collection.";
-        }
-
-        const rarityBadge = document.getElementById('resultRarityTag');
-        rarityBadge.innerText = winningItem.rarity;
-        rarityBadge.className = `inline-block px-3 py-1 rounded-full text-[10px] font-extrabold uppercase ${
-          winningItem.rarity === 'legendary' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
-          winningItem.rarity === 'epic' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-          winningItem.rarity === 'rare' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-slate-800 text-slate-300'
-        }`;
-
-        document.getElementById('resultItemName').innerText = winningItem.name;
-        document.getElementById('resultDuplicateText').innerText = duplicateText;
-        document.getElementById('crateResultBox').classList.remove('hidden');
-      }, 4700);
-    }
-
-    function closeCrateModal() {
-      if (isSpinningCrate) return;
-      document.getElementById('crateModal').classList.add('hidden');
-    }
-
-    function renderUserInventory() {
-      const container = document.getElementById('userInventoryDisplay');
-      if (!currentUserData || !currentUserData.inventory) {
-        container.innerHTML = '<div class="text-center py-6 text-xs text-slate-500 col-span-full">No cosmetics unlocked yet. Open Crates to collect!</div>';
-        return;
-      }
-
-      const ownedIds = Object.keys(currentUserData.inventory);
-      let html = '';
-
-      COSMETICS_CATALOG.forEach(item => {
-        if (ownedIds.includes(item.id)) {
-          let borderColor = item.rarity === 'legendary' ? 'border-amber-400/50 bg-amber-500/10' :
-                            item.rarity === 'epic' ? 'border-purple-400/50 bg-purple-500/10' :
-                            item.rarity === 'rare' ? 'border-indigo-400/50 bg-indigo-500/10' : 'border-slate-800 bg-slate-950';
-
-          html += `
-            <div class="bg-slate-950 border ${borderColor} rounded-xl p-3 text-center space-y-2 relative">
-              <i class="fa-solid ${item.icon} text-xl text-slate-200 ${item.anim}"></i>
-              <div>
-                <div class="text-[10px] font-bold text-slate-200 truncate">${item.name}</div>
-                <div class="text-[9px] text-slate-500 uppercase font-semibold">${item.type}</div>
-              </div>
-            </div>
-          `;
-        }
-      });
-
-      container.innerHTML = html || '<div class="text-center py-6 text-xs text-slate-500 col-span-full">No cosmetics unlocked yet. Open Crates to collect!</div>';
-    }
-
-    // CHESS & MULTIPLAYER
-    function applyBoardTheme(theme) {
-      currentBoardTheme = theme;
-      localStorage.setItem("cogni_board_theme", theme);
-      const wrapper = document.getElementById('boardWrapper');
-      if (wrapper) wrapper.className = `w-full max-w-[560px] aspect-square relative ${theme}`;
-    }
-
-    function clearBoardHighlights() {
-      $('#botBoard .square-55d63, #arenaBoard .square-55d63').removeClass('highlight-last-move');
-      $('.highlight-move-dot').remove();
-    }
-
-    function showLegalMoveDots(boardId, gameInstance, square) {
-      clearBoardHighlights();
-      const moves = gameInstance.moves({ square: square, verbose: true });
-      if (moves.length === 0) return;
-      moves.forEach(m => {
-        const $square = $(`#${boardId} .square-` + m.to);
-        $square.append('<div class="highlight-move-dot"></div>');
-      });
-    }
-
-    let selectedSquare = null;
-
-    function initBotChess() {
-      botGame = new Chess();
-      botBoard = Chessboard('botBoard', {
-        position: 'start',
-        draggable: false,
-        pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
-      });
-      setupClickToMove('botBoard', botGame, makeBotMove);
-    }
-
-    function selectBotSide(side) {
-      ['white', 'black', 'random'].forEach(s => {
-        document.getElementById('side-' + s).className = "py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-semibold text-xs transition flex items-center justify-center space-x-1";
-      });
-      document.getElementById('side-' + side).className = "py-2.5 rounded-xl border border-indigo-500 bg-indigo-500/20 text-indigo-300 font-semibold text-xs transition flex items-center justify-center space-x-1";
-      botPlayerColor = side === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : (side === 'white' ? 'w' : 'b');
-      document.getElementById('botPlayerSide').innerText = botPlayerColor === 'w' ? 'White' : 'Black';
-    }
-
-    function startBotGame() {
-      botGame.reset();
-      botBoard.position('start');
-      clearBoardHighlights();
-      selectedSquare = null;
-
-      if (botPlayerColor === 'b') {
-        botBoard.orientation('black');
-        document.getElementById('botThinking').classList.remove('hidden');
-        setTimeout(makeBotMove, 400);
-      } else {
-        botBoard.orientation('white');
-        document.getElementById('botThinking').classList.add('hidden');
-      }
-      document.getElementById('botGameStatus').innerText = "Game active. Make your move!";
-    }
-
-    function setupClickToMove(boardId, gameInstance, botMoveCallback) {
-      $(`#${boardId}`).on('click', '.square-55d63', function() {
-        if (gameInstance.game_over()) return;
-        if (boardId === 'botBoard' && gameInstance.turn() !== botPlayerColor) return;
-        if (boardId === 'arenaBoard' && gameInstance.turn() !== arenaPlayerColor) return;
-
+    function setupClickToMove() {
+      $('#myBoard').on('click', '.square-55d63', function () {
         const square = $(this).attr('data-square');
+        handleSquareClick(square);
+      });
+    }
 
-        if (selectedSquare === null) {
-          const piece = gameInstance.get(square);
-          if (piece && piece.color === gameInstance.turn()) {
-            selectedSquare = square;
-            showLegalMoveDots(boardId, gameInstance, square);
-          }
+    function handleSquareClick(square) {
+      if (game.game_over()) return;
+
+      // Check turn turn match
+      if (vsBot && game.turn() !== playerColor) return;
+
+      if (!selectedSquare) {
+        // Select source piece
+        const piece = game.get(square);
+        if (piece && piece.color === game.turn()) {
+          selectedSquare = square;
+          highlightSquare(square);
+          showValidMoveIndicators(square);
+        }
+      } else {
+        // Attempt move from selectedSquare to square
+        const moves = game.moves({ square: selectedSquare, verbose: true });
+        const legalMove = moves.find(m => m.to === square);
+
+        if (legalMove) {
+          makeMove({
+            from: selectedSquare,
+            to: square,
+            promotion: 'q'
+          });
+          selectedSquare = null;
+          clearHighlights();
         } else {
-          const move = gameInstance.move({ from: selectedSquare, to: square, promotion: 'q' });
-          if (move !== null) {
-            clearBoardHighlights();
-            $(`#${boardId} .square-` + move.from).addClass('highlight-last-move');
-            $(`#${boardId} .square-` + move.to).addClass('highlight-last-move');
-            
-            if (boardId === 'botBoard') {
-              botBoard.position(gameInstance.fen());
-              selectedSquare = null;
-              checkBotGameStatus();
-              if (!gameInstance.game_over()) {
-                document.getElementById('botThinking').classList.remove('hidden');
-                setTimeout(botMoveCallback, 300);
-              }
-            } else if (boardId === 'arenaBoard') {
-              arenaBoard.position(gameInstance.fen());
-              selectedSquare = null;
-              syncArenaMove(move);
-            }
+          // Reselect new piece or deselect
+          clearHighlights();
+          const piece = game.get(square);
+          if (piece && piece.color === game.turn()) {
+            selectedSquare = square;
+            highlightSquare(square);
+            showValidMoveIndicators(square);
           } else {
-            const piece = gameInstance.get(square);
-            if (piece && piece.color === gameInstance.turn()) {
-              selectedSquare = square;
-              showLegalMoveDots(boardId, gameInstance, square);
-            } else {
-              selectedSquare = null;
-              clearBoardHighlights();
-            }
+            selectedSquare = null;
           }
+        }
+      }
+    }
+
+    function showValidMoveIndicators(square) {
+      const moves = game.moves({ square: square, verbose: true });
+      moves.forEach(m => {
+        const $squareEl = $('#myBoard .square-' + m.to);
+        if ($squareEl.find('.move-indicator').length === 0) {
+          $squareEl.append('<div class="move-indicator"></div>');
         }
       });
     }
 
-    const pieceValues = { p: 10, r: 50, n: 32, b: 33, q: 90, k: 1000 };
+    function clearHighlights() {
+      $('.move-indicator').remove();
+      $('#myBoard .square-55d63').removeClass('highlight-prev');
+    }
+
+    function highlightSquare(sq) {
+      $('#myBoard .square-' + sq).addClass('highlight-prev');
+    }
+
+    function makeMove(moveObj) {
+      const move = game.move(moveObj);
+      if (!move) return null;
+
+      board.position(game.fen());
+      clearHighlights();
+      highlightSquare(move.from);
+      highlightSquare(move.to);
+
+      if (currentRoomCode && roomRef) {
+        roomRef.child('fen').set(game.fen());
+      }
+
+      checkGameOver();
+
+      // Trigger AI Move if Bot game
+      if (vsBot && !game.game_over() && game.turn() !== playerColor) {
+        setTimeout(makeAIMove, 400);
+      }
+
+      return move;
+    }
+
+    // AI Minimax Bot Engine (1500+ Elo Minimax + Alpha-Beta Pruning)
+    function makeAIMove() {
+      if (game.game_over()) return;
+      const bestMove = getBestMoveMinimax(game, 3);
+      if (bestMove) {
+        makeMove(bestMove);
+      }
+    }
+
+    function getBestMoveMinimax(gameObj, depth) {
+      let possibleMoves = gameObj.moves({ verbose: true });
+      if (possibleMoves.length === 0) return null;
+
+      let bestMove = null;
+      let bestValue = -9999;
+
+      for (let i = 0; i < possibleMoves.length; i++) {
+        let move = possibleMoves[i];
+        gameObj.move(move);
+        let boardValue = -minimax(gameObj, depth - 1, -10000, 10000, false);
+        gameObj.undo();
+        if (boardValue > bestValue) {
+          bestValue = boardValue;
+          bestMove = move;
+        }
+      }
+      return bestMove;
+    }
+
+    function minimax(gameObj, depth, alpha, beta, isMaximizing) {
+      if (depth === 0) return evaluateBoard(gameObj.board());
+
+      let possibleMoves = gameObj.moves({ verbose: true });
+
+      if (isMaximizing) {
+        let bestValue = -9999;
+        for (let i = 0; i < possibleMoves.length; i++) {
+          gameObj.move(possibleMoves[i]);
+          bestValue = Math.max(bestValue, minimax(gameObj, depth - 1, alpha, beta, !isMaximizing));
+          gameObj.undo();
+          alpha = Math.max(alpha, bestValue);
+          if (beta <= alpha) break;
+        }
+        return bestValue;
+      } else {
+        let bestValue = 9999;
+        for (let i = 0; i < possibleMoves.length; i++) {
+          gameObj.move(possibleMoves[i]);
+          bestValue = Math.min(bestValue, minimax(gameObj, depth - 1, alpha, beta, !isMaximizing));
+          gameObj.undo();
+          beta = Math.min(beta, bestValue);
+          if (beta <= alpha) break;
+        }
+        return bestValue;
+      }
+    }
 
     function evaluateBoard(boardState) {
-      let totalEval = 0;
+      const pieceValues = { p: 10, r: 50, n: 30, b: 30, q: 90, k: 900 };
+      let totalEvaluation = 0;
       for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
-          const piece = boardState[i][j];
+          let piece = boardState[i][j];
           if (piece) {
-            totalEval += piece.color === 'w' ? pieceValues[piece.type] : -pieceValues[piece.type];
+            let val = pieceValues[piece.type] || 0;
+            totalEvaluation += (piece.color === 'w') ? val : -val;
           }
         }
       }
-      return totalEval;
+      return totalEvaluation;
     }
 
-    function minimax(gameInstance, depth, alpha, beta, isMaximizing) {
-      if (depth === 0 || gameInstance.game_over()) return evaluateBoard(gameInstance.board());
-      const possibleMoves = gameInstance.moves();
-      if (isMaximizing) {
-        let maxEval = -Infinity;
-        for (let i = 0; i < possibleMoves.length; i++) {
-          gameInstance.move(possibleMoves[i]);
-          let eval = minimax(gameInstance, depth - 1, alpha, beta, false);
-          gameInstance.undo();
-          maxEval = Math.max(maxEval, eval);
-          alpha = Math.max(alpha, eval);
-          if (beta <= alpha) break;
-        }
-        return maxEval;
+    // Bot Match Controls
+    function setPlayerSide(side) {
+      $('.side-btn').removeClass('bg-indigo-600 text-white').addClass('bg-slate-800 text-slate-300');
+      if (side === 'white') {
+        playerColor = 'w';
+        $('#side-white').removeClass('bg-slate-800 text-slate-300').addClass('bg-indigo-600 text-white');
+      } else if (side === 'black') {
+        playerColor = 'b';
+        $('#side-black').removeClass('bg-slate-800 text-slate-300').addClass('bg-indigo-600 text-white');
       } else {
-        let minEval = Infinity;
-        for (let i = 0; i < possibleMoves.length; i++) {
-          gameInstance.move(possibleMoves[i]);
-          let eval = minimax(gameInstance, depth - 1, alpha, beta, true);
-          gameInstance.undo();
-          minEval = Math.min(minEval, eval);
-          beta = Math.min(beta, eval);
-          if (beta <= alpha) break;
-        }
-        return minEval;
+        playerColor = Math.random() < 0.5 ? 'w' : 'b';
+        $('#side-random').removeClass('bg-slate-800 text-slate-300').addClass('bg-indigo-600 text-white');
       }
     }
 
-    function makeBotMove() {
-      if (botGame.game_over()) return;
-      const moves = botGame.moves();
-      let bestMove = null;
-      let bestValue = botPlayerColor === 'w' ? Infinity : -Infinity;
+    function startBotMatch() {
+      vsBot = true;
+      document.getElementById('chat-container').classList.add('hidden');
+      document.getElementById('opponent-name').innerText = "Grandmaster Bot";
+      document.getElementById('opponent-elo').innerText = "1500 Elo";
 
-      for (let i = 0; i < moves.length; i++) {
-        botGame.move(moves[i]);
-        let boardValue = minimax(botGame, 3, -Infinity, Infinity, botPlayerColor === 'b');
-        botGame.undo();
-        if (botPlayerColor === 'w') {
-          if (boardValue < bestValue) { bestValue = boardValue; bestMove = moves[i]; }
-        } else {
-          if (boardValue > bestValue) { bestValue = boardValue; bestMove = moves[i]; }
-        }
-      }
+      game.reset();
+      board.position('start');
+      board.orientation(playerColor === 'w' ? 'white' : 'black');
 
-      if (bestMove) {
-        const move = botGame.move(bestMove);
-        botBoard.position(botGame.fen());
-        clearBoardHighlights();
-        $('#botBoard .square-' + move.from).addClass('highlight-last-move');
-        $('#botBoard .square-' + move.to).addClass('highlight-last-move');
-      }
-
-      document.getElementById('botThinking').classList.add('hidden');
-      checkBotGameStatus();
-    }
-
-    function checkBotGameStatus() {
-      if (botGame.in_checkmate()) {
-        const winner = botGame.turn() === 'w' ? 'Black' : 'White';
-        const isPlayerWin = (winner === 'White' && botPlayerColor === 'w') || (winner === 'Black' && botPlayerColor === 'b');
-        if (isPlayerWin) {
-          safeAddCoins(currentUser.uid, 50);
-          showGameOverModal("Victory!", "Checkmate! You won +50 CC!");
-        } else {
-          showGameOverModal("Defeat", "Checkmate! CogniBot GM won.");
-        }
-        document.getElementById('botGameStatus').innerText = "Game Over - Checkmate.";
-      } else if (botGame.in_draw()) {
-        showGameOverModal("Draw", "Game ended in a draw.");
-        document.getElementById('botGameStatus').innerText = "Game Over - Draw.";
+      if (playerColor === 'b') {
+        setTimeout(makeAIMove, 500);
       }
     }
 
+    // 1v1 Arena Multiplayer
     function createArenaRoom() {
+      vsBot = false;
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const timeMinutes = parseInt(document.getElementById('arenaTimerSelect').value) || 10;
-      activeArenaRoom = code;
-      arenaPlayerColor = 'w';
+      currentRoomCode = code;
+      roomRef = db.ref('rooms/' + code);
 
-      db.ref('rooms/' + code).set({
-        code: code, whiteUid: currentUser.uid, whiteHandle: currentUserData.handle, whiteElo: currentUserData.elo,
-        blackUid: null, blackHandle: 'Waiting...', blackElo: 1200, fen: 'start', status: 'waiting', turn: 'w',
-        timeMinutes: timeMinutes, createdAt: Date.now()
+      roomRef.set({
+        hostUid: currentUser.uid,
+        hostEmail: currentUser.email,
+        hostElo: userData ? (userData.elo || 1200) : 1200,
+        fen: 'start',
+        status: 'waiting'
       });
-      setupArenaGameView(code);
+
+      playerColor = 'w';
+      board.orientation('white');
+      game.reset();
+      board.position('start');
+
+      document.getElementById('chat-container').classList.remove('hidden');
+      alert("Room Created! Share Code: " + code);
+      listenToRoom();
     }
 
     function joinArenaRoom() {
-      const code = document.getElementById('arenaJoinCode').value.trim().toUpperCase();
-      if (!code) return alert("Enter room code!");
+      const code = document.getElementById('room-code-input').value.trim().toUpperCase();
+      if (!code) return alert("Enter room code");
 
-      const roomRef = db.ref('rooms/' + code);
+      vsBot = false;
+      currentRoomCode = code;
+      roomRef = db.ref('rooms/' + code);
+
       roomRef.get().then((snap) => {
         if (!snap.exists()) return alert("Room not found!");
-        const room = snap.val();
-        if (room.status !== 'waiting') return alert("Room full!");
 
-        activeArenaRoom = code;
-        arenaPlayerColor = 'b';
-        roomRef.update({ blackUid: currentUser.uid, blackHandle: currentUserData.handle, blackElo: currentUserData.elo, status: 'playing' });
-        setupArenaGameView(code);
+        const val = snap.val();
+        arenaOpponentElo = val.hostElo || 1200;
+        document.getElementById('opponent-name').innerText = val.hostEmail ? val.hostEmail.split('@')[0] : "Opponent";
+        document.getElementById('opponent-elo').innerText = arenaOpponentElo + " Elo";
+
+        roomRef.update({
+          guestUid: currentUser.uid,
+          guestEmail: currentUser.email,
+          guestElo: userData ? (userData.elo || 1200) : 1200,
+          status: 'playing'
+        });
+
+        playerColor = 'b';
+        board.orientation('black');
+        game.reset();
+        board.position('start');
+
+        document.getElementById('chat-container').classList.remove('hidden');
+        listenToRoom();
       });
     }
 
-    function setupArenaGameView(code) {
-      document.getElementById('arenaSetupPanel').classList.add('hidden');
-      document.getElementById('arenaGamePanel').classList.remove('hidden');
-      document.getElementById('arenaActiveCode').innerText = code;
+    function listenToRoom() {
+      if (!roomRef) return;
+      roomRef.on('value', (snap) => {
+        const val = snap.val();
+        if (!val) return;
 
-      arenaGame = new Chess();
-      arenaBoard = Chessboard('arenaBoard', {
-        position: 'start', orientation: arenaPlayerColor === 'w' ? 'white' : 'black', draggable: false,
-        pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
+        if (playerColor === 'w' && val.guestElo) {
+          arenaOpponentElo = val.guestElo;
+          document.getElementById('opponent-name').innerText = val.guestEmail ? val.guestEmail.split('@')[0] : "Opponent";
+          document.getElementById('opponent-elo').innerText = arenaOpponentElo + " Elo";
+        }
+
+        if (val.fen && val.fen !== game.fen()) {
+          game.load(val.fen);
+          board.position(val.fen);
+          checkGameOver();
+        }
+
+        if (val.chat) {
+          renderChatMessages(val.chat);
+        }
+      });
+    }
+
+    function resignGame() {
+      if (!currentUser) return;
+      if (confirm("Are you sure you want to resign?")) {
+        const playerElo = userData ? (userData.elo || 1200) : 1200;
+        const oppElo = vsBot ? 1500 : arenaOpponentElo;
+        const gamesPlayed = userData ? (userData.gamesPlayed || 0) : 0;
+
+        // Actual score 0.0 for loss
+        const delta = calculateRatingChange(playerElo, oppElo, 0.0, gamesPlayed);
+        const newElo = Math.max(0, playerElo + delta);
+
+        db.ref('users/' + currentUser.uid).update({
+          elo: newElo,
+          gamesPlayed: gamesPlayed + 1
+        });
+
+        showGameOverModal("Resigned", "You resigned the match (" + (delta >= 0 ? "+" : "") + delta + " Elo).", "🏳️");
+
+        if (currentRoomCode && roomRef) {
+          roomRef.remove();
+        }
+      }
+    }
+
+    function offerDraw() {
+      alert("Draw offer sent to opponent.");
+    }
+
+    function checkGameOver() {
+      if (game.game_over()) {
+        let title = "Game Over";
+        let desc = "Match drawn or ended.";
+
+        const playerElo = userData ? (userData.elo || 1200) : 1200;
+        const oppElo = vsBot ? 1500 : arenaOpponentElo;
+        const gamesPlayed = userData ? (userData.gamesPlayed || 0) : 0;
+
+        if (game.in_checkmate()) {
+          const winnerColor = game.turn() === 'w' ? 'Black' : 'White';
+          const isPlayerWinner = (winnerColor === 'White' && playerColor === 'w') || (winnerColor === 'Black' && playerColor === 'b');
+          
+          title = winnerColor + " Wins!";
+          const actualScore = isPlayerWinner ? 1.0 : 0.0;
+          const delta = calculateRatingChange(playerElo, oppElo, actualScore, gamesPlayed);
+          const newElo = Math.max(0, playerElo + delta);
+
+          db.ref('users/' + currentUser.uid).update({
+            elo: newElo,
+            gamesPlayed: gamesPlayed + 1
+          });
+
+          if (isPlayerWinner) {
+            safeAddCoins(currentUser.uid, 50);
+            desc = "Checkmate! (" + (delta >= 0 ? "+" : "") + delta + " Elo, +50 CogniCoins)";
+          } else {
+            desc = "Checkmate registered (" + (delta >= 0 ? "+" : "") + delta + " Elo).";
+          }
+        } else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) {
+          title = "Match Drawn";
+          const delta = calculateRatingChange(playerElo, oppElo, 0.5, gamesPlayed);
+          const newElo = Math.max(0, playerElo + delta);
+
+          db.ref('users/' + currentUser.uid).update({
+            elo: newElo,
+            gamesPlayed: gamesPlayed + 1
+          });
+
+          desc = "Game concluded as draw (" + (delta >= 0 ? "+" : "") + delta + " Elo).";
+        }
+
+        showGameOverModal(title, desc, "🏆");
+
+        // Clean room chat and database node if Arena game
+        if (currentRoomCode && roomRef) {
+          roomRef.remove();
+        }
+      }
+    }
+
+    function showGameOverModal(title, desc, icon) {
+      document.getElementById('game-over-icon').innerText = icon || "🏆";
+      document.getElementById('game-over-title').innerText = title;
+      document.getElementById('game-over-desc').innerText = desc;
+      document.getElementById('game-over-modal').classList.remove('hidden');
+
+      setTimeout(() => {
+        document.getElementById('game-over-modal').classList.add('hidden');
+      }, 3000);
+    }
+
+    function applyBoardTheme(themeClass) {
+      localStorage.setItem('cogni_board_theme', themeClass);
+      $('#myBoard').removeClass('theme-wood theme-green theme-grey').addClass(themeClass);
+    }
+
+    // Match Chat Logic
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text || !roomRef) return;
+
+      const senderName = userData ? (userData.username || currentUser.email.split('@')[0]) : "User";
+      roomRef.child('chat').push({
+        sender: senderName,
+        text: text,
+        time: Date.now()
+      });
+      input.value = "";
+    }
+
+    function renderChatMessages(chatObj) {
+      const chatBox = document.getElementById('chat-messages');
+      chatBox.innerHTML = "";
+      Object.values(chatObj).forEach(msg => {
+        const line = document.createElement('div');
+        line.className = "text-xs";
+        line.innerHTML = `<span class="font-bold text-indigo-400">${msg.sender}:</span> <span class="text-slate-200">${msg.text}</span>`;
+        chatBox.appendChild(line);
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // ================= COGNISHOP & CS:GO UNBOXING =================
+    function openCrate(crateType) {
+      const config = CRATE_CONFIGS[crateType];
+      if (!config) return;
+
+      if ((userData.coins || 0) < config.cost) {
+        return alert("Insufficient CogniCoins! You need " + config.cost + " CC.");
+      }
+
+      // Deduct Crate Cost
+      safeAddCoins(currentUser.uid, -config.cost).then(() => {
+        startCrateUnboxingReel(crateType);
+      });
+    }
+
+    function startCrateUnboxingReel(crateType) {
+      const config = CRATE_CONFIGS[crateType];
+      const modal = document.getElementById('crate-modal');
+      const strip = document.getElementById('crate-strip');
+      const resultBox = document.getElementById('unboxing-result');
+      const closeBtn = document.getElementById('btn-close-crate');
+
+      modal.classList.remove('hidden');
+      resultBox.classList.add('hidden');
+      closeBtn.classList.add('hidden');
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateX(0px)';
+
+      // Generate 50 strip items for horizontal rolling reel
+      const stripItems = [];
+      for (let i = 0; i < 45; i++) {
+        stripItems.push(getRandomItemByOdds(config.odds));
+      }
+
+      // Winning item at index 40
+      const winningItem = getRandomItemByOdds(config.odds);
+      stripItems[40] = winningItem;
+
+      // Populate strip DOM
+      strip.innerHTML = "";
+      stripItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `crate-item-card rarity-${item.rarity}`;
+        card.innerHTML = `
+          <div class="text-3xl mb-1 ${item.animClass || ''}">${item.icon}</div>
+          <div class="text-[10px] font-bold text-slate-200 truncate w-full px-1 text-center">${item.name}</div>
+        `;
+        strip.appendChild(card);
       });
 
-      setupClickToMove('arenaBoard', arenaGame, null);
-      db.ref('presence/' + currentUser.uid + '/inGame').set(true);
+      // Trigger CS:GO Horizontal Roll Animation
+      setTimeout(() => {
+        strip.style.transition = 'transform 6s cubic-bezier(0.1, 1, 0.1, 1)';
+        // Item width 120px + margin 10px = 130px. Offset target index 40
+        const translateX = -(40 * 130 - 180);
+        strip.style.transform = `translateX(${translateX}px)`;
+      }, 100);
 
-      db.ref('rooms/' + code).on('value', (snap) => {
-        const room = snap.val();
-        if (!room) return;
+      // Handle Result After Animation Completes
+      setTimeout(() => {
+        // Grant Item / Handle Duplicate 50% Refund
+        const ownedItems = userData.inventory || [];
+        const isDuplicate = ownedItems.includes(winningItem.id);
 
-        if (arenaPlayerColor === 'w') {
-          document.getElementById('arenaOpponentHandle').innerText = room.blackHandle || 'Waiting...';
-          document.getElementById('arenaOpponentElo').innerText = room.blackElo || 1200;
+        if (isDuplicate) {
+          safeAddCoins(currentUser.uid, config.refund);
+          document.getElementById('result-refund-notice').classList.remove('hidden');
         } else {
-          document.getElementById('arenaOpponentHandle').innerText = room.whiteHandle || 'Player';
-          document.getElementById('arenaOpponentElo').innerText = room.whiteElo || 1200;
+          db.ref('users/' + currentUser.uid + '/inventory').set([...ownedItems, winningItem.id]);
+          document.getElementById('result-refund-notice').classList.add('hidden');
         }
 
-        if (room.fen && room.fen !== arenaGame.fen()) {
-          arenaGame.load(room.fen);
-          arenaBoard.position(room.fen);
-        }
+        document.getElementById('result-rarity-tag').innerText = winningItem.rarity;
+        document.getElementById('result-rarity-tag').className = `text-[10px] font-bold uppercase tracking-widest mb-1 text-${getRarityColor(winningItem.rarity)}`;
+        document.getElementById('result-icon').innerText = winningItem.icon;
+        document.getElementById('result-icon').className = `text-4xl my-2 ${winningItem.animClass || ''}`;
+        document.getElementById('result-name').innerText = winningItem.name;
 
-        if (room.status === 'finished') handleArenaFinish(room);
-      });
-
-      db.ref('rooms/' + code + '/messages').on('child_added', (snap) => {
-        const msg = snap.val();
-        const box = document.getElementById('arenaChatBox');
-        box.innerHTML += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800"><span class="font-bold text-indigo-400">${msg.handle}:</span><span class="text-slate-200 ml-1">${msg.text}</span></div>`;
-        box.scrollTop = box.scrollHeight;
-      });
+        resultBox.classList.remove('hidden');
+        closeBtn.classList.remove('hidden');
+      }, 6500);
     }
 
-    function syncArenaMove(move) {
-      if (!activeArenaRoom) return;
-      db.ref('rooms/' + activeArenaRoom).update({ fen: arenaGame.fen(), turn: arenaGame.turn() });
-      if (arenaGame.game_over()) {
-        let winnerUid = arenaGame.in_checkmate() ? (arenaGame.turn() === 'w' ? 'black' : 'white') : null;
-        finishArenaMatch(winnerUid, "Checkmate");
+    function getRandomItemByOdds(odds) {
+      const rand = Math.random();
+      let cumulative = 0;
+      let targetRarity = 'common';
+
+      if (rand < (cumulative += odds.common)) targetRarity = 'common';
+      else if (rand < (cumulative += odds.rare)) targetRarity = 'rare';
+      else if (rand < (cumulative += odds.epic)) targetRarity = 'epic';
+      else targetRarity = 'legendary';
+
+      const matches = ITEM_CATALOG.filter(i => i.rarity === targetRarity);
+      return matches[Math.floor(Math.random() * matches.length)];
+    }
+
+    function getRarityColor(rarity) {
+      if (rarity === 'common') return 'slate-400';
+      if (rarity === 'rare') return 'blue-400';
+      if (rarity === 'epic') return 'purple-400';
+      return 'amber-400';
+    }
+
+    function closeCrateModal() {
+      document.getElementById('crate-modal').classList.add('hidden');
+    }
+
+    // ================= INVENTORY RENDER =================
+    function renderInventory() {
+      const grid = document.getElementById('inventory-grid');
+      if (!grid) return;
+
+      const owned = userData ? (userData.inventory || []) : [];
+      grid.innerHTML = "";
+
+      if (owned.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-slate-500 text-sm italic py-8 text-center">No cosmetics unlocked yet. Open CogniShop Crates to unlock items!</div>`;
+        return;
       }
-    }
 
-    function sendArenaChat(e) {
-      e.preventDefault();
-      const input = document.getElementById('arenaChatInput');
-      const text = input.value.trim();
-      if (!text || !activeArenaRoom) return;
-      db.ref('rooms/' + activeArenaRoom + '/messages').push({ handle: currentUserData.handle, text: text, timestamp: Date.now() });
-      input.value = '';
-    }
+      owned.forEach(itemId => {
+        const item = ITEM_CATALOG.find(i => i.id === itemId);
+        if (!item) return;
 
-    function resignArenaMatch() {
-      if (!activeArenaRoom || !confirm("Are you sure you want to resign? (-16 Elo)")) return;
-      finishArenaMatch(arenaPlayerColor === 'w' ? 'black' : 'white', "Resignation");
-    }
-
-    function offerDraw() { alert("Draw offer sent."); }
-
-    function finishArenaMatch(winnerSide, reason) {
-      if (!activeArenaRoom) return;
-      const roomRef = db.ref('rooms/' + activeArenaRoom);
-      roomRef.get().then((snap) => {
-        const room = snap.val();
-        if (!room || room.status === 'finished') return;
-        let winnerUid = winnerSide === 'white' ? room.whiteUid : (winnerSide === 'black' ? room.blackUid : null);
-        roomRef.update({ status: 'finished', winnerUid: winnerUid, endReason: reason });
+        const card = document.createElement('div');
+        card.className = `bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col items-center justify-center text-center rarity-${item.rarity}`;
+        card.innerHTML = `
+          <div class="text-3xl mb-2 ${item.animClass || ''}">${item.icon}</div>
+          <div class="text-xs font-bold text-slate-200">${item.name}</div>
+          <div class="text-[10px] uppercase font-bold text-${getRarityColor(item.rarity)} mt-1">${item.rarity}</div>
+        `;
+        grid.appendChild(card);
       });
     }
 
-    function handleArenaFinish(room) {
-      if (room.winnerUid === currentUser.uid) {
-        db.ref('users/' + currentUser.uid + '/elo').set((currentUserData.elo || 1200) + 16);
-        safeAddCoins(currentUser.uid, 50);
-        showGameOverModal("Victory!", `You won! +16 Elo & +50 CC (${room.endReason})`);
-      } else if (room.winnerUid) {
-        db.ref('users/' + currentUser.uid + '/elo').set(Math.max(100, (currentUserData.elo || 1200) - 16));
-        showGameOverModal("Defeat", `You lost -16 Elo (${room.endReason})`);
-      } else {
-        showGameOverModal("Draw", "Match ended in a draw.");
-      }
-      cleanupArenaRoom();
-    }
+    // ================= LEADERBOARD =================
+    function loadLeaderboard() {
+      db.ref('users').orderByChild('elo').limitToLast(20).once('value', (snap) => {
+        const tbody = document.getElementById('leaderboard-body');
+        tbody.innerHTML = "";
+        const players = [];
 
-    function leaveArenaRoom() { if (confirm("Leave match room?")) cleanupArenaRoom(); }
-
-    function cleanupArenaRoom() {
-      if (activeArenaRoom) {
-        db.ref('rooms/' + activeArenaRoom).remove();
-        db.ref('presence/' + currentUser.uid + '/inGame').set(false);
-        activeArenaRoom = null;
-      }
-      document.getElementById('arenaGamePanel').classList.add('hidden');
-      document.getElementById('arenaSetupPanel').classList.remove('hidden');
-    }
-
-    // FRIENDS & DM LOGIC
-    function sendFriendRequest() {
-      const targetHandle = document.getElementById('addFriendInput').value.trim();
-      if (!targetHandle) return;
-      db.ref('users').orderByChild('handle').equalTo(targetHandle).once('value', (snap) => {
-        const users = snap.val();
-        if (!users) return document.getElementById('friendSearchMsg').innerText = "User not found.";
-        const targetUid = Object.keys(users)[0];
-        if (targetUid === currentUser.uid) return document.getElementById('friendSearchMsg').innerText = "Cannot add yourself.";
-        db.ref('friends/' + currentUser.uid + '/' + targetUid).set(true);
-        db.ref('friends/' + targetUid + '/' + currentUser.uid).set(true);
-        document.getElementById('friendSearchMsg').innerText = "Friend added!";
-        document.getElementById('addFriendInput').value = '';
-        loadFriendsList();
-      });
-    }
-
-    function loadFriendsList() {
-      const container = document.getElementById('friendsListContainer');
-      db.ref('friends/' + currentUser.uid).once('value', (snap) => {
-        const friendsMap = snap.val();
-        if (!friendsMap) return container.innerHTML = '<div class="text-center py-8 text-xs text-slate-500">No friends added yet.</div>';
-        let html = '';
-        Object.keys(friendsMap).forEach(fUid => {
-          db.ref('users/' + fUid).once('value', (uSnap) => {
-            const fData = uSnap.val();
-            if (fData) {
-              html += `
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                  <div><div class="font-bold text-slate-200">${fData.handle}</div><div class="text-[10px] text-indigo-400">Elo: ${fData.elo || 1200}</div></div>
-                  <div class="flex gap-2">
-                    <button onclick="challengeFriend('${fUid}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">Challenge</button>
-                    <button onclick="removeFriend('${fUid}')" class="text-slate-500 hover:text-red-400 px-2 py-1 text-[11px] transition"><i class="fa-solid fa-trash"></i></button>
-                  </div>
-                </div>
-              `;
-              container.innerHTML = html;
-            }
-          });
+        snap.forEach(child => {
+          players.push({ uid: child.key, ...child.val() });
         });
-      });
-    }
 
-    function removeFriend(fUid) {
-      if (!confirm("Remove friend?")) return;
-      db.ref('friends/' + currentUser.uid + '/' + fUid).remove();
-      db.ref('friends/' + fUid + '/' + currentUser.uid).remove();
-      loadFriendsList();
-    }
+        players.reverse(); // Highest Elo first
 
-    function challengeFriend(fUid) {
-      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      db.ref('challenges/' + fUid).push({ fromHandle: currentUserData.handle, roomCode: code, timestamp: Date.now(), status: 'pending' });
-      alert(`Challenge sent! Creating room ${code}...`);
-      switchTab('chess'); switchChessSubTab('arena'); createArenaRoom();
-    }
-
-    function switchSocialSubTab(sub) {
-      ['list', 'messages'].forEach(s => {
-        document.getElementById('social-view-' + s).classList.add('hidden');
-        const btn = document.getElementById('subtab-' + (s === 'list' ? 'friends' : 'messages'));
-        if (btn) btn.className = "px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200";
-      });
-      document.getElementById('social-view-' + sub).classList.remove('hidden');
-      document.getElementById('subtab-' + (sub === 'list' ? 'friends' : 'messages')).className = "px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700";
-      if (sub === 'messages') loadDMContacts();
-    }
-
-    function loadDMContacts() {
-      const container = document.getElementById('dmContactsContainer');
-      db.ref('friends/' + currentUser.uid).once('value', (snap) => {
-        const friendsMap = snap.val();
-        if (!friendsMap) return container.innerHTML = '<div class="text-center py-6 text-xs text-slate-500">No active contacts.</div>';
-        let html = '';
-        Object.keys(friendsMap).forEach(fUid => {
-          db.ref('users/' + fUid).once('value', (uSnap) => {
-            const fData = uSnap.val();
-            if (fData) {
-              html += `
-                <button onclick="selectDMContact('${fUid}', '${fData.handle}')" class="w-full text-left bg-slate-950 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-800 transition flex items-center space-x-2">
-                  <div class="w-7 h-7 bg-indigo-600/20 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-user"></i></div>
-                  <div class="text-xs font-semibold text-slate-200 truncate">${fData.handle}</div>
-                </button>
-              `;
-              container.innerHTML = html;
-            }
-          });
-        });
-      });
-    }
-
-    function selectDMContact(fUid, handle) {
-      activeDMTarget = fUid;
-      document.getElementById('dmHeader').innerText = "Chatting with " + handle;
-      document.getElementById('dmChatInput').disabled = false;
-      document.getElementById('dmSendBtn').disabled = false;
-
-      const chatId = [currentUser.uid, fUid].sort().join('_');
-      db.ref('direct_messages/' + chatId).limitToLast(30).on('value', (snap) => {
-        const msgs = snap.val();
-        const box = document.getElementById('dmChatMessages');
-        if (!msgs) return box.innerHTML = '<div class="text-center text-slate-500 text-xs py-12">No messages yet. Say hello!</div>';
-        let html = '';
-        Object.values(msgs).forEach(m => {
-          const isSelf = m.senderUid === currentUser.uid;
-          html += `<div class="flex ${isSelf ? 'justify-end' : 'justify-start'}"><div class="${isSelf ? 'bg-indigo-600 text-white' : 'bg-slate-950 border border-slate-800 text-slate-200'} max-w-[75%] px-3 py-2 rounded-xl"><div>${m.text}</div></div></div>`;
-        });
-        box.innerHTML = html;
-        box.scrollTop = box.scrollHeight;
-      });
-    }
-
-    function sendDirectMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('dmChatInput');
-      const text = input.value.trim();
-      if (!text || !activeDMTarget) return;
-      const chatId = [currentUser.uid, activeDMTarget].sort().join('_');
-      db.ref('direct_messages/' + chatId).push({ senderUid: currentUser.uid, text: text, timestamp: Date.now() });
-      input.value = '';
-    }
-
-    // MASTER CONTROL ADMIN PANEL (HARD-LOCKED TO zainisgo123@gmail.com)
-    function listenAdminUsers() {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return; // Guard
-
-      db.ref('users').on('value', (snap) => {
-        const users = snap.val();
-        const table = document.getElementById('adminUsersTable');
-        if (!users) return;
-        let html = '';
-        Object.entries(users).forEach(([uid, u]) => {
-          html += `
-            <tr>
-              <td class="p-3"><div class="font-bold text-slate-100">${u.handle || 'User'}</div><div class="text-[9px] text-slate-500 font-mono">${uid}</div></td>
-              <td class="p-3 text-slate-400">${u.email || 'N/A'}</td>
-              <td class="p-3 font-mono font-bold text-indigo-400">${u.elo || 1200}</td>
-              <td class="p-3 font-mono font-bold text-emerald-400">${(u.coins || 0).toLocaleString()} CC</td>
-              <td class="p-3 text-right space-x-1">
-                <button onclick="adminGrantCoins('${uid}')" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded text-[10px] font-bold">Grant CC</button>
-                <button onclick="adminResetCoins('${uid}')" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-1 rounded text-[10px] font-bold">Reset CC</button>
-                <button onclick="adminResetElo('${uid}')" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-1 rounded text-[10px] font-bold">Reset Elo</button>
-                <button onclick="adminDeleteUser('${uid}')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] font-bold">Delete</button>
-              </td>
-            </tr>
+        players.forEach((p, idx) => {
+          const row = document.createElement('tr');
+          row.className = "hover:bg-slate-800/40 transition";
+          row.innerHTML = `
+            <td class="py-3 px-4 font-bold text-indigo-400">#${idx + 1}</td>
+            <td class="py-3 px-4 font-medium text-slate-200 flex items-center space-x-2">
+              <span>${p.username || p.email.split('@')[0]}</span>
+            </td>
+            <td class="py-3 px-4 text-right font-mono font-bold text-amber-400">${p.elo || 1200} Elo</td>
           `;
+          tbody.appendChild(row);
         });
-        table.innerHTML = html;
       });
     }
 
-    function toggleMaintenanceMode() {
-      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
-      db.ref('system/maintenance').get().then(snap => db.ref('system/maintenance').set(snap.val() !== true));
+    // ================= MASTER CONTROL ADMIN PANEL =================
+    // Restricted strictly to zainisgo123@gmail.com
+    function updateAdminMaintenanceButtonUI(isMaintenance) {
+      const btn = document.getElementById('admin-maint-btn');
+      if (!btn) return;
+
+      if (isMaintenance) {
+        btn.innerText = "Maintenance Active (ON)";
+        btn.className = "px-4 py-2 rounded-xl text-xs font-bold transition shadow-lg bg-red-600 hover:bg-red-700 text-white animate-pulse";
+      } else {
+        btn.innerText = "Maintenance Normal (OFF)";
+        btn.className = "px-4 py-2 rounded-xl text-xs font-bold transition shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white";
+      }
     }
 
-    function triggerGlobalReload() {
+    function adminToggleMaintenance() {
       if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
-      if (confirm("Force global page reload for all active users?")) db.ref('system/globalReloadTimestamp').set(Date.now());
+      db.ref('system/maintenance').get().then((snap) => {
+        const currentVal = snap.val() === true;
+        db.ref('system/maintenance').set(!currentVal);
+      });
     }
 
-    function purgeAbnormalRatings() {
+    function adminForceGlobalReload() {
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      db.ref('system/forceReload').set(Date.now());
+    }
+
+    function adminPurgeHighElo() {
       if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
       db.ref('users').once('value', (snap) => {
-        const users = snap.val(); if (!users) return;
-        Object.entries(users).forEach(([uid, u]) => { if (u.elo > 3000) db.ref('users/' + uid + '/elo').set(1200); });
-        alert("Abnormal ratings purged!");
+        snap.forEach(child => {
+          const user = child.val();
+          if (user.elo && user.elo > 3000) {
+            db.ref('users/' + child.key + '/elo').set(1200);
+          }
+        });
+        alert("Purged accounts exceeding >3000 Elo.");
+      });
+    }
+
+    function loadAdminUserTable() {
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      db.ref('users').on('value', (snap) => {
+        const tbody = document.getElementById('admin-user-table');
+        tbody.innerHTML = "";
+
+        snap.forEach(child => {
+          const uid = child.key;
+          const u = child.val();
+
+          const row = document.createElement('tr');
+          row.className = "hover:bg-slate-800/50";
+          row.innerHTML = `
+            <td class="py-2 px-4 font-mono text-[11px]">
+              <div>${u.email || 'No Email'}</div>
+              <div class="text-slate-500 text-[10px]">${uid}</div>
+            </td>
+            <td class="py-2 px-4 font-mono">${u.elo || 1200}</td>
+            <td class="py-2 px-4 font-mono text-amber-300">${(u.coins || 0).toLocaleString()} CC</td>
+            <td class="py-2 px-4 text-right space-x-1">
+              <button onclick="adminGrantCoins('${uid}')" class="bg-amber-500/20 text-amber-300 px-2 py-1 rounded text-[10px] hover:bg-amber-500/30">+Coins</button>
+              <button onclick="adminResetCoins('${uid}')" class="bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] hover:bg-slate-600">Reset Coins</button>
+              <button onclick="adminResetElo('${uid}')" class="bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded text-[10px] hover:bg-indigo-500/30">Reset Elo</button>
+              <button onclick="adminDeleteUser('${uid}')" class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-[10px] hover:bg-red-500/30">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
       });
     }
 
     function adminGrantCoins(uid) {
       if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
-      const amt = parseInt(prompt("Enter CC amount to grant (Max limit 100k CC applied):")) || 0;
-      if (amt > 0) safeAddCoins(uid, amt).then(() => alert("Coins granted successfully!"));
+      const amt = prompt("Enter CogniCoins amount to grant:", "1000");
+      if (amt) {
+        safeAddCoins(uid, parseInt(amt) || 0);
+      }
     }
 
     function adminResetCoins(uid) {
       if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
-      if (confirm("Reset user coin balance back to 1,000 CC?")) safeSetCoins(uid, 1000).then(() => alert("Coin balance reset to 1,000 CC!"));
+      safeSetCoins(uid, 0);
     }
 
     function adminResetElo(uid) {
       if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
-      if (confirm("Reset user Elo back to 1200?")) db.ref('users/' + uid + '/elo').set(1200);
+      db.ref('users/' + uid + '/elo').set(1200);
     }
 
     function adminDeleteUser(uid) {
       if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
-      if (confirm("Permanently delete account node?")) db.ref('users/' + uid).remove();
-    }
-
-    function openUsernameModal() { document.getElementById('usernameModal').classList.remove('hidden'); }
-    function closeUsernameModal() { document.getElementById('usernameModal').classList.add('hidden'); }
-    function saveUsernameHandle() {
-      const handle = document.getElementById('newHandleInput').value.trim();
-      if (!handle) return;
-      db.ref('users/' + currentUser.uid + '/handle').set(handle).then(() => closeUsernameModal());
-    }
-
-    function showGameOverModal(title, desc) {
-      document.getElementById('goModalTitle').innerText = title;
-      document.getElementById('goModalDesc').innerText = desc;
-      const modal = document.getElementById('gameOverModal');
-      modal.classList.remove('hidden');
-      setTimeout(() => modal.classList.add('hidden'), 3000);
+      if (confirm("Are you sure you want to delete user " + uid + "?")) {
+        db.ref('users/' + uid).remove();
+      }
     }
   </script>
 </body>

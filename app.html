@@ -49,7 +49,6 @@
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-    /* Chessboard Highlight Custom Overlays */
     /* Target dots on valid move squares (70% opaque grey dot) */
     .valid-move-dot {
       position: relative;
@@ -259,7 +258,7 @@
                 <div id="ai-player-elo-badge" class="text-xs text-indigo-400">Rating: 1200</div>
               </div>
             </div>
-            <div id="ai-status-msg" class="text-xs text-slate-400">Select side to start game</div>
+            <div id="ai-status-msg" class="text-xs text-slate-400">Click a piece to move</div>
           </div>
         </div>
 
@@ -272,7 +271,7 @@
               Match Controls
             </h2>
             <p class="text-xs text-slate-400 leading-relaxed">
-              Challenge the Grandmaster Bot to improve your positional judgment. Win matches to earn CogniCoins (+50 CC) and increase your Rating.
+              Challenge the Grandmaster Bot to improve your positional judgment. Win matches to earn CogniCoins (+50 CC) and increase your Rating. Click piece to select, then click target square to move.
             </p>
 
             <div>
@@ -309,8 +308,8 @@
                 <div id="ai-eval-bar" class="bg-indigo-500 h-full transition-all duration-300" style="width: 50%;"></div>
               </div>
               <div class="p-3 bg-slate-950 rounded-xl border border-slate-800/80 text-xs text-slate-400 leading-relaxed font-mono">
-                <span class="text-slate-500 block mb-1">// Last Move Analysis:</span>
-                <span id="ai-analysis-text">Game started. Make a move or select side to begin.</span>
+                <span class="text-slate-500 block mb-1">// Tactical Status:</span>
+                <span id="ai-analysis-text">Game active. Click on your piece to see valid destination squares.</span>
               </div>
             </div>
           </div>
@@ -396,7 +395,7 @@
             </div>
           </div>
 
-          <!-- Arena Match Chat (Shown only in Arena mode) -->
+          <!-- Arena Match Chat -->
           <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-3 flex flex-col h-[300px]">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
               <span><i class="fa-solid fa-comments text-indigo-400 mr-2"></i>Match Chat</span>
@@ -520,7 +519,6 @@
         <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
           
           <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
-            <!-- Equipped Profile Icon & Frame Preview -->
             <div class="relative">
               <div id="profile-frame-preview" class="w-20 h-20 rounded-2xl bg-slate-950 border-2 border-indigo-500/50 flex items-center justify-center text-3xl text-indigo-400 shadow-lg p-1">
                 <i id="profile-icon-preview" class="fa-solid fa-user-graduate"></i>
@@ -650,7 +648,6 @@
             </div>
           </div>
 
-          <!-- Dynamic Maintenance Toggle Button -->
           <button id="admin-maint-toggle-btn" onclick="adminToggleMaintenance()" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg">
             <i class="fa-solid fa-power-off mr-2"></i>
             <span>Maintenance Normal (OFF)</span>
@@ -708,11 +705,11 @@
       <div class="crate-strip-container">
         <div class="crate-strip-ticker"></div>
         <div id="crate-strip-track" class="crate-strip-track">
-          <!-- Item elements generated via JS -->
+          <!-- Generated via JS -->
         </div>
       </div>
 
-      <!-- Dropped Item Result Display (Shown post-spin) -->
+      <!-- Dropped Item Result Display -->
       <div id="crate-result-card" class="hidden space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800">
         <div id="crate-result-rarity" class="text-xs font-bold uppercase tracking-wider text-amber-400">Legendary Drop!</div>
         <div id="crate-result-name" class="text-lg font-bold text-white">Grandmaster Frame</div>
@@ -768,29 +765,26 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Session Persistence Enforced
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
-    // Whitelisted Emails & Admin
     const ADMIN_EMAIL = "zainisgo123@gmail.com";
     const WHITELISTED_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
 
-    // State Variables
     let currentUser = null;
     let currentUserData = null;
     let aiBoard = null;
     let aiGame = null;
     let aiPlayerColor = 'w';
+    let selectedSquare = null;
+
     let arenaBoard = null;
     let arenaGame = null;
     let currentArenaRoomId = null;
     let arenaPlayerColor = 'w';
-    let arenaClockInterval = null;
+    let arenaSelectedSquare = null;
 
-    // Piece CDN
     const PIECE_CDN = "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png";
 
-    // Crate Configurations
     const CRATE_CONFIGS = {
       pawn: {
         name: "Pawn Crate",
@@ -812,7 +806,6 @@
       }
     };
 
-    // Item Catalog
     const ITEM_CATALOG = [
       { id: "frame_bronze", name: "Bronze Frame", type: "frame", rarity: "common", icon: "fa-shield" },
       { id: "tag_novice", name: "Novice Title", type: "nametag", rarity: "common", icon: "fa-tag" },
@@ -827,7 +820,6 @@
       { id: "emote_glow", name: "Glow Emote", type: "emote", rarity: "legendary", icon: "fa-crown" }
     ];
 
-    // Normalized Inventory Array Helper
     function getNormalizedInventory(rawInventory) {
       if (!rawInventory) return [];
       if (Array.isArray(rawInventory)) {
@@ -839,7 +831,6 @@
       return [];
     }
 
-    // Dynamic Elo K-Factor Calculation
     function getKFactor(gamesPlayed) {
       const games = gamesPlayed || 0;
       if (games < 10) return 40;
@@ -853,7 +844,6 @@
       return Math.round(k * (actualScore - expectedScore));
     }
 
-    // Safe Coin Add/Set
     function safeAddCoins(targetUid, amountDelta) {
       if (!targetUid) return Promise.reject("Invalid UID");
       const userCoinsRef = db.ref('users/' + targetUid + '/coins');
@@ -870,7 +860,25 @@
       return db.ref('users/' + targetUid + '/coins').set(safeBal);
     }
 
-    // Auth & App Initialization
+    // Attach Click Handlers to Chessboard Squares via jQuery Event Delegation
+    $(document).ready(function() {
+      $(document).on('click', '#ai-board .square-55d63', function(e) {
+        e.preventDefault();
+        const square = $(this).attr('data-square');
+        if (square) {
+          onAiSquareClick(square);
+        }
+      });
+
+      $(document).on('click', '#arena-board .square-55d63', function(e) {
+        e.preventDefault();
+        const square = $(this).attr('data-square');
+        if (square) {
+          onArenaSquareClick(square);
+        }
+      });
+    });
+
     auth.onAuthStateChanged((user) => {
       if (!user) {
         window.location.href = "index.html";
@@ -878,7 +886,6 @@
       }
       currentUser = user;
 
-      // Check Maintenance Mode
       db.ref('system/maintenance').on('value', (snap) => {
         const isMaint = snap.val() === true;
         const userEmail = (user.email || "").trim().toLowerCase();
@@ -892,7 +899,6 @@
           document.getElementById('modal-maintenance').classList.remove('flex');
         }
 
-        // Sync admin toggle button color
         const toggleBtn = document.getElementById('admin-maint-toggle-btn');
         if (toggleBtn) {
           if (isMaint) {
@@ -905,7 +911,6 @@
         }
       });
 
-      // User Data Sync
       const userRef = db.ref('users/' + user.uid);
       userRef.on('value', (snapshot) => {
         let val = snapshot.val();
@@ -927,10 +932,7 @@
         renderProfileSection();
       });
 
-      // Admin Exclusivity
       checkAdminAccess(user.email);
-
-      // Default Initialization
       initAiGame();
     });
 
@@ -981,7 +983,7 @@
     }
 
     // ==========================================
-    // 2. PROFILE & CUSTOMIZATION ENGINE
+    // PROFILE & CUSTOMIZATION ENGINE
     // ==========================================
     function renderProfileSection() {
       if (!currentUserData) return;
@@ -1038,17 +1040,17 @@
     }
 
     // ==========================================
-    // 3. AI CHESS ENGINE (1500+ ELO GM BOT)
+    // AI CHESS ENGINE (1500+ ELO GM BOT)
     // ==========================================
     function initAiGame() {
       aiGame = new Chess();
       aiPlayerColor = 'w';
+      selectedSquare = null;
 
       const config = {
         draggable: false,
         position: 'start',
-        pieceTheme: PIECE_CDN,
-        onSquareClick: onAiSquareClick
+        pieceTheme: PIECE_CDN
       };
 
       aiBoard = Chessboard('ai-board', config);
@@ -1058,6 +1060,7 @@
 
     function setupAiGame(side) {
       aiGame = new Chess();
+      selectedSquare = null;
       clearHighlights();
 
       if (side === 'random') {
@@ -1070,6 +1073,7 @@
       aiBoard.start();
       applyBoardTheme();
 
+      document.getElementById('ai-turn-indicator').innerText = aiGame.turn() === 'w' ? "White to move" : "Black to move";
       document.getElementById('ai-status-msg').innerText = "Game in progress vs GM Bot";
 
       if (aiPlayerColor === 'b') {
@@ -1077,14 +1081,12 @@
       }
     }
 
-    let selectedSquare = null;
-
     function onAiSquareClick(square) {
-      if (aiGame.game_over()) return;
+      if (!aiGame || aiGame.game_over()) return;
       if (aiGame.turn() !== aiPlayerColor) return;
 
       if (selectedSquare === null) {
-        // First Click - Select Piece
+        // Select Piece
         const piece = aiGame.get(square);
         if (piece && piece.color === aiPlayerColor) {
           selectedSquare = square;
@@ -1092,7 +1094,14 @@
           showValidMoves(square);
         }
       } else {
-        // Second Click - Move Piece
+        // Handle Second Click
+        if (selectedSquare === square) {
+          selectedSquare = null;
+          clearHighlights();
+          clearValidMoveDots();
+          return;
+        }
+
         const move = aiGame.move({
           from: selectedSquare,
           to: square,
@@ -1108,8 +1117,9 @@
 
           if (checkAiGameOver()) return;
 
+          document.getElementById('ai-turn-indicator').innerText = "Bot to move";
           document.getElementById('ai-status-msg').innerText = "Bot is thinking...";
-          setTimeout(makeAiMove, 600);
+          setTimeout(makeAiMove, 500);
         } else {
           // Re-select if clicking another player piece
           const piece = aiGame.get(square);
@@ -1161,7 +1171,7 @@
       });
     }
 
-    // Minimax Evaluation Bot (1500+ ELO)
+    // Bot Engine Move Evaluation
     function makeAiMove() {
       if (aiGame.game_over()) return;
 
@@ -1170,6 +1180,7 @@
         const move = aiGame.move(bestMove);
         aiBoard.position(aiGame.fen());
         highlightMove(move.from, move.to);
+        document.getElementById('ai-turn-indicator').innerText = "Your turn";
         document.getElementById('ai-status-msg').innerText = "Your turn";
         checkAiGameOver();
       }
@@ -1291,7 +1302,7 @@
     }
 
     // ==========================================
-    // 4. COGNISHOP & CS:GO UNBOXING ENGINE
+    // COGNISHOP & CS:GO UNBOXING ENGINE
     // ==========================================
     function openCrate(crateType) {
       const config = CRATE_CONFIGS[crateType];
@@ -1302,7 +1313,6 @@
         return;
       }
 
-      // Deduct Cost
       safeAddCoins(currentUser.uid, -config.cost);
 
       const modal = document.getElementById('modal-crate-unbox');
@@ -1315,16 +1325,13 @@
       doneBtn.classList.add('hidden');
       resultCard.classList.add('hidden');
 
-      // Generate Random Roll Strip
       const rollItems = [];
       for (let i = 0; i < 40; i++) {
         rollItems.push(getRandomItemByOdds(config.odds));
       }
 
-      // Determine Final Winning Item at Index 32
       const winningItem = rollItems[32];
 
-      // Render Strip Elements
       track.style.transition = 'none';
       track.style.transform = 'translateX(0px)';
       track.innerHTML = '';
@@ -1339,15 +1346,12 @@
         track.appendChild(el);
       });
 
-      // Trigger CS:GO Animation
       setTimeout(() => {
         track.style.transition = 'transform 5s cubic-bezier(0.12, 0.8, 0.14, 1)';
-        // 100px width + 10px margin = 110px per card
         const stopOffset = -(32 * 110) + 180;
         track.style.transform = `translateX(${stopOffset}px)`;
       }, 100);
 
-      // Reveal Outcome after 5s
       setTimeout(() => {
         processCrateReward(winningItem, config);
       }, 5200);
@@ -1401,7 +1405,7 @@
     }
 
     // ==========================================
-    // 5. 1V1 ARENA MULTIPLAYER ENGINE
+    // 1V1 ARENA MULTIPLAYER ENGINE
     // ==========================================
     function createArenaRoom() {
       if (!currentUser) return;
@@ -1458,6 +1462,7 @@
     function joinRoomSession(roomCode, color) {
       currentArenaRoomId = roomCode;
       arenaPlayerColor = color;
+      arenaSelectedSquare = null;
 
       document.getElementById('arena-lobby-controls').classList.add('hidden');
       document.getElementById('arena-active-bar').classList.remove('hidden');
@@ -1468,13 +1473,11 @@
         draggable: false,
         position: 'start',
         pieceTheme: PIECE_CDN,
-        orientation: color === 'w' ? 'white' : 'black',
-        onSquareClick: onArenaSquareClick
+        orientation: color === 'w' ? 'white' : 'black'
       };
       arenaBoard = Chessboard('arena-board', config);
       applyBoardTheme();
 
-      // Listen to Room Updates
       db.ref('arena_rooms/' + roomCode).on('value', (snap) => {
         const room = snap.val();
         if (!room) return;
@@ -1484,7 +1487,6 @@
           arenaBoard.position(room.fen);
         }
 
-        // Update Opponent Info
         if (arenaPlayerColor === 'w' && room.guestEmail) {
           document.getElementById('arena-opp-name').innerText = room.guestEmail.split('@')[0];
           document.getElementById('arena-opp-elo').innerText = "Rating: " + (room.guestElo || 1200);
@@ -1494,7 +1496,6 @@
         }
       });
 
-      // Chat Listener
       db.ref('arena_chat/' + roomCode).on('value', (snap) => {
         const chatBox = document.getElementById('arena-chat-box');
         chatBox.innerHTML = '';
@@ -1511,8 +1512,6 @@
       });
     }
 
-    let arenaSelectedSquare = null;
-
     function onArenaSquareClick(square) {
       if (!arenaGame || arenaGame.game_over()) return;
       if (arenaGame.turn() !== arenaPlayerColor) return;
@@ -1521,13 +1520,23 @@
         const piece = arenaGame.get(square);
         if (piece && piece.color === arenaPlayerColor) {
           arenaSelectedSquare = square;
+          highlightArenaSquare(square);
+          showArenaValidMoves(square);
         }
       } else {
+        if (arenaSelectedSquare === square) {
+          arenaSelectedSquare = null;
+          clearArenaHighlights();
+          return;
+        }
+
         const move = arenaGame.move({
           from: arenaSelectedSquare,
           to: square,
           promotion: 'q'
         });
+
+        clearArenaHighlights();
 
         if (move !== null) {
           arenaBoard.position(arenaGame.fen());
@@ -1537,9 +1546,36 @@
           });
           arenaSelectedSquare = null;
         } else {
-          arenaSelectedSquare = null;
+          const piece = arenaGame.get(square);
+          if (piece && piece.color === arenaPlayerColor) {
+            arenaSelectedSquare = square;
+            highlightArenaSquare(square);
+            showArenaValidMoves(square);
+          } else {
+            arenaSelectedSquare = null;
+          }
         }
       }
+    }
+
+    function highlightArenaSquare(square) {
+      clearArenaHighlights();
+      const el = document.querySelector(`#arena-board .square-${square}`);
+      if (el) el.classList.add('highlight-move');
+    }
+
+    function showArenaValidMoves(square) {
+      const moves = arenaGame.moves({ square: square, verbose: true });
+      moves.forEach(m => {
+        const sqEl = document.querySelector(`#arena-board .square-${m.to}`);
+        if (sqEl) sqEl.classList.add('valid-move-dot');
+      });
+    }
+
+    function clearArenaHighlights() {
+      document.querySelectorAll('#arena-board .square-55d63').forEach(el => {
+        el.classList.remove('highlight-move', 'valid-move-dot');
+      });
     }
 
     function sendArenaChatMessage(e) {
@@ -1568,7 +1604,7 @@
     }
 
     // ==========================================
-    // 6. MASTER CONTROL ADMIN PANEL ENGINE
+    // MASTER CONTROL ADMIN PANEL ENGINE
     // ==========================================
     function listenAdminUsersList() {
       db.ref('users').on('value', (snap) => {
@@ -1645,14 +1681,12 @@
       }
     }
 
-    // Global Reload Listener
     db.ref('system/global_reload').on('value', (snap) => {
       if (snap.exists()) {
         window.location.reload();
       }
     });
 
-    // Helper Toast
     function showToast(title, msg) {
       const toast = document.getElementById('toast-gameover');
       document.getElementById('toast-gameover-title').innerText = title;

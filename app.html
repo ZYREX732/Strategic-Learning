@@ -57,7 +57,7 @@
     .theme-grey .white-1e1d7 { background-color: #e2e8f0 !important; color: #64748b; }
     .theme-grey .black-3c85d { background-color: #64748b !important; color: #e2e8f0; }
 
-    /* Move target dot styling: strictly 70% opaque grey dot */
+    /* Move target dot styling: 70% opaque grey dot */
     .highlight-move-dot {
       position: absolute;
       width: 28%;
@@ -75,6 +75,35 @@
       background-color: rgba(254, 240, 138, 0.45) !important;
     }
 
+    /* CS:GO Crate Roller Animations */
+    .crate-strip-container {
+      transition: transform 4.5s cubic-bezier(0.1, 0.85, 0.15, 1);
+    }
+
+    /* Animated Emote Effects */
+    @keyframes emoteBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes emotePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    @keyframes emoteShake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      75% { transform: rotate(10deg); }
+    }
+    @keyframes emoteGlow {
+      0%, 100% { filter: drop-shadow(0 0 4px #fbbf24); }
+      50% { filter: drop-shadow(0 0 12px #f59e0b); }
+    }
+
+    .emote-bounce { animation: emoteBounce 1.2s infinite ease-in-out; display: inline-block; }
+    .emote-pulse { animation: emotePulse 1.4s infinite ease-in-out; display: inline-block; }
+    .emote-shake { animation: emoteShake 0.8s infinite ease-in-out; display: inline-block; }
+    .emote-glow { animation: emoteGlow 1.5s infinite ease-in-out; display: inline-block; }
+
     /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
@@ -91,7 +120,7 @@
         <i class="fa-solid fa-screwdriver-wrench"></i>
       </div>
       <h2 class="text-2xl font-bold text-slate-100 mb-2">System Under Maintenance</h2>
-      <p class="text-slate-400 text-sm mb-6">CogniLearn Strategic Lab is currently undergoing scheduled platform upgrades. Standard access is temporarily restricted.</p>
+      <p class="text-slate-400 text-sm mb-6">CogniLearn Strategic Lab is currently undergoing scheduled platform upgrades.</p>
       <button onclick="logout()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-4 rounded-xl transition text-sm">
         <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Return to Main Page
       </button>
@@ -122,8 +151,8 @@
           <span>Strategic Chess</span>
         </button>
         <button onclick="switchTab('shop')" id="tab-shop" class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900">
-          <i class="fa-solid fa-store"></i>
-          <span>CogniShop</span>
+          <i class="fa-solid fa-box-open"></i>
+          <span>Crate Shop</span>
         </button>
         <button onclick="switchTab('social')" id="tab-social" class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900">
           <i class="fa-solid fa-users"></i>
@@ -174,7 +203,7 @@
   <!-- Mobile Navigation Bar -->
   <div class="md:hidden bg-slate-900 border-b border-slate-800 px-2 py-2 flex justify-around text-xs">
     <button onclick="switchTab('chess')" id="mob-tab-chess" class="px-3 py-1.5 rounded-lg text-indigo-400 font-semibold bg-indigo-500/10">Chess</button>
-    <button onclick="switchTab('shop')" id="mob-tab-shop" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Shop</button>
+    <button onclick="switchTab('shop')" id="mob-tab-shop" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Crates</button>
     <button onclick="switchTab('social')" id="mob-tab-social" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Social</button>
     <button onclick="switchTab('admin')" id="mob-tab-admin" class="hidden px-3 py-1.5 rounded-lg text-amber-400 font-semibold">Admin</button>
   </div>
@@ -184,8 +213,6 @@
 
     <!-- SECTION 1: STRATEGIC THINKING LAB (CHESS) -->
     <section id="section-chess" class="space-y-6">
-      
-      <!-- Sub Navigation Bar -->
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
         <div class="flex space-x-2">
           <button onclick="switchChessSubTab('bot')" id="subtab-bot" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700">
@@ -205,10 +232,7 @@
 
       <!-- BOT PRACTICE MODE -->
       <div id="chess-view-bot" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Chessboard Container -->
         <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col items-center">
-          
-          <!-- Bot Info Bar -->
           <div class="w-full max-w-[560px] flex items-center justify-between mb-3 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
             <div class="flex items-center space-x-3">
               <div class="w-9 h-9 bg-purple-600/20 text-purple-400 rounded-lg flex items-center justify-center font-bold">
@@ -225,12 +249,10 @@
             </div>
           </div>
 
-          <!-- Board Mounting Node -->
           <div class="w-full max-w-[560px] aspect-square relative" id="boardWrapper">
             <div id="botBoard" class="w-full h-full rounded-lg overflow-hidden shadow-2xl"></div>
           </div>
 
-          <!-- Player Info Bar -->
           <div class="w-full max-w-[560px] flex items-center justify-between mt-3 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
             <div class="flex items-center space-x-3">
               <div class="w-9 h-9 bg-indigo-600/20 text-indigo-400 rounded-lg flex items-center justify-center font-bold">
@@ -247,7 +269,6 @@
           </div>
         </div>
 
-        <!-- Controls & Options Side Panel -->
         <div class="lg:col-span-4 space-y-4">
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
             <h3 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
@@ -255,7 +276,6 @@
               <span>Match Controls</span>
             </h3>
 
-            <!-- Side Selection -->
             <div>
               <label class="block text-xs text-slate-400 mb-2 font-medium">Choose Playing Side</label>
               <div class="grid grid-cols-3 gap-2">
@@ -274,34 +294,21 @@
               </div>
             </div>
 
-            <!-- New Game Button -->
             <button onclick="startBotGame()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-2">
               <i class="fa-solid fa-play"></i>
               <span>Start New Bot Game</span>
             </button>
 
-            <!-- Status Indicator -->
             <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-300">
               <div class="text-slate-500 text-[10px] uppercase font-bold mb-1">Status</div>
               <div id="botGameStatus" class="font-medium">Ready to play. Click 'Start New Bot Game'.</div>
             </div>
-          </div>
-
-          <!-- GM Bot Features Info Card -->
-          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 text-xs text-slate-400 space-y-2">
-            <div class="font-bold text-slate-200 flex items-center space-x-2">
-              <i class="fa-solid fa-circle-info text-indigo-400"></i>
-              <span>GM Engine Rules</span>
-            </div>
-            <p>Minimax engine with piece-square positional tables. Playing as Black automatically flips the board and triggers initial AI calculation. Mid-game restart is disabled for competitive integrity.</p>
           </div>
         </div>
       </div>
 
       <!-- 1v1 ONLINE ARENA MODE -->
       <div id="chess-view-arena" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Arena Room Setup Screen -->
         <div id="arenaSetupPanel" class="lg:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-2xl mx-auto w-full space-y-6">
           <div class="text-center space-y-1">
             <h2 class="text-xl font-bold text-slate-100">1v1 Strategic Arena</h2>
@@ -309,7 +316,6 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Create Room Card -->
             <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
               <div class="font-bold text-sm text-slate-200 flex items-center space-x-2">
                 <i class="fa-solid fa-plus-circle text-indigo-400"></i>
@@ -328,7 +334,6 @@
               </button>
             </div>
 
-            <!-- Join Room Card -->
             <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
               <div class="font-bold text-sm text-slate-200 flex items-center space-x-2">
                 <i class="fa-solid fa-right-to-bracket text-emerald-400"></i>
@@ -345,12 +350,8 @@
           </div>
         </div>
 
-        <!-- Active 1v1 Arena Game View -->
         <div id="arenaGamePanel" class="hidden lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
-          <!-- Board Container -->
           <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col items-center">
-            
-            <!-- Opponent Banner -->
             <div class="w-full max-w-[560px] flex items-center justify-between mb-3 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
               <div class="flex items-center space-x-3">
                 <div class="w-9 h-9 bg-red-600/20 text-red-400 rounded-lg flex items-center justify-center font-bold">
@@ -366,12 +367,10 @@
               </div>
             </div>
 
-            <!-- Board Mounting Node -->
             <div class="w-full max-w-[560px] aspect-square relative">
               <div id="arenaBoard" class="w-full h-full rounded-lg overflow-hidden shadow-2xl"></div>
             </div>
 
-            <!-- Self Player Banner -->
             <div class="w-full max-w-[560px] flex items-center justify-between mt-3 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
               <div class="flex items-center space-x-3">
                 <div class="w-9 h-9 bg-emerald-600/20 text-emerald-400 rounded-lg flex items-center justify-center font-bold">
@@ -388,9 +387,7 @@
             </div>
           </div>
 
-          <!-- Controls & In-Game Chat Side Panel -->
           <div class="lg:col-span-4 space-y-4">
-            <!-- Room Info & Match Controls -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
               <div class="flex items-center justify-between">
                 <div>
@@ -412,14 +409,13 @@
               </div>
             </div>
 
-            <!-- Auto-Deleting In-Game Match Chat -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col h-[320px]">
               <div class="text-xs font-bold text-slate-300 mb-2 flex items-center justify-between">
                 <span><i class="fa-solid fa-comments text-indigo-400 mr-1.5"></i>Match Chat</span>
                 <span class="text-[9px] text-slate-500">Auto-Deletes On Exit</span>
               </div>
               <div id="arenaChatBox" class="flex-grow overflow-y-auto space-y-2 pr-1 text-xs mb-3">
-                <div class="text-slate-500 italic text-[11px]">Match room initialized. Messages will purge when the match ends.</div>
+                <div class="text-slate-500 italic text-[11px]">Match room initialized.</div>
               </div>
               <form onsubmit="sendArenaChat(event)" class="flex gap-2">
                 <input type="text" id="arenaChatInput" placeholder="Send message..." class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
@@ -436,36 +432,27 @@
       <div id="chess-view-settings" class="hidden max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
         <div>
           <h2 class="text-lg font-bold text-slate-100">Board Customizer</h2>
-          <p class="text-xs text-slate-400">Select your preferred board aesthetic. Settings save automatically.</p>
+          <p class="text-xs text-slate-400">Select your preferred board aesthetic.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <button onclick="applyBoardTheme('theme-wood')" class="bg-slate-950 border-2 border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl text-center space-y-3 transition">
             <div class="w-16 h-16 mx-auto rounded-lg overflow-hidden border border-slate-700 grid grid-cols-2 grid-rows-2">
-              <div class="bg-[#f0d9b5]"></div>
-              <div class="bg-[#b58863]"></div>
-              <div class="bg-[#b58863]"></div>
-              <div class="bg-[#f0d9b5]"></div>
+              <div class="bg-[#f0d9b5]"></div><div class="bg-[#b58863]"></div><div class="bg-[#b58863]"></div><div class="bg-[#f0d9b5]"></div>
             </div>
             <div class="text-xs font-bold text-slate-200">Classic Wood</div>
           </button>
 
           <button onclick="applyBoardTheme('theme-green')" class="bg-slate-950 border-2 border-slate-800 hover:border-emerald-500/50 p-4 rounded-2xl text-center space-y-3 transition">
             <div class="w-16 h-16 mx-auto rounded-lg overflow-hidden border border-slate-700 grid grid-cols-2 grid-rows-2">
-              <div class="bg-[#eeeed2]"></div>
-              <div class="bg-[#769656]"></div>
-              <div class="bg-[#769656]"></div>
-              <div class="bg-[#eeeed2]"></div>
+              <div class="bg-[#eeeed2]"></div><div class="bg-[#769656]"></div><div class="bg-[#769656]"></div><div class="bg-[#eeeed2]"></div>
             </div>
             <div class="text-xs font-bold text-slate-200">Chess Green</div>
           </button>
 
           <button onclick="applyBoardTheme('theme-grey')" class="bg-slate-950 border-2 border-slate-800 hover:border-slate-500/50 p-4 rounded-2xl text-center space-y-3 transition">
             <div class="w-16 h-16 mx-auto rounded-lg overflow-hidden border border-slate-700 grid grid-cols-2 grid-rows-2">
-              <div class="bg-[#e2e8f0]"></div>
-              <div class="bg-[#64748b]"></div>
-              <div class="bg-[#64748b]"></div>
-              <div class="bg-[#e2e8f0]"></div>
+              <div class="bg-[#e2e8f0]"></div><div class="bg-[#64748b]"></div><div class="bg-[#64748b]"></div><div class="bg-[#e2e8f0]"></div>
             </div>
             <div class="text-xs font-bold text-slate-200">Slate Grey</div>
           </button>
@@ -473,60 +460,116 @@
       </div>
     </section>
 
-    <!-- SECTION 2: COGNISHOP PLACEHOLDER -->
-    <section id="section-shop" class="hidden max-w-4xl mx-auto space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6 text-center">
-        <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-indigo-500/30">
-          <i class="fa-solid fa-store"></i>
+    <!-- SECTION 2: COGNISHOP CRATE LAB -->
+    <section id="section-shop" class="hidden space-y-6">
+      
+      <!-- Crate Header -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-3">
+        <div class="inline-flex items-center space-x-2 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full text-indigo-400 text-xs font-bold">
+          <i class="fa-solid fa-box-open"></i>
+          <span>CogniShop Mystery Crates</span>
         </div>
+        <h2 class="text-2xl font-black text-slate-100">Unbox Animated Emotes, Cosmetics & Flair</h2>
+        <p class="text-xs text-slate-400 max-w-lg mx-auto">
+          Spin crates for Profile Icons, Frames, Name Tags, Board Skins, Piece Sets, and Animated Emotes! 
+          <span class="text-amber-400 font-bold">Duplicates automatically refund 50% CC!</span>
+        </p>
+      </div>
+
+      <!-- Crate Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        <div class="space-y-2 max-w-md mx-auto">
-          <h2 class="text-2xl font-black text-slate-100 tracking-tight">CogniShop</h2>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            The rewards store is under active development. Redeem your hard-earned CogniCoins (CC) for exclusive board themes, custom avatars, and cosmetic badges soon.
-          </p>
+        <!-- Pawn Crate (1,000 CC) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-slate-700 transition">
+          <div class="space-y-4 text-center">
+            <div class="w-20 h-20 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-center text-4xl text-slate-300 mx-auto shadow-inner group-hover:scale-105 transition">
+              <i class="fa-solid fa-chess-pawn"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-extrabold text-slate-100">Pawn Crate</h3>
+              <p class="text-[11px] text-slate-400">Starter crate for icons, badges & emotes.</p>
+            </div>
+
+            <!-- Odds Breakdown -->
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] space-y-1 text-left">
+              <div class="font-bold text-slate-400 uppercase tracking-wider mb-1">Drop Odds</div>
+              <div class="flex justify-between"><span class="text-slate-400">🟢 Common:</span><span class="font-mono text-slate-200">65%</span></div>
+              <div class="flex justify-between"><span class="text-indigo-400">🔵 Rare:</span><span class="font-mono text-slate-200">28%</span></div>
+              <div class="flex justify-between"><span class="text-purple-400">🟣 Epic:</span><span class="font-mono text-slate-200">6%</span></div>
+              <div class="flex justify-between"><span class="text-amber-400">🟡 Legendary:</span><span class="font-mono text-slate-200">1%</span></div>
+            </div>
+          </div>
+
+          <button onclick="openCrateModal('pawn')" class="w-full bg-slate-800 hover:bg-indigo-600 text-slate-100 font-bold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-coins text-emerald-400"></i>
+            <span>Unbox for 1,000 CC</span>
+          </button>
         </div>
 
-        <div class="inline-flex items-center space-x-2 bg-slate-950 border border-slate-800 px-4 py-2 rounded-xl text-xs font-bold text-emerald-400">
-          <i class="fa-solid fa-coins"></i>
-          <span>Your CogniCoins Balance:</span>
-          <span id="shopCoinsDisplay" class="text-slate-100 font-mono">0 CC</span>
+        <!-- Knight Crate (3,500 CC) -->
+        <div class="bg-slate-900 border border-indigo-500/30 rounded-2xl p-6 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-indigo-500/60 transition shadow-lg shadow-indigo-500/5">
+          <div class="space-y-4 text-center">
+            <div class="w-20 h-20 bg-indigo-950/40 border border-indigo-500/30 rounded-2xl flex items-center justify-center text-4xl text-indigo-400 mx-auto shadow-inner group-hover:scale-105 transition">
+              <i class="fa-solid fa-chess-knight"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-extrabold text-slate-100">Knight Crate</h3>
+              <p class="text-[11px] text-slate-400">Higher chance for name tags & board skins.</p>
+            </div>
+
+            <!-- Odds Breakdown -->
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] space-y-1 text-left">
+              <div class="font-bold text-slate-400 uppercase tracking-wider mb-1">Drop Odds</div>
+              <div class="flex justify-between"><span class="text-slate-400">🟢 Common:</span><span class="font-mono text-slate-200">35%</span></div>
+              <div class="flex justify-between"><span class="text-indigo-400">🔵 Rare:</span><span class="font-mono text-slate-200">45%</span></div>
+              <div class="flex justify-between"><span class="text-purple-400">🟣 Epic:</span><span class="font-mono text-slate-200">16%</span></div>
+              <div class="flex justify-between"><span class="text-amber-400">🟡 Legendary:</span><span class="font-mono text-slate-200">4%</span></div>
+            </div>
+          </div>
+
+          <button onclick="openCrateModal('knight')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
+            <i class="fa-solid fa-coins text-emerald-400"></i>
+            <span>Unbox for 3,500 CC</span>
+          </button>
         </div>
 
-        <!-- Catalog Coming Soon Placeholder Cards Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-left">
-          <div class="bg-slate-950 border border-slate-800/80 p-5 rounded-2xl space-y-3 opacity-60">
-            <div class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-indigo-400 text-lg">
-              <i class="fa-solid fa-palette"></i>
+        <!-- Grandmaster Crate (10,000 CC) -->
+        <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-amber-500 transition shadow-xl shadow-amber-500/10">
+          <div class="space-y-4 text-center">
+            <div class="w-20 h-20 bg-amber-950/40 border border-amber-500/30 rounded-2xl flex items-center justify-center text-4xl text-amber-400 mx-auto shadow-inner group-hover:scale-105 transition">
+              <i class="fa-solid fa-chess-king"></i>
             </div>
             <div>
-              <div class="text-xs font-bold text-slate-200">Custom Board Skins</div>
-              <div class="text-[10px] text-slate-500">Premium aesthetics & piece sets.</div>
+              <h3 class="text-lg font-extrabold text-slate-100">Grandmaster Crate</h3>
+              <p class="text-[11px] text-slate-400">Elite crate for Epics & 15% Legendary rate!</p>
             </div>
-            <div class="text-[11px] font-bold text-slate-400">Opening Soon</div>
+
+            <!-- Odds Breakdown -->
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] space-y-1 text-left">
+              <div class="font-bold text-slate-400 uppercase tracking-wider mb-1">Drop Odds</div>
+              <div class="flex justify-between"><span class="text-slate-400">🟢 Common:</span><span class="font-mono text-slate-200">10%</span></div>
+              <div class="flex justify-between"><span class="text-indigo-400">🔵 Rare:</span><span class="font-mono text-slate-200">35%</span></div>
+              <div class="flex justify-between"><span class="text-purple-400">🟣 Epic:</span><span class="font-mono text-slate-200">40%</span></div>
+              <div class="flex justify-between"><span class="text-amber-400">🟡 Legendary:</span><span class="font-mono text-slate-200">15%</span></div>
+            </div>
           </div>
 
-          <div class="bg-slate-950 border border-slate-800/80 p-5 rounded-2xl space-y-3 opacity-60">
-            <div class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-amber-400 text-lg">
-              <i class="fa-solid fa-award"></i>
-            </div>
-            <div>
-              <div class="text-xs font-bold text-slate-200">Profile Badges</div>
-              <div class="text-[10px] text-slate-500">Showcase your achievements online.</div>
-            </div>
-            <div class="text-[11px] font-bold text-slate-400">Opening Soon</div>
-          </div>
+          <button onclick="openCrateModal('grandmaster')" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/20">
+            <i class="fa-solid fa-coins text-slate-950"></i>
+            <span>Unbox for 10,000 CC</span>
+          </button>
+        </div>
 
-          <div class="bg-slate-950 border border-slate-800/80 p-5 rounded-2xl space-y-3 opacity-60">
-            <div class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-emerald-400 text-lg">
-              <i class="fa-solid fa-user-astronaut"></i>
-            </div>
-            <div>
-              <div class="text-xs font-bold text-slate-200">Avatar Frames</div>
-              <div class="text-[10px] text-slate-500">Stand out in match play & chat rooms.</div>
-            </div>
-            <div class="text-[11px] font-bold text-slate-400">Opening Soon</div>
-          </div>
+      </div>
+
+      <!-- Inventory Preview Section -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+        <h3 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
+          <i class="fa-solid fa-box-archive text-indigo-400"></i>
+          <span>Your Owned Cosmetics Collection</span>
+        </h3>
+        <div id="userInventoryDisplay" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          <div class="text-center py-6 text-xs text-slate-500 col-span-full">Loading inventory...</div>
         </div>
       </div>
     </section>
@@ -542,9 +585,7 @@
         </button>
       </div>
 
-      <!-- FRIENDS LIST VIEW -->
       <div id="social-view-list" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Add Friend Card -->
         <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
           <h3 class="text-sm font-bold text-slate-200">Add Friend</h3>
           <div class="flex gap-2">
@@ -556,7 +597,6 @@
           <div id="friendSearchMsg" class="text-[11px] text-slate-400"></div>
         </div>
 
-        <!-- Friends List -->
         <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
           <h3 class="text-sm font-bold text-slate-200">Your Friends</h3>
           <div id="friendsListContainer" class="space-y-2">
@@ -565,9 +605,7 @@
         </div>
       </div>
 
-      <!-- DIRECT MESSAGES VIEW -->
       <div id="social-view-messages" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- DM Contact List -->
         <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
           <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Conversations</h3>
           <div id="dmContactsContainer" class="space-y-1">
@@ -575,7 +613,6 @@
           </div>
         </div>
 
-        <!-- DM Chat Window -->
         <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col h-[480px]">
           <div id="dmHeader" class="text-xs font-bold text-slate-200 pb-3 border-b border-slate-800 flex items-center justify-between">
             <span>Select a friend to message</span>
@@ -604,14 +641,12 @@
             </h2>
             <p class="text-xs text-slate-400">Superuser administrative suite for platform governance and coin regulation.</p>
           </div>
-          <!-- Dynamic Color Maintenance Toggle Button -->
           <button id="adminMaintToggleBtn" onclick="toggleMaintenanceMode()" class="px-4 py-2 rounded-xl font-bold text-xs shadow-lg transition flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white">
             <i class="fa-solid fa-shield-halved"></i>
             <span id="adminMaintText">Maintenance Normal (OFF)</span>
           </button>
         </div>
 
-        <!-- Global System Tools -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button onclick="triggerGlobalReload()" class="bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 p-4 rounded-xl text-left transition flex items-center justify-between">
             <div>
@@ -630,7 +665,6 @@
           </button>
         </div>
 
-        <!-- User Accounts Management Table -->
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Registered Accounts Directory</h3>
@@ -661,6 +695,36 @@
 
   </main>
 
+  <!-- CRATE SPINNER MODAL (CS:GO Horizontal Rolling Strip) -->
+  <div id="crateModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-2xl w-full space-y-6 shadow-2xl relative">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 id="crateModalTitle" class="text-lg font-black text-slate-100">Opening Crate...</h3>
+          <p class="text-xs text-slate-400">Good luck! Unboxing live reward item...</p>
+        </div>
+        <button id="closeCrateModalBtn" onclick="closeCrateModal()" class="text-slate-500 hover:text-slate-200 transition text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="w-full bg-slate-950 border-2 border-indigo-500/50 rounded-xl h-36 relative overflow-hidden flex items-center shadow-inner">
+        <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-amber-400 z-20 shadow-[0_0_12px_rgba(251,191,36,0.8)] pointer-events-none"></div>
+
+        <div id="crateStrip" class="flex items-center space-x-3 absolute left-0 crate-strip-container pl-[280px]">
+          <!-- Dynamic Items Injected via JS -->
+        </div>
+      </div>
+
+      <div id="crateResultBox" class="hidden text-center space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+        <div id="resultRarityTag" class="inline-block px-3 py-1 rounded-full text-[10px] font-extrabold uppercase"></div>
+        <h4 id="resultItemName" class="text-xl font-black text-slate-100">Item Name</h4>
+        <p id="resultDuplicateText" class="text-xs text-emerald-400 font-bold"></p>
+        <button onclick="closeCrateModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2 rounded-xl text-xs transition">Collect Reward</button>
+      </div>
+    </div>
+  </div>
+
   <!-- USERNAME CHANGE MODAL -->
   <div id="usernameModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4">
@@ -673,7 +737,7 @@
     </div>
   </div>
 
-  <!-- GAME OVER 3-SECOND AUTO-DISMISS MODAL -->
+  <!-- GAME OVER MODAL -->
   <div id="gameOverModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full text-center space-y-3 shadow-2xl">
       <div id="goModalIcon" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto text-2xl"></div>
@@ -688,7 +752,7 @@
     // System Constants
     const ADMIN_EMAIL = "zainisgo123@gmail.com";
     const WHITELISTED_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
-    const MAX_COIN_LIMIT = 100000; // Universal Economy Cap Limit
+    const MAX_COIN_LIMIT = 100000;
 
     // Firebase Configuration
     const firebaseConfig = {
@@ -701,14 +765,10 @@
       appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
     };
 
-    // Initialize Firebase
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Session-only Auth Persistence
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
     // Global State
@@ -716,6 +776,7 @@
     let currentUserData = null;
     let sessionStartTime = Date.now();
     let currentBoardTheme = localStorage.getItem("cogni_board_theme") || "theme-wood";
+    let isSpinningCrate = false;
 
     // Chess State
     let botGame = null;
@@ -724,18 +785,67 @@
     let arenaGame = null;
     let arenaBoard = null;
     let activeArenaRoom = null;
-    let arenaClockInterval = null;
-    let arenaTimeSelf = 600;
-    let arenaTimeOpponent = 600;
     let arenaPlayerColor = 'w';
-
-    // Social & DM State
     let activeDMTarget = null;
 
-    // Direct Safe Coin Addition with Strict 100k Cap Lock
+    // CRATE CONFIGURATIONS & ANIMATED EMOTES
+    const CRATE_CONFIGS = {
+      pawn: {
+        name: "Pawn Crate",
+        cost: 1000,
+        refund: 500,
+        odds: { common: 0.65, rare: 0.28, epic: 0.06, legendary: 0.01 }
+      },
+      knight: {
+        name: "Knight Crate",
+        cost: 3500,
+        refund: 1750,
+        odds: { common: 0.35, rare: 0.45, epic: 0.16, legendary: 0.04 }
+      },
+      grandmaster: {
+        name: "Grandmaster Crate",
+        cost: 10000,
+        refund: 5000,
+        odds: { common: 0.10, rare: 0.35, epic: 0.40, legendary: 0.15 }
+      }
+    };
+
+    const COSMETICS_CATALOG = [
+      // Common
+      { id: "icon_pawn_novice", name: "Pawn Novice Icon", type: "Profile Icon", rarity: "common", icon: "fa-chess-pawn", anim: "" },
+      { id: "icon_rook_tower", name: "Rook Tower Icon", type: "Profile Icon", rarity: "common", icon: "fa-chess-rook", anim: "" },
+      { id: "frame_wooden_ring", name: "Wooden Ring Frame", type: "Avatar Frame", rarity: "common", icon: "fa-circle-notch", anim: "" },
+      { id: "title_learner", name: "[Learner] Title", type: "Name Tag", rarity: "common", icon: "fa-tag", anim: "" },
+      { id: "emote_tea", name: "Sipping Tea ☕", type: "Animated Emote", rarity: "common", icon: "fa-mug-hot", anim: "emote-pulse" },
+      { id: "emote_thinking", name: "Thinking 🧠", type: "Animated Emote", rarity: "common", icon: "fa-brain", anim: "emote-pulse" },
+
+      // Rare
+      { id: "icon_knight_shield", name: "Knight Shield Icon", type: "Profile Icon", rarity: "rare", icon: "fa-chess-knight", anim: "" },
+      { id: "icon_bishop_cross", name: "Bishop Cross Icon", type: "Profile Icon", rarity: "rare", icon: "fa-chess-bishop", anim: "" },
+      { id: "frame_iron_border", name: "Iron Border Frame", type: "Avatar Frame", rarity: "rare", icon: "fa-shield-halved", anim: "" },
+      { id: "title_tactician", name: "[Tactician] Title", type: "Name Tag", rarity: "rare", icon: "fa-bolt", anim: "" },
+      { id: "emote_flex", name: "Crown Flex 👑", type: "Animated Emote", rarity: "rare", icon: "fa-crown", anim: "emote-bounce" },
+      { id: "skin_board_green", name: "Chess Green Skin", type: "Board Skin", rarity: "rare", icon: "fa-border-all", anim: "" },
+
+      // Epic
+      { id: "icon_queen_crown", name: "Queen Crown Icon", type: "Profile Icon", rarity: "epic", icon: "fa-chess-queen", anim: "" },
+      { id: "frame_indigo_aura", name: "Glowing Indigo Aura", type: "Avatar Frame", rarity: "epic", icon: "fa-dharmachakra", anim: "emote-spin" },
+      { id: "title_mastermind", name: "[🧠 Mastermind] Title", type: "Name Tag", rarity: "epic", icon: "fa-wand-magic-sparkles", anim: "" },
+      { id: "emote_checkmate", name: "Checkmate Flex ⚡", type: "Animated Emote", rarity: "epic", icon: "fa-hand-fist", anim: "emote-shake" },
+      { id: "skin_board_cyber", name: "Cyber Neon Board Skin", type: "Board Skin", rarity: "epic", icon: "fa-microchip", anim: "" },
+      { id: "pieces_neon_glow", name: "Neon Glow Piece Set", type: "Piece Set", rarity: "epic", icon: "fa-cubes", anim: "" },
+
+      // Legendary
+      { id: "icon_golden_brain", name: "Golden Brain Icon", type: "Profile Icon", rarity: "legendary", icon: "fa-brain", anim: "emote-glow" },
+      { id: "frame_gold_flame", name: "Animated Gold Flame Frame", type: "Avatar Frame", rarity: "legendary", icon: "fa-fire", anim: "emote-bounce" },
+      { id: "title_sovereign", name: "[✨ Sovereign] Title", type: "Name Tag", rarity: "legendary", icon: "fa-gem", anim: "emote-glow" },
+      { id: "emote_gold_trophy", name: "Golden Trophy 🏆", type: "Animated Emote", rarity: "legendary", icon: "fa-trophy", anim: "emote-glow" },
+      { id: "skin_board_gold", name: "Midnight Gold Board Skin", type: "Board Skin", rarity: "legendary", icon: "fa-star", anim: "" },
+      { id: "pieces_imperial_gold", name: "Imperial Gold Piece Set", type: "Piece Set", rarity: "legendary", icon: "fa-crown", anim: "" }
+    ];
+
     function safeAddCoins(targetUid, amountDelta) {
       if (!targetUid) return Promise.reject("Invalid UID");
-      
       const userRef = db.ref('users/' + targetUid + '/coins');
       return userRef.transaction((currentBalance) => {
         const curr = currentBalance !== null ? currentBalance : 1000;
@@ -744,22 +854,19 @@
       });
     }
 
-    // Direct Safe Coin Set with Strict 100k Cap Lock
     function safeSetCoins(targetUid, absoluteAmount) {
       if (!targetUid) return Promise.reject("Invalid UID");
       const safeBal = Math.min(MAX_COIN_LIMIT, Math.max(0, Math.floor(absoluteAmount)));
       return db.ref('users/' + targetUid + '/coins').set(safeBal);
     }
 
-    // AUTHENTICATION & INITIALIZATION
     auth.onAuthStateChanged((user) => {
       if (!user) {
         window.location.href = "index.html";
         return;
       }
       currentUser = user;
-      
-      // Initialize User Record
+
       const userRef = db.ref('users/' + user.uid);
       userRef.on('value', (snap) => {
         const data = snap.val();
@@ -769,12 +876,12 @@
             email: user.email,
             elo: 1200,
             coins: 1000,
+            inventory: { icon_pawn_novice: true },
             createdAt: Date.now()
           };
           userRef.set(defaultData);
           currentUserData = defaultData;
         } else {
-          // Enforce cap dynamically if over limit
           if (data.coins > MAX_COIN_LIMIT) {
             safeSetCoins(user.uid, MAX_COIN_LIMIT);
             data.coins = MAX_COIN_LIMIT;
@@ -782,20 +889,21 @@
           currentUserData = data;
         }
         updateUIHeader();
+        renderUserInventory();
       });
 
-      // Show Admin Tab if Master Email
+      // STRICT ADMIN VISIBILITY LOCK
       if (user.email === ADMIN_EMAIL) {
         document.getElementById('tab-admin').classList.remove('hidden');
         document.getElementById('mob-tab-admin').classList.remove('hidden');
         listenAdminUsers();
+      } else {
+        document.getElementById('tab-admin').classList.add('hidden');
+        document.getElementById('mob-tab-admin').classList.add('hidden');
       }
 
-      // Maintenance Mode Listener
       db.ref('system/maintenance').on('value', (snap) => {
         const isMaint = snap.val() === true;
-        
-        // Update Admin Toggle Button Color & Text
         const toggleBtn = document.getElementById('adminMaintToggleBtn');
         const toggleText = document.getElementById('adminMaintText');
         if (isMaint) {
@@ -806,7 +914,6 @@
           toggleText.innerText = "Maintenance Normal (OFF)";
         }
 
-        // Lock non-whitelisted users
         if (isMaint && !WHITELISTED_EMAILS.includes(user.email)) {
           document.getElementById('maintenanceModal').classList.remove('hidden');
         } else {
@@ -814,52 +921,27 @@
         }
       });
 
-      // Global Reload Trigger
       db.ref('system/globalReloadTimestamp').on('value', (snap) => {
         const ts = snap.val();
-        if (ts && ts > sessionStartTime) {
-          window.location.reload();
-        }
+        if (ts && ts > sessionStartTime) window.location.reload();
       });
 
-      // Presence Tracker
       db.ref('presence/' + user.uid).set({ online: true, inGame: false });
       db.ref('presence/' + user.uid).onDisconnect().remove();
 
-      // Social Direct Challenge Listener
-      db.ref('challenges/' + user.uid).orderByChild('timestamp').startAt(sessionStartTime).on('child_added', (snap) => {
-        const challenge = snap.val();
-        if (challenge && challenge.status === 'pending') {
-          if (confirm(`Challenge from ${challenge.fromHandle}! Join 1v1 Room ${challenge.roomCode}?`)) {
-            document.getElementById('arenaJoinCode').value = challenge.roomCode;
-            switchTab('chess');
-            switchChessSubTab('arena');
-            joinArenaRoom();
-          }
-          snap.ref.remove();
-        }
-      });
-
-      // Initialize Chess Engine Visuals
       initBotChess();
       applyBoardTheme(currentBoardTheme);
     });
 
     function logout() {
       localStorage.clear();
-      if (currentUser) {
-        db.ref('presence/' + currentUser.uid).remove();
-      }
-      auth.signOut().then(() => {
-        window.location.href = "index.html";
-      });
+      if (currentUser) db.ref('presence/' + currentUser.uid).remove();
+      auth.signOut().then(() => { window.location.href = "index.html"; });
     }
 
     function updateUIHeader() {
       if (!currentUserData) return;
-      const coinText = (currentUserData.coins || 0).toLocaleString();
-      document.getElementById('userCoins').innerText = coinText;
-      document.getElementById('shopCoinsDisplay').innerText = coinText + " CC";
+      document.getElementById('userCoins').innerText = (currentUserData.coins || 0).toLocaleString();
       document.getElementById('userElo').innerText = currentUserData.elo || 1200;
       document.getElementById('navHandle').innerText = currentUserData.handle || "Player";
       document.getElementById('botPlayerHandle').innerText = currentUserData.handle || "Player";
@@ -867,46 +949,30 @@
       document.getElementById('arenaSelfElo').innerText = currentUserData.elo || 1200;
     }
 
-    // Faucet Claim Logic (+250 CC with 100k Cap)
     function claimFaucet() {
       if (!currentUser || !currentUserData) return;
-      if (currentUserData.coins >= MAX_COIN_LIMIT) {
-        alert("Coin limit reached! Maximum balance is 100,000 CC.");
-        return;
-      }
-      safeAddCoins(currentUser.uid, 250).then(() => {
-        alert("Claimed +250 CC Daily/Bankruptcy Faucet!");
-      });
+      if (currentUserData.coins >= MAX_COIN_LIMIT) return alert("Coin limit reached! Maximum balance is 100,000 CC.");
+      safeAddCoins(currentUser.uid, 250).then(() => alert("Claimed +250 CC Daily/Bankruptcy Faucet!"));
     }
 
-    // TAB SWITCHING LOGIC
     function switchTab(tab) {
+      if (tab === 'admin' && currentUser.email !== ADMIN_EMAIL) return; // Strict Guard
+
       ['chess', 'shop', 'social', 'admin'].forEach(t => {
         document.getElementById('section-' + t).classList.add('hidden');
         const btn = document.getElementById('tab-' + t);
-        if (btn) {
-          btn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900";
-        }
+        if (btn) btn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900";
       });
 
       document.getElementById('section-' + tab).classList.remove('hidden');
       const activeBtn = document.getElementById('tab-' + tab);
       if (activeBtn) {
-        if (tab === 'admin') {
-          activeBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 bg-amber-500 text-slate-950 font-bold shadow";
-        } else {
-          activeBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 bg-indigo-600 text-white shadow";
-        }
+        if (tab === 'admin') activeBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 bg-amber-500 text-slate-950 font-bold shadow";
+        else activeBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 bg-indigo-600 text-white shadow";
       }
 
-      if (tab === 'chess') {
-        setTimeout(() => {
-          if (botBoard) botBoard.resize();
-          if (arenaBoard) arenaBoard.resize();
-        }, 50);
-      } else if (tab === 'social') {
-        loadFriendsList();
-      }
+      if (tab === 'chess') setTimeout(() => { if (botBoard) botBoard.resize(); if (arenaBoard) arenaBoard.resize(); }, 50);
+      else if (tab === 'social') loadFriendsList();
     }
 
     function switchChessSubTab(sub) {
@@ -917,33 +983,137 @@
       });
       document.getElementById('chess-view-' + sub).classList.remove('hidden');
       document.getElementById('subtab-' + sub).className = "px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700";
+      setTimeout(() => { if (sub === 'bot' && botBoard) botBoard.resize(); if (sub === 'arena' && arenaBoard) arenaBoard.resize(); }, 50);
+    }
 
+    // CRATE SPINNER & UNBOXING LOGIC
+    function openCrateModal(crateKey) {
+      if (isSpinningCrate) return;
+      const crate = CRATE_CONFIGS[crateKey];
+      if (!crate) return;
+
+      if (currentUserData.coins < crate.cost) return alert(`Insufficient coins! Unboxing requires ${crate.cost.toLocaleString()} CC.`);
+
+      safeAddCoins(currentUser.uid, -crate.cost); // Deduct CC
+
+      isSpinningCrate = true;
+      document.getElementById('closeCrateModalBtn').classList.add('hidden');
+      document.getElementById('crateResultBox').classList.add('hidden');
+      document.getElementById('crateModalTitle').innerText = `Opening ${crate.name}...`;
+
+      const modal = document.getElementById('crateModal');
+      modal.classList.remove('hidden');
+
+      // 1. Calculate Win Rarity
+      const rand = Math.random();
+      let wonRarity = "common";
+      if (rand < crate.odds.legendary) wonRarity = "legendary";
+      else if (rand < crate.odds.legendary + crate.odds.epic) wonRarity = "epic";
+      else if (rand < crate.odds.legendary + crate.odds.epic + crate.odds.rare) wonRarity = "rare";
+
+      const possibleItems = COSMETICS_CATALOG.filter(i => i.rarity === wonRarity);
+      const winningItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
+
+      // 2. Generate Strip Array (50 Items, Winner @ Index 40)
+      const stripContainer = document.getElementById('crateStrip');
+      stripContainer.style.transition = 'none';
+      stripContainer.style.transform = 'translateX(0px)';
+
+      let stripHTML = '';
+      for (let i = 0; i < 50; i++) {
+        let item = (i === 40) ? winningItem : COSMETICS_CATALOG[Math.floor(Math.random() * COSMETICS_CATALOG.length)];
+        let borderColor = item.rarity === 'legendary' ? 'border-amber-400 bg-amber-500/10' :
+                          item.rarity === 'epic' ? 'border-purple-400 bg-purple-500/10' :
+                          item.rarity === 'rare' ? 'border-indigo-400 bg-indigo-500/10' : 'border-slate-700 bg-slate-900';
+
+        stripHTML += `
+          <div class="w-28 h-28 rounded-xl border ${borderColor} flex flex-col items-center justify-center p-2 text-center flex-shrink-0 space-y-1">
+            <i class="fa-solid ${item.icon} text-2xl ${item.anim}"></i>
+            <div class="text-[10px] font-bold truncate max-w-full text-slate-200">${item.name}</div>
+          </div>
+        `;
+      }
+      stripContainer.innerHTML = stripHTML;
+
+      // 3. Trigger Roll
       setTimeout(() => {
-        if (sub === 'bot' && botBoard) botBoard.resize();
-        if (sub === 'arena' && arenaBoard) arenaBoard.resize();
+        const scrollDistance = (40 * 124) - 150 + Math.floor(Math.random() * 40 - 20);
+        stripContainer.style.transition = 'transform 4.5s cubic-bezier(0.1, 0.85, 0.15, 1)';
+        stripContainer.style.transform = `translateX(-${scrollDistance}px)`;
       }, 50);
+
+      // 4. Reveal & Duplicate Refund
+      setTimeout(() => {
+        isSpinningCrate = false;
+        document.getElementById('closeCrateModalBtn').classList.remove('hidden');
+
+        const alreadyOwned = currentUserData.inventory && currentUserData.inventory[winningItem.id] === true;
+        let duplicateText = "";
+
+        if (alreadyOwned) {
+          safeAddCoins(currentUser.uid, crate.refund); // 50% Refund
+          duplicateText = `Duplicate Owned! Refunded 50% CC (+${crate.refund.toLocaleString()} CC)`;
+        } else {
+          db.ref('users/' + currentUser.uid + '/inventory/' + winningItem.id).set(true);
+          duplicateText = "New Cosmetic Unlocked! Added to your Collection.";
+        }
+
+        const rarityBadge = document.getElementById('resultRarityTag');
+        rarityBadge.innerText = winningItem.rarity;
+        rarityBadge.className = `inline-block px-3 py-1 rounded-full text-[10px] font-extrabold uppercase ${
+          winningItem.rarity === 'legendary' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+          winningItem.rarity === 'epic' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+          winningItem.rarity === 'rare' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-slate-800 text-slate-300'
+        }`;
+
+        document.getElementById('resultItemName').innerText = winningItem.name;
+        document.getElementById('resultDuplicateText').innerText = duplicateText;
+        document.getElementById('crateResultBox').classList.remove('hidden');
+      }, 4700);
     }
 
-    function switchSocialSubTab(sub) {
-      ['list', 'messages'].forEach(s => {
-        document.getElementById('social-view-' + s).classList.add('hidden');
-        const btn = document.getElementById('subtab-' + (s === 'list' ? 'friends' : 'messages'));
-        if (btn) btn.className = "px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200";
+    function closeCrateModal() {
+      if (isSpinningCrate) return;
+      document.getElementById('crateModal').classList.add('hidden');
+    }
+
+    function renderUserInventory() {
+      const container = document.getElementById('userInventoryDisplay');
+      if (!currentUserData || !currentUserData.inventory) {
+        container.innerHTML = '<div class="text-center py-6 text-xs text-slate-500 col-span-full">No cosmetics unlocked yet. Open Crates to collect!</div>';
+        return;
+      }
+
+      const ownedIds = Object.keys(currentUserData.inventory);
+      let html = '';
+
+      COSMETICS_CATALOG.forEach(item => {
+        if (ownedIds.includes(item.id)) {
+          let borderColor = item.rarity === 'legendary' ? 'border-amber-400/50 bg-amber-500/10' :
+                            item.rarity === 'epic' ? 'border-purple-400/50 bg-purple-500/10' :
+                            item.rarity === 'rare' ? 'border-indigo-400/50 bg-indigo-500/10' : 'border-slate-800 bg-slate-950';
+
+          html += `
+            <div class="bg-slate-950 border ${borderColor} rounded-xl p-3 text-center space-y-2 relative">
+              <i class="fa-solid ${item.icon} text-xl text-slate-200 ${item.anim}"></i>
+              <div>
+                <div class="text-[10px] font-bold text-slate-200 truncate">${item.name}</div>
+                <div class="text-[9px] text-slate-500 uppercase font-semibold">${item.type}</div>
+              </div>
+            </div>
+          `;
+        }
       });
-      document.getElementById('social-view-' + sub).classList.remove('hidden');
-      document.getElementById('subtab-' + (sub === 'list' ? 'friends' : 'messages')).className = "px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700";
 
-      if (sub === 'messages') loadDMContacts();
+      container.innerHTML = html || '<div class="text-center py-6 text-xs text-slate-500 col-span-full">No cosmetics unlocked yet. Open Crates to collect!</div>';
     }
 
-    // BOARD THEMES & HIGHLIGHTS
+    // CHESS & MULTIPLAYER
     function applyBoardTheme(theme) {
       currentBoardTheme = theme;
       localStorage.setItem("cogni_board_theme", theme);
       const wrapper = document.getElementById('boardWrapper');
-      if (wrapper) {
-        wrapper.className = `w-full max-w-[560px] aspect-square relative ${theme}`;
-      }
+      if (wrapper) wrapper.className = `w-full max-w-[560px] aspect-square relative ${theme}`;
     }
 
     function clearBoardHighlights() {
@@ -955,24 +1125,21 @@
       clearBoardHighlights();
       const moves = gameInstance.moves({ square: square, verbose: true });
       if (moves.length === 0) return;
-
       moves.forEach(m => {
         const $square = $(`#${boardId} .square-` + m.to);
         $square.append('<div class="highlight-move-dot"></div>');
       });
     }
 
-    // STRATEGIC CHESS ENGINE (1500+ ELO MINIMAX GM BOT)
     let selectedSquare = null;
 
     function initBotChess() {
       botGame = new Chess();
       botBoard = Chessboard('botBoard', {
         position: 'start',
-        draggable: false, // Click-to-Move only
+        draggable: false,
         pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
       });
-
       setupClickToMove('botBoard', botGame, makeBotMove);
     }
 
@@ -981,12 +1148,7 @@
         document.getElementById('side-' + s).className = "py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-semibold text-xs transition flex items-center justify-center space-x-1";
       });
       document.getElementById('side-' + side).className = "py-2.5 rounded-xl border border-indigo-500 bg-indigo-500/20 text-indigo-300 font-semibold text-xs transition flex items-center justify-center space-x-1";
-      
-      if (side === 'random') {
-        botPlayerColor = Math.random() < 0.5 ? 'w' : 'b';
-      } else {
-        botPlayerColor = side === 'white' ? 'w' : 'b';
-      }
+      botPlayerColor = side === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : (side === 'white' ? 'w' : 'b');
       document.getElementById('botPlayerSide').innerText = botPlayerColor === 'w' ? 'White' : 'Black';
     }
 
@@ -1010,8 +1172,6 @@
     function setupClickToMove(boardId, gameInstance, botMoveCallback) {
       $(`#${boardId}`).on('click', '.square-55d63', function() {
         if (gameInstance.game_over()) return;
-        
-        // Turn Guard
         if (boardId === 'botBoard' && gameInstance.turn() !== botPlayerColor) return;
         if (boardId === 'arenaBoard' && gameInstance.turn() !== arenaPlayerColor) return;
 
@@ -1024,12 +1184,7 @@
             showLegalMoveDots(boardId, gameInstance, square);
           }
         } else {
-          const move = gameInstance.move({
-            from: selectedSquare,
-            to: square,
-            promotion: 'q'
-          });
-
+          const move = gameInstance.move({ from: selectedSquare, to: square, promotion: 'q' });
           if (move !== null) {
             clearBoardHighlights();
             $(`#${boardId} .square-` + move.from).addClass('highlight-last-move');
@@ -1039,7 +1194,6 @@
               botBoard.position(gameInstance.fen());
               selectedSquare = null;
               checkBotGameStatus();
-
               if (!gameInstance.game_over()) {
                 document.getElementById('botThinking').classList.remove('hidden');
                 setTimeout(botMoveCallback, 300);
@@ -1063,7 +1217,6 @@
       });
     }
 
-    // Minimax Engine with Piece-Square Positioning Tables (1500+ Elo)
     const pieceValues = { p: 10, r: 50, n: 32, b: 33, q: 90, k: 1000 };
 
     function evaluateBoard(boardState) {
@@ -1072,8 +1225,7 @@
         for (let j = 0; j < 8; j++) {
           const piece = boardState[i][j];
           if (piece) {
-            const val = pieceValues[piece.type];
-            totalEval += piece.color === 'w' ? val : -val;
+            totalEval += piece.color === 'w' ? pieceValues[piece.type] : -pieceValues[piece.type];
           }
         }
       }
@@ -1081,12 +1233,8 @@
     }
 
     function minimax(gameInstance, depth, alpha, beta, isMaximizing) {
-      if (depth === 0 || gameInstance.game_over()) {
-        return evaluateBoard(gameInstance.board());
-      }
-
+      if (depth === 0 || gameInstance.game_over()) return evaluateBoard(gameInstance.board());
       const possibleMoves = gameInstance.moves();
-
       if (isMaximizing) {
         let maxEval = -Infinity;
         for (let i = 0; i < possibleMoves.length; i++) {
@@ -1114,7 +1262,6 @@
 
     function makeBotMove() {
       if (botGame.game_over()) return;
-
       const moves = botGame.moves();
       let bestMove = null;
       let bestValue = botPlayerColor === 'w' ? Infinity : -Infinity;
@@ -1123,17 +1270,10 @@
         botGame.move(moves[i]);
         let boardValue = minimax(botGame, 3, -Infinity, Infinity, botPlayerColor === 'b');
         botGame.undo();
-
         if (botPlayerColor === 'w') {
-          if (boardValue < bestValue) {
-            bestValue = boardValue;
-            bestMove = moves[i];
-          }
+          if (boardValue < bestValue) { bestValue = boardValue; bestMove = moves[i]; }
         } else {
-          if (boardValue > bestValue) {
-            bestValue = boardValue;
-            bestMove = moves[i];
-          }
+          if (boardValue > bestValue) { bestValue = boardValue; bestMove = moves[i]; }
         }
       }
 
@@ -1153,7 +1293,6 @@
       if (botGame.in_checkmate()) {
         const winner = botGame.turn() === 'w' ? 'Black' : 'White';
         const isPlayerWin = (winner === 'White' && botPlayerColor === 'w') || (winner === 'Black' && botPlayerColor === 'b');
-        
         if (isPlayerWin) {
           safeAddCoins(currentUser.uid, 50);
           showGameOverModal("Victory!", "Checkmate! You won +50 CC!");
@@ -1162,37 +1301,22 @@
         }
         document.getElementById('botGameStatus').innerText = "Game Over - Checkmate.";
       } else if (botGame.in_draw()) {
-        showGameOverModal("Draw", "Game ended in a stalemate/draw.");
+        showGameOverModal("Draw", "Game ended in a draw.");
         document.getElementById('botGameStatus').innerText = "Game Over - Draw.";
       }
     }
 
-    // 1v1 ARENA MULTIPLAYER LOGIC
     function createArenaRoom() {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
       const timeMinutes = parseInt(document.getElementById('arenaTimerSelect').value) || 10;
-      
       activeArenaRoom = code;
       arenaPlayerColor = 'w';
-      arenaTimeSelf = timeMinutes * 60;
-      arenaTimeOpponent = timeMinutes * 60;
 
-      const roomRef = db.ref('rooms/' + code);
-      roomRef.set({
-        code: code,
-        whiteUid: currentUser.uid,
-        whiteHandle: currentUserData.handle,
-        whiteElo: currentUserData.elo,
-        blackUid: null,
-        blackHandle: 'Waiting...',
-        blackElo: 1200,
-        fen: 'start',
-        status: 'waiting',
-        turn: 'w',
-        timeMinutes: timeMinutes,
-        createdAt: Date.now()
+      db.ref('rooms/' + code).set({
+        code: code, whiteUid: currentUser.uid, whiteHandle: currentUserData.handle, whiteElo: currentUserData.elo,
+        blackUid: null, blackHandle: 'Waiting...', blackElo: 1200, fen: 'start', status: 'waiting', turn: 'w',
+        timeMinutes: timeMinutes, createdAt: Date.now()
       });
-
       setupArenaGameView(code);
     }
 
@@ -1204,20 +1328,11 @@
       roomRef.get().then((snap) => {
         if (!snap.exists()) return alert("Room not found!");
         const room = snap.val();
-        if (room.status !== 'waiting') return alert("Room full or in progress!");
+        if (room.status !== 'waiting') return alert("Room full!");
 
         activeArenaRoom = code;
         arenaPlayerColor = 'b';
-        arenaTimeSelf = room.timeMinutes * 60;
-        arenaTimeOpponent = room.timeMinutes * 60;
-
-        roomRef.update({
-          blackUid: currentUser.uid,
-          blackHandle: currentUserData.handle,
-          blackElo: currentUserData.elo,
-          status: 'playing'
-        });
-
+        roomRef.update({ blackUid: currentUser.uid, blackHandle: currentUserData.handle, blackElo: currentUserData.elo, status: 'playing' });
         setupArenaGameView(code);
       });
     }
@@ -1229,16 +1344,13 @@
 
       arenaGame = new Chess();
       arenaBoard = Chessboard('arenaBoard', {
-        position: 'start',
-        orientation: arenaPlayerColor === 'w' ? 'white' : 'black',
-        draggable: false,
+        position: 'start', orientation: arenaPlayerColor === 'w' ? 'white' : 'black', draggable: false,
         pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
       });
 
       setupClickToMove('arenaBoard', arenaGame, null);
       db.ref('presence/' + currentUser.uid + '/inGame').set(true);
 
-      // Listen to Room Changes
       db.ref('rooms/' + code).on('value', (snap) => {
         const room = snap.val();
         if (!room) return;
@@ -1256,37 +1368,22 @@
           arenaBoard.position(room.fen);
         }
 
-        if (room.status === 'finished') {
-          handleArenaFinish(room);
-        }
+        if (room.status === 'finished') handleArenaFinish(room);
       });
 
-      // Match Chat Listener
       db.ref('rooms/' + code + '/messages').on('child_added', (snap) => {
         const msg = snap.val();
         const box = document.getElementById('arenaChatBox');
-        box.innerHTML += `
-          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
-            <span class="font-bold text-indigo-400">${msg.handle}:</span>
-            <span class="text-slate-200 ml-1">${msg.text}</span>
-          </div>
-        `;
+        box.innerHTML += `<div class="bg-slate-950 p-2 rounded-lg border border-slate-800"><span class="font-bold text-indigo-400">${msg.handle}:</span><span class="text-slate-200 ml-1">${msg.text}</span></div>`;
         box.scrollTop = box.scrollHeight;
       });
     }
 
     function syncArenaMove(move) {
       if (!activeArenaRoom) return;
-      db.ref('rooms/' + activeArenaRoom).update({
-        fen: arenaGame.fen(),
-        turn: arenaGame.turn()
-      });
-
+      db.ref('rooms/' + activeArenaRoom).update({ fen: arenaGame.fen(), turn: arenaGame.turn() });
       if (arenaGame.game_over()) {
-        let winnerUid = null;
-        if (arenaGame.in_checkmate()) {
-          winnerUid = arenaGame.turn() === 'w' ? 'black' : 'white';
-        }
+        let winnerUid = arenaGame.in_checkmate() ? (arenaGame.turn() === 'w' ? 'black' : 'white') : null;
         finishArenaMatch(winnerUid, "Checkmate");
       }
     }
@@ -1296,60 +1393,34 @@
       const input = document.getElementById('arenaChatInput');
       const text = input.value.trim();
       if (!text || !activeArenaRoom) return;
-
-      db.ref('rooms/' + activeArenaRoom + '/messages').push({
-        handle: currentUserData.handle,
-        text: text,
-        timestamp: Date.now()
-      });
+      db.ref('rooms/' + activeArenaRoom + '/messages').push({ handle: currentUserData.handle, text: text, timestamp: Date.now() });
       input.value = '';
     }
 
     function resignArenaMatch() {
       if (!activeArenaRoom || !confirm("Are you sure you want to resign? (-16 Elo)")) return;
-      const winner = arenaPlayerColor === 'w' ? 'black' : 'white';
-      finishArenaMatch(winner, "Resignation");
+      finishArenaMatch(arenaPlayerColor === 'w' ? 'black' : 'white', "Resignation");
     }
 
-    function offerDraw() {
-      alert("Draw offer sent to opponent.");
-    }
+    function offerDraw() { alert("Draw offer sent."); }
 
     function finishArenaMatch(winnerSide, reason) {
       if (!activeArenaRoom) return;
       const roomRef = db.ref('rooms/' + activeArenaRoom);
-      
       roomRef.get().then((snap) => {
         const room = snap.val();
         if (!room || room.status === 'finished') return;
-
-        let winnerUid = null;
-        let loserUid = null;
-
-        if (winnerSide === 'white') {
-          winnerUid = room.whiteUid;
-          loserUid = room.blackUid;
-        } else if (winnerSide === 'black') {
-          winnerUid = room.blackUid;
-          loserUid = room.whiteUid;
-        }
-
-        roomRef.update({
-          status: 'finished',
-          winnerUid: winnerUid,
-          endReason: reason
-        });
+        let winnerUid = winnerSide === 'white' ? room.whiteUid : (winnerSide === 'black' ? room.blackUid : null);
+        roomRef.update({ status: 'finished', winnerUid: winnerUid, endReason: reason });
       });
     }
 
     function handleArenaFinish(room) {
       if (room.winnerUid === currentUser.uid) {
-        // Winner gets +16 Elo and +50 CC (Capped at 100k)
         db.ref('users/' + currentUser.uid + '/elo').set((currentUserData.elo || 1200) + 16);
         safeAddCoins(currentUser.uid, 50);
         showGameOverModal("Victory!", `You won! +16 Elo & +50 CC (${room.endReason})`);
       } else if (room.winnerUid) {
-        // Resigning or losing player ONLY loses -16 Elo
         db.ref('users/' + currentUser.uid + '/elo').set(Math.max(100, (currentUserData.elo || 1200) - 16));
         showGameOverModal("Defeat", `You lost -16 Elo (${room.endReason})`);
       } else {
@@ -1358,15 +1429,11 @@
       cleanupArenaRoom();
     }
 
-    function leaveArenaRoom() {
-      if (confirm("Leave match room?")) {
-        cleanupArenaRoom();
-      }
-    }
+    function leaveArenaRoom() { if (confirm("Leave match room?")) cleanupArenaRoom(); }
 
     function cleanupArenaRoom() {
       if (activeArenaRoom) {
-        db.ref('rooms/' + activeArenaRoom).remove(); // Auto-deletes match chat and room
+        db.ref('rooms/' + activeArenaRoom).remove();
         db.ref('presence/' + currentUser.uid + '/inGame').set(false);
         activeArenaRoom = null;
       }
@@ -1374,26 +1441,18 @@
       document.getElementById('arenaSetupPanel').classList.remove('hidden');
     }
 
-    // FRIENDS & DIRECT MESSAGING LOGIC
+    // FRIENDS & DM LOGIC
     function sendFriendRequest() {
       const targetHandle = document.getElementById('addFriendInput').value.trim();
       if (!targetHandle) return;
-
       db.ref('users').orderByChild('handle').equalTo(targetHandle).once('value', (snap) => {
         const users = snap.val();
-        if (!users) {
-          document.getElementById('friendSearchMsg').innerText = "User handle not found.";
-          return;
-        }
+        if (!users) return document.getElementById('friendSearchMsg').innerText = "User not found.";
         const targetUid = Object.keys(users)[0];
-        if (targetUid === currentUser.uid) {
-          document.getElementById('friendSearchMsg').innerText = "Cannot add yourself.";
-          return;
-        }
-
+        if (targetUid === currentUser.uid) return document.getElementById('friendSearchMsg').innerText = "Cannot add yourself.";
         db.ref('friends/' + currentUser.uid + '/' + targetUid).set(true);
         db.ref('friends/' + targetUid + '/' + currentUser.uid).set(true);
-        document.getElementById('friendSearchMsg').innerText = "Friend added successfully!";
+        document.getElementById('friendSearchMsg').innerText = "Friend added!";
         document.getElementById('addFriendInput').value = '';
         loadFriendsList();
       });
@@ -1403,30 +1462,18 @@
       const container = document.getElementById('friendsListContainer');
       db.ref('friends/' + currentUser.uid).once('value', (snap) => {
         const friendsMap = snap.val();
-        if (!friendsMap) {
-          container.innerHTML = '<div class="text-center py-8 text-xs text-slate-500">No friends added yet.</div>';
-          return;
-        }
-
+        if (!friendsMap) return container.innerHTML = '<div class="text-center py-8 text-xs text-slate-500">No friends added yet.</div>';
         let html = '';
-        const keys = Object.keys(friendsMap);
-        keys.forEach(fUid => {
+        Object.keys(friendsMap).forEach(fUid => {
           db.ref('users/' + fUid).once('value', (uSnap) => {
             const fData = uSnap.val();
             if (fData) {
               html += `
                 <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                  <div>
-                    <div class="font-bold text-slate-200">${fData.handle}</div>
-                    <div class="text-[10px] text-indigo-400">Elo: ${fData.elo || 1200}</div>
-                  </div>
+                  <div><div class="font-bold text-slate-200">${fData.handle}</div><div class="text-[10px] text-indigo-400">Elo: ${fData.elo || 1200}</div></div>
                   <div class="flex gap-2">
-                    <button onclick="challengeFriend('${fUid}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">
-                      <i class="fa-solid fa-chess-board mr-1"></i>Challenge
-                    </button>
-                    <button onclick="removeFriend('${fUid}')" class="text-slate-500 hover:text-red-400 px-2 py-1 text-[11px] transition">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <button onclick="challengeFriend('${fUid}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">Challenge</button>
+                    <button onclick="removeFriend('${fUid}')" class="text-slate-500 hover:text-red-400 px-2 py-1 text-[11px] transition"><i class="fa-solid fa-trash"></i></button>
                   </div>
                 </div>
               `;
@@ -1446,28 +1493,27 @@
 
     function challengeFriend(fUid) {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      db.ref('challenges/' + fUid).push({
-        fromHandle: currentUserData.handle,
-        roomCode: code,
-        timestamp: Date.now(),
-        status: 'pending'
-      });
+      db.ref('challenges/' + fUid).push({ fromHandle: currentUserData.handle, roomCode: code, timestamp: Date.now(), status: 'pending' });
       alert(`Challenge sent! Creating room ${code}...`);
-      document.getElementById('arenaTimerSelect').value = "10";
-      switchTab('chess');
-      switchChessSubTab('arena');
-      createArenaRoom();
+      switchTab('chess'); switchChessSubTab('arena'); createArenaRoom();
+    }
+
+    function switchSocialSubTab(sub) {
+      ['list', 'messages'].forEach(s => {
+        document.getElementById('social-view-' + s).classList.add('hidden');
+        const btn = document.getElementById('subtab-' + (s === 'list' ? 'friends' : 'messages'));
+        if (btn) btn.className = "px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200";
+      });
+      document.getElementById('social-view-' + sub).classList.remove('hidden');
+      document.getElementById('subtab-' + (sub === 'list' ? 'friends' : 'messages')).className = "px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700";
+      if (sub === 'messages') loadDMContacts();
     }
 
     function loadDMContacts() {
       const container = document.getElementById('dmContactsContainer');
       db.ref('friends/' + currentUser.uid).once('value', (snap) => {
         const friendsMap = snap.val();
-        if (!friendsMap) {
-          container.innerHTML = '<div class="text-center py-6 text-xs text-slate-500">No active contacts.</div>';
-          return;
-        }
-
+        if (!friendsMap) return container.innerHTML = '<div class="text-center py-6 text-xs text-slate-500">No active contacts.</div>';
         let html = '';
         Object.keys(friendsMap).forEach(fUid => {
           db.ref('users/' + fUid).once('value', (uSnap) => {
@@ -1475,9 +1521,7 @@
             if (fData) {
               html += `
                 <button onclick="selectDMContact('${fUid}', '${fData.handle}')" class="w-full text-left bg-slate-950 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-800 transition flex items-center space-x-2">
-                  <div class="w-7 h-7 bg-indigo-600/20 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-xs">
-                    <i class="fa-solid fa-user"></i>
-                  </div>
+                  <div class="w-7 h-7 bg-indigo-600/20 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-user"></i></div>
                   <div class="text-xs font-semibold text-slate-200 truncate">${fData.handle}</div>
                 </button>
               `;
@@ -1498,21 +1542,11 @@
       db.ref('direct_messages/' + chatId).limitToLast(30).on('value', (snap) => {
         const msgs = snap.val();
         const box = document.getElementById('dmChatMessages');
-        if (!msgs) {
-          box.innerHTML = '<div class="text-center text-slate-500 text-xs py-12">No messages yet. Say hello!</div>';
-          return;
-        }
-
+        if (!msgs) return box.innerHTML = '<div class="text-center text-slate-500 text-xs py-12">No messages yet. Say hello!</div>';
         let html = '';
         Object.values(msgs).forEach(m => {
           const isSelf = m.senderUid === currentUser.uid;
-          html += `
-            <div class="flex ${isSelf ? 'justify-end' : 'justify-start'}">
-              <div class="${isSelf ? 'bg-indigo-600 text-white' : 'bg-slate-950 border border-slate-800 text-slate-200'} max-w-[75%] px-3 py-2 rounded-xl">
-                <div>${m.text}</div>
-              </div>
-            </div>
-          `;
+          html += `<div class="flex ${isSelf ? 'justify-end' : 'justify-start'}"><div class="${isSelf ? 'bg-indigo-600 text-white' : 'bg-slate-950 border border-slate-800 text-slate-200'} max-w-[75%] px-3 py-2 rounded-xl"><div>${m.text}</div></div></div>`;
         });
         box.innerHTML = html;
         box.scrollTop = box.scrollHeight;
@@ -1524,31 +1558,24 @@
       const input = document.getElementById('dmChatInput');
       const text = input.value.trim();
       if (!text || !activeDMTarget) return;
-
       const chatId = [currentUser.uid, activeDMTarget].sort().join('_');
-      db.ref('direct_messages/' + chatId).push({
-        senderUid: currentUser.uid,
-        text: text,
-        timestamp: Date.now()
-      });
+      db.ref('direct_messages/' + chatId).push({ senderUid: currentUser.uid, text: text, timestamp: Date.now() });
       input.value = '';
     }
 
-    // MASTER CONTROL ADMIN PANEL LOGIC
+    // MASTER CONTROL ADMIN PANEL (HARD-LOCKED TO zainisgo123@gmail.com)
     function listenAdminUsers() {
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return; // Guard
+
       db.ref('users').on('value', (snap) => {
         const users = snap.val();
         const table = document.getElementById('adminUsersTable');
         if (!users) return;
-
         let html = '';
         Object.entries(users).forEach(([uid, u]) => {
           html += `
             <tr>
-              <td class="p-3">
-                <div class="font-bold text-slate-100">${u.handle || 'User'}</div>
-                <div class="text-[9px] text-slate-500 font-mono">${uid}</div>
-              </td>
+              <td class="p-3"><div class="font-bold text-slate-100">${u.handle || 'User'}</div><div class="text-[9px] text-slate-500 font-mono">${uid}</div></td>
               <td class="p-3 text-slate-400">${u.email || 'N/A'}</td>
               <td class="p-3 font-mono font-bold text-indigo-400">${u.elo || 1200}</td>
               <td class="p-3 font-mono font-bold text-emerald-400">${(u.coins || 0).toLocaleString()} CC</td>
@@ -1566,72 +1593,51 @@
     }
 
     function toggleMaintenanceMode() {
-      db.ref('system/maintenance').get().then((snap) => {
-        const curr = snap.val() === true;
-        db.ref('system/maintenance').set(!curr);
-      });
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      db.ref('system/maintenance').get().then(snap => db.ref('system/maintenance').set(snap.val() !== true));
     }
 
     function triggerGlobalReload() {
-      if (confirm("Force global page reload for all active users?")) {
-        db.ref('system/globalReloadTimestamp').set(Date.now());
-      }
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (confirm("Force global page reload for all active users?")) db.ref('system/globalReloadTimestamp').set(Date.now());
     }
 
     function purgeAbnormalRatings() {
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
       db.ref('users').once('value', (snap) => {
-        const users = snap.val();
-        if (!users) return;
-        Object.entries(users).forEach(([uid, u]) => {
-          if (u.elo > 3000) {
-            db.ref('users/' + uid + '/elo').set(1200);
-          }
-        });
+        const users = snap.val(); if (!users) return;
+        Object.entries(users).forEach(([uid, u]) => { if (u.elo > 3000) db.ref('users/' + uid + '/elo').set(1200); });
         alert("Abnormal ratings purged!");
       });
     }
 
     function adminGrantCoins(uid) {
-      const amt = parseInt(prompt("Enter amount to grant (Max limit 100k CC applied):")) || 0;
-      if (amt > 0) {
-        safeAddCoins(uid, amt).then(() => alert("Coins granted successfully!"));
-      }
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      const amt = parseInt(prompt("Enter CC amount to grant (Max limit 100k CC applied):")) || 0;
+      if (amt > 0) safeAddCoins(uid, amt).then(() => alert("Coins granted successfully!"));
     }
 
     function adminResetCoins(uid) {
-      if (confirm("Reset user coin balance back to 1,000 CC?")) {
-        safeSetCoins(uid, 1000).then(() => alert("Coin balance reset to 1,000 CC!"));
-      }
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (confirm("Reset user coin balance back to 1,000 CC?")) safeSetCoins(uid, 1000).then(() => alert("Coin balance reset to 1,000 CC!"));
     }
 
     function adminResetElo(uid) {
-      if (confirm("Reset user Elo back to 1200?")) {
-        db.ref('users/' + uid + '/elo').set(1200);
-      }
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (confirm("Reset user Elo back to 1200?")) db.ref('users/' + uid + '/elo').set(1200);
     }
 
     function adminDeleteUser(uid) {
-      if (confirm("Permanently delete account node?")) {
-        db.ref('users/' + uid).remove();
-      }
+      if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+      if (confirm("Permanently delete account node?")) db.ref('users/' + uid).remove();
     }
 
-    // USERNAME & MODAL HELPERS
-    function openUsernameModal() {
-      document.getElementById('usernameModal').classList.remove('hidden');
-    }
-
-    function closeUsernameModal() {
-      document.getElementById('usernameModal').classList.add('hidden');
-    }
-
+    function openUsernameModal() { document.getElementById('usernameModal').classList.remove('hidden'); }
+    function closeUsernameModal() { document.getElementById('usernameModal').classList.add('hidden'); }
     function saveUsernameHandle() {
       const handle = document.getElementById('newHandleInput').value.trim();
       if (!handle) return;
-
-      db.ref('users/' + currentUser.uid + '/handle').set(handle).then(() => {
-        closeUsernameModal();
-      });
+      db.ref('users/' + currentUser.uid + '/handle').set(handle).then(() => closeUsernameModal());
     }
 
     function showGameOverModal(title, desc) {
@@ -1639,10 +1645,7 @@
       document.getElementById('goModalDesc').innerText = desc;
       const modal = document.getElementById('gameOverModal');
       modal.classList.remove('hidden');
-
-      setTimeout(() => {
-        modal.classList.add('hidden');
-      }, 3000); // Auto-dismisses after 3 seconds
+      setTimeout(() => modal.classList.add('hidden'), 3000);
     }
   </script>
 </body>

@@ -370,7 +370,7 @@
             <i class="fa-solid fa-rocket"></i><span>CogniRocket (Crash)</span>
           </button>
           <button onclick="setGamblingGame('roulette')" id="gtab-roulette" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 whitespace-nowrap">
-            <i class="fa-solid fa-[#10b981] fa-compact-disc"></i><span>Strategic Roulette</span>
+            <i class="fa-solid fa-compact-disc"></i><span>Strategic Roulette</span>
           </button>
           <button onclick="setGamblingGame('wagering')" id="gtab-wagering" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 whitespace-nowrap">
             <i class="fa-solid fa-chess-board"></i><span>Arena Match Wagering</span>
@@ -594,12 +594,12 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Maintenance Control -->
+          <!-- Dynamic Maintenance Toggle Button -->
           <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
             <h4 class="text-sm font-bold text-white">System Lockdown Maintenance</h4>
             <p class="text-xs text-slate-400">Locks non-whitelisted players out of the platform.</p>
-            <button id="adminMaintBtn" onclick="toggleMaintenanceMode()" class="bg-amber-600 text-white font-bold py-2 px-4 rounded-lg text-xs">
-              Toggle Maintenance Mode
+            <button id="adminMaintBtn" onclick="toggleMaintenanceMode()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-lg text-xs flex items-center shadow-lg transition">
+              <i class="fa-solid fa-lock-open mr-2"></i> Maintenance Normal (OFF)
             </button>
           </div>
 
@@ -607,7 +607,7 @@
           <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
             <h4 class="text-sm font-bold text-white">Purge Abnormal Elo (>3000)</h4>
             <p class="text-xs text-slate-400">Resets exploit accounts back to 500 default Elo rating.</p>
-            <button onclick="purgeAbnormalRatings()" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-xs">
+            <button onclick="purgeAbnormalRatings()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition">
               Purge High Elo Accounts
             </button>
           </div>
@@ -709,7 +709,6 @@
     let currentRoomCode = null;
     let selectedSquare = null;
     let pendingPromotionMove = null;
-    let whiteTime = 600, blackTime = 600, clockInterval = null;
 
     // Gambling State
     let activeGamblingGame = "blackjack";
@@ -732,9 +731,23 @@
         }
       });
 
-      // System Maintenance Listener
+      // System Maintenance Listener & Dynamic Button Visual Switcher
       db.ref("system/maintenance").on("value", (snapshot) => {
         const isMaint = snapshot.val() === true;
+        
+        // Dynamic Button Styling in Admin Panel
+        const maintBtn = document.getElementById("adminMaintBtn");
+        if (maintBtn) {
+          if (isMaint) {
+            maintBtn.className = "bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg text-xs flex items-center shadow-lg shadow-red-600/30 border border-red-500 transition";
+            maintBtn.innerHTML = `<i class="fa-solid fa-lock mr-2"></i> Maintenance Active (ON)`;
+          } else {
+            maintBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-lg text-xs flex items-center shadow-lg shadow-emerald-600/30 border border-emerald-500 transition";
+            maintBtn.innerHTML = `<i class="fa-solid fa-lock-open mr-2"></i> Maintenance Normal (OFF)`;
+          }
+        }
+
+        // Lockdown enforcement for regular users
         if (isMaint) {
           const email = currentUser ? currentUser.email : "";
           if (!WHITELIST_EMAILS.includes(email)) {
@@ -1714,4 +1727,4 @@
     }
   </script>
 </body>
-</html>
+</html> 

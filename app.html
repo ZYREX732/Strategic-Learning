@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CogniLearn – Strategic Thinking & Risk Lab</title>
+  <title>CogniLearn – Strategic Thinking Lab</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -57,7 +57,7 @@
     .theme-grey .white-1e1d7 { background-color: #e2e8f0 !important; color: #64748b; }
     .theme-grey .black-3c85d { background-color: #64748b !important; color: #e2e8f0; }
 
-    /* Move target dot styling: 70% opaque grey dot */
+    /* Move target dot styling: strictly 70% opaque grey dot */
     .highlight-move-dot {
       position: absolute;
       width: 28%;
@@ -70,12 +70,12 @@
       z-index: 10;
     }
 
-    /* Move source/dest highlight: translucent yellow */
+    /* Move source/dest highlight: pale translucent yellow */
     .highlight-last-move {
       background-color: rgba(254, 240, 138, 0.45) !important;
     }
 
-    /* Scrollbar Styling */
+    /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
@@ -111,7 +111,7 @@
           <div class="font-extrabold text-lg leading-tight tracking-wide bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">
             CogniLearn
           </div>
-          <div class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Strategic & Risk Lab</div>
+          <div class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Strategic Thinking Lab</div>
         </div>
       </div>
 
@@ -121,9 +121,9 @@
           <i class="fa-solid fa-chess"></i>
           <span>Strategic Chess</span>
         </button>
-        <button onclick="switchTab('risk')" id="tab-risk" class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900">
-          <i class="fa-solid fa-dice-three"></i>
-          <span>Risk & Probability</span>
+        <button onclick="switchTab('shop')" id="tab-shop" class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900">
+          <i class="fa-solid fa-store"></i>
+          <span>CogniShop</span>
         </button>
         <button onclick="switchTab('social')" id="tab-social" class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900">
           <i class="fa-solid fa-users"></i>
@@ -174,7 +174,7 @@
   <!-- Mobile Navigation Bar -->
   <div class="md:hidden bg-slate-900 border-b border-slate-800 px-2 py-2 flex justify-around text-xs">
     <button onclick="switchTab('chess')" id="mob-tab-chess" class="px-3 py-1.5 rounded-lg text-indigo-400 font-semibold bg-indigo-500/10">Chess</button>
-    <button onclick="switchTab('risk')" id="mob-tab-risk" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Risk Lab</button>
+    <button onclick="switchTab('shop')" id="mob-tab-shop" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Shop</button>
     <button onclick="switchTab('social')" id="mob-tab-social" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Social</button>
     <button onclick="switchTab('admin')" id="mob-tab-admin" class="hidden px-3 py-1.5 rounded-lg text-amber-400 font-semibold">Admin</button>
   </div>
@@ -473,127 +473,60 @@
       </div>
     </section>
 
-    <!-- SECTION 2: PROBABILITY & RISK LAB -->
-    <section id="section-risk" class="hidden space-y-6">
-      <!-- Sub Navigation Bar -->
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-        <div class="flex space-x-2">
-          <button onclick="switchRiskSubTab('blackjack')" id="subtab-blackjack" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700">
-            <i class="fa-solid fa-cards mr-1.5"></i>Cogni-Blackjack
-          </button>
-          <button onclick="switchRiskSubTab('rocket')" id="subtab-rocket" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
-            <i class="fa-solid fa-rocket mr-1.5"></i>CogniRocket Crash
-          </button>
-          <button onclick="switchRiskSubTab('wagering')" id="subtab-wagering" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
-            <i class="fa-solid fa-coins mr-1.5"></i>Arena Live Wagering
-          </button>
+    <!-- SECTION 2: COGNISHOP PLACEHOLDER -->
+    <section id="section-shop" class="hidden max-w-4xl mx-auto space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6 text-center">
+        <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-indigo-500/30">
+          <i class="fa-solid fa-store"></i>
         </div>
-        <div class="text-xs text-slate-400">
-          Max Balance Cap: <span class="font-bold text-emerald-400">100,000 CC</span>
-        </div>
-      </div>
-
-      <!-- COGNI-BLACKJACK GAME -->
-      <div id="risk-view-blackjack" class="max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-lg font-bold text-slate-100">Cogni-Blackjack (21 vs AI Dealer)</h2>
-            <p class="text-xs text-slate-400">Test decision-making under probability. Max balance limit 100k CC.</p>
-          </div>
-          <div class="text-right">
-            <span id="bjStatusBadge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 rounded-full text-xs font-semibold">Place Bet</span>
-          </div>
+        
+        <div class="space-y-2 max-w-md mx-auto">
+          <h2 class="text-2xl font-black text-slate-100 tracking-tight">CogniShop</h2>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            The rewards store is under active development. Redeem your hard-earned CogniCoins (CC) for exclusive board themes, custom avatars, and cosmetic badges soon.
+          </p>
         </div>
 
-        <!-- Cards Display Area -->
-        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-6">
-          <!-- Dealer Hand -->
-          <div>
-            <div class="text-xs text-slate-400 font-bold uppercase mb-2 flex items-center justify-between">
-              <span>Dealer Hand</span>
-              <span id="dealerScore" class="text-slate-300 font-mono">?</span>
+        <div class="inline-flex items-center space-x-2 bg-slate-950 border border-slate-800 px-4 py-2 rounded-xl text-xs font-bold text-emerald-400">
+          <i class="fa-solid fa-coins"></i>
+          <span>Your CogniCoins Balance:</span>
+          <span id="shopCoinsDisplay" class="text-slate-100 font-mono">0 CC</span>
+        </div>
+
+        <!-- Catalog Coming Soon Placeholder Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-left">
+          <div class="bg-slate-950 border border-slate-800/80 p-5 rounded-2xl space-y-3 opacity-60">
+            <div class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-indigo-400 text-lg">
+              <i class="fa-solid fa-palette"></i>
             </div>
-            <div id="dealerCards" class="flex flex-wrap gap-2 min-h-[70px] items-center">
-              <div class="w-12 h-16 bg-slate-900 border border-slate-800 rounded-lg flex items-center justify-center text-slate-600 font-mono">?</div>
+            <div>
+              <div class="text-xs font-bold text-slate-200">Custom Board Skins</div>
+              <div class="text-[10px] text-slate-500">Premium aesthetics & piece sets.</div>
             </div>
+            <div class="text-[11px] font-bold text-slate-400">Opening Soon</div>
           </div>
 
-          <div class="border-t border-slate-800/80"></div>
-
-          <!-- Player Hand -->
-          <div>
-            <div class="text-xs text-slate-400 font-bold uppercase mb-2 flex items-center justify-between">
-              <span>Your Hand</span>
-              <span id="playerScore" class="text-slate-300 font-mono">0</span>
+          <div class="bg-slate-950 border border-slate-800/80 p-5 rounded-2xl space-y-3 opacity-60">
+            <div class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-amber-400 text-lg">
+              <i class="fa-solid fa-award"></i>
             </div>
-            <div id="playerCards" class="flex flex-wrap gap-2 min-h-[70px] items-center">
-              <div class="w-12 h-16 bg-slate-900 border border-slate-800 rounded-lg flex items-center justify-center text-slate-600 font-mono">-</div>
+            <div>
+              <div class="text-xs font-bold text-slate-200">Profile Badges</div>
+              <div class="text-[10px] text-slate-500">Showcase your achievements online.</div>
             </div>
+            <div class="text-[11px] font-bold text-slate-400">Opening Soon</div>
           </div>
-        </div>
 
-        <!-- Controls Panel -->
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
-          <div class="sm:col-span-5">
-            <label class="block text-[11px] text-slate-400 mb-1 font-medium">Bet Amount (CC)</label>
-            <input type="number" id="bjBetInput" value="50" min="10" max="100000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-bold focus:outline-none focus:border-indigo-500">
+          <div class="bg-slate-950 border border-slate-800/80 p-5 rounded-2xl space-y-3 opacity-60">
+            <div class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-emerald-400 text-lg">
+              <i class="fa-solid fa-user-astronaut"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-200">Avatar Frames</div>
+              <div class="text-[10px] text-slate-500">Stand out in match play & chat rooms.</div>
+            </div>
+            <div class="text-[11px] font-bold text-slate-400">Opening Soon</div>
           </div>
-          <div class="sm:col-span-7 flex gap-2">
-            <button id="bjDealBtn" onclick="dealBlackjack()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition">Deal</button>
-            <button id="bjHitBtn" disabled onclick="hitBlackjack()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs transition disabled:opacity-50">Hit</button>
-            <button id="bjStandBtn" disabled onclick="standBlackjack()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs transition disabled:opacity-50">Stand</button>
-            <button id="bjDoubleBtn" disabled onclick="doubleBlackjack()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs transition disabled:opacity-50">Double</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- COGNIROCKET CRASH GAME -->
-      <div id="risk-view-rocket" class="hidden max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-lg font-bold text-slate-100">CogniRocket Crash</h2>
-            <p class="text-xs text-slate-400">Cash out before the rocket explodes. Exponential multiplier.</p>
-          </div>
-          <div class="text-right">
-            <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md">Anti-Spam Protected</span>
-          </div>
-        </div>
-
-        <!-- Rocket Visual Display -->
-        <div class="bg-slate-950 rounded-2xl border border-slate-800 h-64 flex flex-col items-center justify-center relative overflow-hidden p-6">
-          <div id="rocketMultiplier" class="text-5xl font-mono font-black text-slate-100 tracking-tight z-10">1.00x</div>
-          <div id="rocketSubtext" class="text-xs text-slate-400 mt-2 z-10 font-semibold">Ready for Launch</div>
-          <div id="rocketIcon" class="text-4xl text-indigo-500 mt-4 transition-all duration-300 z-10">
-            <i class="fa-solid fa-rocket"></i>
-          </div>
-        </div>
-
-        <!-- Controls -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-[11px] text-slate-400 mb-1 font-medium">Bet Amount (CC)</label>
-            <input type="number" id="rocketBetInput" value="50" min="10" max="100000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-bold focus:outline-none focus:border-indigo-500">
-          </div>
-          <div>
-            <label class="block text-[11px] text-slate-400 mb-1 font-medium">Auto-Cashout Multiplier</label>
-            <input type="number" id="rocketAutoInput" value="2.00" step="0.10" min="1.10" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-bold focus:outline-none focus:border-indigo-500">
-          </div>
-          <div class="flex gap-2 items-end">
-            <button id="rocketStartBtn" onclick="startRocketGame()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition h-10">Launch</button>
-            <button id="rocketCashoutBtn" disabled onclick="cashoutRocket()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-xl text-xs transition h-10 disabled:opacity-50">Cashout</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ARENA LIVE MATCH WAGERING -->
-      <div id="risk-view-wagering" class="hidden max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-        <div>
-          <h2 class="text-lg font-bold text-slate-100">Live Arena Match Wagering</h2>
-          <p class="text-xs text-slate-400">Place CC wagers on active 1v1 Arena matches in real time. Max balance cap 100k CC.</p>
-        </div>
-
-        <div id="liveWagerMatchesList" class="space-y-3">
-          <div class="text-center py-8 text-xs text-slate-500">Scanning active 1v1 arena matches...</div>
         </div>
       </div>
     </section>
@@ -755,7 +688,7 @@
     // System Constants
     const ADMIN_EMAIL = "zainisgo123@gmail.com";
     const WHITELISTED_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
-    const MAX_COIN_LIMIT = 100000; // Strict Economy Cap Limit
+    const MAX_COIN_LIMIT = 100000; // Universal Economy Cap Limit
 
     // Firebase Configuration
     const firebaseConfig = {
@@ -795,16 +728,6 @@
     let arenaTimeSelf = 600;
     let arenaTimeOpponent = 600;
     let arenaPlayerColor = 'w';
-
-    // Anti-Exploit Rocket State
-    let rocketRunning = false;
-    let rocketInterval = null;
-
-    // Blackjack State
-    let bjDeck = [];
-    let bjPlayerHand = [];
-    let bjDealerHand = [];
-    let bjCurrentBet = 0;
 
     // Social & DM State
     let activeDMTarget = null;
@@ -934,7 +857,9 @@
 
     function updateUIHeader() {
       if (!currentUserData) return;
-      document.getElementById('userCoins').innerText = (currentUserData.coins || 0).toLocaleString();
+      const coinText = (currentUserData.coins || 0).toLocaleString();
+      document.getElementById('userCoins').innerText = coinText;
+      document.getElementById('shopCoinsDisplay').innerText = coinText + " CC";
       document.getElementById('userElo').innerText = currentUserData.elo || 1200;
       document.getElementById('navHandle').innerText = currentUserData.handle || "Player";
       document.getElementById('botPlayerHandle').innerText = currentUserData.handle || "Player";
@@ -956,7 +881,7 @@
 
     // TAB SWITCHING LOGIC
     function switchTab(tab) {
-      ['chess', 'risk', 'social', 'admin'].forEach(t => {
+      ['chess', 'shop', 'social', 'admin'].forEach(t => {
         document.getElementById('section-' + t).classList.add('hidden');
         const btn = document.getElementById('tab-' + t);
         if (btn) {
@@ -981,8 +906,6 @@
         }, 50);
       } else if (tab === 'social') {
         loadFriendsList();
-      } else if (tab === 'risk') {
-        loadLiveWagerMatches();
       }
     }
 
@@ -999,18 +922,6 @@
         if (sub === 'bot' && botBoard) botBoard.resize();
         if (sub === 'arena' && arenaBoard) arenaBoard.resize();
       }, 50);
-    }
-
-    function switchRiskSubTab(sub) {
-      ['blackjack', 'rocket', 'wagering'].forEach(s => {
-        document.getElementById('risk-view-' + s).classList.add('hidden');
-        const btn = document.getElementById('subtab-' + s);
-        if (btn) btn.className = "px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200";
-      });
-      document.getElementById('risk-view-' + sub).classList.remove('hidden');
-      document.getElementById('subtab-' + sub).className = "px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700";
-
-      if (sub === 'wagering') loadLiveWagerMatches();
     }
 
     function switchSocialSubTab(sub) {
@@ -1058,7 +969,7 @@
       botGame = new Chess();
       botBoard = Chessboard('botBoard', {
         position: 'start',
-        draggable: false, // Strict Click-to-Move
+        draggable: false, // Click-to-Move only
         pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png'
       });
 
@@ -1433,7 +1344,7 @@
 
     function handleArenaFinish(room) {
       if (room.winnerUid === currentUser.uid) {
-        // Winner gets +16 Elo and +50 CC (Capped)
+        // Winner gets +16 Elo and +50 CC (Capped at 100k)
         db.ref('users/' + currentUser.uid + '/elo').set((currentUserData.elo || 1200) + 16);
         safeAddCoins(currentUser.uid, 50);
         showGameOverModal("Victory!", `You won! +16 Elo & +50 CC (${room.endReason})`);
@@ -1461,231 +1372,6 @@
       }
       document.getElementById('arenaGamePanel').classList.add('hidden');
       document.getElementById('arenaSetupPanel').classList.remove('hidden');
-    }
-
-    // PROBABILITY & RISK LAB: COGNI-BLACKJACK
-    function dealBlackjack() {
-      const bet = parseInt(document.getElementById('bjBetInput').value) || 0;
-      if (bet <= 0 || bet > currentUserData.coins) return alert("Invalid bet amount!");
-
-      bjCurrentBet = bet;
-      safeAddCoins(currentUser.uid, -bet); // Deduct bet
-
-      bjDeck = createDeck();
-      bjPlayerHand = [drawCard(), drawCard()];
-      bjDealerHand = [drawCard(), drawCard()];
-
-      document.getElementById('bjDealBtn').disabled = true;
-      document.getElementById('bjHitBtn').disabled = false;
-      document.getElementById('bjStandBtn').disabled = false;
-      document.getElementById('bjDoubleBtn').disabled = false;
-      document.getElementById('bjStatusBadge').innerText = "In Hand";
-
-      renderBlackjack();
-    }
-
-    function createDeck() {
-      const suits = ['♠', '♥', '♦', '♣'];
-      const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-      let deck = [];
-      for (let s of suits) {
-        for (let v of values) {
-          deck.push({ suit: s, value: v });
-        }
-      }
-      return deck.sort(() => Math.random() - 0.5);
-    }
-
-    function drawCard() {
-      return bjDeck.pop();
-    }
-
-    function calcHand(hand) {
-      let score = 0;
-      let aces = 0;
-      for (let card of hand) {
-        if (['J', 'Q', 'K'].includes(card.value)) score += 10;
-        else if (card.value === 'A') { score += 11; aces++; }
-        else score += parseInt(card.value);
-      }
-      while (score > 21 && aces > 0) {
-        score -= 10;
-        aces--;
-      }
-      return score;
-    }
-
-    function renderBlackjack(hideDealer = true) {
-      const pContainer = document.getElementById('playerCards');
-      const dContainer = document.getElementById('dealerCards');
-
-      pContainer.innerHTML = bjPlayerHand.map(c => `<div class="w-12 h-16 bg-slate-900 border border-slate-700 rounded-lg flex flex-col items-center justify-center font-bold text-xs"><span class="${['♥','♦'].includes(c.suit)?'text-red-400':'text-slate-200'}">${c.value}</span><span>${c.suit}</span></div>`).join('');
-      document.getElementById('playerScore').innerText = calcHand(bjPlayerHand);
-
-      if (hideDealer) {
-        dContainer.innerHTML = `
-          <div class="w-12 h-16 bg-slate-900 border border-slate-700 rounded-lg flex flex-col items-center justify-center font-bold text-xs"><span class="${['♥','♦'].includes(bjDealerHand[0].suit)?'text-red-400':'text-slate-200'}">${bjDealerHand[0].value}</span><span>${bjDealerHand[0].suit}</span></div>
-          <div class="w-12 h-16 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-center font-mono text-slate-600 font-bold">?</div>
-        `;
-        document.getElementById('dealerScore').innerText = "?";
-      } else {
-        dContainer.innerHTML = bjDealerHand.map(c => `<div class="w-12 h-16 bg-slate-900 border border-slate-700 rounded-lg flex flex-col items-center justify-center font-bold text-xs"><span class="${['♥','♦'].includes(c.suit)?'text-red-400':'text-slate-200'}">${c.value}</span><span>${c.suit}</span></div>`).join('');
-        document.getElementById('dealerScore').innerText = calcHand(bjDealerHand);
-      }
-    }
-
-    function hitBlackjack() {
-      bjPlayerHand.push(drawCard());
-      renderBlackjack();
-      if (calcHand(bjPlayerHand) > 21) {
-        endBlackjack("Bust! You lost.");
-      }
-    }
-
-    function doubleBlackjack() {
-      if (currentUserData.coins < bjCurrentBet) return alert("Insufficient CC to Double Down!");
-      safeAddCoins(currentUser.uid, -bjCurrentBet);
-      bjCurrentBet *= 2;
-      bjPlayerHand.push(drawCard());
-      renderBlackjack();
-      if (calcHand(bjPlayerHand) > 21) {
-        endBlackjack("Bust on Double! You lost.");
-      } else {
-        standBlackjack();
-      }
-    }
-
-    function standBlackjack() {
-      while (calcHand(bjDealerHand) < 17) {
-        bjDealerHand.push(drawCard());
-      }
-      renderBlackjack(false);
-
-      const pScore = calcHand(bjPlayerHand);
-      const dScore = calcHand(bjDealerHand);
-
-      if (dScore > 21 || pScore > dScore) {
-        const winAmount = bjCurrentBet * 2;
-        safeAddCoins(currentUser.uid, winAmount); // Payout capped at 100k CC
-        endBlackjack(`Won +${winAmount} CC!`);
-      } else if (pScore === dScore) {
-        safeAddCoins(currentUser.uid, bjCurrentBet); // Push return
-        endBlackjack("Push! Bet returned.");
-      } else {
-        endBlackjack("Dealer wins.");
-      }
-    }
-
-    function endBlackjack(msg) {
-      document.getElementById('bjStatusBadge').innerText = msg;
-      document.getElementById('bjDealBtn').disabled = false;
-      document.getElementById('bjHitBtn').disabled = true;
-      document.getElementById('bjStandBtn').disabled = true;
-      document.getElementById('bjDoubleBtn').disabled = true;
-    }
-
-    // PROBABILITY & RISK LAB: COGNIROCKET CRASH (ANTI-SPAM PATCHED)
-    let currentRocketMultiplier = 1.00;
-    let crashPoint = 1.00;
-
-    function startRocketGame() {
-      if (rocketRunning) return; // Anti-spam lock guard
-      
-      const bet = parseInt(document.getElementById('rocketBetInput').value) || 0;
-      if (bet <= 0 || bet > currentUserData.coins) return alert("Invalid bet amount!");
-
-      rocketRunning = true;
-      document.getElementById('rocketStartBtn').disabled = true;
-      document.getElementById('rocketCashoutBtn').disabled = false;
-
-      safeAddCoins(currentUser.uid, -bet); // Immediate deduction
-
-      // Calculate Exponential Crash Point
-      const e = 100;
-      const h = Math.random() * e;
-      crashPoint = Math.max(1.01, parseFloat((e / (e - h)).toFixed(2)));
-
-      currentRocketMultiplier = 1.00;
-      document.getElementById('rocketSubtext').innerText = "Rocket in Flight...";
-
-      rocketInterval = setInterval(() => {
-        currentRocketMultiplier += 0.02;
-        document.getElementById('rocketMultiplier').innerText = currentRocketMultiplier.toFixed(2) + "x";
-
-        const autoCash = parseFloat(document.getElementById('rocketAutoInput').value) || 0;
-        if (autoCash > 1.00 && currentRocketMultiplier >= autoCash) {
-          cashoutRocket();
-          return;
-        }
-
-        if (currentRocketMultiplier >= crashPoint) {
-          crashRocket();
-        }
-      }, 100);
-    }
-
-    function cashoutRocket() {
-      if (!rocketRunning) return; // Strict execution lock
-      rocketRunning = false;
-      if (rocketInterval) clearInterval(rocketInterval);
-
-      document.getElementById('rocketCashoutBtn').disabled = true;
-      document.getElementById('rocketStartBtn').disabled = false;
-
-      const bet = parseInt(document.getElementById('rocketBetInput').value) || 0;
-      const winnings = Math.floor(bet * currentRocketMultiplier);
-
-      safeAddCoins(currentUser.uid, winnings); // Capped at 100k CC
-      document.getElementById('rocketSubtext').innerText = `Cashed out at ${currentRocketMultiplier.toFixed(2)}x (+${winnings} CC)`;
-      document.getElementById('rocketMultiplier').className = "text-5xl font-mono font-black text-emerald-400 tracking-tight z-10";
-    }
-
-    function crashRocket() {
-      rocketRunning = false;
-      if (rocketInterval) clearInterval(rocketInterval);
-
-      document.getElementById('rocketCashoutBtn').disabled = true;
-      document.getElementById('rocketStartBtn').disabled = false;
-
-      document.getElementById('rocketSubtext').innerText = `CRASHED @ ${crashPoint.toFixed(2)}x`;
-      document.getElementById('rocketMultiplier').className = "text-5xl font-mono font-black text-red-500 tracking-tight z-10";
-    }
-
-    // LIVE ARENA WAGERING LOGIC
-    function loadLiveWagerMatches() {
-      const container = document.getElementById('liveWagerMatchesList');
-      db.ref('rooms').orderByChild('status').equalTo('playing').once('value', (snap) => {
-        const rooms = snap.val();
-        if (!rooms) {
-          container.innerHTML = '<div class="text-center py-8 text-xs text-slate-500">No active 1v1 arena matches available for wagering.</div>';
-          return;
-        }
-
-        let html = '';
-        Object.values(rooms).forEach(r => {
-          html += `
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-              <div>
-                <span class="font-bold text-slate-200">${r.whiteHandle}</span> <span class="text-slate-500">vs</span> <span class="font-bold text-slate-200">${r.blackHandle}</span>
-                <div class="text-[10px] text-slate-500">Room: ${r.code}</div>
-              </div>
-              <div class="flex gap-2">
-                <button onclick="placeWager('${r.code}', '${r.whiteUid}')" class="bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-lg font-semibold transition">Bet ${r.whiteHandle}</button>
-                <button onclick="placeWager('${r.code}', '${r.blackUid}')" class="bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-lg font-semibold transition">Bet ${r.blackHandle}</button>
-              </div>
-            </div>
-          `;
-        });
-        container.innerHTML = html;
-      });
-    }
-
-    function placeWager(roomCode, targetUid) {
-      const amount = parseInt(prompt("Enter CC Wager Amount:")) || 0;
-      if (amount <= 0 || amount > currentUserData.coins) return alert("Invalid bet amount!");
-
-      safeAddCoins(currentUser.uid, -amount);
-      alert(`Wager of ${amount} CC placed!`);
     }
 
     // FRIENDS & DIRECT MESSAGING LOGIC

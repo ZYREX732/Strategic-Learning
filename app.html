@@ -354,7 +354,7 @@
       <!-- SECTION 2: GAMBLING / RISK LAB -->
       <section id="section-gambling" class="hidden flex-1 flex flex-col space-y-4">
         
-        <!-- Mini-Game Selection Tabs (Roulette Removed) -->
+        <!-- Mini-Game Selection Tabs -->
         <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl flex space-x-2 overflow-x-auto">
           <button onclick="setGamblingGame('blackjack')" id="gtab-blackjack" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 whitespace-nowrap">
             <i class="fa-solid fa-spade"></i><span>Cogni-Blackjack</span>
@@ -407,7 +407,7 @@
           </div>
         </div>
 
-        <!-- GAMBLING GAME 2: ROCKET CRASH (EXPLOIT PATCHED) -->
+        <!-- GAMBLING GAME 2: ROCKET CRASH -->
         <div id="game-rocket" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-between min-h-[480px]">
           <div class="text-center">
             <h3 class="text-xl font-bold text-indigo-400">CogniRocket (Multiplier Crash)</h3>
@@ -1590,9 +1590,10 @@
             <td class="p-2 text-indigo-400 font-bold">${u.elo}</td>
             <td class="p-2 text-amber-400 font-bold">${(u.coins || 0).toLocaleString()}</td>
             <td class="p-2 text-right space-x-1">
-              <button onclick="adminGrantCoins('${c.key}')" class="bg-amber-600 text-white px-2 py-0.5 rounded text-[10px]">+Coins</button>
-              <button onclick="adminResetElo('${c.key}')" class="bg-slate-700 text-slate-200 px-2 py-0.5 rounded text-[10px]">Reset Elo</button>
-              <button onclick="adminDeleteUser('${c.key}')" class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px]">Delete</button>
+              <button onclick="adminGrantCoins('${c.key}')" class="bg-amber-600 hover:bg-amber-500 text-white px-2 py-0.5 rounded text-[10px] font-semibold">+Coins</button>
+              <button onclick="adminResetCoins('${c.key}')" class="bg-amber-800 hover:bg-amber-700 text-amber-200 px-2 py-0.5 rounded text-[10px] font-semibold">Reset Coins</button>
+              <button onclick="adminResetElo('${c.key}')" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-2 py-0.5 rounded text-[10px] font-semibold">Reset Elo</button>
+              <button onclick="adminDeleteUser('${c.key}')" class="bg-red-600 hover:bg-red-500 text-white px-2 py-0.5 rounded text-[10px] font-semibold">Delete</button>
             </td>
           `;
           body.appendChild(tr);
@@ -1626,8 +1627,16 @@
       if (amt) db.ref("users/" + uid + "/coins").transaction(c => (c || 0) + parseInt(amt));
     }
 
+    function adminResetCoins(uid) {
+      if (confirm("Reset this user's balance back to default 1,000 CogniCoins?")) {
+        db.ref("users/" + uid + "/coins").set(1000);
+      }
+    }
+
     function adminResetElo(uid) {
-      db.ref("users/" + uid + "/elo").set(500);
+      if (confirm("Reset this user's rating back to 500 Elo?")) {
+        db.ref("users/" + uid + "/elo").set(500);
+      }
     }
 
     function adminDeleteUser(uid) {

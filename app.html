@@ -1044,7 +1044,7 @@
           };
           userRef.set(val);
         } else {
-          // Verify Daily Quest Reset Date
+          // Verify Daily Quest Reset Date with Non-Destructive Update
           if (val.lastQuestReset !== todayStr) {
             val.lastQuestReset = todayStr;
             val.quests = {
@@ -1074,16 +1074,23 @@
     }
 
     // 3. INVENTORY, PROFILE & DAILY QUEST HELPER FUNCTIONS
+    function parseCategory(data, defaultArr) {
+      if (!data) return defaultArr;
+      if (Array.isArray(data)) return [...data];
+      if (typeof data === 'object') return Object.values(data);
+      return defaultArr;
+    }
+
     function getNormalizedInventory() {
-      if (!userProfile) return { icons: [], frames: [], nametags: [], themes: [], emotes: [] };
+      if (!userProfile) return { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice', 'nametag_tactician'], themes: ['theme-wood', 'theme-green', 'theme-grey'], emotes: ['none'] };
       const inv = userProfile.inventory || {};
 
       let result = {
-        icons: Array.isArray(inv.icons) ? [...inv.icons] : ['icon_user'],
-        frames: Array.isArray(inv.frames) ? [...inv.frames] : ['frame_none'],
-        nametags: Array.isArray(inv.nametags) ? [...inv.nametags] : ['nametag_novice'],
-        themes: Array.isArray(inv.themes) ? [...inv.themes] : ['theme-wood', 'theme-green', 'theme-grey'],
-        emotes: Array.isArray(inv.emotes) ? [...inv.emotes] : ['none']
+        icons: parseCategory(inv.icons, ['icon_user']),
+        frames: parseCategory(inv.frames, ['frame_none']),
+        nametags: parseCategory(inv.nametags, ['nametag_novice']),
+        themes: parseCategory(inv.themes, ['theme-wood', 'theme-green', 'theme-grey']),
+        emotes: parseCategory(inv.emotes, ['none'])
       };
 
       // Guarantee Tactician Synonym Inclusion
@@ -2097,22 +2104,39 @@
       });
     }
 
+    // DYNAMIC GRANT CC WITH PROMPT
     function adminGrantCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+      
+      const input = prompt("Enter CogniCoins (CC) amount to grant:", "5000");
+      if (input === null) return; // Prompt cancelled
+      
+      const amount = parseInt(input, 10);
+      if (isNaN(amount) || amount <= 0) {
+        return alert("Invalid CC amount entered.");
+      }
+
       db.ref('users/' + uid + '/coins').once('value').then((snap) => {
         const cur = snap.val() || 0;
-        db.ref('users/' + uid + '/coins').set(cur + 5000);
+        db.ref('users/' + uid + '/coins').set(cur + amount).then(() => {
+          alert(`Granted ${amount.toLocaleString()} CC successfully!`);
+          loadAdminUserTable();
+        });
       });
     }
 
     function adminResetCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      db.ref('users/' + uid + '/coins').set(1000);
+      db.ref('users/' + uid + '/coins').set(1000).then(() => {
+        loadAdminUserTable();
+      });
     }
 
     function adminResetElo(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      db.ref('users/' + uid + '/elo').set(1500);
+      db.ref('users/' + uid + '/elo').set(1500).then(() => {
+        loadAdminUserTable();
+      });
     }
 
     function adminDeleteUser(uid) {
@@ -2141,7 +2165,7 @@
               <td class="py-2.5 px-4 text-indigo-400 font-bold">${u.elo || 1500}</td>
               <td class="py-2.5 px-4 text-amber-400 font-bold">${(u.coins || 0).toLocaleString()}</td>
               <td class="py-2.5 px-4 text-right space-x-1">
-                <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">+5k CC</button>
+                <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">Grant CC</button>
                 <button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset CC</button>
                 <button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Elo</button>
                 <button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 rounded border border-red-800 text-[10px]">Delete</button>

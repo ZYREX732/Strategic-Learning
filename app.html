@@ -266,7 +266,7 @@
               Match Controls
             </h2>
             <p class="text-xs text-slate-400 leading-relaxed">
-              Challenge the Grandmaster Bot to improve your positional judgment. Win matches to earn CogniCoins (+50 CC) and increase your Rating. Click piece to select, then click target square to move.
+              Challenge the Grandmaster Bot to improve your positional judgment. Win matches to earn CogniCoins (+50 CC) and increase your Rating. Side selections are locked mid-match to prevent restarts.
             </p>
 
             <div>
@@ -303,7 +303,7 @@
               </div>
               <div class="p-3 bg-slate-950 rounded-xl border border-slate-800/80 text-xs text-slate-400 leading-relaxed font-mono">
                 <span class="text-slate-500 block mb-1">// Tactical Status:</span>
-                <span id="ai-analysis-text">Game active. Click on your piece to see valid destination squares.</span>
+                <span id="ai-analysis-text">Engine ready. Scholar's Mate Defence & MVV-LVA move ordering active.</span>
               </div>
             </div>
           </div>
@@ -485,6 +485,7 @@
 
     <!-- SECTION 4: PROFILE & CUSTOMIZATION STUDIO -->
     <section id="section-profile" class="hidden space-y-6">
+      <!-- Profile Header Showcase Card -->
       <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
         <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
           <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
@@ -518,74 +519,76 @@
         </div>
       </div>
 
+      <!-- Customization Studio Options -->
       <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
         <h3 class="text-lg font-bold text-white flex items-center">
           <i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>
-          Customization Studio
+          Profile Customization Studio
         </h3>
 
-        <div class="space-y-6">
-          <div class="space-y-3">
-            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chessboard Skins</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button onclick="equipBoardTheme('theme-wood')" class="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-left flex items-center space-x-3 transition-all">
-                <div class="w-8 h-8 rounded bg-[#b58863] border border-[#f0d9b5]"></div>
-                <div>
-                  <div class="text-xs font-bold text-white">Classic Wood</div>
-                  <div class="text-[10px] text-slate-400">Standard theme</div>
-                </div>
-              </button>
-              <button onclick="equipBoardTheme('theme-green')" class="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-left flex items-center space-x-3 transition-all">
-                <div class="w-8 h-8 rounded bg-[#769656] border border-[#eeeed2]"></div>
-                <div>
-                  <div class="text-xs font-bold text-white">Chess Green</div>
-                  <div class="text-[10px] text-slate-400">Tournament style</div>
-                </div>
-              </button>
-              <button onclick="equipBoardTheme('theme-grey')" class="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-left flex items-center space-x-3 transition-all">
-                <div class="w-8 h-8 rounded bg-[#475569] border border-[#e2e8f0]"></div>
-                <div>
-                  <div class="text-xs font-bold text-white">Slate Grey</div>
-                  <div class="text-[10px] text-slate-400">Modern dark style</div>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Option 1: Player Name Editor -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Custom Player Name</label>
+            <div class="flex space-x-2">
+              <input id="input-custom-name" type="text" placeholder="Enter new display name..." maxlength="20" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <button onclick="savePlayerName()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md">
+                Save
               </button>
             </div>
           </div>
 
-          <div class="space-y-3">
-            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Animated Emotes Deck</h4>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center space-y-2">
-                <i class="fa-solid fa-fire text-amber-500 text-2xl emote-pulse"></i>
-                <span class="text-xs font-semibold text-slate-200">On Fire</span>
-                <span class="text-[10px] text-indigo-400 font-mono">Pulse Effect</span>
-              </div>
-              <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center space-y-2">
-                <i class="fa-solid fa-bolt text-yellow-400 text-2xl emote-bounce"></i>
-                <span class="text-xs font-semibold text-slate-200">Blitz</span>
-                <span class="text-[10px] text-indigo-400 font-mono">Bounce Effect</span>
-              </div>
-              <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center space-y-2">
-                <i class="fa-solid fa-skull text-purple-400 text-2xl emote-shake"></i>
-                <span class="text-xs font-semibold text-slate-200">Checkmate</span>
-                <span class="text-[10px] text-indigo-400 font-mono">Shake Effect</span>
-              </div>
-              <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center space-y-2">
-                <i class="fa-solid fa-crown text-amber-300 text-2xl emote-glow"></i>
-                <span class="text-xs font-semibold text-slate-200">Grandmaster</span>
-                <span class="text-[10px] text-indigo-400 font-mono">Glow Effect</span>
-              </div>
-            </div>
+          <!-- Option 2: Name Tag / Title Dropdown -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Name Tag / Title</label>
+            <select id="select-equipped-tag" onchange="equipCustomization('tag', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="tag_novice">Novice Title (Default)</option>
+            </select>
           </div>
 
-          <div class="space-y-3">
-            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              <span>Unlocked Inventory Items</span>
-              <span id="profile-vault-count" class="text-indigo-400">0 Items</span>
-            </h4>
-
-            <div id="profile-vault-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+          <!-- Option 3: Avatar Icon Dropdown -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Avatar Icon</label>
+            <select id="select-equipped-icon" onchange="equipCustomization('icon', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="icon_grad">Graduate Icon (Default)</option>
+            </select>
           </div>
+
+          <!-- Option 4: Avatar Frame Dropdown -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Avatar Frame</label>
+            <select id="select-equipped-frame" onchange="equipCustomization('frame', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="frame_bronze">Bronze Frame (Default)</option>
+            </select>
+          </div>
+
+          <!-- Option 5: Chessboard Theme Dropdown -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Chessboard Theme</label>
+            <select id="select-equipped-theme" onchange="equipBoardTheme(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="theme-wood">Classic Wood</option>
+              <option value="theme-green">Chess Green</option>
+              <option value="theme-grey">Slate Grey</option>
+            </select>
+          </div>
+
+          <!-- Option 6: Animated Emote Selection -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Active Animated Emote</label>
+            <select id="select-equipped-emote" onchange="equipCustomization('emote', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="emote_blitz">Blitz Emote (Bounce)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Inventory Vault Grid -->
+        <div class="space-y-3 pt-4 border-t border-slate-800">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Unlocked Inventory Items</span>
+            <span id="profile-vault-count" class="text-indigo-400">0 Items</span>
+          </h4>
+
+          <div id="profile-vault-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
         </div>
       </div>
     </section>
@@ -690,7 +693,7 @@
   <script>
     const PAGE_LOAD_TIME = Date.now();
 
-    // 1. Firebase Config
+    // 1. Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
       authDomain: "chess-7df7a.firebaseapp.com",
@@ -732,17 +735,29 @@
     };
 
     const ITEM_CATALOG = [
-      { id: "frame_bronze", name: "Bronze Frame", type: "frame", rarity: "common", icon: "fa-shield" },
-      { id: "tag_novice", name: "Novice Title", type: "nametag", rarity: "common", icon: "fa-tag" },
-      { id: "frame_silver", name: "Silver Frame", type: "frame", rarity: "rare", icon: "fa-shield" },
-      { id: "tag_tactician", name: "Tactician Title", type: "nametag", rarity: "rare", icon: "fa-tag" },
-      { id: "emote_blitz", name: "Blitz Emote", type: "emote", rarity: "rare", icon: "fa-bolt" },
-      { id: "frame_gold", name: "Gold Frame", type: "frame", rarity: "epic", icon: "fa-shield" },
-      { id: "tag_master", name: "Master Title", type: "nametag", rarity: "epic", icon: "fa-tag" },
-      { id: "emote_pulse", name: "On Fire Emote", type: "emote", rarity: "epic", icon: "fa-fire" },
-      { id: "frame_gm", name: "Grandmaster Frame", type: "frame", rarity: "legendary", icon: "fa-crown" },
-      { id: "tag_gm", name: "Grandmaster Title", type: "nametag", rarity: "legendary", icon: "fa-crown" },
-      { id: "emote_glow", name: "Glow Emote", type: "emote", rarity: "legendary", icon: "fa-crown" }
+      // Name Tags / Titles
+      { id: "tag_novice", name: "Novice Title", type: "nametag", rarity: "common", icon: "fa-tag", text: "Novice" },
+      { id: "tag_tactician", name: "Tactician Title", type: "nametag", rarity: "rare", icon: "fa-tag", text: "Tactician" },
+      { id: "tag_master", name: "Master Title", type: "nametag", rarity: "epic", icon: "fa-tag", text: "Master" },
+      { id: "tag_gm", name: "Grandmaster Title", type: "nametag", rarity: "legendary", icon: "fa-crown", text: "Grandmaster" },
+
+      // Frames
+      { id: "frame_bronze", name: "Bronze Frame", type: "frame", rarity: "common", icon: "fa-shield", css: "border-amber-700 text-amber-600" },
+      { id: "frame_silver", name: "Silver Frame", type: "frame", rarity: "rare", icon: "fa-shield", css: "border-slate-300 text-slate-300" },
+      { id: "frame_gold", name: "Gold Frame", type: "frame", rarity: "epic", icon: "fa-shield", css: "border-amber-400 text-amber-400" },
+      { id: "frame_gm", name: "Grandmaster Frame", type: "frame", rarity: "legendary", icon: "fa-crown", css: "border-amber-300 text-amber-300 animate-pulse" },
+
+      // Icons
+      { id: "icon_grad", name: "Graduate Icon", type: "icon", rarity: "common", icon: "fa-user-graduate" },
+      { id: "icon_knight", name: "Knight Icon", type: "icon", rarity: "rare", icon: "fa-chess-knight" },
+      { id: "icon_wizard", name: "Wizard Icon", type: "icon", rarity: "epic", icon: "fa-hat-wizard" },
+      { id: "icon_dragon", name: "Dragon Icon", type: "icon", rarity: "legendary", icon: "fa-dragon" },
+
+      // Emotes
+      { id: "emote_blitz", name: "Blitz Emote", type: "emote", rarity: "rare", icon: "fa-bolt", animClass: "emote-bounce" },
+      { id: "emote_pulse", name: "On Fire Emote", type: "emote", rarity: "epic", icon: "fa-fire", animClass: "emote-pulse" },
+      { id: "emote_shake", name: "Checkmate Emote", type: "emote", rarity: "epic", icon: "fa-skull", animClass: "emote-shake" },
+      { id: "emote_glow", name: "Glow Emote", type: "emote", rarity: "legendary", icon: "fa-crown", animClass: "emote-glow" }
     ];
 
     function getNormalizedInventory(rawInventory) {
@@ -785,7 +800,7 @@
       return db.ref('users/' + targetUid + '/coins').set(safeBal).catch(err => console.warn("safeSetCoins failed:", err));
     }
 
-    // Delegated Click Movement Event Listener
+    // Delegated Click Movement Listener
     $(document).ready(function() {
       $(document).on('click', '#ai-board .square-55d63', function(e) {
         e.preventDefault();
@@ -800,7 +815,7 @@
       });
     });
 
-    // Auth & Safe User Sync
+    // Auth & Safe Realtime Sync
     auth.onAuthStateChanged((user) => {
       if (!user) {
         window.location.href = "index.html";
@@ -837,7 +852,15 @@
       userRef.once('value').then((snapshot) => {
         let val = snapshot.val();
         if (!val) {
-          val = { email: user.email, elo: 1200, coins: 1000, gamesPlayed: 0, inventory: [] };
+          val = {
+            email: user.email,
+            displayName: user.email ? user.email.split('@')[0] : "Student",
+            elo: 1200,
+            coins: 1000,
+            gamesPlayed: 0,
+            inventory: [],
+            equipped: { tag: "tag_novice", icon: "icon_grad", frame: "frame_bronze", emote: "emote_blitz" }
+          };
           userRef.set(val).catch(err => console.warn("User create error:", err));
         }
 
@@ -847,7 +870,15 @@
         renderProfileSection();
       }).catch((err) => {
         console.warn("User fetch error:", err);
-        currentUserData = { email: user.email, elo: 1200, coins: 1000, gamesPlayed: 0, inventory: [] };
+        currentUserData = {
+          email: user.email,
+          displayName: "Student",
+          elo: 1200,
+          coins: 1000,
+          gamesPlayed: 0,
+          inventory: [],
+          equipped: { tag: "tag_novice", icon: "icon_grad", frame: "frame_bronze", emote: "emote_blitz" }
+        };
         updateUIWithUserData();
         renderProfileSection();
       });
@@ -879,12 +910,25 @@
 
     function updateUIWithUserData() {
       if (!currentUserData) return;
+      const name = currentUserData.displayName || (currentUserData.email ? currentUserData.email.split('@')[0] : "Student");
+
       document.getElementById('nav-user-coins').innerText = (currentUserData.coins || 0).toLocaleString();
-      document.getElementById('nav-user-name').innerText = currentUserData.email ? currentUserData.email.split('@')[0] : "Student";
+      document.getElementById('nav-user-name').innerText = name;
       document.getElementById('nav-user-elo').innerText = (currentUserData.elo || 1200) + " ELO";
       
-      document.getElementById('ai-player-name').innerText = currentUserData.email ? currentUserData.email.split('@')[0] : "Player";
+      document.getElementById('ai-player-name').innerText = name;
       document.getElementById('ai-player-elo-badge').innerText = "Rating: " + (currentUserData.elo || 1200);
+
+      // Render Equipped Cosmetics on Profile Badge
+      const eq = currentUserData.equipped || {};
+      const tagObj = ITEM_CATALOG.find(i => i.id === eq.tag) || ITEM_CATALOG[0];
+      const iconObj = ITEM_CATALOG.find(i => i.id === eq.icon) || { icon: "fa-user-graduate" };
+
+      const nameBadge = document.getElementById('profile-nametag-badge');
+      if (nameBadge) nameBadge.innerText = tagObj.text || "Novice";
+
+      const iconPreview = document.getElementById('profile-icon-preview');
+      if (iconPreview) iconPreview.className = `fa-solid ${iconObj.icon}`;
     }
 
     function switchTab(tabId) {
@@ -912,11 +956,14 @@
       });
     }
 
-    // Profile & Customization Engine
+    // ==========================================
+    // PROFILE & CUSTOMIZATION STUDIO ENGINE
+    // ==========================================
     function renderProfileSection() {
       if (!currentUserData) return;
 
-      document.getElementById('profile-display-name').innerText = currentUserData.email ? currentUserData.email.split('@')[0] : "Student";
+      const name = currentUserData.displayName || (currentUserData.email ? currentUserData.email.split('@')[0] : "Student");
+      document.getElementById('profile-display-name').innerText = name;
       document.getElementById('profile-email-display').innerText = currentUserData.email || "";
       document.getElementById('profile-elo-stat').innerText = currentUserData.elo || 1200;
       document.getElementById('profile-games-stat').innerText = currentUserData.gamesPlayed || 0;
@@ -925,6 +972,10 @@
       const inv = getNormalizedInventory(currentUserData.inventory);
       document.getElementById('profile-vault-count').innerText = `${inv.length} Items`;
 
+      // Populate Dropdowns with Owned Items
+      populateCustomizationDropdowns(inv);
+
+      // Render Vault Items Grid
       const vaultGrid = document.getElementById('profile-vault-grid');
       vaultGrid.innerHTML = "";
 
@@ -952,6 +1003,66 @@
       });
     }
 
+    function populateCustomizationDropdowns(unlockedIds) {
+      const eq = currentUserData.equipped || {};
+
+      // Name Tags
+      const tagSelect = document.getElementById('select-equipped-tag');
+      tagSelect.innerHTML = `<option value="tag_novice">Novice Title (Default)</option>`;
+      ITEM_CATALOG.filter(i => i.type === 'nametag' && unlockedIds.includes(i.id)).forEach(item => {
+        tagSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+      });
+      tagSelect.value = eq.tag || "tag_novice";
+
+      // Icons
+      const iconSelect = document.getElementById('select-equipped-icon');
+      iconSelect.innerHTML = `<option value="icon_grad">Graduate Icon (Default)</option>`;
+      ITEM_CATALOG.filter(i => i.type === 'icon' && unlockedIds.includes(i.id)).forEach(item => {
+        iconSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+      });
+      iconSelect.value = eq.icon || "icon_grad";
+
+      // Frames
+      const frameSelect = document.getElementById('select-equipped-frame');
+      frameSelect.innerHTML = `<option value="frame_bronze">Bronze Frame (Default)</option>`;
+      ITEM_CATALOG.filter(i => i.type === 'frame' && unlockedIds.includes(i.id)).forEach(item => {
+        frameSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+      });
+      frameSelect.value = eq.frame || "frame_bronze";
+
+      // Emotes
+      const emoteSelect = document.getElementById('select-equipped-emote');
+      emoteSelect.innerHTML = `<option value="emote_blitz">Blitz Emote (Default)</option>`;
+      ITEM_CATALOG.filter(i => i.type === 'emote' && unlockedIds.includes(i.id)).forEach(item => {
+        emoteSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+      });
+      emoteSelect.value = eq.emote || "emote_blitz";
+
+      // Active Board Theme Select
+      const currentTheme = localStorage.getItem('cogni_board_theme') || 'theme-wood';
+      document.getElementById('select-equipped-theme').value = currentTheme;
+    }
+
+    function savePlayerName() {
+      const newName = document.getElementById('input-custom-name').value.trim();
+      if (!newName) {
+        alert("Please enter a valid display name.");
+        return;
+      }
+      db.ref('users/' + currentUser.uid + '/displayName').set(newName).then(() => {
+        showToast("Name Updated", `Display name changed to "${newName}"`);
+        document.getElementById('input-custom-name').value = '';
+      });
+    }
+
+    function equipCustomization(category, value) {
+      if (!currentUser) return;
+      const path = `users/${currentUser.uid}/equipped/${category}`;
+      db.ref(path).set(value).then(() => {
+        showToast("Equipped Item", `Updated your ${category} customization!`);
+      });
+    }
+
     function equipBoardTheme(themeClass) {
       localStorage.setItem('cogni_board_theme', themeClass);
       applyBoardTheme(themeClass);
@@ -968,8 +1079,7 @@
     }
 
     // ==========================================
-    // HIGH-LEVEL 1500+ ELO CHESS BOT ENGINE
-    // Minimax + Alpha-Beta + Piece-Square Tables (PST) + MVV-LVA Move Ordering
+    // GRANDMASTER BOT (1500+ ELO + ANTI-SCHOLAR'S MATE)
     // ==========================================
     function initAiGame() {
       aiGame = new Chess();
@@ -989,6 +1099,15 @@
     }
 
     function setupAiGame(side) {
+      // PREVENT MID-GAME RESTART EXPLOIT
+      if (aiGame && aiGame.history().length > 0 && !aiGame.game_over()) {
+        const confirmResign = confirm("Game in progress! Restarting now will count as a Resignation (-ELO). Do you want to resign and start a new game?");
+        if (!confirmResign) return;
+
+        // Record ELO Resignation Penalty
+        handleAiGameLoss();
+      }
+
       aiGame = new Chess();
       selectedSquare = null;
       clearHighlights();
@@ -1102,10 +1221,10 @@
       });
     }
 
-    // Piece Centipawn Values
+    // Piece Values
     const PIECE_VALUES = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
 
-    // Piece-Square Tables (PST) for Positional Evaluation
+    // Piece-Square Tables (PST)
     const pawnPst = [
       [ 0,  0,  0,  0,  0,  0,  0,  0],
       [50, 50, 50, 50, 50, 50, 50, 50],
@@ -1201,7 +1320,6 @@
       return totalEval;
     }
 
-    // MVV-LVA Move Ordering for Fast Alpha-Beta Pruning
     function orderMoves(game, moves) {
       return moves.sort((a, b) => {
         let scoreA = 0;
@@ -1219,6 +1337,9 @@
 
     function minimaxAlphaBeta(game, depth, alpha, beta, isMaximizing) {
       if (depth === 0 || game.game_over()) {
+        if (game.in_checkmate()) {
+          return isMaximizing ? -99999 : 99999;
+        }
         return evaluateBoard(game.board());
       }
 
@@ -1256,8 +1377,32 @@
       let moves = aiGame.moves({ verbose: true });
       if (moves.length === 0) return;
 
-      moves = orderMoves(aiGame, moves);
+      // ANTI-SCHOLAR'S MATE OPENING BOOK DEFENCE
+      const history = aiGame.history();
+      if (aiPlayerColor === 'b' && history.length <= 6) {
+        // 1. e4 e5 2. Qh5 -> 2... Nc6!
+        if (history.length === 3 && history[0] === 'e4' && history[1] === 'e5' && history[2] === 'Qh5') {
+          const move = moves.find(m => m.san === 'Nc6');
+          if (move) return executeBotMove(move);
+        }
+        // 1. e4 e5 2. Qh5 Nc6 3. Bc4 -> 3... g6!
+        if (history.length === 5 && history[2] === 'Qh5' && (history[4] === 'Bc4' || history[4] === 'Bc4+')) {
+          const move = moves.find(m => m.san === 'g6');
+          if (move) return executeBotMove(move);
+        }
+        // 1. e4 e5 2. Bc4 Nc6 3. Qh5 -> 3... g6!
+        if (history.length === 5 && history[2] === 'Bc4' && history[4] === 'Qh5') {
+          const move = moves.find(m => m.san === 'g6');
+          if (move) return executeBotMove(move);
+        }
+        // 1. e4 e5 2. Qh5 Nc6 3. Bc4 g6 4. Qf3 -> 4... Nf6!
+        if (history.length === 7 && history[6] === 'Qf3') {
+          const move = moves.find(m => m.san === 'Nf6');
+          if (move) return executeBotMove(move);
+        }
+      }
 
+      moves = orderMoves(aiGame, moves);
       const isBotWhite = (aiPlayerColor === 'b');
       let bestMove = null;
       let bestValue = isBotWhite ? -99999 : 99999;
@@ -1266,7 +1411,6 @@
         const move = moves[i];
         aiGame.move(move);
 
-        // 3-Ply Deep Search
         const boardValue = minimaxAlphaBeta(aiGame, 3, -100000, 100000, !isBotWhite);
         aiGame.undo();
 
@@ -1284,24 +1428,27 @@
       }
 
       if (bestMove) {
-        const move = aiGame.move(bestMove);
-        aiBoard.position(aiGame.fen());
-        highlightMove(move.from, move.to);
-        
-        const finalEval = evaluateBoard(aiGame.board());
-        updateEngineEvalDisplay(finalEval / 100);
-
-        document.getElementById('ai-turn-indicator').innerText = "Your turn";
-        document.getElementById('ai-status-msg').innerText = "Your turn";
-        checkAiGameOver();
+        executeBotMove(bestMove);
       }
+    }
+
+    function executeBotMove(moveObj) {
+      const move = aiGame.move(moveObj);
+      aiBoard.position(aiGame.fen());
+      highlightMove(move.from, move.to);
+      
+      const finalEval = evaluateBoard(aiGame.board());
+      updateEngineEvalDisplay(finalEval / 100);
+
+      document.getElementById('ai-turn-indicator').innerText = "Your turn";
+      document.getElementById('ai-status-msg').innerText = "Your turn";
+      checkAiGameOver();
     }
 
     function updateEngineEvalDisplay(evalScore) {
       const formattedScore = (evalScore >= 0 ? "+" : "") + evalScore.toFixed(2);
       document.getElementById('ai-eval-score').innerText = formattedScore;
 
-      // Eval Bar Percentage (50% = 0.00, 100% = +5.00, 0% = -5.00)
       let clamped = Math.max(-5, Math.min(5, evalScore));
       let pct = 50 + (clamped / 5) * 45;
       document.getElementById('ai-eval-bar').style.width = pct + "%";
@@ -1633,7 +1780,7 @@
       if (!text || !currentArenaRoomId) return;
 
       db.ref('arena_chat/' + currentArenaRoomId).push({
-        sender: currentUser.email ? currentUser.email.split('@')[0] : "Player",
+        sender: currentUserData.displayName || (currentUser.email ? currentUser.email.split('@')[0] : "Player"),
         text: text,
         timestamp: firebase.database.ServerValue.TIMESTAMP
       });
@@ -1731,7 +1878,6 @@
       }
     }
 
-    // Fixed Global Reload Listener (Prevents Auto-Reload Loop)
     db.ref('system/global_reload').on('value', (snap) => {
       const reloadTimestamp = snap.val();
       if (reloadTimestamp && typeof reloadTimestamp === 'number' && reloadTimestamp > PAGE_LOAD_TIME + 2000) {

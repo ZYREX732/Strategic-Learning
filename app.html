@@ -70,6 +70,14 @@
     .badge-mythic { background-color: #9333ea; color: #ffffff; }
     .badge-legendary { background-color: #d97706; color: #ffffff; }
 
+    /* Frame Preview Effects */
+    .frame-style-none { border-color: #334155; }
+    .frame-style-bronze { border-color: #b45309; box-shadow: 0 0 12px rgba(180, 83, 9, 0.4); }
+    .frame-style-silver { border-color: #cbd5e1; box-shadow: 0 0 12px rgba(203, 213, 225, 0.5); }
+    .frame-style-gold { border-color: #f59e0b; box-shadow: 0 0 16px rgba(245, 158, 11, 0.6); }
+    .frame-style-diamond { border-color: #22d3ee; box-shadow: 0 0 16px rgba(34, 211, 238, 0.6); }
+    .frame-style-neon { border-color: #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.7); }
+
     /* Animated Emotes Keyframes */
     @keyframes emoteBounce {
       0%, 100% { transform: translateY(0) scale(1); }
@@ -161,9 +169,13 @@
             <i class="fa-solid fa-store"></i>
             <span>CogniShop</span>
           </button>
-          <button onclick="switchTab('studio')" id="nav-studio" class="nav-tab h-full px-4 text-sm font-semibold flex items-center space-x-2 text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition">
-            <i class="fa-solid fa-sliders"></i>
-            <span>Studio / Profile</span>
+          <button onclick="switchTab('profile')" id="nav-profile" class="nav-tab h-full px-4 text-sm font-semibold flex items-center space-x-2 text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition">
+            <i class="fa-solid fa-user text-indigo-400"></i>
+            <span>Profile</span>
+          </button>
+          <button onclick="switchTab('quests')" id="nav-quests" class="nav-tab h-full px-4 text-sm font-semibold flex items-center space-x-2 text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition">
+            <i class="fa-solid fa-list-check text-amber-400"></i>
+            <span>Quests</span>
           </button>
           <button onclick="switchTab('admin')" id="nav-admin" class="hidden nav-tab h-full px-4 text-sm font-semibold flex items-center space-x-2 text-red-400 hover:text-red-300 border-b-2 border-transparent transition">
             <i class="fa-solid fa-user-shield"></i>
@@ -218,7 +230,6 @@
                 <div class="text-xs text-slate-400">Minimax Engine (3-Ply Pruned)</div>
               </div>
             </div>
-            <!-- Dynamic Opponent Emote Display -->
             <div id="ai-opponent-emote-display" class="w-10 h-10 flex items-center justify-center text-2xl hidden"></div>
           </div>
 
@@ -246,10 +257,7 @@
                 <span>Emote</span>
               </button>
 
-              <!-- Emote Popover Picker -->
-              <div id="ai-emote-picker" class="hidden absolute right-0 bottom-12 z-40 bg-slate-900 border border-slate-700 rounded-xl p-2 shadow-2xl grid grid-cols-4 gap-2 w-52">
-                <!-- Dynamically populated -->
-              </div>
+              <div id="ai-emote-picker" class="hidden absolute right-0 bottom-12 z-40 bg-slate-900 border border-slate-700 rounded-xl p-2 shadow-2xl grid grid-cols-4 gap-2 w-52"></div>
             </div>
           </div>
 
@@ -257,8 +265,6 @@
 
         <!-- AI Match Sidebar -->
         <div class="space-y-6">
-          
-          <!-- Match Options Card -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
             <h3 class="text-base font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-sliders text-indigo-400"></i>
@@ -280,7 +286,6 @@
             </div>
           </div>
 
-          <!-- Status & Move History -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
             <h3 class="text-base font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-list-ol text-indigo-400"></i>
@@ -298,7 +303,6 @@
               </div>
             </div>
           </div>
-
         </div>
 
       </div>
@@ -307,7 +311,6 @@
     <!-- 2. 1v1 ARENA VIEW -->
     <section id="tab-arena" class="tab-content hidden space-y-6">
       
-      <!-- Lobby / Room Controls -->
       <div id="arena-lobby-panel" class="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6 text-center">
         <div class="w-16 h-16 bg-indigo-600/10 rounded-2xl border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-3xl mx-auto">
           <i class="fa-solid fa-swords"></i>
@@ -330,19 +333,14 @@
         </div>
       </div>
 
-      <!-- Live Match Room -->
       <div id="arena-match-panel" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Board Container -->
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center justify-center">
           
-          <!-- Room Header Bar -->
           <div class="w-full max-w-[500px] flex items-center justify-between mb-3 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800">
             <div class="text-xs font-mono text-slate-400">Room Code: <span id="arena-room-code-display" class="font-bold text-indigo-400">------</span></div>
             <div id="arena-room-status" class="text-xs font-bold text-amber-400">Waiting for Opponent...</div>
           </div>
 
-          <!-- Opponent Banner -->
           <div class="w-full max-w-[500px] flex items-center justify-between mb-3 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
             <div class="flex items-center space-x-3">
               <div id="arena-opponent-avatar-box" class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-lg">
@@ -353,16 +351,13 @@
                 <div id="arena-opponent-name" class="text-sm font-bold text-white">Waiting...</div>
               </div>
             </div>
-            <!-- Dynamic Opponent Emote Overlay -->
             <div id="arena-opponent-emote-display" class="w-10 h-10 flex items-center justify-center text-2xl hidden"></div>
           </div>
 
-          <!-- Board Mount -->
           <div class="w-full max-w-[500px] aspect-square relative">
             <div id="arena-board" class="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-slate-800"></div>
           </div>
 
-          <!-- Player Banner -->
           <div class="w-full max-w-[500px] flex items-center justify-between mt-3 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
             <div class="flex items-center space-x-3">
               <div id="arena-player-avatar-box" class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 text-lg">
@@ -374,24 +369,19 @@
               </div>
             </div>
 
-            <!-- In-Game Arena Emote Picker Trigger -->
             <div class="relative">
               <button onclick="toggleEmotePicker('arena')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
                 <i class="fa-solid fa-face-smile text-amber-400"></i>
                 <span>Emote</span>
               </button>
 
-              <div id="arena-emote-picker" class="hidden absolute right-0 bottom-12 z-40 bg-slate-900 border border-slate-700 rounded-xl p-2 shadow-2xl grid grid-cols-4 gap-2 w-52">
-                <!-- Dynamically populated -->
-              </div>
+              <div id="arena-emote-picker" class="hidden absolute right-0 bottom-12 z-40 bg-slate-900 border border-slate-700 rounded-xl p-2 shadow-2xl grid grid-cols-4 gap-2 w-52"></div>
             </div>
           </div>
 
         </div>
 
-        <!-- Arena Controls & Live Chat -->
         <div class="space-y-6 flex flex-col h-full">
-          
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
             <h3 class="text-base font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-chess-king text-indigo-400"></i>
@@ -405,7 +395,6 @@
             <button onclick="leaveArenaRoom()" class="w-full py-2 bg-slate-950 hover:bg-slate-800 text-slate-400 font-semibold rounded-xl text-xs transition border border-slate-800">Leave Match</button>
           </div>
 
-          <!-- Strict 500-Character Arena Chat Box -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex-1 flex flex-col justify-between space-y-3">
             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
               <h3 class="text-base font-bold text-white flex items-center space-x-2">
@@ -415,18 +404,15 @@
               <span id="arena-chat-counter" class="text-[10px] font-mono font-bold text-slate-500">0/500</span>
             </div>
 
-            <!-- Chat Messages -->
             <div id="arena-chat-messages" class="flex-1 min-h-[160px] max-h-[220px] overflow-y-auto bg-slate-950 rounded-xl p-3 border border-slate-800 space-y-2 text-xs">
               <div class="text-slate-600 italic">Chat messages will appear here...</div>
             </div>
 
-            <!-- Chat Form -->
             <form onsubmit="sendArenaChatMessage(event)" class="flex items-center space-x-2">
               <input type="text" id="arena-chat-input" placeholder="Type a message (500 max)..." maxlength="500" oninput="updateChatCounter(this)" class="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
               <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition">Send</button>
             </form>
           </div>
-
         </div>
 
       </div>
@@ -440,9 +426,7 @@
         <p class="text-slate-400 text-sm">Open crates to discover exclusive cosmetics. Duplicates automatically refund <span class="text-amber-400 font-bold">50% CC</span> value!</p>
       </div>
 
-      <!-- Crate Cards Row -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
         <!-- Pawn Crate -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between text-center relative overflow-hidden group hover:border-slate-700 transition">
           <div class="space-y-4">
@@ -514,7 +498,6 @@
             <span class="text-amber-200 font-mono">10,000 CC</span>
           </button>
         </div>
-
       </div>
 
       <!-- Unboxing Reel Modal -->
@@ -543,12 +526,14 @@
       </div>
     </section>
 
-    <!-- 4. STUDIO / PROFILE VIEW -->
-    <section id="tab-studio" class="tab-content hidden space-y-6">
+    <!-- 4. PROFILE VIEW (CUSTOMIZER + LIVE CARD PREVIEW) -->
+    <section id="tab-profile" class="tab-content hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
+        <!-- Left: Profile Customizer Controls -->
         <div class="lg:col-span-2 space-y-6">
           
+          <!-- Custom Display Name -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
             <h3 class="text-lg font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-id-card text-indigo-400"></i>
@@ -561,10 +546,11 @@
             </div>
           </div>
 
+          <!-- Cosmetic Dropdowns (Clean Text without [RARITY]) -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
             <h3 class="text-lg font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-shirt text-indigo-400"></i>
-              <span>Cosmetics & Loadout Customizer</span>
+              <span>Cosmetics & Loadout Selection</span>
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -599,43 +585,98 @@
 
         </div>
 
-        <!-- Sidebar -->
+        <!-- Right: Live Profile Card Preview -->
         <div class="space-y-6">
-          
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
-            <h3 class="text-base font-bold text-white flex items-center space-x-2">
-              <i class="fa-solid fa-calendar-check text-indigo-400"></i>
-              <span>Daily Strategic Quests</span>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-center space-y-5">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-eye text-indigo-400"></i>
+              <span>Live Profile Preview</span>
             </h3>
 
-            <div id="daily-quests-container" class="space-y-3"></div>
-          </div>
+            <!-- Avatar Box with Live Frame Effect -->
+            <div id="preview-avatar-box" class="relative w-24 h-24 mx-auto flex items-center justify-center rounded-2xl bg-slate-950 border-4 transition-all duration-300">
+              <i id="preview-avatar-icon" class="text-4xl text-indigo-400 fa-solid fa-user"></i>
+            </div>
 
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
-            <h3 class="text-base font-bold text-white flex items-center space-x-2">
-              <i class="fa-solid fa-fire text-amber-400"></i>
-              <span>Win Streak Multipliers</span>
-            </h3>
+            <!-- Profile Info -->
+            <div class="space-y-1">
+              <div id="preview-title" class="text-xs text-indigo-400 font-bold uppercase tracking-wider">Apprentice</div>
+              <div id="preview-name" class="text-xl font-black text-white">Player</div>
+              <div id="preview-rating" class="text-xs font-mono text-slate-400 pt-1">1200 Rating (±350 RD)</div>
+            </div>
 
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-              <div class="flex justify-between items-center text-xs">
-                <span class="text-slate-400 font-semibold">Current Win Streak:</span>
-                <span id="studio-streak-count" class="font-bold text-amber-400">0 Games</span>
+            <!-- Loadout Summary Badges -->
+            <div class="pt-3 border-t border-slate-800 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 flex flex-col items-center">
+                <span class="text-[10px] text-slate-500 uppercase font-bold">Board Skin</span>
+                <span id="preview-board-name" class="font-bold text-slate-200 mt-0.5">Classic Wood</span>
               </div>
-              <div class="space-y-1 pt-1 text-[11px]">
-                <div class="flex justify-between text-slate-400"><span>3 Win Streak:</span><span class="text-amber-300 font-mono">+15 CC / win</span></div>
-                <div class="flex justify-between text-slate-400"><span>5 Win Streak:</span><span class="text-amber-300 font-mono">+30 CC / win</span></div>
-                <div class="flex justify-between text-slate-400"><span>10 Win Streak:</span><span class="text-amber-300 font-mono">+50 CC / win</span></div>
+              <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 flex flex-col items-center">
+                <span class="text-[10px] text-slate-500 uppercase font-bold">Default Emote</span>
+                <span id="preview-emote-symbol" class="text-lg mt-0.5">👍</span>
               </div>
             </div>
           </div>
-
         </div>
 
       </div>
     </section>
 
-    <!-- 5. MASTER CONTROL ADMIN PANEL VIEW -->
+    <!-- 5. DEDICATED QUESTS TAB -->
+    <section id="tab-quests" class="tab-content hidden space-y-6 max-w-5xl mx-auto">
+      <div class="text-center space-y-2">
+        <h2 class="text-3xl font-black text-white">Strategic Daily Quests</h2>
+        <p class="text-slate-400 text-sm">Complete daily tasks and build win streaks to maximize your CogniCoins earnings!</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Daily Strategic Quests List (2 Columns) -->
+        <div class="md:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+          <h3 class="text-base font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-calendar-check text-indigo-400"></i>
+            <span>Daily Objectives</span>
+          </h3>
+
+          <div id="daily-quests-container" class="space-y-3">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Win Streak Multipliers (1 Column) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+          <h3 class="text-base font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-fire text-amber-400"></i>
+            <span>Win Streak Multipliers</span>
+          </h3>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400 font-semibold">Current Win Streak:</span>
+              <span id="studio-streak-count" class="font-bold text-amber-400 text-sm">0 Games</span>
+            </div>
+            
+            <div class="space-y-2 pt-2 text-xs border-t border-slate-800">
+              <div class="flex justify-between text-slate-300">
+                <span>3 Win Streak:</span>
+                <span class="text-amber-300 font-mono font-bold">+15 CC / win</span>
+              </div>
+              <div class="flex justify-between text-slate-300">
+                <span>5 Win Streak:</span>
+                <span class="text-amber-300 font-mono font-bold">+30 CC / win</span>
+              </div>
+              <div class="flex justify-between text-slate-300">
+                <span>10 Win Streak:</span>
+                <span class="text-amber-300 font-mono font-bold">+50 CC / win</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 6. MASTER CONTROL ADMIN PANEL VIEW -->
     <section id="tab-admin" class="tab-content hidden space-y-6">
       <div class="bg-red-950/20 border border-red-900/40 rounded-2xl p-6 shadow-xl space-y-6">
         
@@ -723,11 +764,10 @@
     const PAGE_LOAD_TIME = Date.now();
 
     /* ==========================================================================
-       2. CHESS.COM GLICKO-1 RATING ENGINE ALGORITHM
+       2. CHESS.COM GLICKO-1 RATING ALGORITHM
        ========================================================================== */
     function calculateGlicko1(r1, rd1, r2, rd2, outcome) {
-      // outcome: 1.0 = win, 0.5 = draw, 0.0 = loss
-      const q = Math.LN10 / 400; // 0.00575646273
+      const q = Math.LN10 / 400;
       const pi = Math.PI;
 
       function g(rd) {
@@ -745,7 +785,6 @@
 
       const newRating = r1 + (q / ((1 / Math.pow(rd1, 2)) + (1 / d2))) * g_rd2 * (outcome - expected);
 
-      // Decay / tighten RD on match played, cap bounds between 30 (high confidence) and 350 (unrated/idle)
       let newRD = Math.sqrt(1 / ((1 / Math.pow(rd1, 2)) + (1 / d2)));
       newRD = Math.max(30, Math.min(350, newRD));
 
@@ -759,8 +798,7 @@
     }
 
     /* ==========================================================================
-       3. COSMETIC ITEMS REGISTRY WITH 4-TIER RARITY HIERARCHY
-       (Common -> Rare -> Mythic -> Legendary)
+       3. COSMETIC ITEMS REGISTRY
        ========================================================================== */
     const ALL_ITEMS = {
       nametags: [
@@ -779,12 +817,12 @@
         { id: "avatar_king", name: "King Avatar", rarity: "legendary", icon: "fa-chess-king", class: "badge-legendary" }
       ],
       frames: [
-        { id: "frame_none", name: "No Frame", rarity: "common", class: "badge-common" },
-        { id: "frame_bronze", name: "Bronze Frame", rarity: "common", class: "badge-common" },
-        { id: "frame_silver", name: "Silver Frame", rarity: "rare", class: "badge-rare" },
-        { id: "frame_gold", name: "Gold Frame", rarity: "mythic", class: "badge-mythic" },
-        { id: "frame_diamond", name: "Diamond Frame", rarity: "legendary", class: "badge-legendary" },
-        { id: "frame_neon", name: "Neon Frame", rarity: "legendary", class: "badge-legendary" }
+        { id: "frame_none", name: "No Frame", rarity: "common", class: "badge-common", styleClass: "frame-style-none" },
+        { id: "frame_bronze", name: "Bronze Frame", rarity: "common", class: "badge-common", styleClass: "frame-style-bronze" },
+        { id: "frame_silver", name: "Silver Frame", rarity: "rare", class: "badge-rare", styleClass: "frame-style-silver" },
+        { id: "frame_gold", name: "Gold Frame", rarity: "mythic", class: "badge-mythic", styleClass: "frame-style-gold" },
+        { id: "frame_diamond", name: "Diamond Frame", rarity: "legendary", class: "badge-legendary", styleClass: "frame-style-diamond" },
+        { id: "frame_neon", name: "Neon Frame", rarity: "legendary", class: "badge-legendary", styleClass: "frame-style-neon" }
       ],
       boards: [
         { id: "skin_classic", name: "Classic Wood", rarity: "common", theme: "theme-wood", class: "badge-common" },
@@ -800,7 +838,6 @@
       ]
     };
 
-    /* CRATE ODDS DEFINITIONS */
     const CRATE_ODDS = {
       pawn: { common: 0.70, rare: 0.20, mythic: 0.08, legendary: 0.02, cost: 1000 },
       knight: { common: 0.35, rare: 0.45, mythic: 0.15, legendary: 0.05, cost: 3500 },
@@ -898,7 +935,7 @@
     }
 
     /* ==========================================================================
-       5. PROFILE DATA SYNC WITH GLICKO-1 DB FIELDS
+       5. PROFILE DATA SYNC
        ========================================================================== */
     function loadUserProfile() {
       if (!currentUser) return;
@@ -910,8 +947,8 @@
           val = {
             displayName: currentUser.displayName || "Chess Master",
             email: currentUser.email,
-            elo: 1200,      // Glicko Rating
-            rd: 350,        // Glicko Rating Deviation
+            elo: 1200,
+            rd: 350,
             coins: 1000,
             winStreak: 0,
             equipped: {
@@ -933,7 +970,6 @@
           userRef.set(val);
         }
 
-        // Default Glicko-1 RD if non-existent
         if (val.rd === undefined || val.rd === null) {
           val.rd = 350;
           userRef.update({ rd: 350 });
@@ -952,7 +988,8 @@
 
         userProfileData = val;
         renderHeaderData();
-        renderStudioView();
+        renderProfileView();
+        renderDailyQuests();
 
         if ((currentUser.email || "").toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
           document.getElementById("nav-admin").classList.remove("hidden");
@@ -985,7 +1022,7 @@
     }
 
     /* ==========================================================================
-       6. PRACTICE AI ENGINE (1500 GM Minimax Bot)
+       6. PRACTICE AI ENGINE
        ========================================================================== */
     const PST_PAWN = [
       0,  0,  0,  0,  0,  0,  0,  0,
@@ -1163,17 +1200,15 @@
       document.getElementById("ai-status-banner").innerText = "Resigned. GM AI Wins!";
     }
 
-    /* GLICKO-1 MATCH RESULT PROCESSORS */
     function applyAiMatchWin() {
       if (!userProfileData) return;
 
-      // GM Bot Rating: 1500, RD: 50
       const glicko = calculateGlicko1(
         userProfileData.elo || 1200,
         userProfileData.rd || 350,
         1500,
         50,
-        1.0 // Win
+        1.0
       );
 
       const currentStreak = (userProfileData.winStreak || 0) + 1;
@@ -1207,7 +1242,7 @@
         userProfileData.rd || 350,
         1500,
         50,
-        0.0 // Loss
+        0.0
       );
 
       db.ref("users/" + currentUser.uid).update({
@@ -1557,7 +1592,7 @@
     }
 
     /* ==========================================================================
-       8. MULTI-EMOTE PICKER & LIVE BROADCASTING
+       8. MULTI-EMOTE PICKER
        ========================================================================== */
     function toggleEmotePicker(type) {
       const picker = document.getElementById(`${type}-emote-picker`);
@@ -1620,7 +1655,7 @@
     }
 
     /* ==========================================================================
-       9. COGNISHOP & CS:GO HORIZONTAL REEL UNBOXING STRIP
+       9. COGNISHOP & CS:GO UNBOXING
        ========================================================================== */
     let isUnboxingActive = false;
 
@@ -1766,18 +1801,17 @@
     }
 
     /* ==========================================================================
-       10. STUDIO / PROFILE LOADOUT & DAILY QUESTS
+       10. PROFILE VIEW & LIVE CARD PREVIEW
        ========================================================================== */
-    function renderStudioView() {
+    function renderProfileView() {
       if (!userProfileData) return;
 
       document.getElementById("studio-name-input").value = userProfileData.displayName || "";
       document.getElementById("ai-player-name-display").innerText = userProfileData.displayName || "You";
       document.getElementById("ai-player-title-display").innerText = getEquippedTitleLabel();
-      document.getElementById("studio-streak-count").innerText = `${userProfileData.winStreak || 0} Games`;
 
       populateCosmeticDropdowns();
-      renderDailyQuests();
+      updateLiveProfilePreview();
     }
 
     function getEquippedTitleLabel() {
@@ -1787,6 +1821,7 @@
       return item ? item.name : "Apprentice";
     }
 
+    /* Clean Dropdown Population (NO Rarity tag inside option text) */
     function populateCosmeticDropdowns() {
       const inv = userProfileData.inventory || {};
 
@@ -1815,7 +1850,7 @@
         if (isOwned) {
           const opt = document.createElement("option");
           opt.value = item.id;
-          opt.text = `[${item.rarity.toUpperCase()}] ${item.name}`;
+          opt.text = item.name; // Clean item name without [RARITY] tag
           if (item.id === currentlyEquippedId) opt.selected = true;
           select.appendChild(opt);
         }
@@ -1830,6 +1865,7 @@
         displayName: newName
       }).then(() => {
         alert("Display name updated successfully!");
+        updateLiveProfilePreview();
       });
     }
 
@@ -1837,9 +1873,44 @@
       if (!userProfileData) return;
       db.ref("users/" + currentUser.uid + "/equipped").update({
         [category]: itemId
+      }).then(() => {
+        updateLiveProfilePreview();
       });
     }
 
+    /* Live Card Preview Updater */
+    function updateLiveProfilePreview() {
+      if (!userProfileData) return;
+
+      const equipped = userProfileData.equipped || {};
+
+      // Name & Title
+      document.getElementById("preview-name").innerText = userProfileData.displayName || "Player";
+      document.getElementById("preview-title").innerText = getEquippedTitleLabel();
+      document.getElementById("preview-rating").innerText = `${userProfileData.elo || 1200} Rating (±${userProfileData.rd || 350} RD)`;
+
+      // Avatar Icon
+      const avatarItem = ALL_ITEMS.avatars.find(a => a.id === equipped.avatars) || ALL_ITEMS.avatars[0];
+      const avatarIconEl = document.getElementById("preview-avatar-icon");
+      avatarIconEl.className = `text-4xl text-indigo-400 fa-solid ${avatarItem.icon || 'fa-user'}`;
+
+      // Frame Border Effect
+      const frameItem = ALL_ITEMS.frames.find(f => f.id === equipped.frames) || ALL_ITEMS.frames[0];
+      const avatarBox = document.getElementById("preview-avatar-box");
+      avatarBox.className = `relative w-24 h-24 mx-auto flex items-center justify-center rounded-2xl bg-slate-950 border-4 transition-all duration-300 ${frameItem.styleClass || 'frame-style-none'}`;
+
+      // Board Skin
+      const boardItem = ALL_ITEMS.boards.find(b => b.id === equipped.boards) || ALL_ITEMS.boards[0];
+      document.getElementById("preview-board-name").innerText = boardItem.name;
+
+      // Quick Emote
+      const emoteItem = ALL_ITEMS.emotes.find(e => e.id === equipped.emotes) || ALL_ITEMS.emotes[0];
+      document.getElementById("preview-emote-symbol").innerText = emoteItem.symbol || "👍";
+    }
+
+    /* ==========================================================================
+       11. DEDICATED QUESTS ENGINE
+       ========================================================================== */
     function generateDefaultDailyQuests() {
       return [
         { id: "q1", title: "Play 1 AI Match", desc: "Test your skills against GM AI", reward: 100, progress: 0, target: 1, claimed: false, type: "play_ai" },
@@ -1850,30 +1921,33 @@
 
     function renderDailyQuests() {
       const container = document.getElementById("daily-quests-container");
-      const quests = userProfileData.dailyQuests || generateDefaultDailyQuests();
+      if (!container) return;
+
+      const quests = userProfileData?.dailyQuests || generateDefaultDailyQuests();
+      document.getElementById("studio-streak-count").innerText = `${userProfileData?.winStreak || 0} Games`;
 
       let html = "";
       quests.forEach((q, idx) => {
         const isComplete = q.progress >= q.target;
         html += `
-          <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <div class="text-xs font-bold text-white">${escapeHtml(q.title)}</div>
-                <div class="text-[10px] text-slate-400">${escapeHtml(q.desc)}</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(q.desc)}</div>
               </div>
-              <span class="text-xs font-mono font-bold text-amber-400">+${q.reward} CC</span>
+              <span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">+${q.reward} CC</span>
             </div>
             
-            <div class="flex items-center space-x-3">
-              <div class="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                <div class="h-full bg-indigo-500 rounded-full" style="width: ${Math.min(100, (q.progress / q.target) * 100)}%"></div>
+            <div class="flex items-center space-x-3 pt-1">
+              <div class="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-indigo-500 rounded-full transition-all" style="width: ${Math.min(100, (q.progress / q.target) * 100)}%"></div>
               </div>
               ${q.claimed 
-                ? `<span class="text-[10px] font-bold text-slate-500">Claimed</span>`
+                ? `<span class="text-xs font-bold text-slate-500"><i class="fa-solid fa-check border border-slate-700 rounded-full p-1 text-[9px] mr-1"></i>Claimed</span>`
                 : isComplete 
-                  ? `<button onclick="claimQuestReward(${idx})" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded text-[10px] transition">Claim</button>`
-                  : `<span class="text-[10px] font-bold text-slate-400">${q.progress}/${q.target}</span>`
+                  ? `<button onclick="claimQuestReward(${idx})" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-lg text-xs transition shadow-md">Claim</button>`
+                  : `<span class="text-xs font-mono font-bold text-slate-400">${q.progress}/${q.target}</span>`
               }
             </div>
           </div>
@@ -1912,7 +1986,7 @@
     }
 
     /* ==========================================================================
-       11. MASTER CONTROL ADMIN PANEL (Restricted to zainisgo123@gmail.com)
+       12. MASTER CONTROL ADMIN PANEL
        ========================================================================== */
     function loadAdminUserTable() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;

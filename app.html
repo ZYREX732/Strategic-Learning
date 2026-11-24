@@ -183,7 +183,7 @@
         <div class="flex items-center space-x-3">
           <div class="text-right hidden sm:block">
             <div id="header-user-name" class="text-sm font-bold text-slate-200">Player</div>
-            <div id="header-user-elo" class="text-xs font-medium text-slate-400">1200 ELO</div>
+            <div id="header-user-elo" class="text-xs font-medium text-slate-400">1200 Rating (±350)</div>
           </div>
           <button onclick="userLogout()" title="Logout" class="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition border border-slate-700">
             <i class="fa-solid fa-right-from-bracket"></i>
@@ -213,7 +213,7 @@
               <div>
                 <div class="text-sm font-bold text-white flex items-center space-x-2">
                   <span>Grandmaster AI</span>
-                  <span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-mono">1500+ ELO</span>
+                  <span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-mono">1500 Rating</span>
                 </div>
                 <div class="text-xs text-slate-400">Minimax Engine (3-Ply Pruned)</div>
               </div>
@@ -307,7 +307,7 @@
     <!-- 2. 1v1 ARENA VIEW -->
     <section id="tab-arena" class="tab-content hidden space-y-6">
       
-      <!-- Lobby / Room Controls (When not in game) -->
+      <!-- Lobby / Room Controls -->
       <div id="arena-lobby-panel" class="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6 text-center">
         <div class="w-16 h-16 bg-indigo-600/10 rounded-2xl border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-3xl mx-auto">
           <i class="fa-solid fa-swords"></i>
@@ -330,7 +330,7 @@
         </div>
       </div>
 
-      <!-- Live Match Room (When room active) -->
+      <!-- Live Match Room -->
       <div id="arena-match-panel" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Board Container -->
@@ -389,10 +389,9 @@
 
         </div>
 
-        <!-- Arena Match Controls & Live Chat -->
+        <!-- Arena Controls & Live Chat -->
         <div class="space-y-6 flex flex-col h-full">
           
-          <!-- Actions & Offers Card -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
             <h3 class="text-base font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-chess-king text-indigo-400"></i>
@@ -416,12 +415,12 @@
               <span id="arena-chat-counter" class="text-[10px] font-mono font-bold text-slate-500">0/500</span>
             </div>
 
-            <!-- Chat Message Output -->
+            <!-- Chat Messages -->
             <div id="arena-chat-messages" class="flex-1 min-h-[160px] max-h-[220px] overflow-y-auto bg-slate-950 rounded-xl p-3 border border-slate-800 space-y-2 text-xs">
               <div class="text-slate-600 italic">Chat messages will appear here...</div>
             </div>
 
-            <!-- Chat Input Form -->
+            <!-- Chat Form -->
             <form onsubmit="sendArenaChatMessage(event)" class="flex items-center space-x-2">
               <input type="text" id="arena-chat-input" placeholder="Type a message (500 max)..." maxlength="500" oninput="updateChatCounter(this)" class="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
               <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition">Send</button>
@@ -455,7 +454,6 @@
               <h3 class="text-xl font-bold text-white mt-1">Pawn Crate</h3>
               <p class="text-xs text-slate-400 mt-2">A basic crate with low odds for cool items.</p>
             </div>
-            <!-- Odds Badge Row -->
             <div class="flex items-center justify-center space-x-1 text-[10px] font-bold">
               <span class="px-1.5 py-0.5 rounded badge-common">70% Slate</span>
               <span class="px-1.5 py-0.5 rounded badge-rare">20% Blue</span>
@@ -519,20 +517,16 @@
 
       </div>
 
-      <!-- Unboxing Reel Modal Container -->
+      <!-- Unboxing Reel Modal -->
       <div id="unboxing-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl text-center space-y-6">
           <h3 class="text-xl font-extrabold text-white">Unboxing Cosmetic Crate...</h3>
           
-          <!-- Strip Viewport -->
           <div id="unboxing-strip-container" class="w-full h-36 bg-slate-950 rounded-2xl border-2 border-slate-800 relative flex items-center overflow-hidden">
             <div class="absolute left-1/2 top-0 bottom-0 w-1 bg-amber-400 z-20 shadow-[0_0_12px_#f59e0b]"></div>
-            <div id="unboxing-strip" class="flex items-center space-x-3 px-4">
-              <!-- Dynamically populated 50 items -->
-            </div>
+            <div id="unboxing-strip" class="flex items-center space-x-3 px-4"></div>
           </div>
 
-          <!-- Reveal & Done Section -->
           <div id="unboxing-result-box" class="hidden space-y-4">
             <div id="unboxing-result-card" class="p-6 rounded-2xl border-2 max-w-sm mx-auto space-y-3">
               <div id="unboxing-result-icon" class="text-4xl"></div>
@@ -541,7 +535,6 @@
               <div id="unboxing-duplicate-refund" class="hidden text-xs text-amber-400 font-bold">Duplicate Owned! Refunded 50% CC Value</div>
             </div>
 
-            <!-- Clear Dedicated Done Button -->
             <button onclick="closeUnboxingModal()" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold rounded-xl shadow-xl text-sm transition">
               Done
             </button>
@@ -554,10 +547,8 @@
     <section id="tab-studio" class="tab-content hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Profile Customizer Controls -->
         <div class="lg:col-span-2 space-y-6">
           
-          <!-- Custom Display Name & Header -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
             <h3 class="text-lg font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-id-card text-indigo-400"></i>
@@ -570,7 +561,6 @@
             </div>
           </div>
 
-          <!-- Cosmetic Customizer Dropdowns -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
             <h3 class="text-lg font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-shirt text-indigo-400"></i>
@@ -579,44 +569,29 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               
-              <!-- Name Tag / Title -->
               <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Name Tag Title</label>
-                <select id="select-nametag" onchange="equipCosmetic('nametags', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
-                  <!-- Populated dynamically -->
-                </select>
+                <select id="select-nametag" onchange="equipCosmetic('nametags', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"></select>
               </div>
 
-              <!-- Avatar Icon -->
               <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Avatar Icon</label>
-                <select id="select-avatar" onchange="equipCosmetic('avatars', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
-                  <!-- Populated dynamically -->
-                </select>
+                <select id="select-avatar" onchange="equipCosmetic('avatars', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"></select>
               </div>
 
-              <!-- Avatar Frame -->
               <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Avatar Frame</label>
-                <select id="select-frame" onchange="equipCosmetic('frames', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
-                  <!-- Populated dynamically -->
-                </select>
+                <select id="select-frame" onchange="equipCosmetic('frames', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"></select>
               </div>
 
-              <!-- Chessboard Theme -->
               <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Board Theme</label>
-                <select id="select-board" onchange="equipCosmetic('boards', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
-                  <!-- Populated dynamically -->
-                </select>
+                <select id="select-board" onchange="equipCosmetic('boards', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"></select>
               </div>
 
-              <!-- Default Emote -->
               <div class="sm:col-span-2">
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Default Quick Emote</label>
-                <select id="select-emote" onchange="equipCosmetic('emotes', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
-                  <!-- Populated dynamically -->
-                </select>
+                <select id="select-emote" onchange="equipCosmetic('emotes', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"></select>
               </div>
 
             </div>
@@ -624,22 +599,18 @@
 
         </div>
 
-        <!-- Daily Quests & Win Streak Sidebar -->
+        <!-- Sidebar -->
         <div class="space-y-6">
           
-          <!-- Daily Quests Card -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
             <h3 class="text-base font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-calendar-check text-indigo-400"></i>
               <span>Daily Strategic Quests</span>
             </h3>
 
-            <div id="daily-quests-container" class="space-y-3">
-              <!-- Dynamically rendered 3 Daily Quests -->
-            </div>
+            <div id="daily-quests-container" class="space-y-3"></div>
           </div>
 
-          <!-- Streak Multipliers Card -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
             <h3 class="text-base font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-fire text-amber-400"></i>
@@ -677,16 +648,13 @@
             <p class="text-xs text-red-300/80 mt-1">Strict Restricted Administrative Command & Platform Overrides</p>
           </div>
 
-          <!-- Dynamic Green (OFF) / Red (ON) Maintenance Toggle Button -->
           <button id="admin-maint-btn" onclick="toggleMaintenanceMode()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl text-xs transition shadow-lg border border-emerald-400 flex items-center space-x-2">
             <i class="fa-solid fa-power-off"></i>
             <span id="admin-maint-label">Maintenance Normal (OFF)</span>
           </button>
         </div>
 
-        <!-- Global Action Buttons -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          
           <button onclick="adminGlobalReload()" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl font-bold text-xs text-slate-200 transition text-left flex items-center space-x-3">
             <i class="fa-solid fa-rotate text-indigo-400 text-lg"></i>
             <div>
@@ -698,14 +666,12 @@
           <button onclick="adminPurgeHighElo()" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl font-bold text-xs text-red-400 transition text-left flex items-center space-x-3">
             <i class="fa-solid fa-broom text-red-400 text-lg"></i>
             <div>
-              <div>Purge High ELO (&gt;3000)</div>
+              <div>Purge High Rating (&gt;3000)</div>
               <div class="text-[10px] text-slate-400 font-normal">Reset unnatural scores</div>
             </div>
           </button>
-
         </div>
 
-        <!-- Registered User Accounts Table -->
         <div class="space-y-3">
           <h3 class="text-base font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-users text-slate-400"></i>
@@ -717,14 +683,12 @@
               <thead>
                 <tr class="border-b border-slate-800 bg-slate-900/60 text-slate-400">
                   <th class="p-3">User / Email</th>
-                  <th class="p-3">ELO</th>
+                  <th class="p-3">Glicko Rating (RD)</th>
                   <th class="p-3">Coins</th>
                   <th class="p-3 text-right">Admin Controls</th>
                 </tr>
               </thead>
-              <tbody id="admin-user-table-body" class="divide-y divide-slate-800/60 text-slate-300">
-                <!-- Dynamically populated -->
-              </tbody>
+              <tbody id="admin-user-table-body" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
             </table>
           </div>
         </div>
@@ -736,7 +700,7 @@
 
   <script>
     /* ==========================================================================
-       1. FIREBASE CONFIGURATION & SYSTEM CONSTANTS
+       1. FIREBASE CONFIGURATION & CONSTANTS
        ========================================================================== */
     const firebaseConfig = {
       apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
@@ -759,7 +723,43 @@
     const PAGE_LOAD_TIME = Date.now();
 
     /* ==========================================================================
-       2. COSMETIC ITEMS REGISTRY WITH 4-TIER RARITY SYSTEM
+       2. CHESS.COM GLICKO-1 RATING ENGINE ALGORITHM
+       ========================================================================== */
+    function calculateGlicko1(r1, rd1, r2, rd2, outcome) {
+      // outcome: 1.0 = win, 0.5 = draw, 0.0 = loss
+      const q = Math.LN10 / 400; // 0.00575646273
+      const pi = Math.PI;
+
+      function g(rd) {
+        return 1 / Math.sqrt(1 + (3 * Math.pow(q, 2) * Math.pow(rd, 2)) / Math.pow(pi, 2));
+      }
+
+      function E(r, r_opp, g_rd) {
+        return 1 / (1 + Math.pow(10, (-g_rd * (r - r_opp)) / 400));
+      }
+
+      const g_rd2 = g(rd2);
+      const expected = E(r1, r2, g_rd2);
+
+      const d2 = 1 / (Math.pow(q, 2) * Math.pow(g_rd2, 2) * expected * (1 - expected));
+
+      const newRating = r1 + (q / ((1 / Math.pow(rd1, 2)) + (1 / d2))) * g_rd2 * (outcome - expected);
+
+      // Decay / tighten RD on match played, cap bounds between 30 (high confidence) and 350 (unrated/idle)
+      let newRD = Math.sqrt(1 / ((1 / Math.pow(rd1, 2)) + (1 / d2)));
+      newRD = Math.max(30, Math.min(350, newRD));
+
+      const delta = Math.round(newRating - r1);
+
+      return {
+        rating: Math.round(newRating),
+        rd: Math.round(newRD),
+        delta: delta
+      };
+    }
+
+    /* ==========================================================================
+       3. COSMETIC ITEMS REGISTRY WITH 4-TIER RARITY HIERARCHY
        (Common -> Rare -> Mythic -> Legendary)
        ========================================================================== */
     const ALL_ITEMS = {
@@ -800,21 +800,19 @@
       ]
     };
 
-    /* CRATE ODDS DEFINITIONS (Common -> Rare -> Mythic -> Legendary) */
+    /* CRATE ODDS DEFINITIONS */
     const CRATE_ODDS = {
       pawn: { common: 0.70, rare: 0.20, mythic: 0.08, legendary: 0.02, cost: 1000 },
       knight: { common: 0.35, rare: 0.45, mythic: 0.15, legendary: 0.05, cost: 3500 },
       grandmaster: { common: 0.10, rare: 0.30, mythic: 0.40, legendary: 0.20, cost: 10000 }
     };
 
-    /* Title Synonym Normalizer */
     const TITLE_SYNONYMS = {
       "tactition": "nametag_tactician",
       "tactician": "nametag_tactician",
       "the tactician": "nametag_tactician"
     };
 
-    /* Helper: Array / Object Inventory Parser */
     function parseCategory(data, defaultArr) {
       if (!data) return defaultArr;
       if (Array.isArray(data)) return [...data];
@@ -823,33 +821,27 @@
     }
 
     /* ==========================================================================
-       3. GLOBAL APP STATE
+       4. GLOBAL STATE & AUTHENTICATION
        ========================================================================== */
     let currentUser = null;
     let userProfileData = null;
     let isMaintenanceActive = false;
 
-    // AI Match State
     let aiBoard = null;
     let aiGame = null;
     let aiPlayerColor = 'w';
     let aiSelectedSquare = null;
 
-    // Arena Match State
     let arenaBoard = null;
     let arenaGame = null;
     let currentArenaRoomId = null;
     let arenaPlayerColor = 'w';
     let arenaSelectedSquare = null;
 
-    /* Piece Image Loader */
     function pieceThemeUrl(piece) {
       return `https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/${piece}.png`;
     }
 
-    /* ==========================================================================
-       4. AUTHENTICATION & MAINTENANCE LISTENERS
-       ========================================================================== */
     auth.onAuthStateChanged((user) => {
       if (user) {
         currentUser = user;
@@ -906,7 +898,7 @@
     }
 
     /* ==========================================================================
-       5. PROFILE DATA SYNC & INVENTORY PARSER
+       5. PROFILE DATA SYNC WITH GLICKO-1 DB FIELDS
        ========================================================================== */
     function loadUserProfile() {
       if (!currentUser) return;
@@ -915,11 +907,11 @@
       userRef.on("value", (snap) => {
         let val = snap.val();
         if (!val) {
-          // Initialize fresh user profile
           val = {
             displayName: currentUser.displayName || "Chess Master",
             email: currentUser.email,
-            elo: 1200,
+            elo: 1200,      // Glicko Rating
+            rd: 350,        // Glicko Rating Deviation
             coins: 1000,
             winStreak: 0,
             equipped: {
@@ -941,7 +933,12 @@
           userRef.set(val);
         }
 
-        // Normalize inventory parsing
+        // Default Glicko-1 RD if non-existent
+        if (val.rd === undefined || val.rd === null) {
+          val.rd = 350;
+          userRef.update({ rd: 350 });
+        }
+
         val.inventory = val.inventory || {};
         val.inventory.nametags = parseCategory(val.inventory.nametags, ["nametag_apprentice", "nametag_tactician"]);
         val.inventory.avatars = parseCategory(val.inventory.avatars, ["avatar_pawn"]);
@@ -949,7 +946,6 @@
         val.inventory.boards = parseCategory(val.inventory.boards, ["skin_classic"]);
         val.inventory.emotes = parseCategory(val.inventory.emotes, ["emote_thumbsup"]);
 
-        // Ensure tactician support
         if (!val.inventory.nametags.includes("nametag_tactician")) {
           val.inventory.nametags.push("nametag_tactician");
         }
@@ -958,7 +954,6 @@
         renderHeaderData();
         renderStudioView();
 
-        // Reveal Admin Tab if Admin
         if ((currentUser.email || "").toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
           document.getElementById("nav-admin").classList.remove("hidden");
           loadAdminUserTable();
@@ -970,12 +965,9 @@
       if (!userProfileData) return;
       document.getElementById("header-user-coins").innerText = (userProfileData.coins || 0).toLocaleString();
       document.getElementById("header-user-name").innerText = userProfileData.displayName || "Player";
-      document.getElementById("header-user-elo").innerText = (userProfileData.elo || 1200) + " ELO";
+      document.getElementById("header-user-elo").innerText = `${userProfileData.elo || 1200} Rating (±${userProfileData.rd || 350})`;
     }
 
-    /* ==========================================================================
-       6. NAVIGATION TABS
-       ========================================================================== */
     function switchTab(tabId) {
       $(".tab-content").addClass("hidden");
       $(".nav-tab").removeClass("text-indigo-400 border-indigo-500").addClass("text-slate-400 border-transparent");
@@ -993,7 +985,7 @@
     }
 
     /* ==========================================================================
-       7. PRACTICE AI ENGINE (1500+ GM Minimax with Alpha-Beta & Opening Anti-Scholar)
+       6. PRACTICE AI ENGINE (1500 GM Minimax Bot)
        ========================================================================== */
     const PST_PAWN = [
       0,  0,  0,  0,  0,  0,  0,  0,
@@ -1048,7 +1040,6 @@
       }
 
       const moves = game.moves({ verbose: true });
-      // MVV-LVA move ordering
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
 
       if (isMaximizing) {
@@ -1077,16 +1068,13 @@
     }
 
     function getBestAiMove(game) {
-      // Anti-Scholar's Mate Theoretical Defenses
       const fen = game.fen();
       if (fen.startsWith("r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR")) {
-        // Scholar's attack with Qf3 -> defense Nf6
         const legalMoves = game.moves({ verbose: true });
         const nf6 = legalMoves.find(m => m.from === 'g8' && m.to === 'f6');
         if (nf6) return nf6;
       }
       if (fen.startsWith("r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR")) {
-        // Qh5 attack -> g6 defense
         const legalMoves = game.moves({ verbose: true });
         const g6 = legalMoves.find(m => m.from === 'g7' && m.to === 'g6');
         if (g6) return g6;
@@ -1145,9 +1133,7 @@
 
     function selectAiSide(side) {
       if (aiGame && aiGame.history().length > 0 && !aiGame.game_over()) {
-        if (!confirm("Switching side mid-game counts as a resignation. Proceed?")) {
-          return;
-        }
+        if (!confirm("Switching side mid-game counts as a resignation. Proceed?")) return;
         applyAiMatchLoss();
       }
 
@@ -1165,9 +1151,7 @@
 
     function resetAiMatchConfirm() {
       if (aiGame && aiGame.history().length > 0 && !aiGame.game_over()) {
-        if (!confirm("Starting a new game will apply a resignation penalty. Proceed?")) {
-          return;
-        }
+        if (!confirm("Starting a new game will apply a resignation penalty. Proceed?")) return;
         applyAiMatchLoss();
       }
       setupAiGame();
@@ -1179,19 +1163,20 @@
       document.getElementById("ai-status-banner").innerText = "Resigned. GM AI Wins!";
     }
 
-    function applyAiMatchLoss() {
-      if (!userProfileData) return;
-      const newElo = Math.max(100, (userProfileData.elo || 1200) - 15);
-      db.ref("users/" + currentUser.uid).update({
-        elo: newElo,
-        winStreak: 0
-      });
-    }
-
+    /* GLICKO-1 MATCH RESULT PROCESSORS */
     function applyAiMatchWin() {
       if (!userProfileData) return;
+
+      // GM Bot Rating: 1500, RD: 50
+      const glicko = calculateGlicko1(
+        userProfileData.elo || 1200,
+        userProfileData.rd || 350,
+        1500,
+        50,
+        1.0 // Win
+      );
+
       const currentStreak = (userProfileData.winStreak || 0) + 1;
-      
       let streakBonus = 0;
       if (currentStreak >= 10) streakBonus = 50;
       else if (currentStreak >= 5) streakBonus = 30;
@@ -1199,18 +1184,37 @@
 
       const winPayout = 50 + streakBonus;
       const newCoins = (userProfileData.coins || 0) + winPayout;
-      const newElo = (userProfileData.elo || 1200) + 20;
 
       db.ref("users/" + currentUser.uid).update({
         coins: newCoins,
-        elo: newElo,
+        elo: glicko.rating,
+        rd: glicko.rd,
         winStreak: currentStreak
       });
 
       checkQuestProgress("win_ai");
       checkQuestProgress("win_any");
 
-      alert(`Victory! You won +${winPayout} CC (+50 Win ${streakBonus ? `+${streakBonus} Streak` : ''}) and +20 ELO!`);
+      const deltaFormatted = glicko.delta >= 0 ? `+${glicko.delta}` : `${glicko.delta}`;
+      alert(`Victory! ${deltaFormatted} Rating (New: ${glicko.rating}, ±${glicko.rd} RD). Earned +${winPayout} CC!`);
+    }
+
+    function applyAiMatchLoss() {
+      if (!userProfileData) return;
+
+      const glicko = calculateGlicko1(
+        userProfileData.elo || 1200,
+        userProfileData.rd || 350,
+        1500,
+        50,
+        0.0 // Loss
+      );
+
+      db.ref("users/" + currentUser.uid).update({
+        elo: glicko.rating,
+        rd: glicko.rd,
+        winStreak: 0
+      });
     }
 
     function makeAiEngineMove() {
@@ -1233,7 +1237,6 @@
         $(`#ai-board .square-${lastTo}`).addClass("highlight-move");
       }
 
-      // Update History
       const moves = aiGame.history();
       const historyContainer = document.getElementById("ai-move-history");
       if (moves.length === 0) {
@@ -1273,7 +1276,6 @@
       }
     }
 
-    // Delegated Click-to-Move handlers for AI board
     $(document).on("click", "#ai-board .square-55d63", function () {
       if (!aiGame || aiGame.game_over()) return;
       if (aiGame.turn() !== aiPlayerColor) return;
@@ -1326,7 +1328,7 @@
     }
 
     /* ==========================================================================
-       8. 1v1 MULTIPLAYER ARENA SYSTEM
+       7. 1v1 MULTIPLAYER ARENA SYSTEM
        ========================================================================== */
     function createArenaRoom() {
       const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -1336,6 +1338,8 @@
         hostUid: currentUser.uid,
         hostName: userProfileData.displayName || "Player",
         hostTitle: getEquippedTitleLabel(),
+        hostElo: userProfileData.elo || 1200,
+        hostRd: userProfileData.rd || 350,
         fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
         status: "waiting",
         createdAt: firebase.database.ServerValue.TIMESTAMP
@@ -1364,6 +1368,8 @@
             guestUid: currentUser.uid,
             guestName: userProfileData.displayName || "Player",
             guestTitle: getEquippedTitleLabel(),
+            guestElo: userProfileData.elo || 1200,
+            guestRd: userProfileData.rd || 350,
             status: "active"
           });
         }
@@ -1428,7 +1434,6 @@
       });
     }
 
-    // Delegated Click-to-Move for Arena
     $(document).on("click", "#arena-board .square-55d63", function () {
       if (!arenaGame || arenaGame.game_over() || !currentArenaRoomId) return;
       if (arenaGame.turn() !== arenaPlayerColor) return;
@@ -1481,7 +1486,7 @@
         const winnerColor = arenaGame.turn() === 'w' ? 'b' : 'w';
         if (winnerColor === arenaPlayerColor) {
           db.ref("arena_rooms/" + currentArenaRoomId).update({ winner: currentUser.uid });
-          applyAiMatchWin(); // Reuse win payout logic
+          applyAiMatchWin();
         } else {
           applyAiMatchLoss();
         }
@@ -1506,14 +1511,13 @@
     function leaveArenaRoom() {
       if (currentArenaRoomId) {
         db.ref("arena_rooms/" + currentArenaRoomId).off();
-        db.ref("arena_chat/" + currentArenaRoomId).remove(); // Auto-cleanup chat on leave
+        db.ref("arena_chat/" + currentArenaRoomId).remove();
       }
       currentArenaRoomId = null;
       $("#arena-match-panel").addClass("hidden");
       $("#arena-lobby-panel").removeClass("hidden");
     }
 
-    /* Strict 500-Character Arena Chat Handler */
     function updateChatCounter(input) {
       document.getElementById("arena-chat-counter").innerText = `${input.value.length}/500`;
     }
@@ -1553,7 +1557,7 @@
     }
 
     /* ==========================================================================
-       9. MULTI-EMOTE PICKER & LIVE BROADCASTING
+       8. MULTI-EMOTE PICKER & LIVE BROADCASTING
        ========================================================================== */
     function toggleEmotePicker(type) {
       const picker = document.getElementById(`${type}-emote-picker`);
@@ -1616,7 +1620,7 @@
     }
 
     /* ==========================================================================
-       10. COGNISHOP & CS:GO HORIZONTAL REEL UNBOXING STRIP
+       9. COGNISHOP & CS:GO HORIZONTAL REEL UNBOXING STRIP
        ========================================================================== */
     let isUnboxingActive = false;
 
@@ -1630,11 +1634,9 @@
         return alert("Insufficient CogniCoins (CC) balance to unlock this crate.");
       }
 
-      // Deduct coins non-destructively
       const updatedCoins = currentCoins - oddsData.cost;
       db.ref("users/" + currentUser.uid).update({ coins: updatedCoins });
 
-      // Roll item based on odds
       const wonItem = rollCrateItem(crateType);
       startUnboxingAnimation(crateType, wonItem);
 
@@ -1651,7 +1653,6 @@
       else if (rand < odds.common + odds.rare + odds.mythic) targetRarity = "mythic";
       else targetRarity = "legendary";
 
-      // Pool items matching selected rarity
       const pool = [];
       Object.keys(ALL_ITEMS).forEach(cat => {
         ALL_ITEMS[cat].forEach(item => {
@@ -1674,7 +1675,6 @@
       strip.style.transition = "none";
       strip.style.transform = "translateX(0px)";
 
-      // Generate 50 items for horizontal roll strip
       let stripItems = [];
       const allPossibleItems = [];
       Object.keys(ALL_ITEMS).forEach(cat => {
@@ -1685,13 +1685,12 @@
         const rnd = allPossibleItems[Math.floor(Math.random() * allPossibleItems.length)];
         stripItems.push(rnd);
       }
-      stripItems.push(wonItem); // Winning item at index 45
+      stripItems.push(wonItem);
       for (let i = 0; i < 4; i++) {
         const rnd = allPossibleItems[Math.floor(Math.random() * allPossibleItems.length)];
         stripItems.push(rnd);
       }
 
-      // Render Strip
       let html = "";
       stripItems.forEach(item => {
         const borderClass = `rarity-${item.rarity}-card`;
@@ -1706,14 +1705,12 @@
       });
       strip.innerHTML = html;
 
-      // Animate Reel Roll
       setTimeout(() => {
         const targetOffset = 45 * (112 + 12) - 180 + Math.floor(Math.random() * 40 - 20);
         strip.style.transition = "transform 4.5s cubic-bezier(0.1, 1, 0.1, 1)";
         strip.style.transform = `translateX(-${targetOffset}px)`;
       }, 50);
 
-      // Finish reveal after animation completes
       setTimeout(() => {
         finalizeUnboxedItem(wonItem, CRATE_ODDS[crateType].cost);
       }, 4800);
@@ -1740,14 +1737,10 @@
 
       if (!isDuplicate) {
         currentCategoryInventory.push(item.id);
-        const updatedInventory = { ...userProfileData.inventory };
-        updatedInventory[cat] = currentCategoryInventory;
-
         db.ref("users/" + currentUser.uid + "/inventory").update({
           [cat]: currentCategoryInventory
         });
       } else {
-        // Apply 50% CC Refund for duplicates
         const refundAmount = Math.floor(crateCost * 0.5);
         const newBalance = (userProfileData.coins || 0) + refundAmount;
 
@@ -1755,7 +1748,6 @@
         $("#unboxing-duplicate-refund").text(`Duplicate Owned! Refunded +${refundAmount} CC (50%)`).removeClass("hidden");
       }
 
-      // Render Result Card
       const resCard = document.getElementById("unboxing-result-card");
       resCard.className = `p-6 rounded-2xl border-2 max-w-sm mx-auto space-y-3 rarity-${item.rarity}-card rarity-${item.rarity}-bg`;
       document.getElementById("unboxing-result-icon").innerHTML = getItemDisplayIcon(item);
@@ -1774,7 +1766,7 @@
     }
 
     /* ==========================================================================
-       11. STUDIO / PROFILE LOADOUT & DAILY QUESTS
+       10. STUDIO / PROFILE LOADOUT & DAILY QUESTS
        ========================================================================== */
     function renderStudioView() {
       if (!userProfileData) return;
@@ -1798,23 +1790,18 @@
     function populateCosmeticDropdowns() {
       const inv = userProfileData.inventory || {};
 
-      // Name Tags
       const nametags = parseCategory(inv.nametags, ["nametag_apprentice", "nametag_tactician"]);
       populateSelect("select-nametag", ALL_ITEMS.nametags, nametags, userProfileData.equipped?.nametags);
 
-      // Avatars
       const avatars = parseCategory(inv.avatars, ["avatar_pawn"]);
       populateSelect("select-avatar", ALL_ITEMS.avatars, avatars, userProfileData.equipped?.avatars);
 
-      // Frames
       const frames = parseCategory(inv.frames, ["frame_none"]);
       populateSelect("select-frame", ALL_ITEMS.frames, frames, userProfileData.equipped?.frames);
 
-      // Board Skins
       const boards = parseCategory(inv.boards, ["skin_classic"]);
       populateSelect("select-board", ALL_ITEMS.boards, boards, userProfileData.equipped?.boards);
 
-      // Emotes
       const emotes = parseCategory(inv.emotes, ["emote_thumbsup"]);
       populateSelect("select-emote", ALL_ITEMS.emotes, emotes, userProfileData.equipped?.emotes);
     }
@@ -1853,7 +1840,6 @@
       });
     }
 
-    /* DAILY QUESTS ENGINE */
     function generateDefaultDailyQuests() {
       return [
         { id: "q1", title: "Play 1 AI Match", desc: "Test your skills against GM AI", reward: 100, progress: 0, target: 1, claimed: false, type: "play_ai" },
@@ -1926,7 +1912,7 @@
     }
 
     /* ==========================================================================
-       12. MASTER CONTROL ADMIN PANEL (Restricted to zainisgo123@gmail.com)
+       11. MASTER CONTROL ADMIN PANEL (Restricted to zainisgo123@gmail.com)
        ========================================================================== */
     function loadAdminUserTable() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
@@ -1944,12 +1930,12 @@
                 <div class="font-bold text-white">${escapeHtml(u.displayName || "Player")}</div>
                 <div class="text-[10px] text-slate-500">${escapeHtml(u.email || uid)}</div>
               </td>
-              <td class="p-3 font-mono text-slate-300">${u.elo || 1200}</td>
+              <td class="p-3 font-mono text-slate-300">${u.elo || 1200} Rating (±${u.rd || 350})</td>
               <td class="p-3 font-mono text-amber-400 font-bold">${(u.coins || 0).toLocaleString()} CC</td>
               <td class="p-3 text-right space-x-1">
                 <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded text-[10px] font-bold transition">Grant CC</button>
                 <button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-bold transition">Reset CC</button>
-                <button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-bold transition">Reset ELO</button>
+                <button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-bold transition">Reset Glicko</button>
                 <button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded text-[10px] font-bold transition">Delete</button>
               </td>
             </tr>
@@ -1959,7 +1945,6 @@
       });
     }
 
-    /* Interactive Custom Coin Grant */
     function adminGrantCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const input = prompt("Enter CogniCoins (CC) amount to grant:", "5000");
@@ -1985,8 +1970,8 @@
 
     function adminResetElo(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      if (confirm("Reset user ELO to 1,200?")) {
-        db.ref("users/" + uid + "/elo").set(1200).then(() => loadAdminUserTable());
+      if (confirm("Reset user Glicko rating to 1,200 (RD: 350)?")) {
+        db.ref("users/" + uid).update({ elo: 1200, rd: 350 }).then(() => loadAdminUserTable());
       }
     }
 
@@ -2025,12 +2010,12 @@
 
     function adminPurgeHighElo() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      if (confirm("Purge all ELO ratings above 3000 to 1200?")) {
+      if (confirm("Purge all Glicko ratings above 3000 down to 1200?")) {
         db.ref("users").once("value").then((snap) => {
           const users = snap.val() || {};
           Object.keys(users).forEach(uid => {
             if ((users[uid].elo || 0) > 3000) {
-              db.ref("users/" + uid + "/elo").set(1200);
+              db.ref("users/" + uid).update({ elo: 1200, rd: 350 });
             }
           });
           loadAdminUserTable();
@@ -2038,7 +2023,6 @@
       }
     }
 
-    /* Utility: HTML Escape Sanitizer */
     function escapeHtml(str) {
       if (!str) return "";
       return String(str)
@@ -2049,7 +2033,6 @@
         .replace(/'/g, "&#039;");
     }
 
-    /* Initial Setup Trigger */
     $(document).ready(() => {
       setupAiGame();
     });

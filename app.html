@@ -88,14 +88,26 @@
 
     /* Animated Emotes Keyframes */
     @keyframes emoteBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    @keyframes emotePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
-    @keyframes emoteShake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
-    @keyframes emoteGlow { 0%, 100% { filter: drop-shadow(0 0 2px #f59e0b); } 50% { filter: drop-shadow(0 0 10px #ef4444); } }
+    @keyframes emotePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+    @keyframes emoteShake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); } }
+    @keyframes emoteGlow { 0%, 100% { filter: drop-shadow(0 0 2px #f59e0b); } 50% { filter: drop-shadow(0 0 12px #ef4444); } }
 
-    .emote-bounce { animation: emoteBounce 1s infinite; }
-    .emote-pulse { animation: emotePulse 1.2s infinite; }
-    .emote-shake { animation: emoteShake 0.6s infinite; }
-    .emote-glow { animation: emoteGlow 1.5s infinite; }
+    .emote-bounce { animation: emoteBounce 0.8s infinite; }
+    .emote-pulse { animation: emotePulse 1s infinite; }
+    .emote-shake { animation: emoteShake 0.5s infinite; }
+    .emote-glow { animation: emoteGlow 1.2s infinite; }
+
+    /* Emote Pop Animation */
+    .emote-pop {
+      animation: popFade 3.5s forwards;
+    }
+    @keyframes popFade {
+      0% { opacity: 0; transform: scale(0.4) translateY(10px); }
+      15% { opacity: 1; transform: scale(1.2) translateY(-4px); }
+      25% { transform: scale(1) translateY(0); }
+      80% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-15px); }
+    }
 
     /* Crate Unboxing CS:GO Strip CSS */
     .crate-strip-container {
@@ -196,11 +208,19 @@
       <!-- Player Stats Bar & Logout -->
       <div class="flex items-center gap-3">
         <div class="flex items-center bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 gap-3">
+          <!-- Win Streak Badge -->
+          <div class="flex items-center gap-1 text-amber-500 font-bold text-xs" title="Active Win Streak">
+            <i class="fa-solid fa-fire text-amber-500 animate-pulse"></i>
+            <span id="nav-streak">0</span>
+          </div>
+          <div class="h-4 w-[1px] bg-slate-700"></div>
+          <!-- Coins -->
           <div class="flex items-center gap-1.5 text-amber-400 font-bold text-sm" title="CogniCoins (CC)">
             <i class="fa-solid fa-coins text-amber-400"></i>
             <span id="nav-coins">1,000</span> <span class="text-xs text-amber-500 font-normal">CC</span>
           </div>
           <div class="h-4 w-[1px] bg-slate-700"></div>
+          <!-- Elo -->
           <div class="flex items-center gap-1.5 text-indigo-400 font-bold text-sm" title="Elo Rating">
             <i class="fa-solid fa-chart-line"></i>
             <span id="nav-elo">1500</span>
@@ -217,6 +237,27 @@
 
   <!-- Main Content Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- DAILY QUESTS & STREAK BANNER WIDGET -->
+    <div class="mb-6 bg-slate-900 border border-indigo-500/20 rounded-2xl p-4 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-2xl flex-shrink-0">
+          <i class="fa-solid fa-scroll"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            Daily Strategic Quests
+            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">Resets Daily</span>
+          </h2>
+          <p class="text-xs text-slate-400">Complete daily chess challenges to earn extra CogniCoins!</p>
+        </div>
+      </div>
+
+      <!-- Quests Cards Container -->
+      <div id="daily-quests-container" class="w-full md:w-auto grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- Quests populated by JS -->
+      </div>
+    </div>
 
     <!-- SECTION: PLAY VS AI -->
     <section id="section-ai" class="space-y-6">
@@ -249,7 +290,7 @@
           </div>
 
           <!-- Player Bar -->
-          <div class="w-full flex items-center justify-between mt-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl">
+          <div class="w-full flex items-center justify-between mt-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
               <div id="ai-user-frame-container" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg frame-none overflow-hidden">
                 <i id="ai-user-icon" class="fa-solid fa-user"></i>
@@ -262,7 +303,14 @@
                 <div class="text-xs text-slate-400">Rating: <span id="ai-user-elo-text" class="text-indigo-400 font-semibold">1500</span></div>
               </div>
             </div>
-            <div id="ai-player-emote" class="text-2xl hidden"></div>
+
+            <!-- In-Game Emote Trigger & Display -->
+            <div class="flex items-center gap-3">
+              <div id="ai-player-emote-display" class="text-3xl hidden"></div>
+              <button onclick="triggerInGameEmote('ai')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+                <i class="fa-solid fa-face-smile"></i> Emote
+              </button>
+            </div>
           </div>
         </div>
 
@@ -287,9 +335,6 @@
                   <i class="fa-solid fa-shuffle"></i> Random
                 </button>
               </div>
-              <p id="side-locked-msg" class="text-xs text-amber-400 mt-2 hidden">
-                <i class="fa-solid fa-circle-exclamation mr-1"></i> Side is locked during an active match.
-              </p>
             </div>
 
             <!-- Game Actions -->
@@ -311,12 +356,12 @@
             </div>
           </div>
 
-          <!-- Bottom Rewards Info -->
+          <!-- Rewards Info -->
           <div class="bg-indigo-950/40 border border-indigo-500/20 rounded-xl p-4 text-xs text-indigo-300 flex items-center gap-3">
             <i class="fa-solid fa-award text-2xl text-amber-400 flex-shrink-0"></i>
             <div>
-              <div class="font-bold text-white">Earn CogniCoins</div>
-              <div>Defeat the Grandmaster Bot to earn <span class="text-amber-400 font-bold">+50 CC</span> and boost your Elo rating!</div>
+              <div class="font-bold text-white">Earn Rewards</div>
+              <div>Defeat the Grandmaster Bot for <span class="text-amber-400 font-bold">+50 CC</span> and Win Streak bonuses!</div>
             </div>
           </div>
         </div>
@@ -332,7 +377,7 @@
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center">
           
           <!-- Opponent Card -->
-          <div class="w-full flex items-center justify-between mb-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl">
+          <div class="w-full flex items-center justify-between mb-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
               <div id="arena-opp-frame" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 text-lg frame-none overflow-hidden">
                 <i id="arena-opp-icon" class="fa-solid fa-user"></i>
@@ -345,7 +390,7 @@
                 <div class="text-xs text-slate-400">Elo: <span id="arena-opp-elo" class="text-indigo-400 font-semibold">----</span></div>
               </div>
             </div>
-            <div id="arena-opp-emote" class="text-2xl hidden"></div>
+            <div id="arena-opp-emote-display" class="text-3xl hidden"></div>
           </div>
 
           <!-- Board Mount -->
@@ -354,7 +399,7 @@
           </div>
 
           <!-- Self Card -->
-          <div class="w-full flex items-center justify-between mt-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl">
+          <div class="w-full flex items-center justify-between mt-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
               <div id="arena-self-frame" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg frame-none overflow-hidden">
                 <i id="arena-self-icon" class="fa-solid fa-user"></i>
@@ -367,7 +412,12 @@
                 <div class="text-xs text-slate-400">Elo: <span id="arena-self-elo" class="text-indigo-400 font-semibold">1500</span></div>
               </div>
             </div>
-            <div id="arena-self-emote" class="text-2xl hidden"></div>
+            <div class="flex items-center gap-3">
+              <div id="arena-self-emote-display" class="text-3xl hidden"></div>
+              <button onclick="triggerInGameEmote('arena')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+                <i class="fa-solid fa-face-smile"></i> Emote
+              </button>
+            </div>
           </div>
 
         </div>
@@ -397,7 +447,7 @@
               <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Join Room Code</label>
                 <div class="flex gap-2">
-                  <input type="text" id="arena-room-input" placeholder="6-digit code" uppercase maxlength="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white font-mono tracking-widest uppercase focus:outline-none focus:border-indigo-500">
+                  <input type="text" id="arena-room-input" placeholder="6-digit code" maxlength="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white font-mono tracking-widest uppercase focus:outline-none focus:border-indigo-500">
                   <button onclick="joinArenaRoom()" class="px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700 transition">
                     Join
                   </button>
@@ -427,16 +477,17 @@
               </div>
             </div>
 
-            <!-- Real-Time Match Chat -->
+            <!-- Real-Time Match Chat (Strict 500 Char Cap + Counter) -->
             <div id="arena-chat-box" class="hidden flex flex-col h-64 bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
-              <div class="bg-slate-900 px-3 py-2 border-b border-slate-800 text-xs font-semibold text-slate-400 flex items-center gap-2">
-                <i class="fa-solid fa-comments text-indigo-400"></i> Match Chat
+              <div class="bg-slate-900 px-3 py-2 border-b border-slate-800 text-xs font-semibold text-slate-400 flex items-center justify-between">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-comments text-indigo-400"></i> Match Chat</span>
+                <span id="chat-char-counter" class="text-[10px] font-mono text-slate-500">0/500</span>
               </div>
               <div id="chat-messages" class="flex-1 p-3 overflow-y-auto space-y-2 text-xs">
                 <div class="text-slate-500 italic text-center text-[11px]">Chat messages auto-delete after match ends.</div>
               </div>
               <form onsubmit="sendChatMessage(event)" class="p-2 border-t border-slate-800 flex gap-2 bg-slate-900">
-                <input type="text" id="chat-input" placeholder="Type a message..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                <input type="text" id="chat-input" maxlength="500" oninput="updateChatCharCount()" placeholder="Type a message (max 500 chars)..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
                 <button type="submit" class="px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs transition">
                   Send
                 </button>
@@ -909,6 +960,13 @@
       }
     };
 
+    // Daily Quest Catalog Definition
+    const DAILY_QUESTS_CONFIG = {
+      q_black_win: { id: 'q_black_win', title: 'Black Victory', desc: 'Win 1 match playing as Black', req: 1, reward: 75 },
+      q_play_3: { id: 'q_play_3', title: 'Battle Hardened', desc: 'Play 3 total chess games', req: 3, reward: 50 },
+      q_streak_2: { id: 'q_streak_2', title: 'Hot Streak', desc: 'Achieve a 2-Game Win Streak', req: 2, reward: 100 }
+    };
+
     // 2. AUTHENTICATION & MAINTENANCE MODE LISTENERS
     auth.onAuthStateChanged((user) => {
       if (!user) {
@@ -954,6 +1012,8 @@
 
       userRef.on('value', (snap) => {
         let val = snap.val();
+        const todayStr = new Date().toISOString().split('T')[0];
+
         if (!val) {
           // Initialize new profile defaults
           val = {
@@ -962,24 +1022,46 @@
             elo: 1500,
             coins: 1000,
             gamesPlayed: 0,
+            winStreak: 0,
+            lastQuestReset: todayStr,
+            quests: {
+              q_black_win: { progress: 0, claimed: false },
+              q_play_3: { progress: 0, claimed: false },
+              q_streak_2: { progress: 0, claimed: false }
+            },
             inventory: {
               icons: ['icon_user'],
               frames: ['frame_none'],
               nametags: ['nametag_novice', 'nametag_tactician'],
               themes: ['theme-wood', 'theme-green', 'theme-grey'],
-              emotes: ['none']
+              emotes: ['none', 'emote_fire', 'emote_gg']
             },
             equippedIcon: 'icon_user',
             equippedFrame: 'frame_none',
             equippedNametag: 'nametag_novice',
             equippedTheme: currentTheme,
-            equippedEmote: 'none'
+            equippedEmote: 'emote_fire'
           };
           userRef.set(val);
+        } else {
+          // Verify Daily Quest Reset Date
+          if (val.lastQuestReset !== todayStr) {
+            val.lastQuestReset = todayStr;
+            val.quests = {
+              q_black_win: { progress: 0, claimed: false },
+              q_play_3: { progress: 0, claimed: false },
+              q_streak_2: { progress: 0, claimed: false }
+            };
+            userRef.update({
+              lastQuestReset: todayStr,
+              quests: val.quests
+            });
+          }
         }
         
         userProfile = val;
         updateUIProfileDisplay();
+        renderDailyQuests();
       }, (err) => {
         console.error("Firebase read error:", err);
       });
@@ -991,7 +1073,7 @@
       });
     }
 
-    // 3. INVENTORY & PROFILE HELPER FUNCTIONS
+    // 3. INVENTORY, PROFILE & DAILY QUEST HELPER FUNCTIONS
     function getNormalizedInventory() {
       if (!userProfile) return { icons: [], frames: [], nametags: [], themes: [], emotes: [] };
       const inv = userProfile.inventory || {};
@@ -1015,12 +1097,84 @@
       return result;
     }
 
+    function renderDailyQuests() {
+      if (!userProfile) return;
+      const $container = $('#daily-quests-container').empty();
+      const userQuests = userProfile.quests || {};
+
+      Object.keys(DAILY_QUESTS_CONFIG).forEach(qKey => {
+        const qConf = DAILY_QUESTS_CONFIG[qKey];
+        const qState = userQuests[qKey] || { progress: 0, claimed: false };
+        const isComplete = qState.progress >= qConf.req;
+        const isClaimed = qState.claimed === true;
+
+        let actionBtnHtml = '';
+        if (isClaimed) {
+          actionBtnHtml = `<span class="text-[10px] bg-slate-800 text-slate-500 border border-slate-700 px-2 py-1 rounded-md font-semibold">Claimed</span>`;
+        } else if (isComplete) {
+          actionBtnHtml = `<button onclick="claimQuest('${qKey}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow-md transition">Claim +${qConf.reward} CC</button>`;
+        } else {
+          actionBtnHtml = `<span class="text-[10px] text-amber-400 font-mono font-bold">+${qConf.reward} CC</span>`;
+        }
+
+        $container.append(`
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between space-y-2">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-white mb-0.5">
+                <span>${qConf.title}</span>
+                <span class="text-[10px] text-slate-400 font-mono">${Math.min(qState.progress, qConf.req)}/${qConf.req}</span>
+              </div>
+              <div class="text-[11px] text-slate-400">${qConf.desc}</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+              <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: ${Math.min(100, (qState.progress / qConf.req) * 100)}%"></div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1 border-t border-slate-900">
+              ${actionBtnHtml}
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    function updateQuestProgress(qKey, delta) {
+      if (!currentUser || !userProfile) return;
+      const quests = userProfile.quests || {};
+      const currentVal = (quests[qKey]?.progress || 0) + delta;
+      const isClaimed = quests[qKey]?.claimed || false;
+
+      db.ref(`users/${currentUser.uid}/quests/${qKey}`).update({
+        progress: currentVal,
+        claimed: isClaimed
+      });
+    }
+
+    function claimQuest(qKey) {
+      if (!currentUser || !userProfile) return;
+      const qConf = DAILY_QUESTS_CONFIG[qKey];
+      const qState = userProfile.quests?.[qKey];
+      if (!qConf || !qState || qState.claimed || qState.progress < qConf.req) return;
+
+      const newCoins = (userProfile.coins || 0) + qConf.reward;
+
+      db.ref(`users/${currentUser.uid}`).update({
+        coins: newCoins,
+        [`quests/${qKey}/claimed`]: true
+      }).then(() => {
+        alert(`Quest Claimed! Rewards: +${qConf.reward} CogniCoins!`);
+      });
+    }
+
     function updateUIProfileDisplay() {
       if (!userProfile) return;
 
       // Header Top Bar Sync
       $('#nav-coins').text((userProfile.coins || 0).toLocaleString());
       $('#nav-elo').text(userProfile.elo || 1500);
+      $('#nav-streak').text(userProfile.winStreak || 0);
 
       // Shop Coins Sync
       $('#shop-coins-text').text((userProfile.coins || 0).toLocaleString());
@@ -1090,7 +1244,7 @@
       });
       $frameSel.val(userProfile.equippedFrame || 'frame_none');
 
-      // 3. Name Tag / Title Dropdown (Includes Tactician Guarantee)
+      // 3. Name Tag / Title Dropdown
       const $tagSel = $('#profile-nametag-select').empty();
       const uniqueTags = new Set(inv.nametags);
       uniqueTags.forEach(k => {
@@ -1148,7 +1302,41 @@
       $('#ai-board, #arena-board').removeClass('theme-wood theme-green theme-grey').addClass(themeClass);
     }
 
-    // 4. NAVIGATION TABS CONTROLLER
+    // 4. ANIMATED EMOTE TRIGGER SYSTEM
+    function triggerInGameEmote(mode) {
+      if (!userProfile) return;
+      const emoteKey = userProfile.equippedEmote || 'emote_fire';
+      const emoteObj = COSMETICS_CATALOG.emotes[emoteKey];
+      if (!emoteObj || !emoteObj.emoji) return alert("Select an active emote in Profile & Cosmetics Studio!");
+
+      if (mode === 'ai') {
+        showEmoteDisplay('#ai-player-emote-display', emoteObj);
+      } else if (mode === 'arena') {
+        showEmoteDisplay('#arena-self-emote-display', emoteObj);
+        if (currentRoomCode) {
+          db.ref('arena_rooms/' + currentRoomCode + '/lastEmote').set({
+            senderUid: currentUser.uid,
+            emoteKey: emoteKey,
+            timestamp: Date.now()
+          });
+        }
+      }
+    }
+
+    function showEmoteDisplay(elementSelector, emoteObj) {
+      const $el = $(elementSelector);
+      $el.html(`<span class="inline-block ${emoteObj.class}">${emoteObj.emoji}</span>`)
+         .removeClass('hidden emote-pop');
+      
+      void $el[0].offsetWidth; // Trigger reflow for animation reset
+      $el.addClass('emote-pop');
+
+      setTimeout(() => {
+        $el.addClass('hidden').removeClass('emote-pop');
+      }, 3500);
+    }
+
+    // 5. NAVIGATION TABS CONTROLLER
     function showSection(sectionId) {
       $('main > section').addClass('hidden');
       $('#section-' + sectionId).removeClass('hidden');
@@ -1177,7 +1365,7 @@
       }
     }
 
-    // 5. CHESS AI ENGINE (1500+ ELO MINIMAX + ALPHA-BETA + ANTI-SCHOLAR BOOK)
+    // 6. CHESS AI ENGINE (1500+ ELO MINIMAX + ALPHA-BETA + ANTI-SCHOLAR BOOK)
     const PIECE_VALUES = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
 
     const PST_PAWN = [
@@ -1229,7 +1417,6 @@
       }
 
       const moves = game.moves({ verbose: true });
-      // MVV-LVA Move Ordering
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
 
       if (isMaximizing) {
@@ -1287,7 +1474,6 @@
       let isMax = game.turn() === 'w';
       let bestValue = isMax ? -Infinity : Infinity;
 
-      // MVV-LVA Pre-Sort
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
 
       for (const move of moves) {
@@ -1310,7 +1496,7 @@
       return bestMove || moves[Math.floor(Math.random() * moves.length)];
     }
 
-    // 6. PLAY VS AI MATCH CONTROLLER
+    // 7. PLAY VS AI MATCH CONTROLLER
     function initAiBoard() {
       aiGame = new Chess();
       const config = {
@@ -1456,6 +1642,10 @@
 
     function checkAiGameOver() {
       if (!aiGame.game_over()) return false;
+      
+      // Update Quests Progress
+      updateQuestProgress('q_play_3', 1);
+
       if (aiGame.in_checkmate()) {
         const winnerColor = aiGame.turn() === 'w' ? 'b' : 'w';
         if (winnerColor === aiPlayerColor) {
@@ -1488,14 +1678,35 @@
       if (!currentUser || !userProfile) return;
       const currentElo = userProfile.elo || 1500;
       const newElo = calculateElo(currentElo, 1500, 1, userProfile.gamesPlayed || 0);
-      const newCoins = (userProfile.coins || 0) + 50;
+
+      // Win Streak Calculation
+      const currentStreak = (userProfile.winStreak || 0) + 1;
+      let streakBonus = 0;
+      if (currentStreak >= 3 && currentStreak < 5) streakBonus = 15;
+      if (currentStreak >= 5 && currentStreak < 10) streakBonus = 30;
+      if (currentStreak >= 10) streakBonus = 50;
+
+      const totalGain = 50 + streakBonus;
+      const newCoins = (userProfile.coins || 0) + totalGain;
+
+      // Quest Updates
+      if (aiPlayerColor === 'b') {
+        updateQuestProgress('q_black_win', 1);
+      }
+      if (currentStreak >= 2) {
+        updateQuestProgress('q_streak_2', 1);
+      }
 
       db.ref('users/' + currentUser.uid).update({
         elo: newElo,
         coins: newCoins,
+        winStreak: currentStreak,
         gamesPlayed: (userProfile.gamesPlayed || 0) + 1
       }).then(() => {
-        alert(`VICTORY! You defeated the Grandmaster Bot!\n+50 CogniCoins | New Rating: ${newElo} Elo`);
+        let msg = `VICTORY! You defeated the Grandmaster Bot!\n+50 CC Base`;
+        if (streakBonus > 0) msg += ` + ${streakBonus} CC Streak Bonus 🔥`;
+        msg += `\nNew Rating: ${newElo} Elo | Streak: ${currentStreak} WINS!`;
+        alert(msg);
       });
     }
 
@@ -1506,13 +1717,14 @@
 
       db.ref('users/' + currentUser.uid).update({
         elo: Math.max(100, newElo),
+        winStreak: 0,
         gamesPlayed: (userProfile.gamesPlayed || 0) + 1
       }).then(() => {
-        alert(`DEFEAT: Match lost. New Rating: ${Math.max(100, newElo)} Elo`);
+        alert(`DEFEAT: Match lost. Win streak reset to 0. New Rating: ${Math.max(100, newElo)} Elo`);
       });
     }
 
-    // 7. MULTIPLAYER 1V1 ARENA
+    // 8. MULTIPLAYER 1V1 ARENA
     function initArenaBoard() {
       arenaGame = new Chess();
       const config = {
@@ -1607,26 +1819,48 @@
           $('#arena-opp-elo').text(oppElo || 1500);
           $('#arena-opp-nametag').text(ALL_TITLE_MAP[oppTagKey] || oppTagKey).removeClass('hidden');
         }
+
+        // Live Emote Broadcast Listener
+        if (room.lastEmote && room.lastEmote.senderUid !== currentUser.uid) {
+          const emoteObj = COSMETICS_CATALOG.emotes[room.lastEmote.emoteKey];
+          if (emoteObj) {
+            showEmoteDisplay('#arena-opp-emote-display', emoteObj);
+          }
+        }
       });
 
       // Chat Listener
       chatRef.on('child_added', (snap) => {
         const msg = snap.val();
-        $('#chat-messages').append(`<div><span class="font-bold text-indigo-400">${msg.sender}:</span> ${msg.text}</div>`);
+        $('#chat-messages').append(`<div><span class="font-bold text-indigo-400">${escapeHtml(msg.sender)}:</span> ${escapeHtml(msg.text)}</div>`);
         $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
       });
     }
 
+    function updateChatCharCount() {
+      const len = $('#chat-input').val().length;
+      $('#chat-char-counter').text(`${len}/500`);
+    }
+
     function sendChatMessage(e) {
       e.preventDefault();
-      const text = $('#chat-input').val().trim();
-      if (!text || !currentRoomCode) return;
+      const rawText = $('#chat-input').val().trim();
+      if (!rawText || !currentRoomCode) return;
+
+      // 500 Character Limit Enforcement
+      const text = rawText.substring(0, 500);
+
       chatRef.push({
         sender: userProfile.username || 'Player',
         text: text,
         timestamp: Date.now()
       });
       $('#chat-input').val('');
+      updateChatCharCount();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     function copyRoomCode() {
@@ -1685,7 +1919,7 @@
       }
     });
 
-    // 8. COGNISHOP & CS:GO HORIZONTAL UNBOXING CRATE STRIP LOGIC
+    // 9. COGNISHOP & CS:GO HORIZONTAL UNBOXING CRATE STRIP LOGIC
     function buyCrate(crateType) {
       if (!userProfile) return;
       const crate = CRATE_DEFINITIONS[crateType];
@@ -1788,7 +2022,7 @@
       $('#crate-modal').addClass('hidden');
     }
 
-    // 9. LEADERBOARD SYSTEM
+    // 10. LEADERBOARD SYSTEM
     function loadLeaderboard() {
       const $tbody = $('#leaderboard-table-body').empty().append('<tr><td colspan="5" class="py-8 text-center text-slate-500">Loading rankings...</td></tr>');
 
@@ -1825,7 +2059,7 @@
       });
     }
 
-    // 10. MASTER CONTROL ADMIN PANEL (zainisgo123@gmail.com STRICT)
+    // 11. MASTER CONTROL ADMIN PANEL (zainisgo123@gmail.com STRICT)
     function toggleMaintenanceMode() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/maintenance').once('value').then((snap) => {
@@ -1920,7 +2154,6 @@
 
     // Window Init Event Listener
     $(document).ready(() => {
-      // Auto-initialize default view
       showSection('ai');
     });
   </script>

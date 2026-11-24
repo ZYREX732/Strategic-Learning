@@ -23,7 +23,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
   <style>
-    /* Custom Theme Overrides & Animations */
     body {
       background-color: #0f172a;
       color: #f8fafc;
@@ -84,7 +83,7 @@
       border: 1px solid #475569;
     }
 
-    /* Dynamic Board Skin Overrides */
+    /* Dynamic Board Skins */
     .theme-classic .white-1e1d7 { background-color: #f0d9b5 !important; color: #b58863; }
     .theme-classic .black-3c85d { background-color: #b58863 !important; color: #f0d9b5; }
     
@@ -97,12 +96,10 @@
     .theme-midnight .white-1e1d7 { background-color: #334155 !important; color: #64748b; }
     .theme-midnight .black-3c85d { background-color: #0f172a !important; color: #334155; }
 
-    /* Highlight square for click-to-move & pre-moves */
     .highlight-sq {
       box-shadow: inset 0 0 3px 3px rgba(234, 179, 8, 0.75) !important;
     }
 
-    /* Modal Backdrop */
     .modal-backdrop {
       background-color: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(4px);
@@ -133,7 +130,6 @@
   <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       
-      <!-- Brand Logo -->
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
           <i class="fa-solid fa-chess-knight text-xl text-white"></i>
@@ -146,7 +142,6 @@
         </div>
       </div>
 
-      <!-- Main Navigation Tabs -->
       <nav class="hidden md:flex items-center space-x-1">
         <button id="tab-ai" onclick="switchTab('ai')" class="px-4 py-2 text-sm font-medium text-white border-b-2 border-indigo-500 transition flex items-center gap-2">
           <i class="fa-solid fa-robot"></i> Practice AI
@@ -171,7 +166,6 @@
         </button>
       </nav>
 
-      <!-- User Auth & Status Bar -->
       <div class="flex items-center space-x-4">
         <div id="user-stats-bar" class="hidden flex items-center space-x-3 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
           <div class="flex items-center text-amber-400 text-xs font-semibold">
@@ -190,7 +184,7 @@
         </button>
         
         <div id="user-menu" class="hidden flex items-center space-x-2">
-          <img id="nav-avatar" src="" class="w-8 h-8 rounded-full border border-slate-600 object-cover">
+          <img id="nav-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" onerror="this.src='https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png'" class="w-8 h-8 rounded-full border border-slate-600 object-cover">
           <button onclick="logout()" class="text-slate-400 hover:text-white text-sm p-1">
             <i class="fa-solid fa-right-from-bracket"></i>
           </button>
@@ -199,7 +193,7 @@
     </div>
   </header>
 
-  <!-- MOBILE NAVIGATION TABS BAR -->
+  <!-- MOBILE TABS -->
   <div class="md:hidden bg-slate-900 border-b border-slate-800 px-2 py-2 flex justify-around text-xs">
     <button onclick="switchTab('ai')" class="text-slate-300 flex flex-col items-center"><i class="fa-solid fa-robot mb-1"></i>AI</button>
     <button onclick="switchTab('arena')" class="text-slate-300 flex flex-col items-center"><i class="fa-solid fa-swords mb-1"></i>Arena</button>
@@ -216,7 +210,6 @@
     <!-- 1. PRACTICE AI SECTION -->
     <section id="view-ai" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <div class="lg:col-span-8 flex flex-col items-center">
-        <!-- Opponent Bar -->
         <div class="w-full max-w-[500px] bg-slate-800 rounded-t-xl p-3 border border-slate-700 flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div id="ai-avatar-display" class="w-10 h-10 rounded-lg bg-indigo-900/50 flex items-center justify-center text-indigo-400 border border-indigo-700">
@@ -229,15 +222,13 @@
           </div>
         </div>
 
-        <!-- Chessboard Canvas -->
         <div id="ai-board-container" class="w-full max-w-[500px] aspect-square bg-slate-900 border-x border-slate-700">
           <div id="aiBoard" class="w-full h-full"></div>
         </div>
 
-        <!-- Player Bar -->
         <div class="w-full max-w-[500px] bg-slate-800 rounded-b-xl p-3 border border-slate-700 flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <img id="ai-player-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
+            <img id="ai-player-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" onerror="this.src='https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png'" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
             <div>
               <div id="ai-player-name" class="font-bold text-sm text-white">Guest Player</div>
               <div id="ai-player-rating" class="text-xs text-slate-400">1200 Rating</div>
@@ -246,7 +237,6 @@
         </div>
       </div>
 
-      <!-- Controls & Strategic Feedback Sidebar -->
       <div class="lg:col-span-4 space-y-4">
         <div class="bg-slate-800 rounded-2xl p-5 border border-slate-700">
           <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
@@ -303,7 +293,7 @@
 
         <div class="w-full max-w-[500px] bg-slate-800 rounded-t-xl p-3 border border-slate-700 flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <img id="arena-opp-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/bP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
+            <img id="arena-opp-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/bP.png" onerror="this.src='https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/bP.png'" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
             <div>
               <div id="arena-opp-name" class="font-bold text-sm text-white">Waiting for Opponent...</div>
               <div id="arena-opp-rating" class="text-xs text-slate-400">----</div>
@@ -320,7 +310,7 @@
 
         <div class="w-full max-w-[500px] bg-slate-800 rounded-b-xl p-3 border border-slate-700 flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <img id="arena-self-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
+            <img id="arena-self-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" onerror="this.src='https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png'" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
             <div>
               <div id="arena-self-name" class="font-bold text-sm text-white">You</div>
               <div id="arena-self-rating" class="text-xs text-slate-400">1200 Rating</div>
@@ -348,13 +338,13 @@
       </div>
     </section>
 
-    <!-- 3. PUZZLE LAB SECTION (Mate in 1, 2, 3 & Best Capture) -->
+    <!-- 3. PUZZLE LAB SECTION -->
     <section id="view-puzzles" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
       <div class="lg:col-span-8 flex flex-col items-center">
         <div class="w-full max-w-[500px] bg-slate-800 rounded-t-xl p-4 border border-slate-700 flex items-center justify-between">
           <div>
             <h3 id="puzzle-title" class="font-bold text-sm text-white">Mate in 1 Challenge</h3>
-            <p id="puzzle-desc" class="text-xs text-indigo-400">White to move and deliver checkmate in 1 move.</p>
+            <p id="puzzle-desc" class="text-xs text-indigo-400">White to move and deliver immediate checkmate in 1 move.</p>
           </div>
           <span id="puzzle-badge" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs px-2.5 py-1 rounded-full font-semibold">MATE IN 1</span>
         </div>
@@ -408,7 +398,7 @@
       </div>
     </section>
 
-    <!-- 5. DEDICATED QUESTS TAB -->
+    <!-- 5. QUESTS TAB -->
     <section id="view-quests" class="hidden max-w-3xl mx-auto space-y-4">
       <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700">
         <h2 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
@@ -423,7 +413,7 @@
     <section id="view-profile" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
       <div class="lg:col-span-4 bg-slate-800 rounded-2xl p-6 border border-slate-700 text-center space-y-4">
         <div class="relative w-24 h-24 mx-auto">
-          <img id="profile-card-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-24 h-24 rounded-2xl bg-slate-700 border-2 border-indigo-500 object-cover">
+          <img id="profile-card-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" onerror="this.src='https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png'" class="w-24 h-24 rounded-2xl bg-slate-700 border-2 border-indigo-500 object-cover">
         </div>
         <div>
           <h3 id="profile-card-name" class="text-lg font-bold text-white">Player</h3>
@@ -538,7 +528,7 @@
     </div>
   </div>
 
-  <!-- CHESS.COM-STYLE GAME REVIEW MODAL -->
+  <!-- GAME REVIEW MODAL -->
   <div id="modal-game-review" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] flex flex-col space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -567,11 +557,14 @@
   </div>
 
   <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
-    CogniLearn Strategic Thinking Lab &copy; 2025. Deploy Version 5.0.1
+    CogniLearn Strategic Thinking Lab &copy; 2025. Deploy Version 5.0.2
   </footer>
 
   <!-- SCRIPT ENGINE CORE -->
   <script>
+    // GLOBAL PIECE THEME CDN PATH (Fixes all broken board piece images)
+    const PIECE_THEME_CDN = 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png';
+
     const firebaseConfig = {
       apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
       authDomain: "chess-7df7a.firebaseapp.com",
@@ -613,7 +606,6 @@
     let puzzleBoard = null;
     let currentPuzzleIdx = 0;
 
-    // Structured Puzzles: Mate in 1, Mate in 2, Mate in 3, Best Capture
     const PUZZLES = [
       {
         title: "Mate in 1 Challenge",
@@ -655,7 +647,6 @@
     let arenaPlayerColor = 'w';
     let isSpectator = false;
 
-    // Master Cosmetics Database with Image Asset Mapping
     const SHOP_ITEMS = [
       { id: "avatar_knight", category: "avatars", name: "Knight Avatar", cost: 100, rarity: "rare", img: "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wN.png" },
       { id: "avatar_king", category: "avatars", name: "Crown King", cost: 100, rarity: "mythic", img: "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wK.png" },
@@ -704,7 +695,7 @@
         if (user) {
           $("#btn-auth-login").addClass("hidden");
           $("#user-menu, #user-stats-bar").removeClass("hidden");
-          $("#nav-avatar").attr("src", user.photoURL || "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png");
+          $("#nav-avatar").attr("src", user.photoURL || getAvatarImage("default"));
           if (user.email && user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
             $("#tab-admin, #mobile-tab-admin").removeClass("hidden");
           }
@@ -795,11 +786,9 @@
       $("#profile-xp-val").text(`${userProfile.xp % 500} / 500 XP`);
       $("#profile-xp-bar").css("width", `${((userProfile.xp % 500) / 500) * 100}%`);
 
-      // Dynamic Avatar Image Update
       const avatarUrl = getAvatarImage(userProfile.equipped.avatar);
       $("#profile-card-avatar, #ai-player-avatar, #arena-self-avatar").attr("src", avatarUrl);
 
-      // Dynamic Cosmetic Options Populator
       populateCosmeticDropdown("equip-avatar-select", userProfile.inventory.avatars, userProfile.equipped.avatar);
       populateCosmeticDropdown("equip-theme-select", userProfile.inventory.themes, userProfile.equipped.theme);
       populateCosmeticDropdown("equip-title-select", userProfile.inventory.titles, userProfile.equipped.title);
@@ -826,6 +815,7 @@
     // AI ENGINE & MINIMAX
     function initAIBoard() {
       aiBoard = Chessboard('aiBoard', {
+        pieceTheme: PIECE_THEME_CDN,
         draggable: true,
         position: 'start',
         onDragStart: (src, pc) => !aiGame.game_over() && aiGame.turn() === 'w',
@@ -962,6 +952,7 @@
       $("#puzzle-status").text("Find the winning move.").removeClass("text-emerald-400 text-amber-400 text-red-400").addClass("text-slate-400");
 
       puzzleBoard = Chessboard('puzzleBoard', {
+        pieceTheme: PIECE_THEME_CDN,
         draggable: true,
         position: p.fen,
         onDrop: (src, tgt) => {
@@ -1003,7 +994,7 @@
       initPuzzleBoard();
     }
 
-    // CHESS.COM GAME REVIEW ENGINE
+    // GAME REVIEW ENGINE
     function openGameReview() {
       closeMatchModal();
       $("#modal-game-review").removeClass("hidden");
@@ -1076,6 +1067,7 @@
     // 1v1 ARENA MULTIPLAYER ENGINE
     function initArenaBoard() {
       arenaBoard = Chessboard('arenaBoard', {
+        pieceTheme: PIECE_THEME_CDN,
         draggable: true,
         position: 'start',
         onDragStart: () => !isSpectator && !arenaGame.game_over() && arenaGame.turn() === arenaPlayerColor,
@@ -1302,4 +1294,4 @@
     }
   </script>
 </body>
-</html> 
+</html>

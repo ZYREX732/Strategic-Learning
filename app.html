@@ -109,6 +109,12 @@
       100% { opacity: 0; transform: translateY(-15px); }
     }
 
+    /* Rarity Glow Classes */
+    .rarity-common-card { border: 2px solid #475569; background: #0f172a; }
+    .rarity-rare-card { border: 2px solid #3b82f6; background: #172554; box-shadow: 0 0 10px rgba(59, 130, 246, 0.25); }
+    .rarity-legendary-card { border: 2px solid #f59e0b; background: #451a03; box-shadow: 0 0 12px rgba(245, 158, 11, 0.35); }
+    .rarity-mythic-card { border: 2px solid #a855f7; background: #3b0764; box-shadow: 0 0 16px rgba(168, 85, 247, 0.45); }
+
     /* Crate Unboxing CS:GO Strip CSS */
     .crate-strip-container {
       overflow: hidden;
@@ -131,13 +137,12 @@
       height: 120px;
       margin-right: 12px;
       flex-shrink: 0;
-      background: #1e293b;
-      border: 2px solid #475569;
       border-radius: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 6px;
     }
     .crate-indicator-line {
       position: absolute;
@@ -168,58 +173,58 @@
     </div>
   </div>
 
-  <!-- Navigation Bar -->
-  <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
+  <!-- Unified Top Navigation Bar (Integrated Header Tabs) -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
-      <!-- Logo & Title -->
+      <!-- Brand Logo & Title -->
       <div class="flex items-center gap-3 cursor-pointer" onclick="showSection('ai')">
         <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-black shadow-lg shadow-indigo-500/30">
           <i class="fa-solid fa-chess"></i>
         </div>
         <div>
           <h1 class="font-bold text-lg tracking-tight text-white leading-tight">CogniLearn</h1>
-          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-widest">Strategic Thinking Lab</p>
+          <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Strategic Thinking Lab</p>
         </div>
       </div>
 
-      <!-- Main Navigation Tabs -->
-      <nav class="hidden md:flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800/80">
-        <button onclick="showSection('ai')" id="nav-ai" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition text-white bg-indigo-600 shadow">
-          <i class="fa-solid fa-robot mr-2"></i>Play vs AI
+      <!-- Integrated Top Navigation Tabs -->
+      <nav class="hidden md:flex items-center h-full gap-2">
+        <button onclick="showSection('ai')" id="nav-ai" class="nav-btn h-full px-4 text-sm font-bold transition flex items-center gap-2 border-b-2 border-indigo-500 text-white">
+          <i class="fa-solid fa-robot"></i> Play vs AI
         </button>
-        <button onclick="showSection('arena')" id="nav-arena" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-users mr-2"></i>1v1 Arena
+        <button onclick="showSection('arena')" id="nav-arena" class="nav-btn h-full px-4 text-sm font-semibold text-slate-400 hover:text-white transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-users"></i> 1v1 Arena
         </button>
-        <button onclick="showSection('shop')" id="nav-shop" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-store mr-2"></i>CogniShop
+        <button onclick="showSection('shop')" id="nav-shop" class="nav-btn h-full px-4 text-sm font-semibold text-slate-400 hover:text-white transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-store"></i> CogniShop
         </button>
-        <button onclick="showSection('profile')" id="nav-profile" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-user-gear mr-2"></i>Profile & Cosmetics
+        <button onclick="showSection('profile')" id="nav-profile" class="nav-btn h-full px-4 text-sm font-semibold text-slate-400 hover:text-white transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-user-gear"></i> Profile & Studio
         </button>
-        <button onclick="showSection('leaderboard')" id="nav-leaderboard" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-trophy mr-2"></i>Leaderboard
+        <button onclick="showSection('leaderboard')" id="nav-leaderboard" class="nav-btn h-full px-4 text-sm font-semibold text-slate-400 hover:text-white transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-trophy"></i> Leaderboard
         </button>
-        <button id="admin-nav-link" onclick="showSection('admin')" class="hidden nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-red-400 hover:text-red-300 hover:bg-red-950/40 transition">
-          <i class="fa-solid fa-user-shield mr-2"></i>Admin Panel
+        <button id="admin-nav-link" onclick="showSection('admin')" class="hidden nav-btn h-full px-4 text-sm font-semibold text-red-400 hover:text-red-300 transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-user-shield"></i> Admin Panel
         </button>
       </nav>
 
       <!-- Player Stats Bar & Logout -->
       <div class="flex items-center gap-3">
-        <div class="flex items-center bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 gap-3">
+        <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 gap-3">
           <!-- Win Streak Badge -->
           <div class="flex items-center gap-1 text-amber-500 font-bold text-xs" title="Active Win Streak">
             <i class="fa-solid fa-fire text-amber-500 animate-pulse"></i>
             <span id="nav-streak">0</span>
           </div>
-          <div class="h-4 w-[1px] bg-slate-700"></div>
+          <div class="h-4 w-[1px] bg-slate-800"></div>
           <!-- Coins -->
           <div class="flex items-center gap-1.5 text-amber-400 font-bold text-sm" title="CogniCoins (CC)">
             <i class="fa-solid fa-coins text-amber-400"></i>
             <span id="nav-coins">1,000</span> <span class="text-xs text-amber-500 font-normal">CC</span>
           </div>
-          <div class="h-4 w-[1px] bg-slate-700"></div>
+          <div class="h-4 w-[1px] bg-slate-800"></div>
           <!-- Elo -->
           <div class="flex items-center gap-1.5 text-indigo-400 font-bold text-sm" title="Elo Rating">
             <i class="fa-solid fa-chart-line"></i>
@@ -227,7 +232,7 @@
           </div>
         </div>
 
-        <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-red-400 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-xl transition" title="Logout">
+        <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-red-400 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition" title="Logout">
           <i class="fa-solid fa-right-from-bracket"></i>
         </button>
       </div>
@@ -239,15 +244,15 @@
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
     <!-- DAILY QUESTS & STREAK BANNER WIDGET -->
-    <div class="mb-6 bg-slate-900 border border-indigo-500/20 rounded-2xl p-4 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="mb-6 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-2xl flex-shrink-0">
+        <div class="w-12 h-12 rounded-xl bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-2xl flex-shrink-0">
           <i class="fa-solid fa-scroll"></i>
         </div>
         <div>
           <h2 class="text-base font-bold text-white flex items-center gap-2">
             Daily Strategic Quests
-            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">Resets Daily</span>
+            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono">Resets Daily</span>
           </h2>
           <p class="text-xs text-slate-400">Complete daily chess challenges to earn extra CogniCoins!</p>
         </div>
@@ -266,7 +271,7 @@
         <!-- Chess Board Column -->
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center">
           <!-- Opponent Bar -->
-          <div class="w-full flex items-center justify-between mb-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl">
+          <div class="w-full flex items-center justify-between mb-4 bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-indigo-950 border border-indigo-500/50 flex items-center justify-center text-indigo-400 text-lg">
                 <i class="fa-solid fa-robot"></i>
@@ -290,7 +295,7 @@
           </div>
 
           <!-- Player Bar -->
-          <div class="w-full flex items-center justify-between mt-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
+          <div class="w-full flex items-center justify-between mt-4 bg-slate-950/80 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
               <div id="ai-user-frame-container" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg frame-none overflow-hidden">
                 <i id="ai-user-icon" class="fa-solid fa-user"></i>
@@ -304,12 +309,18 @@
               </div>
             </div>
 
-            <!-- In-Game Emote Trigger & Display -->
-            <div class="flex items-center gap-3">
+            <!-- In-Game Multi-Emote Quick Bar & Display -->
+            <div class="flex items-center gap-2 relative">
               <div id="ai-player-emote-display" class="text-3xl hidden"></div>
-              <button onclick="triggerInGameEmote('ai')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-                <i class="fa-solid fa-face-smile"></i> Emote
+              
+              <button onclick="toggleEmotePicker('ai')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-face-smile"></i> Emote <i class="fa-solid fa-chevron-up text-[10px]"></i>
               </button>
+
+              <!-- Emote Picker Floating Popover -->
+              <div id="ai-emote-picker" class="hidden absolute right-0 bottom-12 bg-slate-900 border border-slate-700 rounded-xl p-2 shadow-2xl z-50 flex gap-1.5 max-w-[280px] flex-wrap justify-center">
+                <!-- Dynamically populated unlocked emotes -->
+              </div>
             </div>
           </div>
         </div>
@@ -377,7 +388,7 @@
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center">
           
           <!-- Opponent Card -->
-          <div class="w-full flex items-center justify-between mb-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
+          <div class="w-full flex items-center justify-between mb-4 bg-slate-950/80 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
               <div id="arena-opp-frame" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 text-lg frame-none overflow-hidden">
                 <i id="arena-opp-icon" class="fa-solid fa-user"></i>
@@ -399,7 +410,7 @@
           </div>
 
           <!-- Self Card -->
-          <div class="w-full flex items-center justify-between mt-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
+          <div class="w-full flex items-center justify-between mt-4 bg-slate-950/80 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
               <div id="arena-self-frame" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg frame-none overflow-hidden">
                 <i id="arena-self-icon" class="fa-solid fa-user"></i>
@@ -412,11 +423,18 @@
                 <div class="text-xs text-slate-400">Elo: <span id="arena-self-elo" class="text-indigo-400 font-semibold">1500</span></div>
               </div>
             </div>
-            <div class="flex items-center gap-3">
+
+            <!-- Arena Multi-Emote Quick Bar & Display -->
+            <div class="flex items-center gap-2 relative">
               <div id="arena-self-emote-display" class="text-3xl hidden"></div>
-              <button onclick="triggerInGameEmote('arena')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-                <i class="fa-solid fa-face-smile"></i> Emote
+              
+              <button onclick="toggleEmotePicker('arena')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-face-smile"></i> Emote <i class="fa-solid fa-chevron-up text-[10px]"></i>
               </button>
+
+              <div id="arena-emote-picker" class="hidden absolute right-0 bottom-12 bg-slate-900 border border-slate-700 rounded-xl p-2 shadow-2xl z-50 flex gap-1.5 max-w-[280px] flex-wrap justify-center">
+                <!-- Dynamically populated unlocked emotes -->
+              </div>
             </div>
           </div>
 
@@ -512,7 +530,7 @@
           <h2 class="text-2xl font-bold text-white flex items-center gap-3">
             <i class="fa-solid fa-boxes-packing text-amber-400"></i> CogniShop Cosmetic Crates
           </h2>
-          <p class="text-slate-400 text-sm mt-1">Unlock exclusive Avatar Icons, Cosmetic Frames, Name Tag Titles, Chessboard Skins & Emotes!</p>
+          <p class="text-slate-400 text-sm mt-1">Unlock exclusive Rarity-Tiered Avatar Icons, Cosmetic Frames, Titles & Animated Emotes!</p>
         </div>
         <div class="bg-slate-950 border border-slate-800 rounded-2xl px-5 py-3 flex items-center gap-3">
           <i class="fa-solid fa-coins text-2xl text-amber-400"></i>
@@ -534,11 +552,11 @@
             </div>
             <h3 class="text-xl font-bold text-white mb-1">Pawn Crate</h3>
             <p class="text-xs text-slate-400 mb-4">A basic crate with low odds for cool items</p>
-            <div class="space-y-1 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-              <div class="flex justify-between"><span>Pawn Novice Title</span><span class="text-slate-400">Common</span></div>
-              <div class="flex justify-between"><span>Tactician Title</span><span class="text-slate-400">Common</span></div>
-              <div class="flex justify-between"><span>Wood League Title</span><span class="text-slate-400">Common</span></div>
-              <div class="flex justify-between"><span>Bronze Border Frame</span><span class="text-slate-400">Common</span></div>
+            <div class="space-y-1.5 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+              <div class="flex justify-between items-center"><span>Pawn Novice Title</span><span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-mono">COMMON</span></div>
+              <div class="flex justify-between items-center"><span>Tactician Title</span><span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800 font-mono">RARE</span></div>
+              <div class="flex justify-between items-center"><span>Wood League Title</span><span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-mono">COMMON</span></div>
+              <div class="flex justify-between items-center"><span>Bronze Border Frame</span><span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-mono">COMMON</span></div>
             </div>
           </div>
           <button onclick="buyCrate('pawn')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center justify-center gap-2">
@@ -548,18 +566,18 @@
         </div>
 
         <!-- Knight Crate -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between hover:border-slate-700 transition">
+        <div class="bg-slate-900 border border-blue-900/40 rounded-2xl p-6 shadow-xl flex flex-col justify-between hover:border-blue-500/50 transition">
           <div>
-            <div class="w-16 h-16 bg-blue-950 rounded-2xl flex items-center justify-center text-3xl text-blue-400 mb-4 border border-blue-800/50">
+            <div class="w-16 h-16 bg-blue-950 rounded-2xl flex items-center justify-center text-3xl text-blue-400 mb-4 border border-blue-800/50 shadow-md shadow-blue-500/10">
               <i class="fa-solid fa-chess-knight"></i>
             </div>
             <h3 class="text-xl font-bold text-white mb-1">Knight Crate</h3>
             <p class="text-xs text-slate-400 mb-4">A decent crate with higher odds for nice items</p>
-            <div class="space-y-1 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-              <div class="flex justify-between"><span>Knight's Valor Title</span><span class="text-blue-400">Rare</span></div>
-              <div class="flex justify-between"><span>Tactician Title</span><span class="text-blue-400">Rare</span></div>
-              <div class="flex justify-between"><span>Checkmate Master</span><span class="text-blue-400">Rare</span></div>
-              <div class="flex justify-between"><span>Gold Radiance Frame</span><span class="text-blue-400">Rare</span></div>
+            <div class="space-y-1.5 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+              <div class="flex justify-between items-center"><span>Knight's Valor Title</span><span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800 font-mono">RARE</span></div>
+              <div class="flex justify-between items-center"><span>Tactician Title</span><span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800 font-mono">RARE</span></div>
+              <div class="flex justify-between items-center"><span>Checkmate Master</span><span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800 font-mono">RARE</span></div>
+              <div class="flex justify-between items-center"><span>Gold Radiance Frame</span><span class="text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 font-mono">LEGENDARY</span></div>
             </div>
           </div>
           <button onclick="buyCrate('knight')" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20 transition flex items-center justify-center gap-2">
@@ -572,16 +590,16 @@
         <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-xl flex flex-col justify-between hover:border-amber-500/50 transition relative overflow-hidden">
           <div class="absolute -right-8 -top-8 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
           <div>
-            <div class="w-16 h-16 bg-amber-950 rounded-2xl flex items-center justify-center text-3xl text-amber-400 mb-4 border border-amber-800/50">
+            <div class="w-16 h-16 bg-amber-950 rounded-2xl flex items-center justify-center text-3xl text-amber-400 mb-4 border border-amber-800/50 shadow-md shadow-amber-500/10">
               <i class="fa-solid fa-chess-king"></i>
             </div>
             <h3 class="text-xl font-bold text-white mb-1">Grandmaster Crate</h3>
             <p class="text-xs text-slate-400 mb-4">A legendary crate with the best odds for the best items</p>
-            <div class="space-y-1 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-              <div class="flex justify-between"><span>Grandmaster Title</span><span class="text-amber-400">Legendary</span></div>
-              <div class="flex justify-between"><span>Tactician Title</span><span class="text-amber-400">Legendary</span></div>
-              <div class="flex justify-between"><span>Diamond Legend Frame</span><span class="text-amber-400">Legendary</span></div>
-              <div class="flex justify-between"><span>Cosmic Sparkle Frame</span><span class="text-amber-400">Legendary</span></div>
+            <div class="space-y-1.5 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+              <div class="flex justify-between items-center"><span>Grandmaster Title</span><span class="text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 font-mono">LEGENDARY</span></div>
+              <div class="flex justify-between items-center"><span>Tactician Title</span><span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800 font-mono">RARE</span></div>
+              <div class="flex justify-between items-center"><span>Diamond Legend Frame</span><span class="text-[10px] px-2 py-0.5 rounded bg-purple-950 text-purple-400 border border-purple-800 font-mono">MYTHIC</span></div>
+              <div class="flex justify-between items-center"><span>Cosmic Sparkle Frame</span><span class="text-[10px] px-2 py-0.5 rounded bg-purple-950 text-purple-400 border border-purple-800 font-mono">MYTHIC</span></div>
             </div>
           </div>
           <button onclick="buyCrate('grandmaster')" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-600/20 transition flex items-center justify-center gap-2">
@@ -677,9 +695,9 @@
               </select>
             </div>
 
-            <!-- Active Emote Selector -->
+            <!-- Default Active Emote Selector -->
             <div class="md:col-span-2">
-              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Active Animated Emote</label>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Default Quick Emote</label>
               <select id="profile-emote-select" onchange="equipCosmetic('emote', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
                 <option value="none">None</option>
               </select>
@@ -885,22 +903,22 @@
 
     const COSMETICS_CATALOG = {
       icons: {
-        "icon_user": { name: "Standard User", icon: "fa-user" },
-        "icon_pawn": { name: "Pawn Novice", icon: "fa-chess-pawn" },
-        "icon_knight": { name: "Knight Defender", icon: "fa-chess-knight" },
-        "icon_bishop": { name: "Bishop Cleric", icon: "fa-chess-bishop" },
-        "icon_rook": { name: "Rook Fortress", icon: "fa-chess-rook" },
-        "icon_queen": { name: "Queen Majesty", icon: "fa-chess-queen" },
-        "icon_king": { name: "King Sovereign", icon: "fa-chess-king" }
+        "icon_user": { name: "Standard User", icon: "fa-user", rarity: "common" },
+        "icon_pawn": { name: "Pawn Novice", icon: "fa-chess-pawn", rarity: "common" },
+        "icon_knight": { name: "Knight Defender", icon: "fa-chess-knight", rarity: "rare" },
+        "icon_bishop": { name: "Bishop Cleric", icon: "fa-chess-bishop", rarity: "rare" },
+        "icon_rook": { name: "Rook Fortress", icon: "fa-chess-rook", rarity: "legendary" },
+        "icon_queen": { name: "Queen Majesty", icon: "fa-chess-queen", rarity: "mythic" },
+        "icon_king": { name: "King Sovereign", icon: "fa-chess-king", rarity: "mythic" }
       },
       frames: {
-        "frame_none": { name: "No Frame", class: "frame-none" },
-        "frame_bronze": { name: "Bronze Border", class: "frame-bronze" },
-        "frame_silver": { name: "Silver Crest", class: "frame-silver" },
-        "frame_gold": { name: "Gold Radiance", class: "frame-gold" },
-        "frame_diamond": { name: "Diamond Legend", class: "frame-diamond" },
-        "frame_neon": { name: "Neon Cyber", class: "frame-neon" },
-        "frame_cosmic": { name: "Cosmic Sparkle", class: "frame-cosmic" }
+        "frame_none": { name: "No Frame", class: "frame-none", rarity: "common" },
+        "frame_bronze": { name: "Bronze Border", class: "frame-bronze", rarity: "common" },
+        "frame_silver": { name: "Silver Crest", class: "frame-silver", rarity: "rare" },
+        "frame_gold": { name: "Gold Radiance", class: "frame-gold", rarity: "legendary" },
+        "frame_diamond": { name: "Diamond Legend", class: "frame-diamond", rarity: "mythic" },
+        "frame_neon": { name: "Neon Cyber", class: "frame-neon", rarity: "mythic" },
+        "frame_cosmic": { name: "Cosmic Sparkle", class: "frame-cosmic", rarity: "mythic" }
       },
       nametags: ALL_TITLE_MAP,
       themes: {
@@ -909,15 +927,30 @@
         "theme-grey": "Slate Grey"
       },
       emotes: {
-        "none": { name: "None", emoji: "", class: "" },
-        "emote_fire": { name: "Fire", emoji: "🔥", class: "emote-bounce" },
-        "emote_gg": { name: "GG WP", emoji: "🤝", class: "emote-pulse" },
-        "emote_mindblown": { name: "Mind Blown", emoji: "🤯", class: "emote-pulse" },
-        "emote_rage": { name: "Rage", emoji: "🤬", class: "emote-shake" },
-        "emote_troll": { name: "Smug Troll", emoji: "😏", class: "emote-shake" },
-        "emote_crown": { name: "Crown Flex", emoji: "👑", class: "emote-glow" }
+        "none": { name: "None", emoji: "", class: "", rarity: "common" },
+        "emote_fire": { name: "Fire", emoji: "🔥", class: "emote-bounce", rarity: "common" },
+        "emote_gg": { name: "GG WP", emoji: "🤝", class: "emote-pulse", rarity: "common" },
+        "emote_mindblown": { name: "Mind Blown", emoji: "🤯", class: "emote-pulse", rarity: "rare" },
+        "emote_rage": { name: "Rage", emoji: "🤬", class: "emote-shake", rarity: "rare" },
+        "emote_troll": { name: "Smug Troll", emoji: "😏", class: "emote-shake", rarity: "legendary" },
+        "emote_crown": { name: "Crown Flex", emoji: "👑", class: "emote-glow", rarity: "mythic" }
       }
     };
+
+    // Rarity Helper Functions
+    function getItemRarityClass(rarity) {
+      if (rarity === 'rare') return 'rarity-rare-card';
+      if (rarity === 'legendary') return 'rarity-legendary-card';
+      if (rarity === 'mythic') return 'rarity-mythic-card';
+      return 'rarity-common-card';
+    }
+
+    function getItemRarityBadge(rarity) {
+      if (rarity === 'rare') return `<span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800 font-mono uppercase">RARE</span>`;
+      if (rarity === 'legendary') return `<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 font-mono uppercase">LEGENDARY</span>`;
+      if (rarity === 'mythic') return `<span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-950 text-purple-400 border border-purple-800 font-mono uppercase">MYTHIC</span>`;
+      return `<span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-mono uppercase">COMMON</span>`;
+    }
 
     // Shop Crates Odds Configuration
     const CRATE_DEFINITIONS = {
@@ -925,37 +958,40 @@
         name: "Pawn Crate",
         price: 1000,
         items: [
-          { type: 'nametag', id: 'nametag_novice' },
-          { type: 'nametag', id: 'nametag_tactician' },
-          { type: 'nametag', id: 'nametag_wood' },
-          { type: 'icon', id: 'icon_pawn' },
-          { type: 'frame', id: 'frame_bronze' }
+          { type: 'nametag', id: 'nametag_novice', rarity: 'common' },
+          { type: 'nametag', id: 'nametag_tactician', rarity: 'rare' },
+          { type: 'nametag', id: 'nametag_wood', rarity: 'common' },
+          { type: 'icon', id: 'icon_pawn', rarity: 'common' },
+          { type: 'frame', id: 'frame_bronze', rarity: 'common' },
+          { type: 'emote', id: 'emote_mindblown', rarity: 'rare' }
         ]
       },
       knight: {
         name: "Knight Crate",
         price: 3500,
         items: [
-          { type: 'nametag', id: 'nametag_knight' },
-          { type: 'nametag', id: 'nametag_tactician' },
-          { type: 'nametag', id: 'nametag_master' },
-          { type: 'icon', id: 'icon_knight' },
-          { type: 'icon', id: 'icon_bishop' },
-          { type: 'frame', id: 'frame_silver' },
-          { type: 'frame', id: 'frame_gold' }
+          { type: 'nametag', id: 'nametag_knight', rarity: 'rare' },
+          { type: 'nametag', id: 'nametag_tactician', rarity: 'rare' },
+          { type: 'nametag', id: 'nametag_master', rarity: 'rare' },
+          { type: 'icon', id: 'icon_knight', rarity: 'rare' },
+          { type: 'icon', id: 'icon_bishop', rarity: 'rare' },
+          { type: 'frame', id: 'frame_silver', rarity: 'rare' },
+          { type: 'frame', id: 'frame_gold', rarity: 'legendary' },
+          { type: 'emote', id: 'emote_troll', rarity: 'legendary' }
         ]
       },
       grandmaster: {
         name: "Grandmaster Crate",
         price: 10000,
         items: [
-          { type: 'nametag', id: 'nametag_gm' },
-          { type: 'nametag', id: 'nametag_tactician' },
-          { type: 'icon', id: 'icon_queen' },
-          { type: 'icon', id: 'icon_king' },
-          { type: 'frame', id: 'frame_diamond' },
-          { type: 'frame', id: 'frame_neon' },
-          { type: 'frame', id: 'frame_cosmic' }
+          { type: 'nametag', id: 'nametag_gm', rarity: 'legendary' },
+          { type: 'nametag', id: 'nametag_tactician', rarity: 'rare' },
+          { type: 'icon', id: 'icon_queen', rarity: 'mythic' },
+          { type: 'icon', id: 'icon_king', rarity: 'mythic' },
+          { type: 'frame', id: 'frame_diamond', rarity: 'mythic' },
+          { type: 'frame', id: 'frame_neon', rarity: 'mythic' },
+          { type: 'frame', id: 'frame_cosmic', rarity: 'mythic' },
+          { type: 'emote', id: 'emote_crown', rarity: 'mythic' }
         ]
       }
     };
@@ -1062,6 +1098,7 @@
         userProfile = val;
         updateUIProfileDisplay();
         renderDailyQuests();
+        renderEmotePickers();
       }, (err) => {
         console.error("Firebase read error:", err);
       });
@@ -1082,7 +1119,7 @@
     }
 
     function getNormalizedInventory() {
-      if (!userProfile) return { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice', 'nametag_tactician'], themes: ['theme-wood', 'theme-green', 'theme-grey'], emotes: ['none'] };
+      if (!userProfile) return { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice', 'nametag_tactician'], themes: ['theme-wood', 'theme-green', 'theme-grey'], emotes: ['none', 'emote_fire', 'emote_gg'] };
       const inv = userProfile.inventory || {};
 
       let result = {
@@ -1090,7 +1127,7 @@
         frames: parseCategory(inv.frames, ['frame_none']),
         nametags: parseCategory(inv.nametags, ['nametag_novice']),
         themes: parseCategory(inv.themes, ['theme-wood', 'theme-green', 'theme-grey']),
-        emotes: parseCategory(inv.emotes, ['none'])
+        emotes: parseCategory(inv.emotes, ['none', 'emote_fire', 'emote_gg'])
       };
 
       // Guarantee Tactician Synonym Inclusion
@@ -1236,7 +1273,7 @@
       inv.icons.forEach(k => {
         const item = COSMETICS_CATALOG.icons[k];
         if (item) {
-          $iconSel.append(`<option value="${k}">${item.name}</option>`);
+          $iconSel.append(`<option value="${k}">${item.name} (${item.rarity.toUpperCase()})</option>`);
         }
       });
       $iconSel.val(userProfile.equippedIcon || 'icon_user');
@@ -1246,7 +1283,7 @@
       inv.frames.forEach(k => {
         const item = COSMETICS_CATALOG.frames[k];
         if (item) {
-          $frameSel.append(`<option value="${k}">${item.name}</option>`);
+          $frameSel.append(`<option value="${k}">${item.name} (${item.rarity.toUpperCase()})</option>`);
         }
       });
       $frameSel.val(userProfile.equippedFrame || 'frame_none');
@@ -1272,11 +1309,11 @@
       const $emoteSel = $('#profile-emote-select').empty();
       inv.emotes.forEach(k => {
         const item = COSMETICS_CATALOG.emotes[k];
-        if (item) {
-          $emoteSel.append(`<option value="${k}">${item.name}</option>`);
+        if (item && item.emoji) {
+          $emoteSel.append(`<option value="${k}">${item.emoji} ${item.name}</option>`);
         }
       });
-      $emoteSel.val(userProfile.equippedEmote || 'none');
+      $emoteSel.val(userProfile.equippedEmote || 'emote_fire');
     }
 
     function saveProfileName() {
@@ -1309,16 +1346,48 @@
       $('#ai-board, #arena-board').removeClass('theme-wood theme-green theme-grey').addClass(themeClass);
     }
 
-    // 4. ANIMATED EMOTE TRIGGER SYSTEM
-    function triggerInGameEmote(mode) {
-      if (!userProfile) return;
-      const emoteKey = userProfile.equippedEmote || 'emote_fire';
+    // 4. MULTI-EMOTE PICKER & BROADCAST SYSTEM
+    function renderEmotePickers() {
+      const inv = getNormalizedInventory();
+      const $aiPicker = $('#ai-emote-picker').empty();
+      const $arenaPicker = $('#arena-emote-picker').empty();
+
+      inv.emotes.forEach(eKey => {
+        const emoteObj = COSMETICS_CATALOG.emotes[eKey];
+        if (emoteObj && emoteObj.emoji) {
+          const btnHtml = `
+            <button onclick="selectAndSendEmote('${eKey}', 'ai')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xl border border-slate-700 transition hover:scale-110" title="${emoteObj.name}">
+              ${emoteObj.emoji}
+            </button>
+          `;
+          const btnArenaHtml = `
+            <button onclick="selectAndSendEmote('${eKey}', 'arena')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xl border border-slate-700 transition hover:scale-110" title="${emoteObj.name}">
+              ${emoteObj.emoji}
+            </button>
+          `;
+          $aiPicker.append(btnHtml);
+          $arenaPicker.append(btnArenaHtml);
+        }
+      });
+    }
+
+    function toggleEmotePicker(mode) {
+      if (mode === 'ai') {
+        $('#ai-emote-picker').toggleClass('hidden');
+      } else {
+        $('#arena-emote-picker').toggleClass('hidden');
+      }
+    }
+
+    function selectAndSendEmote(emoteKey, mode) {
       const emoteObj = COSMETICS_CATALOG.emotes[emoteKey];
-      if (!emoteObj || !emoteObj.emoji) return alert("Select an active emote in Profile & Cosmetics Studio!");
+      if (!emoteObj || !emoteObj.emoji) return;
 
       if (mode === 'ai') {
+        $('#ai-emote-picker').addClass('hidden');
         showEmoteDisplay('#ai-player-emote-display', emoteObj);
       } else if (mode === 'arena') {
+        $('#arena-emote-picker').addClass('hidden');
         showEmoteDisplay('#arena-self-emote-display', emoteObj);
         if (currentRoomCode) {
           db.ref('arena_rooms/' + currentRoomCode + '/lastEmote').set({
@@ -1335,7 +1404,7 @@
       $el.html(`<span class="inline-block ${emoteObj.class}">${emoteObj.emoji}</span>`)
          .removeClass('hidden emote-pop');
       
-      void $el[0].offsetWidth; // Trigger reflow for animation reset
+      void $el[0].offsetWidth; // Trigger reflow for CSS animation reset
       $el.addClass('emote-pop');
 
       setTimeout(() => {
@@ -1343,13 +1412,14 @@
       }, 3500);
     }
 
-    // 5. NAVIGATION TABS CONTROLLER
+    // 5. NAVIGATION TABS CONTROLLER (Unified Top Header Tabs)
     function showSection(sectionId) {
       $('main > section').addClass('hidden');
       $('#section-' + sectionId).removeClass('hidden');
 
-      $('.nav-btn').removeClass('bg-indigo-600 text-white shadow').addClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
-      $('#nav-' + sectionId).addClass('bg-indigo-600 text-white shadow').removeClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
+      // Update Top Tabs Underline Highlights
+      $('.nav-btn').removeClass('border-indigo-500 text-white font-bold').addClass('border-transparent text-slate-400 font-semibold');
+      $('#nav-' + sectionId).removeClass('border-transparent text-slate-400 font-semibold').addClass('border-indigo-500 text-white font-bold');
 
       if (sectionId === 'ai' && !aiBoard) {
         initAiBoard();
@@ -1926,7 +1996,7 @@
       }
     });
 
-    // 9. COGNISHOP & CS:GO HORIZONTAL UNBOXING CRATE STRIP LOGIC
+    // 9. COGNISHOP & CS:GO HORIZONTAL UNBOXING CRATE STRIP LOGIC (RARITY COLOR INTEGRATION)
     function buyCrate(crateType) {
       if (!userProfile) return;
       const crate = CRATE_DEFINITIONS[crateType];
@@ -1964,17 +2034,22 @@
         }
       }
 
-      // Populate Strip Cards
+      // Populate Strip Cards with Rarity Styling
       stripItems.forEach(item => {
         let label = item.id;
         if (item.type === 'nametag') label = ALL_TITLE_MAP[item.id] || item.id;
         if (item.type === 'icon') label = COSMETICS_CATALOG.icons[item.id]?.name || item.id;
         if (item.type === 'frame') label = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
+        if (item.type === 'emote') label = COSMETICS_CATALOG.emotes[item.id]?.name || item.id;
+
+        const rarityClass = getItemRarityClass(item.rarity || 'common');
+        const badgeHtml = getItemRarityBadge(item.rarity || 'common');
 
         $strip.append(`
-          <div class="crate-item-card">
-            <i class="fa-solid fa-gift text-2xl text-amber-400 mb-2"></i>
-            <span class="text-[10px] text-center font-bold text-slate-200 px-1 truncate w-full">${label}</span>
+          <div class="crate-item-card ${rarityClass}">
+            <i class="fa-solid fa-gift text-xl mb-1.5 text-slate-200"></i>
+            <span class="text-[10px] text-center font-bold text-white px-1 truncate w-full">${label}</span>
+            <div class="mt-1">${badgeHtml}</div>
           </div>
         `);
       });
@@ -2001,6 +2076,7 @@
       if (item.type === 'nametag') { catKey = 'nametags'; categoryArray = inv.nametags; }
       if (item.type === 'icon') { catKey = 'icons'; categoryArray = inv.icons; }
       if (item.type === 'frame') { catKey = 'frames'; categoryArray = inv.frames; }
+      if (item.type === 'emote') { catKey = 'emotes'; categoryArray = inv.emotes; }
 
       const isDuplicate = categoryArray.includes(item.id);
       let displayName = item.id;
@@ -2008,9 +2084,10 @@
       if (item.type === 'nametag') displayName = ALL_TITLE_MAP[item.id] || item.id;
       if (item.type === 'icon') displayName = COSMETICS_CATALOG.icons[item.id]?.name || item.id;
       if (item.type === 'frame') displayName = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
+      if (item.type === 'emote') displayName = COSMETICS_CATALOG.emotes[item.id]?.name || item.id;
 
       $('#crate-result-name').text(displayName);
-      $('#crate-result-type').text(item.type.toUpperCase());
+      $('#crate-result-type').html(`${item.type.toUpperCase()} • ${getItemRarityBadge(item.rarity || 'common')}`);
       $('#crate-result-area, #crate-done-btn').removeClass('hidden');
 
       if (isDuplicate) {
@@ -2109,7 +2186,7 @@
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       
       const input = prompt("Enter CogniCoins (CC) amount to grant:", "5000");
-      if (input === null) return; // Prompt cancelled
+      if (input === null) return;
       
       const amount = parseInt(input, 10);
       if (isNaN(amount) || amount <= 0) {

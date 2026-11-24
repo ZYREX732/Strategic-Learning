@@ -33,7 +33,7 @@
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-    /* Move Dot Indicators (70% Opaque Grey Dots) */
+    /* Move Dot Indicators */
     .square-55d63 { position: relative; }
     .move-dot-indicator {
       position: absolute;
@@ -48,12 +48,25 @@
       z-index: 10;
     }
 
-    /* Previous Move Source & Dest Highlight (Pale Yellow) */
+    /* Pre-move Square Highlight */
+    .premove-highlight {
+      background-color: rgba(168, 85, 247, 0.45) !important;
+    }
+
+    /* Move Source & Dest Highlight */
     .highlight-move {
       background-color: rgba(254, 240, 138, 0.45) !important;
     }
 
-    /* Rarity Card Borders & Styling (Common -> Rare -> Mythic -> Legendary) */
+    /* Enlarge Piece While Dragging */
+    .dragging-piece-active {
+      transform: scale(1.18) !important;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+      z-index: 100 !important;
+      transition: transform 0.05s ease;
+    }
+
+    /* Rarity Styling (Common -> Rare -> Mythic -> Legendary) */
     .rarity-common-card { border-color: #64748b !important; }
     .rarity-rare-card { border-color: #3b82f6 !important; }
     .rarity-mythic-card { border-color: #a855f7 !important; }
@@ -64,13 +77,12 @@
     .rarity-mythic-bg { background-color: rgba(168, 85, 247, 0.12); }
     .rarity-legendary-bg { background-color: rgba(245, 158, 11, 0.12); }
 
-    /* Rarity Badges */
     .badge-common { background-color: #475569; color: #f8fafc; }
     .badge-rare { background-color: #2563eb; color: #ffffff; }
     .badge-mythic { background-color: #9333ea; color: #ffffff; }
     .badge-legendary { background-color: #d97706; color: #ffffff; }
 
-    /* Frame Preview Effects */
+    /* Avatar Frame Preview Effects */
     .frame-style-none { border-color: #334155; }
     .frame-style-bronze { border-color: #b45309; box-shadow: 0 0 12px rgba(180, 83, 9, 0.4); }
     .frame-style-silver { border-color: #cbd5e1; box-shadow: 0 0 12px rgba(203, 213, 225, 0.5); }
@@ -78,26 +90,11 @@
     .frame-style-diamond { border-color: #22d3ee; box-shadow: 0 0 16px rgba(34, 211, 238, 0.6); }
     .frame-style-neon { border-color: #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.7); }
 
-    /* Animated Emotes Keyframes */
-    @keyframes emoteBounce {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-16px) scale(1.2); }
-    }
-    @keyframes emotePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.35); }
-    }
-    @keyframes emoteShake {
-      0%, 100% { transform: rotate(0deg); }
-      20% { transform: rotate(-15deg); }
-      40% { transform: rotate(15deg); }
-      60% { transform: rotate(-10deg); }
-      80% { transform: rotate(10deg); }
-    }
-    @keyframes emoteGlow {
-      0%, 100% { filter: drop-shadow(0 0 5px #f59e0b); transform: scale(1); }
-      50% { filter: drop-shadow(0 0 20px #a855f7); transform: scale(1.25); }
-    }
+    /* Animated Emotes */
+    @keyframes emoteBounce { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-16px) scale(1.2); } }
+    @keyframes emotePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+    @keyframes emoteShake { 0%, 100% { transform: rotate(0deg); } 20% { transform: rotate(-15deg); } 40% { transform: rotate(15deg); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(10deg); } }
+    @keyframes emoteGlow { 0%, 100% { filter: drop-shadow(0 0 5px #f59e0b); transform: scale(1); } 50% { filter: drop-shadow(0 0 20px #a855f7); transform: scale(1.25); } }
 
     .emote-anim-bounce { animation: emoteBounce 0.8s ease-in-out infinite; }
     .emote-anim-pulse { animation: emotePulse 0.8s ease-in-out infinite; }
@@ -107,23 +104,14 @@
     /* Board Theme Overrides */
     .theme-wood .white-1e1d7 { background-color: #f0d9b5 !important; color: #b58863; }
     .theme-wood .black-3c85d { background-color: #b58863 !important; color: #f0d9b5; }
-
     .theme-green .white-1e1d7 { background-color: #eeeed2 !important; color: #769656; }
     .theme-green .black-3c85d { background-color: #769656 !important; color: #eeeed2; }
-
     .theme-grey .white-1e1d7 { background-color: #e2e8f0 !important; color: #475569; }
     .theme-grey .black-3c85d { background-color: #475569 !important; color: #e2e8f0; }
 
     /* CS:GO Unboxing Reel Strip */
-    #unboxing-strip-container {
-      overflow: hidden;
-      position: relative;
-    }
-    #unboxing-strip {
-      display: flex;
-      transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1);
-      will-change: transform;
-    }
+    #unboxing-strip-container { overflow: hidden; position: relative; }
+    #unboxing-strip { display: flex; transition: transform 5s cubic-bezier(0.1, 1, 0.1, 1); will-change: transform; }
   </style>
 </head>
 
@@ -143,7 +131,6 @@
   <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
       
-      <!-- Brand & Integrated Nav Tabs -->
       <div class="flex items-center space-x-8">
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-600/30">
@@ -155,7 +142,6 @@
           </div>
         </div>
 
-        <!-- Integrated Top Navigation Bar -->
         <nav class="hidden md:flex items-center space-x-1 h-16">
           <button onclick="switchTab('ai')" id="nav-ai" class="nav-tab h-full px-4 text-sm font-semibold flex items-center space-x-2 text-indigo-400 border-b-2 border-indigo-500 transition">
             <i class="fa-solid fa-robot"></i>
@@ -184,7 +170,6 @@
         </nav>
       </div>
 
-      <!-- Right User Status / Coins / Auth -->
       <div class="flex items-center space-x-4">
         <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-full border border-slate-800">
           <i class="fa-solid fa-coins text-amber-400"></i>
@@ -195,7 +180,7 @@
         <div class="flex items-center space-x-3">
           <div class="text-right hidden sm:block">
             <div id="header-user-name" class="text-sm font-bold text-slate-200">Player</div>
-            <div id="header-user-elo" class="text-xs font-medium text-slate-400">1200 Rating (±350)</div>
+            <div id="header-user-elo" class="text-xs font-medium text-slate-400">1200 Rating</div>
           </div>
           <button onclick="userLogout()" title="Logout" class="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition border border-slate-700">
             <i class="fa-solid fa-right-from-bracket"></i>
@@ -213,11 +198,10 @@
     <section id="tab-ai" class="tab-content space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Board Container -->
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center justify-center">
           
           <!-- Top Opponent Banner -->
-          <div class="w-full max-w-[500px] flex items-center justify-between mb-3 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
+          <div class="w-full max-w-[500px] flex items-center justify-between mb-2 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
             <div class="flex items-center space-x-3">
               <div class="w-9 h-9 rounded-lg bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold text-lg">
                 <i class="fa-solid fa-robot"></i>
@@ -227,10 +211,16 @@
                   <span>Grandmaster AI</span>
                   <span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-mono">1500 Rating</span>
                 </div>
-                <div class="text-xs text-slate-400">Minimax Engine (3-Ply Pruned)</div>
+                <div class="text-xs text-slate-400">Minimax Engine</div>
               </div>
             </div>
             <div id="ai-opponent-emote-display" class="w-10 h-10 flex items-center justify-center text-2xl hidden"></div>
+          </div>
+
+          <!-- Opponent Captured Pieces Tray -->
+          <div class="w-full max-w-[500px] flex items-center justify-between px-2 py-1 text-xs font-mono text-slate-400 mb-1">
+            <div id="ai-black-captured" class="flex items-center space-x-1 min-h-[20px]"></div>
+            <div id="ai-black-material" class="font-bold text-amber-400"></div>
           </div>
 
           <!-- Board Mount -->
@@ -238,8 +228,14 @@
             <div id="ai-board" class="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-slate-800"></div>
           </div>
 
+          <!-- Player Captured Pieces Tray -->
+          <div class="w-full max-w-[500px] flex items-center justify-between px-2 py-1 text-xs font-mono text-slate-400 mt-1">
+            <div id="ai-white-captured" class="flex items-center space-x-1 min-h-[20px]"></div>
+            <div id="ai-white-material" class="font-bold text-amber-400"></div>
+          </div>
+
           <!-- Player Banner -->
-          <div class="w-full max-w-[500px] flex items-center justify-between mt-3 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
+          <div class="w-full max-w-[500px] flex items-center justify-between mt-2 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
             <div class="flex items-center space-x-3">
               <div id="ai-player-avatar-box" class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 text-lg">
                 <i class="fa-solid fa-user"></i>
@@ -250,7 +246,6 @@
               </div>
             </div>
 
-            <!-- In-Game Emote Picker Trigger -->
             <div class="relative">
               <button onclick="toggleEmotePicker('ai')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
                 <i class="fa-solid fa-face-smile text-amber-400"></i>
@@ -263,7 +258,7 @@
 
         </div>
 
-        <!-- AI Match Sidebar -->
+        <!-- Sidebar -->
         <div class="space-y-6">
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
             <h3 class="text-base font-bold text-white flex items-center space-x-2">
@@ -281,7 +276,10 @@
             </div>
 
             <div class="pt-2 flex space-x-2">
-              <button onclick="resetAiMatchConfirm()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition">New Game</button>
+              <button onclick="resetAiMatchConfirm()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center space-x-1.5">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>New Game</span>
+              </button>
               <button onclick="resignAiMatch()" class="px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold text-xs rounded-xl transition">Resign</button>
             </div>
           </div>
@@ -292,8 +290,9 @@
               <span>Match Status</span>
             </h3>
 
-            <div id="ai-status-banner" class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center text-xs font-bold text-slate-300">
-              White to move
+            <div id="ai-status-banner" class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center text-xs font-bold text-slate-300 flex items-center justify-between">
+              <span id="ai-status-text">White to move</span>
+              <button id="ai-rematch-btn" onclick="setupAiGame()" class="hidden px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded text-[10px] transition">Rematch</button>
             </div>
 
             <div>
@@ -328,7 +327,7 @@
           
           <div class="space-y-2">
             <input type="text" id="arena-join-code-input" placeholder="Enter 6-Char Code" maxlength="6" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-center font-mono uppercase text-white tracking-widest text-sm focus:outline-none focus:border-indigo-500">
-            <button onclick="joinArenaRoom()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-bold text-xs transition">Join Match</button>
+            <button onclick="joinArenaRoom()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-bold text-xs transition">Join / Spectate</button>
           </div>
         </div>
       </div>
@@ -341,7 +340,7 @@
             <div id="arena-room-status" class="text-xs font-bold text-amber-400">Waiting for Opponent...</div>
           </div>
 
-          <div class="w-full max-w-[500px] flex items-center justify-between mb-3 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
+          <div class="w-full max-w-[500px] flex items-center justify-between mb-2 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
             <div class="flex items-center space-x-3">
               <div id="arena-opponent-avatar-box" class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-lg">
                 <i class="fa-solid fa-user-ninja"></i>
@@ -354,11 +353,21 @@
             <div id="arena-opponent-emote-display" class="w-10 h-10 flex items-center justify-center text-2xl hidden"></div>
           </div>
 
+          <div class="w-full max-w-[500px] flex items-center justify-between px-2 py-1 text-xs font-mono text-slate-400 mb-1">
+            <div id="arena-black-captured" class="flex items-center space-x-1 min-h-[20px]"></div>
+            <div id="arena-black-material" class="font-bold text-amber-400"></div>
+          </div>
+
           <div class="w-full max-w-[500px] aspect-square relative">
             <div id="arena-board" class="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-slate-800"></div>
           </div>
 
-          <div class="w-full max-w-[500px] flex items-center justify-between mt-3 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
+          <div class="w-full max-w-[500px] flex items-center justify-between px-2 py-1 text-xs font-mono text-slate-400 mt-1">
+            <div id="arena-white-captured" class="flex items-center space-x-1 min-h-[20px]"></div>
+            <div id="arena-white-material" class="font-bold text-amber-400"></div>
+          </div>
+
+          <div class="w-full max-w-[500px] flex items-center justify-between mt-2 bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800">
             <div class="flex items-center space-x-3">
               <div id="arena-player-avatar-box" class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 text-lg">
                 <i class="fa-solid fa-user"></i>
@@ -526,14 +535,13 @@
       </div>
     </section>
 
-    <!-- 4. PROFILE VIEW (CUSTOMIZER + LIVE CARD PREVIEW) -->
+    <!-- 4. PROFILE VIEW -->
     <section id="tab-profile" class="tab-content hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Left: Profile Customizer Controls -->
         <div class="lg:col-span-2 space-y-6">
           
-          <!-- Custom Display Name -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
             <h3 class="text-lg font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-id-card text-indigo-400"></i>
@@ -546,7 +554,7 @@
             </div>
           </div>
 
-          <!-- Cosmetic Dropdowns (Clean Text without [RARITY]) -->
+          <!-- Cosmetic Dropdowns -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
             <h3 class="text-lg font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-shirt text-indigo-400"></i>
@@ -554,7 +562,6 @@
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              
               <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Name Tag Title</label>
                 <select id="select-nametag" onchange="equipCosmetic('nametags', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"></select>
@@ -579,33 +586,35 @@
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Default Quick Emote</label>
                 <select id="select-emote" onchange="equipCosmetic('emotes', this.value)" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"></select>
               </div>
-
             </div>
+          </div>
+
+          <!-- Trophy Case / Achievements -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-trophy text-amber-400"></i>
+              <span>Trophy Case & Achievements</span>
+            </h3>
+
+            <div id="trophy-case-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
           </div>
 
         </div>
 
-        <!-- Right: Live Profile Card Preview -->
+        <!-- Right: Player Card Preview -->
         <div class="space-y-6">
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-center space-y-5">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-center space-x-2">
-              <i class="fa-solid fa-eye text-indigo-400"></i>
-              <span>Live Profile Preview</span>
-            </h3>
-
-            <!-- Avatar Box with Live Frame Effect -->
             <div id="preview-avatar-box" class="relative w-24 h-24 mx-auto flex items-center justify-center rounded-2xl bg-slate-950 border-4 transition-all duration-300">
               <i id="preview-avatar-icon" class="text-4xl text-indigo-400 fa-solid fa-user"></i>
             </div>
 
-            <!-- Profile Info -->
             <div class="space-y-1">
               <div id="preview-title" class="text-xs text-indigo-400 font-bold uppercase tracking-wider">Apprentice</div>
               <div id="preview-name" class="text-xl font-black text-white">Player</div>
-              <div id="preview-rating" class="text-xs font-mono text-slate-400 pt-1">1200 Rating (±350 RD)</div>
+              <div id="preview-level-badge" class="inline-block bg-indigo-950 border border-indigo-500/30 text-indigo-300 font-mono text-[10px] px-2 py-0.5 rounded mt-1 font-bold">Level 1</div>
+              <div id="preview-rating" class="text-xs font-mono text-slate-400 pt-1">1200 Rating</div>
             </div>
 
-            <!-- Loadout Summary Badges -->
             <div class="pt-3 border-t border-slate-800 grid grid-cols-2 gap-2 text-xs">
               <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 flex flex-col items-center">
                 <span class="text-[10px] text-slate-500 uppercase font-bold">Board Skin</span>
@@ -630,20 +639,15 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        <!-- Daily Strategic Quests List (2 Columns) -->
         <div class="md:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
           <h3 class="text-base font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-calendar-check text-indigo-400"></i>
             <span>Daily Objectives</span>
           </h3>
 
-          <div id="daily-quests-container" class="space-y-3">
-            <!-- Dynamically populated -->
-          </div>
+          <div id="daily-quests-container" class="space-y-3"></div>
         </div>
 
-        <!-- Win Streak Multipliers (1 Column) -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
           <h3 class="text-base font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-fire text-amber-400"></i>
@@ -672,7 +676,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -724,7 +727,8 @@
               <thead>
                 <tr class="border-b border-slate-800 bg-slate-900/60 text-slate-400">
                   <th class="p-3">User / Email</th>
-                  <th class="p-3">Glicko Rating (RD)</th>
+                  <th class="p-3">Rating</th>
+                  <th class="p-3">Level / XP</th>
                   <th class="p-3">Coins</th>
                   <th class="p-3 text-right">Admin Controls</th>
                 </tr>
@@ -764,19 +768,14 @@
     const PAGE_LOAD_TIME = Date.now();
 
     /* ==========================================================================
-       2. CHESS.COM GLICKO-1 RATING ALGORITHM
+       2. GLICKO-1 RATING ALGORITHM
        ========================================================================== */
     function calculateGlicko1(r1, rd1, r2, rd2, outcome) {
       const q = Math.LN10 / 400;
       const pi = Math.PI;
 
-      function g(rd) {
-        return 1 / Math.sqrt(1 + (3 * Math.pow(q, 2) * Math.pow(rd, 2)) / Math.pow(pi, 2));
-      }
-
-      function E(r, r_opp, g_rd) {
-        return 1 / (1 + Math.pow(10, (-g_rd * (r - r_opp)) / 400));
-      }
+      function g(rd) { return 1 / Math.sqrt(1 + (3 * Math.pow(q, 2) * Math.pow(rd, 2)) / Math.pow(pi, 2)); }
+      function E(r, r_opp, g_rd) { return 1 / (1 + Math.pow(10, (-g_rd * (r - r_opp)) / 400)); }
 
       const g_rd2 = g(rd2);
       const expected = E(r1, r2, g_rd2);
@@ -790,15 +789,11 @@
 
       const delta = Math.round(newRating - r1);
 
-      return {
-        rating: Math.round(newRating),
-        rd: Math.round(newRD),
-        delta: delta
-      };
+      return { rating: Math.round(newRating), rd: Math.round(newRD), delta: delta };
     }
 
     /* ==========================================================================
-       3. COSMETIC ITEMS REGISTRY
+       3. COSMETIC ITEMS & ACHIEVEMENTS REGISTRY
        ========================================================================== */
     const ALL_ITEMS = {
       nametags: [
@@ -838,6 +833,13 @@
       ]
     };
 
+    const ALL_ACHIEVEMENTS = [
+      { id: "first_win", name: "First Victory", desc: "Win your first chess game", icon: "fa-trophy" },
+      { id: "streak_5", name: "On Fire", desc: "Achieve a 5 Win Streak", icon: "fa-fire" },
+      { id: "open_crate", name: "Crate Unboxer", desc: "Unlock your first cosmetic crate", icon: "fa-box-open" },
+      { id: "level_5", name: "Rising Star", desc: "Reach Player Level 5", icon: "fa-star" }
+    ];
+
     const CRATE_ODDS = {
       pawn: { common: 0.70, rare: 0.20, mythic: 0.08, legendary: 0.02, cost: 1000 },
       knight: { common: 0.35, rare: 0.45, mythic: 0.15, legendary: 0.05, cost: 3500 },
@@ -850,6 +852,7 @@
       "the tactician": "nametag_tactician"
     };
 
+    /* Object-Safe Category Parser (Fixes Inventory Resets) */
     function parseCategory(data, defaultArr) {
       if (!data) return defaultArr;
       if (Array.isArray(data)) return [...data];
@@ -864,16 +867,20 @@
     let userProfileData = null;
     let isMaintenanceActive = false;
 
+    // AI State
     let aiBoard = null;
     let aiGame = null;
     let aiPlayerColor = 'w';
     let aiSelectedSquare = null;
+    let aiPreMove = null;
 
+    // Arena State
     let arenaBoard = null;
     let arenaGame = null;
     let currentArenaRoomId = null;
     let arenaPlayerColor = 'w';
     let arenaSelectedSquare = null;
+    let arenaPreMove = null;
 
     function pieceThemeUrl(piece) {
       return `https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/${piece}.png`;
@@ -950,6 +957,8 @@
             elo: 1200,
             rd: 350,
             coins: 1000,
+            level: 1,
+            xp: 0,
             winStreak: 0,
             equipped: {
               nametags: "nametag_apprentice",
@@ -965,6 +974,7 @@
               boards: ["skin_classic"],
               emotes: ["emote_thumbsup"]
             },
+            achievements: {},
             dailyQuests: generateDefaultDailyQuests()
           };
           userRef.set(val);
@@ -1002,7 +1012,7 @@
       if (!userProfileData) return;
       document.getElementById("header-user-coins").innerText = (userProfileData.coins || 0).toLocaleString();
       document.getElementById("header-user-name").innerText = userProfileData.displayName || "Player";
-      document.getElementById("header-user-elo").innerText = `${userProfileData.elo || 1200} Rating (±${userProfileData.rd || 350})`;
+      document.getElementById("header-user-elo").innerText = `${userProfileData.elo || 1200} Rating`;
     }
 
     function switchTab(tabId) {
@@ -1018,6 +1028,34 @@
         setTimeout(() => aiBoard.resize(), 100);
       } else if (tabId === 'arena' && arenaBoard) {
         setTimeout(() => arenaBoard.resize(), 100);
+      }
+    }
+
+    /* XP & Leveling */
+    function addXp(amount) {
+      if (!userProfileData) return;
+      let currentXp = (userProfileData.xp || 0) + amount;
+      let currentLevel = userProfileData.level || 1;
+
+      while (currentXp >= 500) {
+        currentXp -= 500;
+        currentLevel += 1;
+        checkAchievement("level_5");
+      }
+
+      db.ref("users/" + currentUser.uid).update({
+        xp: currentXp,
+        level: currentLevel
+      });
+    }
+
+    /* Achievement Unlocker */
+    function checkAchievement(achId) {
+      if (!userProfileData) return;
+      const achs = userProfileData.achievements || {};
+      if (!achs[achId]) {
+        achs[achId] = true;
+        db.ref("users/" + currentUser.uid + "/achievements").update({ [achId]: true });
       }
     }
 
@@ -1072,9 +1110,7 @@
     }
 
     function minimax(game, depth, alpha, beta, isMaximizing) {
-      if (depth === 0 || game.game_over()) {
-        return evaluateBoard(game);
-      }
+      if (depth === 0 || game.game_over()) return evaluateBoard(game);
 
       const moves = game.moves({ verbose: true });
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
@@ -1129,10 +1165,7 @@
           game.move(move);
           const evalVal = minimax(game, 2, -Infinity, Infinity, false);
           game.undo();
-          if (evalVal > maxEval) {
-            maxEval = evalVal;
-            bestMove = move;
-          }
+          if (evalVal > maxEval) { maxEval = evalVal; bestMove = move; }
         }
       } else {
         let minEval = Infinity;
@@ -1140,10 +1173,7 @@
           game.move(move);
           const evalVal = minimax(game, 2, -Infinity, Infinity, true);
           game.undo();
-          if (evalVal < minEval) {
-            minEval = evalVal;
-            bestMove = move;
-          }
+          if (evalVal < minEval) { minEval = evalVal; bestMove = move; }
         }
       }
       return bestMove;
@@ -1152,12 +1182,17 @@
     function setupAiGame() {
       aiGame = new Chess();
       aiSelectedSquare = null;
+      aiPreMove = null;
+      $("#ai-rematch-btn").addClass("hidden");
 
       const config = {
-        draggable: false,
+        draggable: true,
         position: 'start',
         pieceTheme: pieceThemeUrl,
-        orientation: (aiPlayerColor === 'w') ? 'white' : 'black'
+        orientation: (aiPlayerColor === 'w') ? 'white' : 'black',
+        onDragStart: onAiDragStart,
+        onDrop: onAiDrop,
+        onSnapEnd: onAiSnapEnd
       };
 
       aiBoard = Chessboard('ai-board', config);
@@ -1168,17 +1203,53 @@
       }
     }
 
+    function onAiDragStart(source, piece) {
+      if (aiGame.game_over()) return false;
+      if (aiGame.turn() !== aiPlayerColor) {
+        // Allow pre-move drag start
+        $(`#ai-board .square-${source} img`).addClass("dragging-piece-active");
+        return true;
+      }
+      if ((aiPlayerColor === 'w' && piece.search(/^b/) !== -1) ||
+          (aiPlayerColor === 'b' && piece.search(/^w/) !== -1)) {
+        return false;
+      }
+      $(`#ai-board .square-${source} img`).addClass("dragging-piece-active");
+      return true;
+    }
+
+    function onAiDrop(source, target) {
+      $(".square-55d63 img").removeClass("dragging-piece-active");
+      
+      // If not my turn, store pre-move
+      if (aiGame.turn() !== aiPlayerColor) {
+        aiPreMove = { from: source, to: target };
+        $(".square-55d63").removeClass("premove-highlight");
+        $(`#ai-board .square-${source}`).addClass("premove-highlight");
+        $(`#ai-board .square-${target}`).addClass("premove-highlight");
+        return 'snapback';
+      }
+
+      const move = aiGame.move({ from: source, to: target, promotion: 'q' });
+      if (move === null) return 'snapback';
+
+      updateAiBoardUI(move.from, move.to);
+      if (!checkAiGameOver()) {
+        setTimeout(makeAiEngineMove, 400);
+      }
+    }
+
+    function onAiSnapEnd() {
+      aiBoard.position(aiGame.fen());
+    }
+
     function selectAiSide(side) {
       if (aiGame && aiGame.history().length > 0 && !aiGame.game_over()) {
         if (!confirm("Switching side mid-game counts as a resignation. Proceed?")) return;
         applyAiMatchLoss();
       }
 
-      if (side === 'random') {
-        aiPlayerColor = Math.random() < 0.5 ? 'w' : 'b';
-      } else {
-        aiPlayerColor = (side === 'white') ? 'w' : 'b';
-      }
+      aiPlayerColor = (side === 'random') ? (Math.random() < 0.5 ? 'w' : 'b') : ((side === 'white') ? 'w' : 'b');
 
       $("#side-white, #side-black, #side-random").removeClass("bg-indigo-600 border-indigo-500 text-white").addClass("bg-slate-800 border-slate-700 text-slate-300");
       $(`#side-${side}`).removeClass("bg-slate-800 border-slate-700 text-slate-300").addClass("bg-indigo-600 border-indigo-500 text-white");
@@ -1197,21 +1268,16 @@
     function resignAiMatch() {
       if (!aiGame || aiGame.game_over()) return;
       applyAiMatchLoss();
-      document.getElementById("ai-status-banner").innerText = "Resigned. GM AI Wins!";
+      document.getElementById("ai-status-text").innerText = "Resigned. GM AI Wins!";
+      $("#ai-rematch-btn").removeClass("hidden");
     }
 
     function applyAiMatchWin() {
       if (!userProfileData) return;
 
-      const glicko = calculateGlicko1(
-        userProfileData.elo || 1200,
-        userProfileData.rd || 350,
-        1500,
-        50,
-        1.0
-      );
-
+      const glicko = calculateGlicko1(userProfileData.elo || 1200, userProfileData.rd || 350, 1500, 50, 1.0);
       const currentStreak = (userProfileData.winStreak || 0) + 1;
+      
       let streakBonus = 0;
       if (currentStreak >= 10) streakBonus = 50;
       else if (currentStreak >= 5) streakBonus = 30;
@@ -1227,29 +1293,24 @@
         winStreak: currentStreak
       });
 
+      addXp(100);
       checkQuestProgress("win_ai");
       checkQuestProgress("win_any");
+      checkAchievement("first_win");
+      if (currentStreak >= 5) checkAchievement("streak_5");
 
       const deltaFormatted = glicko.delta >= 0 ? `+${glicko.delta}` : `${glicko.delta}`;
-      alert(`Victory! ${deltaFormatted} Rating (New: ${glicko.rating}, ±${glicko.rd} RD). Earned +${winPayout} CC!`);
+      alert(`Victory! ${deltaFormatted} Rating (${glicko.rating}). Won +${winPayout} CC & +100 XP!`);
+      $("#ai-rematch-btn").removeClass("hidden");
     }
 
     function applyAiMatchLoss() {
       if (!userProfileData) return;
 
-      const glicko = calculateGlicko1(
-        userProfileData.elo || 1200,
-        userProfileData.rd || 350,
-        1500,
-        50,
-        0.0
-      );
-
-      db.ref("users/" + currentUser.uid).update({
-        elo: glicko.rating,
-        rd: glicko.rd,
-        winStreak: 0
-      });
+      const glicko = calculateGlicko1(userProfileData.elo || 1200, userProfileData.rd || 350, 1500, 50, 0.0);
+      db.ref("users/" + currentUser.uid).update({ elo: glicko.rating, rd: glicko.rd, winStreak: 0 });
+      addXp(25);
+      $("#ai-rematch-btn").removeClass("hidden");
     }
 
     function makeAiEngineMove() {
@@ -1259,7 +1320,19 @@
         aiGame.move(move);
         aiBoard.position(aiGame.fen());
         updateAiBoardUI(move.from, move.to);
-        checkAiGameOver();
+
+        if (!checkAiGameOver() && aiPreMove) {
+          // Execute queued pre-move
+          const pMove = aiGame.move({ from: aiPreMove.from, to: aiPreMove.to, promotion: 'q' });
+          aiPreMove = null;
+          $(".square-55d63").removeClass("premove-highlight");
+
+          if (pMove) {
+            aiBoard.position(aiGame.fen());
+            updateAiBoardUI(pMove.from, pMove.to);
+            if (!checkAiGameOver()) setTimeout(makeAiEngineMove, 400);
+          }
+        }
       }
     }
 
@@ -1271,6 +1344,8 @@
         $(`#ai-board .square-${lastFrom}`).addClass("highlight-move");
         $(`#ai-board .square-${lastTo}`).addClass("highlight-move");
       }
+
+      updateCapturedPiecesUI("ai", aiGame);
 
       const moves = aiGame.history();
       const historyContainer = document.getElementById("ai-move-history");
@@ -1290,27 +1365,79 @@
 
       if (!aiGame.game_over()) {
         const turn = aiGame.turn() === 'w' ? 'White' : 'Black';
-        document.getElementById("ai-status-banner").innerText = `${turn} to move`;
+        document.getElementById("ai-status-text").innerText = `${turn} to move`;
+      }
+    }
+
+    /* Captured Pieces & Material Advantage Calculator */
+    function updateCapturedPiecesUI(type, game) {
+      if (!game) return;
+      const initialCounts = { p: 8, n: 2, b: 2, r: 2, q: 1 };
+      const currentCounts = { w: { p:0, n:0, b:0, r:0, q:0 }, b: { p:0, n:0, b:0, r:0, q:0 } };
+
+      const board = game.board();
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const p = board[r][c];
+          if (p && p.type !== 'k') {
+            currentCounts[p.color][p.type]++;
+          }
+        }
+      }
+
+      // Calculate Captured White (captured by black) & Captured Black (captured by white)
+      let wMaterial = 0, bMaterial = 0;
+      let wCapturedIcons = "", bCapturedIcons = "";
+
+      const pieceSymbolMap = { p: "♟", n: "♞", b: "♝", r: "♜", q: "♛" };
+
+      Object.keys(initialCounts).forEach(pt => {
+        const wDiff = initialCounts[pt] - currentCounts.w[pt];
+        const bDiff = initialCounts[pt] - currentCounts.b[pt];
+
+        for (let i = 0; i < wDiff; i++) wCapturedIcons += pieceSymbolMap[pt] + " ";
+        for (let i = 0; i < bDiff; i++) bCapturedIcons += pieceSymbolMap[pt] + " ";
+
+        wMaterial += currentCounts.w[pt] * (PIECE_VALUES[pt]/100);
+        bMaterial += currentCounts.b[pt] * (PIECE_VALUES[pt]/100);
+      });
+
+      document.getElementById(`${type}-white-captured`).innerText = bCapturedIcons; // Black pieces captured by White
+      document.getElementById(`${type}-black-captured`).innerText = wCapturedIcons; // White pieces captured by Black
+
+      const diff = wMaterial - bMaterial;
+      if (diff > 0) {
+        document.getElementById(`${type}-white-material`).innerText = `+${diff}`;
+        document.getElementById(`${type}-black-material`).innerText = ``;
+      } else if (diff < 0) {
+        document.getElementById(`${type}-white-material`).innerText = ``;
+        document.getElementById(`${type}-black-material`).innerText = `+${Math.abs(diff)}`;
+      } else {
+        document.getElementById(`${type}-white-material`).innerText = ``;
+        document.getElementById(`${type}-black-material`).innerText = ``;
       }
     }
 
     function checkAiGameOver() {
-      if (!aiGame.game_over()) return;
+      if (!aiGame.game_over()) return false;
 
       if (aiGame.in_checkmate()) {
         const winnerColor = aiGame.turn() === 'w' ? 'b' : 'w';
         if (winnerColor === aiPlayerColor) {
-          document.getElementById("ai-status-banner").innerText = "CHECKMATE! You won!";
+          document.getElementById("ai-status-text").innerText = "CHECKMATE! You won!";
           applyAiMatchWin();
         } else {
-          document.getElementById("ai-status-banner").innerText = "CHECKMATE! GM AI Wins!";
+          document.getElementById("ai-status-text").innerText = "CHECKMATE! GM AI Wins!";
           applyAiMatchLoss();
         }
       } else if (aiGame.in_draw()) {
-        document.getElementById("ai-status-banner").innerText = "Game Drawn!";
+        document.getElementById("ai-status-text").innerText = "Game Drawn!";
+        $("#ai-rematch-btn").removeClass("hidden");
       }
+      return true;
     }
 
+    // Click-to-Move Handler
     $(document).on("click", "#ai-board .square-55d63", function () {
       if (!aiGame || aiGame.game_over()) return;
       if (aiGame.turn() !== aiPlayerColor) return;
@@ -1324,12 +1451,7 @@
           showValidMoveDots("ai", square);
         }
       } else {
-        const move = aiGame.move({
-          from: aiSelectedSquare,
-          to: square,
-          promotion: 'q'
-        });
-
+        const move = aiGame.move({ from: aiSelectedSquare, to: square, promotion: 'q' });
         $(".move-dot-indicator").remove();
 
         if (move !== null) {
@@ -1337,9 +1459,7 @@
           updateAiBoardUI(move.from, move.to);
           aiSelectedSquare = null;
 
-          if (!checkAiGameOver()) {
-            setTimeout(makeAiEngineMove, 400);
-          }
+          if (!checkAiGameOver()) setTimeout(makeAiEngineMove, 400);
         } else {
           const piece = aiGame.get(square);
           if (piece && piece.color === aiPlayerColor) {
@@ -1363,7 +1483,7 @@
     }
 
     /* ==========================================================================
-       7. 1v1 MULTIPLAYER ARENA SYSTEM
+       7. 1v1 MULTIPLAYER ARENA SYSTEM WITH SPECTATOR MODE
        ========================================================================== */
     function createArenaRoom() {
       const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -1374,7 +1494,6 @@
         hostName: userProfileData.displayName || "Player",
         hostTitle: getEquippedTitleLabel(),
         hostElo: userProfileData.elo || 1200,
-        hostRd: userProfileData.rd || 350,
         fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
         status: "waiting",
         createdAt: firebase.database.ServerValue.TIMESTAMP
@@ -1389,24 +1508,29 @@
       joinArenaRoomById(code, 'b');
     }
 
-    function joinArenaRoomById(roomId, assignedColor) {
+    function joinArenaRoomById(roomId, preferredColor) {
       currentArenaRoomId = roomId;
-      arenaPlayerColor = assignedColor;
-
       const roomRef = db.ref("arena_rooms/" + roomId);
 
       roomRef.once("value").then((snap) => {
         if (!snap.exists()) return alert("Arena room not found.");
+        const data = snap.val();
 
-        if (assignedColor === 'b') {
+        if (data.hostUid === currentUser.uid) {
+          arenaPlayerColor = 'w';
+        } else if (!data.guestUid || data.guestUid === currentUser.uid) {
+          arenaPlayerColor = 'b';
           roomRef.update({
             guestUid: currentUser.uid,
             guestName: userProfileData.displayName || "Player",
             guestTitle: getEquippedTitleLabel(),
             guestElo: userProfileData.elo || 1200,
-            guestRd: userProfileData.rd || 350,
             status: "active"
           });
+        } else {
+          // Spectator Mode
+          arenaPlayerColor = 'spectator';
+          alert("Match in progress. Entering Spectator Mode!");
         }
 
         $("#arena-lobby-panel").addClass("hidden");
@@ -1424,13 +1548,41 @@
       arenaSelectedSquare = null;
 
       const config = {
-        draggable: false,
+        draggable: (arenaPlayerColor !== 'spectator'),
         position: 'start',
         pieceTheme: pieceThemeUrl,
-        orientation: (arenaPlayerColor === 'w') ? 'white' : 'black'
+        orientation: (arenaPlayerColor === 'b') ? 'black' : 'white',
+        onDragStart: onArenaDragStart,
+        onDrop: onArenaDrop,
+        onSnapEnd: onArenaSnapEnd
       };
 
       arenaBoard = Chessboard('arena-board', config);
+    }
+
+    function onArenaDragStart(source, piece) {
+      if (arenaPlayerColor === 'spectator' || arenaGame.game_over()) return false;
+      if (arenaGame.turn() !== arenaPlayerColor) return false;
+      $(`#arena-board .square-${source} img`).addClass("dragging-piece-active");
+      return true;
+    }
+
+    function onArenaDrop(source, target) {
+      $(".square-55d63 img").removeClass("dragging-piece-active");
+      const move = arenaGame.move({ from: source, to: target, promotion: 'q' });
+      if (move === null) return 'snapback';
+
+      db.ref("arena_rooms/" + currentArenaRoomId).update({
+        fen: arenaGame.fen(),
+        lastMoveFrom: move.from,
+        lastMoveTo: move.to
+      });
+
+      checkArenaGameOver();
+    }
+
+    function onArenaSnapEnd() {
+      arenaBoard.position(arenaGame.fen());
     }
 
     function listenToArenaRoomUpdates() {
@@ -1441,7 +1593,7 @@
         if (!data) return;
 
         if (data.status === 'active') {
-          document.getElementById("arena-room-status").innerText = "Match in Progress";
+          document.getElementById("arena-room-status").innerText = (arenaPlayerColor === 'spectator') ? "Spectating Match" : "Match in Progress";
           document.getElementById("arena-opponent-name").innerText = (arenaPlayerColor === 'w') ? (data.guestName || "Guest") : (data.hostName || "Host");
           document.getElementById("arena-opponent-title").innerText = (arenaPlayerColor === 'w') ? (data.guestTitle || "Apprentice") : (data.hostTitle || "Apprentice");
         }
@@ -1449,6 +1601,8 @@
         if (data.fen && data.fen !== arenaGame.fen()) {
           arenaGame.load(data.fen);
           arenaBoard.position(data.fen);
+          updateCapturedPiecesUI("arena", arenaGame);
+
           if (data.lastMoveFrom && data.lastMoveTo) {
             $("#arena-board .square-55d63").removeClass("highlight-move");
             $(`#arena-board .square-${data.lastMoveFrom}`).addClass("highlight-move");
@@ -1456,63 +1610,8 @@
           }
           checkArenaGameOver();
         }
-
-        if (data.winner) {
-          if (data.winner === currentUser.uid) {
-            document.getElementById("arena-room-status").innerText = "Victory!";
-          } else if (data.winner === 'draw') {
-            document.getElementById("arena-room-status").innerText = "Game Drawn";
-          } else {
-            document.getElementById("arena-room-status").innerText = "Defeat!";
-          }
-        }
       });
     }
-
-    $(document).on("click", "#arena-board .square-55d63", function () {
-      if (!arenaGame || arenaGame.game_over() || !currentArenaRoomId) return;
-      if (arenaGame.turn() !== arenaPlayerColor) return;
-
-      const square = $(this).data("square");
-
-      if (arenaSelectedSquare === null) {
-        const piece = arenaGame.get(square);
-        if (piece && piece.color === arenaPlayerColor) {
-          arenaSelectedSquare = square;
-          showValidMoveDots("arena", square);
-        }
-      } else {
-        const move = arenaGame.move({
-          from: arenaSelectedSquare,
-          to: square,
-          promotion: 'q'
-        });
-
-        $(".move-dot-indicator").remove();
-
-        if (move !== null) {
-          arenaBoard.position(arenaGame.fen());
-          const newFen = arenaGame.fen();
-
-          db.ref("arena_rooms/" + currentArenaRoomId).update({
-            fen: newFen,
-            lastMoveFrom: move.from,
-            lastMoveTo: move.to
-          });
-
-          arenaSelectedSquare = null;
-          checkArenaGameOver();
-        } else {
-          const piece = arenaGame.get(square);
-          if (piece && piece.color === arenaPlayerColor) {
-            arenaSelectedSquare = square;
-            showValidMoveDots("arena", square);
-          } else {
-            arenaSelectedSquare = null;
-          }
-        }
-      }
-    });
 
     function checkArenaGameOver() {
       if (!arenaGame || !arenaGame.game_over() || !currentArenaRoomId) return;
@@ -1522,7 +1621,7 @@
         if (winnerColor === arenaPlayerColor) {
           db.ref("arena_rooms/" + currentArenaRoomId).update({ winner: currentUser.uid });
           applyAiMatchWin();
-        } else {
+        } else if (arenaPlayerColor !== 'spectator') {
           applyAiMatchLoss();
         }
       }
@@ -1610,8 +1709,7 @@
 
       let html = "";
       ALL_ITEMS.emotes.forEach(item => {
-        const owned = ownedEmoteIds.includes(item.id);
-        if (owned) {
+        if (ownedEmoteIds.includes(item.id)) {
           html += `
             <button onclick="triggerEmote('${type}', '${item.id}')" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-700 rounded-lg text-xl flex items-center justify-center transition">
               <span class="${item.anim}">${item.symbol}</span>
@@ -1624,7 +1722,6 @@
 
     function triggerEmote(type, emoteId) {
       $(`#${type}-emote-picker`).addClass("hidden");
-
       const item = ALL_ITEMS.emotes.find(e => e.id === emoteId);
       if (!item) return;
 
@@ -1676,6 +1773,7 @@
       startUnboxingAnimation(crateType, wonItem);
 
       checkQuestProgress("open_crate");
+      checkAchievement("open_crate");
     }
 
     function rollCrateItem(crateType) {
@@ -1691,9 +1789,7 @@
       const pool = [];
       Object.keys(ALL_ITEMS).forEach(cat => {
         ALL_ITEMS[cat].forEach(item => {
-          if (item.rarity === targetRarity) {
-            pool.push({ ...item, category: cat });
-          }
+          if (item.rarity === targetRarity) pool.push({ ...item, category: cat });
         });
       });
 
@@ -1717,21 +1813,17 @@
       });
 
       for (let i = 0; i < 45; i++) {
-        const rnd = allPossibleItems[Math.floor(Math.random() * allPossibleItems.length)];
-        stripItems.push(rnd);
+        stripItems.push(allPossibleItems[Math.floor(Math.random() * allPossibleItems.length)]);
       }
       stripItems.push(wonItem);
       for (let i = 0; i < 4; i++) {
-        const rnd = allPossibleItems[Math.floor(Math.random() * allPossibleItems.length)];
-        stripItems.push(rnd);
+        stripItems.push(allPossibleItems[Math.floor(Math.random() * allPossibleItems.length)]);
       }
 
       let html = "";
       stripItems.forEach(item => {
-        const borderClass = `rarity-${item.rarity}-card`;
-        const bgClass = `rarity-${item.rarity}-bg`;
         html += `
-          <div class="w-28 h-28 flex-shrink-0 bg-slate-900 border-2 ${borderClass} ${bgClass} rounded-xl flex flex-col items-center justify-center p-2 text-center shadow-lg">
+          <div class="w-28 h-28 flex-shrink-0 bg-slate-900 border-2 rarity-${item.rarity}-card rarity-${item.rarity}-bg rounded-xl flex flex-col items-center justify-center p-2 text-center shadow-lg">
             <div class="text-2xl text-white mb-1">${getItemDisplayIcon(item)}</div>
             <div class="text-[10px] font-bold text-slate-200 truncate w-full">${escapeHtml(item.name)}</div>
             <div class="text-[9px] font-bold uppercase ${getItemBadgeClass(item.rarity)} px-1.5 py-0.5 rounded mt-1">${item.rarity}</div>
@@ -1766,33 +1858,34 @@
 
     function finalizeUnboxedItem(item, crateCost) {
       const cat = item.category;
-      const currentCategoryInventory = parseCategory(userProfileData.inventory[cat], []);
-
-      let isDuplicate = currentCategoryInventory.includes(item.id);
-
-      if (!isDuplicate) {
-        currentCategoryInventory.push(item.id);
-        db.ref("users/" + currentUser.uid + "/inventory").update({
-          [cat]: currentCategoryInventory
-        });
-      } else {
-        const refundAmount = Math.floor(crateCost * 0.5);
-        const newBalance = (userProfileData.coins || 0) + refundAmount;
-
-        db.ref("users/" + currentUser.uid).update({ coins: newBalance });
-        $("#unboxing-duplicate-refund").text(`Duplicate Owned! Refunded +${refundAmount} CC (50%)`).removeClass("hidden");
-      }
-
-      const resCard = document.getElementById("unboxing-result-card");
-      resCard.className = `p-6 rounded-2xl border-2 max-w-sm mx-auto space-y-3 rarity-${item.rarity}-card rarity-${item.rarity}-bg`;
-      document.getElementById("unboxing-result-icon").innerHTML = getItemDisplayIcon(item);
-      document.getElementById("unboxing-result-title").innerText = item.name;
       
-      const resRarity = document.getElementById("unboxing-result-rarity");
-      resRarity.innerText = item.rarity;
-      resRarity.className = `inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getItemBadgeClass(item.rarity)}`;
+      // Direct Firebase Check prior to update
+      db.ref("users/" + currentUser.uid + "/inventory/" + cat).once("value").then((snap) => {
+        const currentArr = parseCategory(snap.val(), []);
+        let isDuplicate = currentArr.includes(item.id);
 
-      $("#unboxing-result-box").removeClass("hidden");
+        if (!isDuplicate) {
+          currentArr.push(item.id);
+          db.ref("users/" + currentUser.uid + "/inventory/" + cat).set(currentArr);
+        } else {
+          const refundAmount = Math.floor(crateCost * 0.5);
+          const newBalance = (userProfileData.coins || 0) + refundAmount;
+
+          db.ref("users/" + currentUser.uid).update({ coins: newBalance });
+          $("#unboxing-duplicate-refund").text(`Duplicate Owned! Refunded +${refundAmount} CC (50%)`).removeClass("hidden");
+        }
+
+        const resCard = document.getElementById("unboxing-result-card");
+        resCard.className = `p-6 rounded-2xl border-2 max-w-sm mx-auto space-y-3 rarity-${item.rarity}-card rarity-${item.rarity}-bg`;
+        document.getElementById("unboxing-result-icon").innerHTML = getItemDisplayIcon(item);
+        document.getElementById("unboxing-result-title").innerText = item.name;
+        
+        const resRarity = document.getElementById("unboxing-result-rarity");
+        resRarity.innerText = item.rarity;
+        resRarity.className = `inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getItemBadgeClass(item.rarity)}`;
+
+        $("#unboxing-result-box").removeClass("hidden");
+      });
     }
 
     function closeUnboxingModal() {
@@ -1812,6 +1905,7 @@
 
       populateCosmeticDropdowns();
       updateLiveProfilePreview();
+      renderTrophyCase();
     }
 
     function getEquippedTitleLabel() {
@@ -1821,7 +1915,6 @@
       return item ? item.name : "Apprentice";
     }
 
-    /* Clean Dropdown Population (NO Rarity tag inside option text) */
     function populateCosmeticDropdowns() {
       const inv = userProfileData.inventory || {};
 
@@ -1846,11 +1939,10 @@
       select.innerHTML = "";
 
       fullItemList.forEach(item => {
-        const isOwned = ownedIdArray.includes(item.id);
-        if (isOwned) {
+        if (ownedIdArray.includes(item.id)) {
           const opt = document.createElement("option");
           opt.value = item.id;
-          opt.text = item.name; // Clean item name without [RARITY] tag
+          opt.text = item.name; // Clean item name without [RARITY] prefix
           if (item.id === currentlyEquippedId) opt.selected = true;
           select.appendChild(opt);
         }
@@ -1878,34 +1970,46 @@
       });
     }
 
-    /* Live Card Preview Updater */
     function updateLiveProfilePreview() {
       if (!userProfileData) return;
-
       const equipped = userProfileData.equipped || {};
 
-      // Name & Title
       document.getElementById("preview-name").innerText = userProfileData.displayName || "Player";
       document.getElementById("preview-title").innerText = getEquippedTitleLabel();
-      document.getElementById("preview-rating").innerText = `${userProfileData.elo || 1200} Rating (±${userProfileData.rd || 350} RD)`;
+      document.getElementById("preview-level-badge").innerText = `Level ${userProfileData.level || 1} (${userProfileData.xp || 0}/500 XP)`;
+      document.getElementById("preview-rating").innerText = `${userProfileData.elo || 1200} Rating`;
 
-      // Avatar Icon
       const avatarItem = ALL_ITEMS.avatars.find(a => a.id === equipped.avatars) || ALL_ITEMS.avatars[0];
-      const avatarIconEl = document.getElementById("preview-avatar-icon");
-      avatarIconEl.className = `text-4xl text-indigo-400 fa-solid ${avatarItem.icon || 'fa-user'}`;
+      document.getElementById("preview-avatar-icon").className = `text-4xl text-indigo-400 fa-solid ${avatarItem.icon || 'fa-user'}`;
 
-      // Frame Border Effect
       const frameItem = ALL_ITEMS.frames.find(f => f.id === equipped.frames) || ALL_ITEMS.frames[0];
-      const avatarBox = document.getElementById("preview-avatar-box");
-      avatarBox.className = `relative w-24 h-24 mx-auto flex items-center justify-center rounded-2xl bg-slate-950 border-4 transition-all duration-300 ${frameItem.styleClass || 'frame-style-none'}`;
+      document.getElementById("preview-avatar-box").className = `relative w-24 h-24 mx-auto flex items-center justify-center rounded-2xl bg-slate-950 border-4 transition-all duration-300 ${frameItem.styleClass || 'frame-style-none'}`;
 
-      // Board Skin
       const boardItem = ALL_ITEMS.boards.find(b => b.id === equipped.boards) || ALL_ITEMS.boards[0];
       document.getElementById("preview-board-name").innerText = boardItem.name;
 
-      // Quick Emote
       const emoteItem = ALL_ITEMS.emotes.find(e => e.id === equipped.emotes) || ALL_ITEMS.emotes[0];
       document.getElementById("preview-emote-symbol").innerText = emoteItem.symbol || "👍";
+    }
+
+    function renderTrophyCase() {
+      const grid = document.getElementById("trophy-case-grid");
+      if (!grid) return;
+
+      const userAchs = userProfileData?.achievements || {};
+      let html = "";
+
+      ALL_ACHIEVEMENTS.forEach(ach => {
+        const unlocked = !!userAchs[ach.id];
+        html += `
+          <div class="p-3 rounded-xl border text-center space-y-1 ${unlocked ? 'bg-slate-950 border-amber-500/40 text-amber-300' : 'bg-slate-950/40 border-slate-800 text-slate-600 opacity-60'}">
+            <i class="fa-solid ${ach.icon} text-xl ${unlocked ? 'text-amber-400' : 'text-slate-600'}"></i>
+            <div class="text-xs font-bold">${escapeHtml(ach.name)}</div>
+            <div class="text-[9px] ${unlocked ? 'text-slate-400' : 'text-slate-600'}">${escapeHtml(ach.desc)}</div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
     }
 
     /* ==========================================================================
@@ -2004,12 +2108,13 @@
                 <div class="font-bold text-white">${escapeHtml(u.displayName || "Player")}</div>
                 <div class="text-[10px] text-slate-500">${escapeHtml(u.email || uid)}</div>
               </td>
-              <td class="p-3 font-mono text-slate-300">${u.elo || 1200} Rating (±${u.rd || 350})</td>
+              <td class="p-3 font-mono text-slate-300">${u.elo || 1200} Rating</td>
+              <td class="p-3 font-mono text-indigo-400 font-bold">Lvl ${u.level || 1} (${u.xp || 0} XP)</td>
               <td class="p-3 font-mono text-amber-400 font-bold">${(u.coins || 0).toLocaleString()} CC</td>
               <td class="p-3 text-right space-x-1">
                 <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded text-[10px] font-bold transition">Grant CC</button>
                 <button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-bold transition">Reset CC</button>
-                <button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-bold transition">Reset Glicko</button>
+                <button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-bold transition">Reset Rating</button>
                 <button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded text-[10px] font-bold transition">Delete</button>
               </td>
             </tr>
@@ -2044,7 +2149,7 @@
 
     function adminResetElo(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      if (confirm("Reset user Glicko rating to 1,200 (RD: 350)?")) {
+      if (confirm("Reset user Glicko rating to 1,200?")) {
         db.ref("users/" + uid).update({ elo: 1200, rd: 350 }).then(() => loadAdminUserTable());
       }
     }

@@ -101,9 +101,6 @@
     .highlight-sq {
       box-shadow: inset 0 0 3px 3px rgba(234, 179, 8, 0.75) !important;
     }
-    .premove-sq {
-      box-shadow: inset 0 0 4px 4px rgba(239, 68, 68, 0.85) !important;
-    }
 
     /* Modal Backdrop */
     .modal-backdrop {
@@ -143,7 +140,7 @@
         </div>
         <div>
           <h1 class="font-black text-lg tracking-wide text-white flex items-center gap-2">
-            COCNILEARN <span class="text-xs font-normal text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">LAB</span>
+            COGNILEARN <span class="text-xs font-normal text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">LAB</span>
           </h1>
           <p class="text-xs text-slate-400">Strategic Thinking Engine</p>
         </div>
@@ -193,7 +190,7 @@
         </button>
         
         <div id="user-menu" class="hidden flex items-center space-x-2">
-          <img id="nav-avatar" src="" class="w-8 h-8 rounded-full border border-slate-600">
+          <img id="nav-avatar" src="" class="w-8 h-8 rounded-full border border-slate-600 object-cover">
           <button onclick="logout()" class="text-slate-400 hover:text-white text-sm p-1">
             <i class="fa-solid fa-right-from-bracket"></i>
           </button>
@@ -240,7 +237,7 @@
         <!-- Player Bar -->
         <div class="w-full max-w-[500px] bg-slate-800 rounded-b-xl p-3 border border-slate-700 flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <img id="ai-player-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600">
+            <img id="ai-player-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
             <div>
               <div id="ai-player-name" class="font-bold text-sm text-white">Guest Player</div>
               <div id="ai-player-rating" class="text-xs text-slate-400">1200 Rating</div>
@@ -306,7 +303,7 @@
 
         <div class="w-full max-w-[500px] bg-slate-800 rounded-t-xl p-3 border border-slate-700 flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <img id="arena-opp-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/bP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600">
+            <img id="arena-opp-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/bP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
             <div>
               <div id="arena-opp-name" class="font-bold text-sm text-white">Waiting for Opponent...</div>
               <div id="arena-opp-rating" class="text-xs text-slate-400">----</div>
@@ -323,7 +320,7 @@
 
         <div class="w-full max-w-[500px] bg-slate-800 rounded-b-xl p-3 border border-slate-700 flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <img id="arena-self-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600">
+            <img id="arena-self-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-10 h-10 rounded-lg bg-slate-700 border border-slate-600 object-cover">
             <div>
               <div id="arena-self-name" class="font-bold text-sm text-white">You</div>
               <div id="arena-self-rating" class="text-xs text-slate-400">1200 Rating</div>
@@ -351,15 +348,15 @@
       </div>
     </section>
 
-    <!-- 3. HARD-TIER PUZZLE LAB SECTION -->
+    <!-- 3. PUZZLE LAB SECTION (Mate in 1, 2, 3 & Best Capture) -->
     <section id="view-puzzles" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
       <div class="lg:col-span-8 flex flex-col items-center">
         <div class="w-full max-w-[500px] bg-slate-800 rounded-t-xl p-4 border border-slate-700 flex items-center justify-between">
           <div>
-            <h3 id="puzzle-title" class="font-bold text-sm text-white">Hard Tactical Challenge #1</h3>
-            <p id="puzzle-desc" class="text-xs text-indigo-400">White to move and force Anastasia's Mate</p>
+            <h3 id="puzzle-title" class="font-bold text-sm text-white">Mate in 1 Challenge</h3>
+            <p id="puzzle-desc" class="text-xs text-indigo-400">White to move and deliver checkmate in 1 move.</p>
           </div>
-          <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-xs px-2.5 py-1 rounded-full font-semibold">HARD TIER</span>
+          <span id="puzzle-badge" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs px-2.5 py-1 rounded-full font-semibold">MATE IN 1</span>
         </div>
 
         <div class="w-full max-w-[500px] aspect-square bg-slate-900 border-x border-slate-700">
@@ -367,21 +364,21 @@
         </div>
 
         <div class="w-full max-w-[500px] bg-slate-800 rounded-b-xl p-3 border border-slate-700 flex items-center justify-between text-xs">
-          <span id="puzzle-status" class="text-slate-400">Find the winning tactical sequence.</span>
+          <span id="puzzle-status" class="text-slate-400">Find the winning move.</span>
           <button onclick="nextPuzzle()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-semibold transition">Next Puzzle</button>
         </div>
       </div>
 
       <div class="lg:col-span-4 bg-slate-800 rounded-2xl p-5 border border-slate-700 space-y-4">
         <h3 class="text-md font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-brain text-indigo-400"></i> Tactical Insights
+          <i class="fa-solid fa-brain text-indigo-400"></i> Tactical Objectives
         </h3>
         <p class="text-xs text-slate-400 leading-relaxed">
-          These puzzles feature high-difficulty sacrifices, deflections, and tactical mating nets. Solving them awards <strong>+25 CC</strong> and <strong>+25 XP</strong>.
+          Master essential tactical patterns including <strong>Mate in 1</strong>, <strong>Mate in 2</strong>, <strong>Mate in 3</strong>, and <strong>Best Material Captures</strong>.
         </p>
         <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2 text-xs">
           <div class="flex justify-between text-slate-300">
-            <span>Puzzle Solved Reward:</span>
+            <span>Puzzle Reward:</span>
             <span class="text-amber-400 font-bold">+25 CC</span>
           </div>
           <div class="flex justify-between text-slate-300">
@@ -528,9 +525,7 @@
       <h3 id="modal-title" class="text-xl font-bold text-white">Match Finished</h3>
       <p id="modal-desc" class="text-xs text-slate-400">Game concluded by checkmate.</p>
       
-      <div id="modal-rewards-box" class="bg-slate-800 p-3 rounded-xl text-xs font-semibold text-emerald-400 border border-emerald-500/20 text-left space-y-1">
-        <!-- Payout breakdown dynamically filled -->
-      </div>
+      <div id="modal-rewards-box" class="bg-slate-800 p-3 rounded-xl text-xs font-semibold text-emerald-400 border border-emerald-500/20 text-left space-y-1"></div>
 
       <div class="flex items-center gap-2">
         <button onclick="openGameReview()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex-1">
@@ -565,20 +560,14 @@
         </div>
       </div>
 
-      <!-- Classification Grid -->
-      <div id="review-classifications-grid" class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-        <!-- Dynamically filled with Chess.com style classification counts -->
-      </div>
+      <div id="review-classifications-grid" class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs"></div>
 
-      <!-- Move Breakdown List -->
-      <div id="review-move-list" class="flex-grow overflow-y-auto space-y-1.5 text-xs pr-1 bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono">
-        <!-- Moves with analysis tags -->
-      </div>
+      <div id="review-move-list" class="flex-grow overflow-y-auto space-y-1.5 text-xs pr-1 bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono"></div>
     </div>
   </div>
 
   <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
-    CogniLearn Strategic Thinking Lab &copy; 2025. Deploy Version 5.0.0
+    CogniLearn Strategic Thinking Lab &copy; 2025. Deploy Version 5.0.1
   </footer>
 
   <!-- SCRIPT ENGINE CORE -->
@@ -624,20 +613,38 @@
     let puzzleBoard = null;
     let currentPuzzleIdx = 0;
 
-    // Hard Tactical Puzzles
-    const HARD_PUZZLES = [
+    // Structured Puzzles: Mate in 1, Mate in 2, Mate in 3, Best Capture
+    const PUZZLES = [
       {
-        title: "Hard Tactical Challenge #1",
-        desc: "White to move and force Anastasia's Mate sacrifice",
+        title: "Mate in 1 Challenge",
+        badge: "MATE IN 1",
+        desc: "White to move and deliver immediate checkmate in 1 move.",
+        fen: "r1bqkb1r/pppp1ppp/2n5/4p3/2B1n3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 1",
+        solution: ["f3f7"],
+        solved: false
+      },
+      {
+        title: "Mate in 2 Challenge",
+        badge: "MATE IN 2",
+        desc: "White to move: Force checkmate in 2 moves.",
+        fen: "r2qkb1r/pp2nppp/3p4/2pNN3/2BnP3/3P4/PPP2PPP/R1BbK2R w KQkq - 0 1",
+        solution: ["d5f6", "g7f6", "c4f7"],
+        solved: false
+      },
+      {
+        title: "Mate in 3 Challenge",
+        badge: "MATE IN 3",
+        desc: "White to move: Force checkmate sequence in 3 moves.",
         fen: "r1b2r1k/4Nppp/p7/1p6/4R3/1P5P/P1P2PP1/R5K1 w - - 0 1",
         solution: ["e4h4", "h7h6", "h4h6"],
         solved: false
       },
       {
-        title: "Hard Tactical Challenge #2",
-        desc: "White to move and execute Greek Gift knight blow",
-        fen: "2r2rk1/1bq1bppp/p2pp3/1p2P3/3N1P2/2N1Q3/PPP3PP/2KRR3 w - - 0 1",
-        solution: ["d4e6", "f7e6", "e5d6"],
+        title: "Find the Best Capture",
+        badge: "BEST CAPTURE",
+        desc: "White to move: Find the tactical capture that wins material.",
+        fen: "r1bqk2r/ppp2ppp/2n1p3/3n4/2BP4/5N2/PPP2PPP/RN1QK2R w KQkq - 0 1",
+        solution: ["c4d5"],
         solved: false
       }
     ];
@@ -648,19 +655,30 @@
     let arenaPlayerColor = 'w';
     let isSpectator = false;
 
+    // Master Cosmetics Database with Image Asset Mapping
     const SHOP_ITEMS = [
-      { id: "avatar_knight", category: "avatars", name: "Knight Avatar", cost: 100, rarity: "rare" },
-      { id: "avatar_king", category: "avatars", name: "Crown King", cost: 100, rarity: "mythic" },
-      { id: "theme_wood", category: "themes", name: "Classic Wood", cost: 100, rarity: "rare" },
-      { id: "theme_neon", category: "themes", name: "Cyber Neon", cost: 100, rarity: "legendary" },
+      { id: "avatar_knight", category: "avatars", name: "Knight Avatar", cost: 100, rarity: "rare", img: "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wN.png" },
+      { id: "avatar_king", category: "avatars", name: "Crown King", cost: 100, rarity: "mythic", img: "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wK.png" },
+      { id: "theme_wood", category: "themes", name: "Classic Wood", cost: 100, rarity: "rare", css: "theme-wood" },
+      { id: "theme_neon", category: "themes", name: "Cyber Neon", cost: 100, rarity: "legendary", css: "theme-neon" },
       { id: "title_tactician", category: "titles", name: "Grand Tactician", cost: 100, rarity: "rare" }
     ];
 
     function parseCategory(data, defaultArr) {
-      if (!data) return defaultArr;
+      if (!data) return [...defaultArr];
       if (Array.isArray(data)) return [...data];
-      if (typeof data === 'object') return Object.values(data);
-      return defaultArr;
+      if (typeof data === 'object') {
+        const vals = Object.values(data).filter(v => typeof v === 'string');
+        return vals.length > 0 ? vals : [...defaultArr];
+      }
+      return [...defaultArr];
+    }
+
+    function getAvatarImage(avatarId) {
+      const item = SHOP_ITEMS.find(s => s.id === avatarId);
+      if (item && item.img) return item.img;
+      if (currentUser && currentUser.photoURL) return currentUser.photoURL;
+      return "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png";
     }
 
     function calculateGlicko1(r1, rd1, r2, rd2, outcome) {
@@ -734,23 +752,20 @@
           userProfile.displayName = val.displayName || currentUser.displayName || "Player";
           userProfile.rating = val.rating || 1200;
           userProfile.rd = val.rd || 350;
-          userProfile.coins = val.coins || 0;
+          userProfile.coins = (val.coins !== undefined) ? val.coins : 0;
           userProfile.xp = val.xp || 0;
           userProfile.level = val.level || 1;
           userProfile.winStreak = val.winStreak || 0;
           userProfile.lastWinTimestamp = val.lastWinTimestamp || 0;
 
-          if (val.inventory) {
-            userProfile.inventory.avatars = parseCategory(val.inventory.avatars, ["default"]);
-            userProfile.inventory.themes = parseCategory(val.inventory.themes, ["classic"]);
-            userProfile.inventory.titles = parseCategory(val.inventory.titles, ["Apprentice"]);
-          }
+          userProfile.inventory.avatars = parseCategory(val.inventory?.avatars, ["default"]);
+          userProfile.inventory.themes = parseCategory(val.inventory?.themes, ["classic"]);
+          userProfile.inventory.titles = parseCategory(val.inventory?.titles, ["Apprentice"]);
 
-          if (val.equipped) {
-            userProfile.equipped.avatar = val.equipped.avatar || "default";
-            userProfile.equipped.theme = val.equipped.theme || "classic";
-            userProfile.equipped.title = val.equipped.title || "Apprentice";
-          }
+          userProfile.equipped.avatar = val.equipped?.avatar || "default";
+          userProfile.equipped.theme = val.equipped?.theme || "classic";
+          userProfile.equipped.title = val.equipped?.title || "Apprentice";
+
           userProfile.achievements = val.achievements || {};
         } else {
           db.ref("users/" + uid).set(userProfile);
@@ -780,6 +795,11 @@
       $("#profile-xp-val").text(`${userProfile.xp % 500} / 500 XP`);
       $("#profile-xp-bar").css("width", `${((userProfile.xp % 500) / 500) * 100}%`);
 
+      // Dynamic Avatar Image Update
+      const avatarUrl = getAvatarImage(userProfile.equipped.avatar);
+      $("#profile-card-avatar, #ai-player-avatar, #arena-self-avatar").attr("src", avatarUrl);
+
+      // Dynamic Cosmetic Options Populator
       populateCosmeticDropdown("equip-avatar-select", userProfile.inventory.avatars, userProfile.equipped.avatar);
       populateCosmeticDropdown("equip-theme-select", userProfile.inventory.themes, userProfile.equipped.theme);
       populateCosmeticDropdown("equip-title-select", userProfile.inventory.titles, userProfile.equipped.title);
@@ -864,7 +884,7 @@
         const isFirstWin = (now - userProfile.lastWinTimestamp) > 86400000;
         const newStreak = userProfile.winStreak + 1;
 
-        let coinGain = 50; // Standard Match Win
+        let coinGain = 50;
         rewardsHTML += `<div>• Standard Win: <span class="text-amber-400">+50 CC</span></div>`;
 
         if (isFirstWin) {
@@ -932,13 +952,14 @@
       resetAIGame();
     }
 
-    // HARD PUZZLE LAB ENGINE
+    // PUZZLE LAB ENGINE
     function initPuzzleBoard() {
-      const p = HARD_PUZZLES[currentPuzzleIdx];
+      const p = PUZZLES[currentPuzzleIdx];
       puzzleGame.load(p.fen);
       $("#puzzle-title").text(p.title);
+      $("#puzzle-badge").text(p.badge);
       $("#puzzle-desc").text(p.desc);
-      $("#puzzle-status").text("Find the winning tactical move.");
+      $("#puzzle-status").text("Find the winning move.").removeClass("text-emerald-400 text-amber-400 text-red-400").addClass("text-slate-400");
 
       puzzleBoard = Chessboard('puzzleBoard', {
         draggable: true,
@@ -950,10 +971,10 @@
           const targetMove = p.solution[0];
 
           if (moveSan === targetMove || move.san === targetMove) {
-            $("#puzzle-status").text("Brilliant move! Next tactical step...").addClass("text-emerald-400");
+            $("#puzzle-status").text("Great move! Executing sequence...").removeClass("text-slate-400").addClass("text-emerald-400");
             p.solution.shift();
             if (p.solution.length === 0) {
-              $("#puzzle-status").text("Puzzle Solved! +25 CC & +25 XP Earned.").removeClass("text-slate-400").addClass("text-amber-400 font-bold");
+              $("#puzzle-status").text("Puzzle Solved! +25 CC & +25 XP Earned.").removeClass("text-slate-400 text-emerald-400").addClass("text-amber-400 font-bold");
               if (currentUser && !p.solved) {
                 p.solved = true;
                 db.ref("users/" + currentUser.uid).update({
@@ -970,7 +991,7 @@
             }
           } else {
             puzzleGame.undo();
-            $("#puzzle-status").text("Incorrect move. Try another tactical sequence.").addClass("text-red-400");
+            $("#puzzle-status").text("Incorrect move. Try another tactical choice.").removeClass("text-slate-400 text-emerald-400").addClass("text-red-400");
             return 'snapback';
           }
         }
@@ -978,7 +999,7 @@
     }
 
     function nextPuzzle() {
-      currentPuzzleIdx = (currentPuzzleIdx + 1) % HARD_PUZZLES.length;
+      currentPuzzleIdx = (currentPuzzleIdx + 1) % PUZZLES.length;
       initPuzzleBoard();
     }
 
@@ -1003,7 +1024,6 @@
         let tag = "Best";
         let colorClass = "text-emerald-400";
 
-        // Simulated Chess.com Move Quality Algorithm
         const rand = Math.random();
         if (move.flags.includes('c') && rand > 0.7) {
           tag = "Brilliant (!!)";
@@ -1153,7 +1173,7 @@
       if (userProfile.coins < 100) return alert("Insufficient CogniCoins! Win matches or solve puzzles.");
 
       db.ref("users/" + currentUser.uid).once("value", (snap) => {
-        const val = snap.val();
+        const val = snap.val() || {};
         const currentCoins = val.coins || 0;
         if (currentCoins < 100) return alert("Insufficient CogniCoins.");
 
@@ -1161,7 +1181,11 @@
         buildCrateReel(winningItem);
 
         const newCoins = currentCoins - 100;
-        const currentCat = parseCategory(val.inventory ? val.inventory[winningItem.category] : null, ["default"]);
+        let defaultArr = ["default"];
+        if (winningItem.category === 'themes') defaultArr = ["classic"];
+        if (winningItem.category === 'titles') defaultArr = ["Apprentice"];
+
+        const currentCat = parseCategory(val.inventory ? val.inventory[winningItem.category] : null, defaultArr);
         if (!currentCat.includes(winningItem.id)) currentCat.push(winningItem.id);
 
         const updates = {};
@@ -1200,7 +1224,7 @@
       const $container = $("#quests-list-container").empty();
       const quests = [
         { desc: "Win 1 Match against AI or Arena", reward: 50 },
-        { desc: "Solve 1 Hard Tactical Puzzle", reward: 25 }
+        { desc: "Solve 1 Tactical Puzzle", reward: 25 }
       ];
       quests.forEach(q => {
         $container.append(`
@@ -1278,4 +1302,4 @@
     }
   </script>
 </body>
-</html>
+</html> 

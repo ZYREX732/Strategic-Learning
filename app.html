@@ -359,7 +359,6 @@
 
         <!-- Arena Room Control & Live Chat -->
         <div class="flex-1 space-y-6 w-full">
-          <!-- Room Setup Box -->
           <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
             <h2 class="text-lg font-bold text-white flex items-center">
               <i class="fa-solid fa-users text-indigo-400 mr-2"></i>
@@ -382,7 +381,6 @@
               </div>
             </div>
 
-            <!-- Active Room Indicator Bar -->
             <div id="arena-active-bar" class="hidden p-3 bg-slate-950 rounded-xl border border-indigo-500/30 flex items-center justify-between">
               <div class="flex items-center space-x-3">
                 <span class="text-xs text-slate-400">ROOM CODE:</span>
@@ -395,7 +393,6 @@
             </div>
           </div>
 
-          <!-- Arena Match Chat -->
           <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-3 flex flex-col h-[300px]">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
               <span><i class="fa-solid fa-comments text-indigo-400 mr-2"></i>Match Chat</span>
@@ -433,7 +430,6 @@
         </p>
       </div>
 
-      <!-- Crates Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <!-- Pawn Crate -->
@@ -514,7 +510,6 @@
     <!-- ========================================== -->
     <section id="section-profile" class="hidden space-y-6">
       
-      <!-- Profile Header Showcase Card -->
       <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
         <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
           
@@ -550,17 +545,13 @@
         </div>
       </div>
 
-      <!-- Customization Studio Navigation / Categories -->
       <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
         <h3 class="text-lg font-bold text-white flex items-center">
           <i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>
           Customization Studio
         </h3>
 
-        <!-- Customizer Categories Grid -->
         <div class="space-y-6">
-          
-          <!-- Category 1: Board Skins -->
           <div class="space-y-3">
             <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chessboard Skins</h4>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -588,7 +579,6 @@
             </div>
           </div>
 
-          <!-- Category 2: Emote Deck -->
           <div class="space-y-3">
             <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Animated Emotes Deck</h4>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -615,7 +605,6 @@
             </div>
           </div>
 
-          <!-- Category 3: Inventory Item Vault -->
           <div class="space-y-3">
             <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
               <span>Unlocked Inventory Items</span>
@@ -626,7 +615,6 @@
               <!-- Item cards rendered dynamically -->
             </div>
           </div>
-
         </div>
       </div>
     </section>
@@ -664,7 +652,6 @@
         </div>
       </div>
 
-      <!-- User Management Table -->
       <div class="bg-slate-900 rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center">
           <h3 class="text-sm font-bold text-white uppercase tracking-wider">Registered System Users</h3>
@@ -692,37 +679,25 @@
 
   </main>
 
-  <!-- ========================================== -->
-  <!-- MODALS                                     -->
-  <!-- ========================================== -->
-
-  <!-- Modal 1: Crate CS:GO Unboxing Modal -->
+  <!-- Modals -->
   <div id="modal-crate-unbox" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full space-y-6 text-center shadow-2xl">
       <h3 id="crate-modal-title" class="text-xl font-bold text-white">Unboxing Crate...</h3>
-      
-      <!-- Horizontal CS:GO Roller -->
       <div class="crate-strip-container">
         <div class="crate-strip-ticker"></div>
-        <div id="crate-strip-track" class="crate-strip-track">
-          <!-- Generated via JS -->
-        </div>
+        <div id="crate-strip-track" class="crate-strip-track"></div>
       </div>
-
-      <!-- Dropped Item Result Display -->
       <div id="crate-result-card" class="hidden space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800">
         <div id="crate-result-rarity" class="text-xs font-bold uppercase tracking-wider text-amber-400">Legendary Drop!</div>
         <div id="crate-result-name" class="text-lg font-bold text-white">Grandmaster Frame</div>
         <div id="crate-result-refund" class="text-xs text-amber-300 hidden">Duplicate item drop! Converted to 50% CC Refund (+1,750 CC)</div>
       </div>
-
       <button id="crate-done-btn" onclick="closeCrateModal()" class="hidden w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all shadow-lg">
         Done
       </button>
     </div>
   </div>
 
-  <!-- Modal 2: Maintenance Overlay Modal -->
   <div id="modal-maintenance" class="fixed inset-0 bg-slate-950/95 backdrop-blur-lg hidden items-center justify-center z-50 p-4">
     <div class="bg-slate-900 border border-red-500/40 rounded-2xl p-8 max-w-md w-full text-center space-y-5 shadow-2xl">
       <div class="w-16 h-16 rounded-full bg-red-950/60 border border-red-500/40 flex items-center justify-center text-red-400 text-3xl mx-auto">
@@ -740,15 +715,12 @@
     </div>
   </div>
 
-  <!-- Modal 3: Auto-Dismiss Game Over Toast -->
   <div id="toast-gameover" class="fixed bottom-6 right-6 hidden z-50 max-w-sm w-full bg-slate-900 border border-indigo-500/40 p-4 rounded-2xl shadow-2xl space-y-1">
     <div id="toast-gameover-title" class="font-bold text-sm text-white">Game Ended</div>
     <div id="toast-gameover-msg" class="text-xs text-slate-300">Match result calculated.</div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- JAVASCRIPT LOGIC                           -->
-  <!-- ========================================== -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     // 1. Firebase Configuration
     const firebaseConfig = {
@@ -786,24 +758,9 @@
     const PIECE_CDN = "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png";
 
     const CRATE_CONFIGS = {
-      pawn: {
-        name: "Pawn Crate",
-        cost: 1000,
-        refund: 500,
-        odds: { common: 0.65, rare: 0.28, epic: 0.06, legendary: 0.01 }
-      },
-      knight: {
-        name: "Knight Crate",
-        cost: 3500,
-        refund: 1750,
-        odds: { common: 0.35, rare: 0.45, epic: 0.16, legendary: 0.04 }
-      },
-      grandmaster: {
-        name: "Grandmaster Crate",
-        cost: 10000,
-        refund: 5000,
-        odds: { common: 0.10, rare: 0.35, epic: 0.40, legendary: 0.15 }
-      }
+      pawn: { name: "Pawn Crate", cost: 1000, refund: 500, odds: { common: 0.65, rare: 0.28, epic: 0.06, legendary: 0.01 } },
+      knight: { name: "Knight Crate", cost: 3500, refund: 1750, odds: { common: 0.35, rare: 0.45, epic: 0.16, legendary: 0.04 } },
+      grandmaster: { name: "Grandmaster Crate", cost: 10000, refund: 5000, odds: { common: 0.10, rare: 0.35, epic: 0.40, legendary: 0.15 } }
     };
 
     const ITEM_CATALOG = [
@@ -851,34 +808,31 @@
         const currBal = (current !== null) ? current : 1000;
         const newBal = currBal + amountDelta;
         return Math.max(0, Math.floor(newBal));
-      });
+      }).catch(err => console.warn("safeAddCoins failed:", err));
     }
 
     function safeSetCoins(targetUid, absoluteAmount) {
       if (!targetUid) return Promise.reject("Invalid UID");
       const safeBal = Math.max(0, Math.floor(absoluteAmount));
-      return db.ref('users/' + targetUid + '/coins').set(safeBal);
+      return db.ref('users/' + targetUid + '/coins').set(safeBal).catch(err => console.warn("safeSetCoins failed:", err));
     }
 
-    // Attach Click Handlers to Chessboard Squares via jQuery Event Delegation
+    // Delegated Piece Movement Handlers
     $(document).ready(function() {
       $(document).on('click', '#ai-board .square-55d63', function(e) {
         e.preventDefault();
         const square = $(this).attr('data-square');
-        if (square) {
-          onAiSquareClick(square);
-        }
+        if (square) onAiSquareClick(square);
       });
 
       $(document).on('click', '#arena-board .square-55d63', function(e) {
         e.preventDefault();
         const square = $(this).attr('data-square');
-        if (square) {
-          onArenaSquareClick(square);
-        }
+        if (square) onArenaSquareClick(square);
       });
     });
 
+    // Auth & Permission-Safe User Initialization
     auth.onAuthStateChanged((user) => {
       if (!user) {
         window.location.href = "index.html";
@@ -886,6 +840,7 @@
       }
       currentUser = user;
 
+      // Safe Maintenance Check with Error Handler
       db.ref('system/maintenance').on('value', (snap) => {
         const isMaint = snap.val() === true;
         const userEmail = (user.email || "").trim().toLowerCase();
@@ -909,10 +864,14 @@
             toggleBtn.innerHTML = `<i class="fa-solid fa-power-off mr-2"></i><span>Maintenance Normal (OFF)</span>`;
           }
         }
+      }, (err) => {
+        console.warn("Maintenance check error:", err);
       });
 
+      // User Profile Initialization & Realtime Sync
       const userRef = db.ref('users/' + user.uid);
-      userRef.on('value', (snapshot) => {
+
+      userRef.once('value').then((snapshot) => {
         let val = snapshot.val();
         if (!val) {
           val = {
@@ -922,14 +881,32 @@
             gamesPlayed: 0,
             inventory: []
           };
-          userRef.set(val);
+          userRef.set(val).catch(err => console.warn("Failed to create profile record:", err));
         }
 
         currentUserData = val;
         currentUserData.inventory = getNormalizedInventory(val.inventory);
-
         updateUIWithUserData();
         renderProfileSection();
+      }).catch((err) => {
+        console.warn("User record fetch error:", err);
+        // Fallback profile if permission pending
+        currentUserData = { email: user.email, elo: 1200, coins: 1000, gamesPlayed: 0, inventory: [] };
+        updateUIWithUserData();
+        renderProfileSection();
+      });
+
+      // Realtime User Updates with Permission Error Guard
+      userRef.on('value', (snapshot) => {
+        let val = snapshot.val();
+        if (val) {
+          currentUserData = val;
+          currentUserData.inventory = getNormalizedInventory(val.inventory);
+          updateUIWithUserData();
+          renderProfileSection();
+        }
+      }, (err) => {
+        console.warn("User realtime sync error:", err);
       });
 
       checkAdminAccess(user.email);
@@ -982,9 +959,7 @@
       });
     }
 
-    // ==========================================
-    // PROFILE & CUSTOMIZATION ENGINE
-    // ==========================================
+    // Profile & Customization Engine
     function renderProfileSection() {
       if (!currentUserData) return;
 
@@ -1039,9 +1014,7 @@
       });
     }
 
-    // ==========================================
-    // AI CHESS ENGINE (1500+ ELO GM BOT)
-    // ==========================================
+    // AI Chess Engine
     function initAiGame() {
       aiGame = new Chess();
       aiPlayerColor = 'w';
@@ -1086,7 +1059,6 @@
       if (aiGame.turn() !== aiPlayerColor) return;
 
       if (selectedSquare === null) {
-        // Select Piece
         const piece = aiGame.get(square);
         if (piece && piece.color === aiPlayerColor) {
           selectedSquare = square;
@@ -1094,7 +1066,6 @@
           showValidMoves(square);
         }
       } else {
-        // Handle Second Click
         if (selectedSquare === square) {
           selectedSquare = null;
           clearHighlights();
@@ -1121,7 +1092,6 @@
           document.getElementById('ai-status-msg').innerText = "Bot is thinking...";
           setTimeout(makeAiMove, 500);
         } else {
-          // Re-select if clicking another player piece
           const piece = aiGame.get(square);
           if (piece && piece.color === aiPlayerColor) {
             selectedSquare = square;
@@ -1171,7 +1141,6 @@
       });
     }
 
-    // Bot Engine Move Evaluation
     function makeAiMove() {
       if (aiGame.game_over()) return;
 
@@ -1285,9 +1254,9 @@
       db.ref('users/' + currentUser.uid).update({
         elo: Math.max(100, (currentUserData.elo || 1200) + eloChange),
         gamesPlayed: (currentUserData.gamesPlayed || 0) + 1
-      });
-      safeAddCoins(currentUser.uid, 50);
+      }).catch(err => console.warn("Update win failed:", err));
 
+      safeAddCoins(currentUser.uid, 50);
       showToast("Victory Rewards", `+50 CogniCoins | ELO Change: +${eloChange}`);
     }
 
@@ -1298,12 +1267,10 @@
       db.ref('users/' + currentUser.uid).update({
         elo: Math.max(100, (currentUserData.elo || 1200) + eloChange),
         gamesPlayed: (currentUserData.gamesPlayed || 0) + 1
-      });
+      }).catch(err => console.warn("Update loss failed:", err));
     }
 
-    // ==========================================
-    // COGNISHOP & CS:GO UNBOXING ENGINE
-    // ==========================================
+    // CogniShop Engine
     function openCrate(crateType) {
       const config = CRATE_CONFIGS[crateType];
       if (!config) return;
@@ -1391,7 +1358,7 @@
       } else {
         refundEl.classList.add('hidden');
         currentInv.push(winningItem.id);
-        db.ref('users/' + currentUser.uid + '/inventory').set(currentInv);
+        db.ref('users/' + currentUser.uid + '/inventory').set(currentInv).catch(err => console.warn("Inventory update error:", err));
       }
 
       resultCard.classList.remove('hidden');
@@ -1404,9 +1371,7 @@
       modal.classList.remove('flex');
     }
 
-    // ==========================================
-    // 1V1 ARENA MULTIPLAYER ENGINE
-    // ==========================================
+    // Arena Multiplayer Engine
     function createArenaRoom() {
       if (!currentUser) return;
       const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -1426,7 +1391,7 @@
 
       roomRef.set(roomData).then(() => {
         joinRoomSession(roomCode, 'w');
-      });
+      }).catch(err => console.warn("Create room error:", err));
     }
 
     function joinArenaRoom() {
@@ -1494,7 +1459,7 @@
           document.getElementById('arena-opp-name').innerText = room.hostEmail.split('@')[0];
           document.getElementById('arena-opp-elo').innerText = "Rating: " + (room.hostElo || 1200);
         }
-      });
+      }, (err) => console.warn("Arena room listener error:", err));
 
       db.ref('arena_chat/' + roomCode).on('value', (snap) => {
         const chatBox = document.getElementById('arena-chat-box');
@@ -1509,7 +1474,7 @@
           chatBox.appendChild(div);
         });
         chatBox.scrollTop = chatBox.scrollHeight;
-      });
+      }, (err) => console.warn("Arena chat listener error:", err));
     }
 
     function onArenaSquareClick(square) {
@@ -1603,12 +1568,14 @@
       }
     }
 
-    // ==========================================
-    // MASTER CONTROL ADMIN PANEL ENGINE
-    // ==========================================
+    // Admin Control Panel Engine
     function listenAdminUsersList() {
+      const isNavAdmin = (currentUser && currentUser.email || "").trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      if (!isNavAdmin) return;
+
       db.ref('users').on('value', (snap) => {
         const tbody = document.getElementById('admin-users-table-body');
+        if (!tbody) return;
         tbody.innerHTML = '';
         const users = snap.val();
         if (!users) return;
@@ -1634,6 +1601,8 @@
           `;
           tbody.appendChild(tr);
         });
+      }, (err) => {
+        console.warn("Admin users list read error:", err);
       });
     }
 
@@ -1685,7 +1654,7 @@
       if (snap.exists()) {
         window.location.reload();
       }
-    });
+    }, (err) => console.warn("Global reload listener error:", err));
 
     function showToast(title, msg) {
       const toast = document.getElementById('toast-gameover');

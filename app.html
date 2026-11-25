@@ -47,20 +47,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
   <style>
-    /* Fix: Dropdown chevron spacing so arrows never hug the edge */
+    /* Fix: Dropdown arrow spacing so it never touches the edge */
     select {
-      appearance: none !important;
-      -webkit-appearance: none !important;
-      -moz-appearance: none !important;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
-      background-repeat: no-repeat !important;
-      background-position: right 0.85rem center !important;
-      background-size: 1.1rem !important;
-      padding-right: 2.75rem !important;
+      padding-right: 2.25rem !important;
       cursor: pointer;
     }
 
-    /* Custom Board & Piece Styling */
+    /* Board & Piece Styling */
     .chessboard-63f37 {
       border: 4px solid #334155 !important;
       border-radius: 8px;
@@ -96,41 +89,21 @@
       z-index: 999;
     }
     
-    /* Click-to-Move Selected Square Highlight */
+    /* Selected square & Legal move dot indicators */
     .selected-square {
       background-color: rgba(234, 179, 8, 0.45) !important;
     }
-
-    /* Small Legal Move Indicator Dots */
     .legal-dot {
-      width: 26%;
-      height: 26%;
-      background: rgba(15, 23, 42, 0.5);
+      width: 14px;
+      height: 14px;
+      background: rgba(148, 163, 184, 0.75);
       border-radius: 50%;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       pointer-events: none;
-      z-index: 40;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-    }
-    .theme-slate .legal-dot, .theme-midnight .legal-dot, .theme-neon .legal-dot {
-      background: rgba(241, 245, 249, 0.6);
-    }
-
-    /* Capture target ring on opponent pieces */
-    .legal-capture-ring {
-      width: 82%;
-      height: 82%;
-      border: 4px solid rgba(239, 68, 68, 0.7);
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 40;
+      z-index: 20;
     }
 
     /* Scrollbars */
@@ -149,7 +122,6 @@
       background: #475569;
     }
 
-    /* Pulse animation */
     @keyframes pulse-subtle {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.6; }
@@ -298,8 +270,8 @@
         <div class="w-full flex items-center justify-between p-3 bg-slate-800 rounded-b-xl border-b border-x border-slate-700">
           <div class="flex items-center gap-3">
             <div class="relative">
-              <img id="ai-player-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cogni" class="w-10 h-10 rounded-xl bg-slate-700 border-2 border-indigo-500 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Cogni';" />
-              <div id="ai-player-badge" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
+              <img id="ai-player-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cogni" class="w-9 h-9 rounded-lg bg-slate-700 border border-indigo-500 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Cogni';" />
+              <div id="ai-player-badge" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
                 <i class="fa-solid fa-star"></i>
               </div>
             </div>
@@ -311,18 +283,8 @@
               <p class="text-xs text-slate-400 font-mono" id="ai-player-rating">1200 Rating</p>
             </div>
           </div>
-
-          <!-- AI Action Controls & Timer -->
-          <div class="flex items-center gap-2">
-            <button onclick="offerAIDraw()" class="px-2.5 py-1 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded font-semibold transition" title="Offer Draw to AI">
-              <i class="fa-solid fa-handshake"></i>
-            </button>
-            <button onclick="resignAIGame()" class="px-2.5 py-1 text-xs bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 rounded font-semibold transition" title="Resign Match">
-              <i class="fa-solid fa-flag"></i>
-            </button>
-            <div class="font-mono text-base font-bold bg-slate-900 px-3 py-1 rounded border border-slate-700 text-slate-200" id="ai-timer-white">
-              10:00
-            </div>
+          <div class="font-mono text-base font-bold bg-slate-900 px-3 py-1 rounded border border-slate-700 text-slate-200" id="ai-timer-white">
+            10:00
           </div>
         </div>
       </div>
@@ -409,8 +371,8 @@
         <div class="w-full flex items-center justify-between p-3 bg-slate-800 rounded-b-xl border-b border-x border-slate-700">
           <div class="flex items-center gap-3">
             <div class="relative">
-              <img id="arena-self-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Self" class="w-10 h-10 rounded-xl bg-slate-700 border-2 border-indigo-500 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Self';" />
-              <div id="arena-self-badge" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
+              <img id="arena-self-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Self" class="w-9 h-9 rounded-lg bg-slate-700 border border-indigo-500 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Self';" />
+              <div id="arena-self-badge" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
                 <i class="fa-solid fa-star"></i>
               </div>
             </div>
@@ -428,7 +390,7 @@
         </div>
       </div>
 
-      <!-- Arena Matchmaking & Room Management Column -->
+      <!-- Arena Matchmaking Column -->
       <div class="w-full lg:w-96 flex flex-col gap-4">
         
         <!-- Matchmaking State Card -->
@@ -495,7 +457,6 @@
 
     <!-- TAB 3: COGNISHOP -->
     <section id="tab-shop" class="tab-content hidden flex-col gap-6">
-      
       <!-- Crate Dispensers Section -->
       <div>
         <div class="flex items-center justify-between mb-4">
@@ -508,8 +469,7 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          
-          <!-- Novice Crate -->
+          <!-- Bronze Crate -->
           <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col items-center text-center relative overflow-hidden group hover:border-indigo-500/50 transition">
             <div class="w-16 h-16 bg-slate-700/50 rounded-2xl flex items-center justify-center text-3xl text-slate-300 mb-3 group-hover:scale-110 transition">
               <i class="fa-solid fa-box"></i>
@@ -564,11 +524,10 @@
               </button>
             </div>
           </div>
-
         </div>
       </div>
 
-      <!-- Equipment Customization Hub (With Spaced Dropdown Arrows) -->
+      <!-- Equipment Customization Hub (With Fixed Dropdown Arrow Spacing) -->
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
         <h3 class="text-base font-black text-white mb-4 flex items-center gap-2">
           <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i> Wardrobe & Cosmetic Loadout
@@ -637,8 +596,6 @@
         </div>
 
         <div class="flex flex-col gap-3" id="quests-list">
-          
-          <!-- Quest 1 -->
           <div class="p-4 bg-slate-900 rounded-xl border border-slate-700/80 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
@@ -647,9 +604,6 @@
               <div>
                 <h4 class="text-sm font-bold text-slate-200">AI Sparring Partner</h4>
                 <p class="text-xs text-slate-400">Play 1 match against CogniBot (any difficulty).</p>
-                <div class="w-32 bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div class="bg-indigo-500 h-full w-full"></div>
-                </div>
               </div>
             </div>
             <button onclick="claimQuest('quest_ai_play')" id="btn-quest-ai" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg transition">
@@ -657,7 +611,6 @@
             </button>
           </div>
 
-          <!-- Quest 2 -->
           <div class="p-4 bg-slate-900 rounded-xl border border-slate-700/80 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
@@ -666,9 +619,6 @@
               <div>
                 <h4 class="text-sm font-bold text-slate-200">Arena Victor</h4>
                 <p class="text-xs text-slate-400">Win 1 rated match in the 1v1 Arena.</p>
-                <div class="w-32 bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div class="bg-amber-500 h-full w-0" id="quest-arena-bar"></div>
-                </div>
               </div>
             </div>
             <button onclick="claimQuest('quest_arena_win')" id="btn-quest-arena" class="px-4 py-2 bg-slate-800 text-slate-500 font-bold text-xs rounded-lg cursor-not-allowed">
@@ -676,7 +626,6 @@
             </button>
           </div>
 
-          <!-- Quest 3 -->
           <div class="p-4 bg-slate-900 rounded-xl border border-slate-700/80 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -685,24 +634,18 @@
               <div>
                 <h4 class="text-sm font-bold text-slate-200">Daily Login Bonus</h4>
                 <p class="text-xs text-slate-400">Sign in to check daily calibrations.</p>
-                <div class="w-32 bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div class="bg-emerald-500 h-full w-full"></div>
-                </div>
               </div>
             </div>
             <button onclick="claimQuest('quest_login')" id="btn-quest-login" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg transition">
               Claim 25 CC
             </button>
           </div>
-
         </div>
       </div>
     </section>
 
     <!-- TAB 5: PROFILE -->
     <section id="tab-profile" class="tab-content hidden flex-col gap-6 max-w-4xl mx-auto w-full">
-      
-      <!-- Profile Header Card -->
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
         <div class="flex items-center gap-4">
           <div class="relative">
@@ -736,12 +679,10 @@
         </div>
       </div>
 
-      <!-- Match History & Stat Details -->
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
         <h3 class="text-base font-black text-white mb-4 flex items-center gap-2">
           <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> Recent Arena Matches
         </h3>
-        
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-slate-300">
             <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] font-bold">
@@ -779,10 +720,7 @@
           <span class="text-xs font-mono bg-amber-500/10 text-amber-300 px-3 py-1 rounded-full border border-amber-500/20 font-bold">Super Admin</span>
         </div>
 
-        <!-- Admin Controls Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <!-- Maintenance Toggle Card -->
           <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col justify-between gap-3">
             <div>
               <h4 class="text-xs font-bold uppercase text-slate-300 tracking-wider">Maintenance Mode</h4>
@@ -793,7 +731,6 @@
             </button>
           </div>
 
-          <!-- Currency Grant Tool -->
           <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col justify-between gap-3">
             <div>
               <h4 class="text-xs font-bold uppercase text-slate-300 tracking-wider">CogniCoin Mint / Grant</h4>
@@ -804,7 +741,6 @@
             </button>
           </div>
 
-          <!-- Broadcast Announcement -->
           <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 col-span-1 md:col-span-2 flex flex-col gap-3">
             <h4 class="text-xs font-bold uppercase text-slate-300 tracking-wider">Global System Announcement</h4>
             <div class="flex gap-2">
@@ -820,7 +756,7 @@
 
   <!-- Unboxing Reward Modal -->
   <div id="unboxing-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[999] hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-indigo-500/50 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative animate-scale-up">
+    <div class="bg-slate-900 border border-indigo-500/50 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
       <div id="unboxing-anim-box" class="w-24 h-24 mx-auto mb-4 bg-indigo-600/20 border border-indigo-500/40 rounded-2xl flex items-center justify-center text-4xl text-indigo-400">
         <i class="fa-solid fa-gift animate-bounce"></i>
       </div>
@@ -832,7 +768,7 @@
     </div>
   </div>
 
-  <!-- Sound Synthesis Helper -->
+  <!-- Audio Engine -->
   <script>
     const AudioEngine = {
       ctx: null,
@@ -852,7 +788,6 @@
           const gain = this.ctx.createGain();
           osc.connect(gain);
           gain.connect(this.ctx.destination);
-
           const now = this.ctx.currentTime;
 
           if (type === 'move') {
@@ -895,7 +830,6 @@
 
   <!-- Application Logic & Firebase Engine -->
   <script>
-    // --- 1. FIREBASE CONFIGURATION ---
     const firebaseConfig = {
       apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
       authDomain: "chess-7df7a.firebaseapp.com",
@@ -912,14 +846,10 @@
     const auth = firebase.auth();
     const rtdb = firebase.database();
 
-    // Constant CDN to prevent broken chess piece images
     const PIECE_THEME_CDN = 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png';
-
-    // Whitelist & Permissions
     const SUPER_ADMIN_EMAIL = 'zainisgo123@gmail.com';
     const MAINTENANCE_WHITELIST = ['zainisgo123@gmail.com', 'faceca4769@afronewz.com'];
 
-    // State Variables
     let currentUser = null;
     let userProfile = {
       coins: 100,
@@ -943,7 +873,6 @@
       }
     };
 
-    // Helper: Safely parse array / object categories from Firebase
     function parseCategory(data, defaultArr) {
       if (!data) return [...defaultArr];
       if (Array.isArray(data)) return [...data];
@@ -954,7 +883,7 @@
       return [...defaultArr];
     }
 
-    // --- 2. AUTHENTICATION & PROFILE ENGINE ---
+    // --- AUTHENTICATION & PROFILE ENGINE ---
     auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
@@ -968,7 +897,6 @@
           $('#nav-admin, #mobile-nav-admin').addClass('hidden');
         }
 
-        // Realtime User Data Listener
         rtdb.ref('users/' + user.uid).on('value', snap => {
           const val = snap.val();
           if (val) {
@@ -1014,12 +942,10 @@
 
     function loginWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(err => {
-        alert("Authentication Error: " + err.message);
-      });
+      auth.signInWithPopup(provider).catch(err => alert("Authentication Error: " + err.message));
     }
 
-    // --- 3. MAINTENANCE & BROADCAST LISTENERS ---
+    // --- MAINTENANCE & BROADCAST LISTENERS ---
     rtdb.ref('system/maintenance').on('value', snap => {
       const isMaint = snap.val() === true;
       const userEmail = currentUser && currentUser.email ? currentUser.email.toLowerCase() : '';
@@ -1048,48 +974,39 @@
       }
     });
 
-    // --- 4. GLICKO-1 RATING ENGINE ---
+    // --- GLICKO-1 RATING CALCULATOR ---
     function calculateGlicko1(r1, rd1, r2, rd2, outcome) {
       const q = Math.LN10 / 400;
       const pi = Math.PI;
       function g(rd) { return 1 / Math.sqrt(1 + (3 * Math.pow(q, 2) * Math.pow(rd, 2)) / Math.pow(pi, 2)); }
       function E(r, r_opp, g_rd) { return 1 / (1 + Math.pow(10, (-g_rd * (r - r_opp)) / 400)); }
-
       const g_rd2 = g(rd2);
       const expected = E(r1, r2, g_rd2);
       const d2 = 1 / (Math.pow(q, 2) * Math.pow(g_rd2, 2) * expected * (1 - expected));
       const newRating = r1 + (q / ((1 / Math.pow(rd1, 2)) + (1 / d2))) * g_rd2 * (outcome - expected);
       let newRD = Math.sqrt(1 / ((1 / Math.pow(rd1, 2)) + (1 / d2)));
       newRD = Math.max(30, Math.min(350, newRD));
-
-      return {
-        rating: Math.round(newRating),
-        rd: Math.round(newRD),
-        delta: Math.round(newRating - r1)
-      };
+      return { rating: Math.round(newRating), rd: Math.round(newRD), delta: Math.round(newRating - r1) };
     }
 
-    // --- 5. UI SYNCHRONIZATION ---
+    // --- UI SYNC ---
     function switchTab(tabId) {
       $('.tab-content').addClass('hidden');
       $('#tab-' + tabId).removeClass('hidden').addClass('flex');
-
       $('.nav-btn').removeClass('bg-indigo-600 text-white shadow').addClass('text-slate-400 hover:text-slate-200 hover:bg-slate-800');
       $('#nav-' + tabId).addClass('bg-indigo-600 text-white shadow').removeClass('text-slate-400 hover:text-slate-200 hover:bg-slate-800');
-
       if (tabId === 'ai' && aiBoard) aiBoard.resize();
       if (tabId === 'arena' && arenaBoard) arenaBoard.resize();
     }
 
     function syncUI() {
       $('#user-coins-display').text(userProfile.coins);
-      
       const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${userProfile.equipped.avatar}`;
       
-      // Fix: Strictly sync avatar and badge everywhere including AI board & arena
+      // Fix: Strictly sync AI avatar and badge with profile
       $('#header-avatar-img, #ai-player-avatar, #arena-self-avatar, #profile-avatar-large').attr('src', avatarUrl);
-      const badgeIcon = `<i class="fa-solid ${userProfile.equipped.badge}"></i>`;
-      $('#header-badge-icon, #profile-badge-icon, #ai-player-badge, #arena-self-badge').html(badgeIcon);
+      const badgeHtml = `<i class="fa-solid ${userProfile.equipped.badge}"></i>`;
+      $('#header-badge-icon, #profile-badge-icon, #ai-player-badge, #arena-self-badge').html(badgeHtml);
 
       const pName = currentUser ? currentUser.displayName || 'Player' : 'Guest Player';
       $('#ai-player-name, #arena-self-name, #profile-name').text(pName);
@@ -1106,38 +1023,30 @@
       const winRate = totalGames > 0 ? Math.round((userProfile.wins / totalGames) * 100) : 0;
       $('#profile-winrate').text(`${winRate}%`);
 
-      // Equip dropdowns
       $('#equip-board').val(userProfile.equipped.board);
       $('#equip-title').val(userProfile.equipped.title);
       $('#equip-avatar').val(userProfile.equipped.avatar);
       $('#equip-badge').val(userProfile.equipped.badge);
 
-      // Apply board skin class
       $('#ai-board, #arena-board').removeClass('theme-slate theme-wood theme-emerald theme-midnight theme-neon').addClass('theme-' + userProfile.equipped.board);
     }
 
-    // --- 6. LEGAL MOVE DOTS & DUAL CONTROLS HELPER ---
-    function showDotsOnBoard(boardId, gameObj, sourceSq) {
-      clearDotsOnBoard(boardId);
+    // --- LEGAL MOVE DOTS HELPER ---
+    function showDots(boardId, gameObj, sourceSq) {
+      clearDots(boardId);
       $(`#${boardId} .square-${sourceSq}`).addClass('selected-square');
-
-      const legalMoves = gameObj.moves({ square: sourceSq, verbose: true });
-      legalMoves.forEach(m => {
-        const $targetSquare = $(`#${boardId} .square-${m.to}`);
-        if (m.captured) {
-          $targetSquare.append('<div class="legal-capture-ring"></div>');
-        } else {
-          $targetSquare.append('<div class="legal-dot"></div>');
-        }
+      const moves = gameObj.moves({ square: sourceSq, verbose: true });
+      moves.forEach(m => {
+        $(`#${boardId} .square-${m.to}`).append('<div class="legal-dot"></div>');
       });
     }
 
-    function clearDotsOnBoard(boardId) {
-      $(`#${boardId} .legal-dot, #${boardId} .legal-capture-ring`).remove();
+    function clearDots(boardId) {
+      $(`#${boardId} .legal-dot`).remove();
       $(`#${boardId} .square-55d63`).removeClass('selected-square');
     }
 
-    // --- 7. PRACTICE AI ENGINE ---
+    // --- PRACTICE AI ENGINE ---
     let aiGame = new Chess();
     let aiBoard = null;
     let aiDifficulty = 'novice';
@@ -1153,65 +1062,51 @@
         onDrop: onAIDrop,
         onSnapEnd: () => {
           aiBoard.position(aiGame.fen());
-          clearDotsOnBoard('ai-board');
+          clearDots('ai-board');
         }
       };
       aiBoard = Chessboard('ai-board', config);
       $(window).resize(() => aiBoard && aiBoard.resize());
 
-      // Click-to-Move Listener for AI Board
+      // Click-to-Move
       $('#ai-board').on('click', '.square-55d63', function() {
         if (aiGame.game_over()) return;
-        
         const turnColor = aiGame.turn() === 'w' ? 'white' : 'black';
         if (turnColor !== aiPlayerColor) return;
 
-        const clickedSquare = $(this).attr('data-square');
-        const piece = aiGame.get(clickedSquare);
+        const sq = $(this).attr('data-square');
+        const piece = aiGame.get(sq);
 
         if (aiSelectedSquare) {
-          // Deselect if same square
-          if (clickedSquare === aiSelectedSquare) {
+          if (sq === aiSelectedSquare) {
             aiSelectedSquare = null;
-            clearDotsOnBoard('ai-board');
+            clearDots('ai-board');
             return;
           }
-
-          // Switch selection to another of own pieces
           if (piece && piece.color === (aiPlayerColor === 'white' ? 'w' : 'b')) {
-            aiSelectedSquare = clickedSquare;
-            showDotsOnBoard('ai-board', aiGame, clickedSquare);
+            aiSelectedSquare = sq;
+            showDots('ai-board', aiGame, sq);
             return;
           }
-
-          // Attempt Click-to-Move
-          const move = aiGame.move({
-            from: aiSelectedSquare,
-            to: clickedSquare,
-            promotion: 'q'
-          });
-
+          const move = aiGame.move({ from: aiSelectedSquare, to: sq, promotion: 'q' });
           aiSelectedSquare = null;
-          clearDotsOnBoard('ai-board');
+          clearDots('ai-board');
 
           if (move !== null) {
             aiBoard.position(aiGame.fen());
             AudioEngine.play(move.captured ? 'capture' : 'move');
             updateAIMoveHistory();
-
             if (aiGame.game_over()) {
               handleAIGameEnd();
               return;
             }
-
             $('#game-status-pill').text('Bot thinking...');
             window.setTimeout(makeAIMove, 300);
           }
         } else {
-          // First square click
           if (piece && piece.color === (aiPlayerColor === 'white' ? 'w' : 'b')) {
-            aiSelectedSquare = clickedSquare;
-            showDotsOnBoard('ai-board', aiGame, clickedSquare);
+            aiSelectedSquare = sq;
+            showDots('ai-board', aiGame, sq);
           }
         }
       });
@@ -1224,17 +1119,12 @@
         return false;
       }
       aiSelectedSquare = null;
-      showDotsOnBoard('ai-board', aiGame, source);
+      showDots('ai-board', aiGame, source);
     }
 
     function onAIDrop(source, target) {
-      clearDotsOnBoard('ai-board');
-      const move = aiGame.move({
-        from: source,
-        to: target,
-        promotion: 'q'
-      });
-
+      clearDots('ai-board');
+      const move = aiGame.move({ from: source, to: target, promotion: 'q' });
       if (move === null) return 'snapback';
 
       AudioEngine.play(move.captured ? 'capture' : 'move');
@@ -1251,12 +1141,10 @@
 
     function makeAIMove() {
       if (aiGame.game_over()) return;
-
       const moves = aiGame.moves({ verbose: true });
       if (moves.length === 0) return;
 
       let chosenMove = null;
-
       if (aiDifficulty === 'novice') {
         const captures = moves.filter(m => m.captured);
         chosenMove = (captures.length > 0 && Math.random() > 0.5) ?
@@ -1264,19 +1152,13 @@
           moves[Math.floor(Math.random() * moves.length)];
       } else if (aiDifficulty === 'intermediate') {
         const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
-        moves.sort((a, b) => {
-          const valA = a.captured ? pieceValues[a.captured] : 0;
-          const valB = b.captured ? pieceValues[b.captured] : 0;
-          return valB - valA;
-        });
+        moves.sort((a, b) => (b.captured ? pieceValues[b.captured] : 0) - (a.captured ? pieceValues[a.captured] : 0));
         chosenMove = moves[0];
       } else {
         const center = ['d4', 'd5', 'e4', 'e5'];
         moves.sort((a, b) => {
-          let scoreA = a.captured ? 5 : 0;
-          let scoreB = b.captured ? 5 : 0;
-          if (center.includes(a.to)) scoreA += 2;
-          if (center.includes(b.to)) scoreB += 2;
+          let scoreA = (a.captured ? 5 : 0) + (center.includes(a.to) ? 2 : 0);
+          let scoreB = (b.captured ? 5 : 0) + (center.includes(b.to) ? 2 : 0);
           return scoreB - scoreA;
         });
         chosenMove = moves[0];
@@ -1286,7 +1168,6 @@
       aiBoard.position(aiGame.fen());
       AudioEngine.play(executed.captured ? 'capture' : 'move');
       updateAIMoveHistory();
-
       $('#game-status-pill').text('Turn: Your move');
 
       if (aiGame.game_over()) {
@@ -1299,12 +1180,10 @@
       let html = '';
       for (let i = 0; i < history.length; i += 2) {
         const moveNum = (i / 2) + 1;
-        const whiteMove = history[i];
-        const blackMove = history[i + 1] || '';
         html += `<div class="flex justify-between py-0.5 border-b border-slate-800">
           <span class="text-slate-500">${moveNum}.</span>
-          <span class="font-bold text-slate-200">${whiteMove}</span>
-          <span class="text-slate-300">${blackMove}</span>
+          <span class="font-bold text-slate-200">${history[i]}</span>
+          <span class="text-slate-300">${history[i + 1] || ''}</span>
         </div>`;
       }
       $('#ai-move-history').html(html || '<span class="text-slate-500 text-center col-span-2 py-4">No moves yet.</span>');
@@ -1312,7 +1191,7 @@
     }
 
     function handleAIGameEnd() {
-      clearDotsOnBoard('ai-board');
+      clearDots('ai-board');
       if (aiGame.in_checkmate()) {
         const winner = aiGame.turn() === 'w' ? 'Black' : 'White';
         const userWon = (winner === 'White' && aiPlayerColor === 'white') || (winner === 'Black' && aiPlayerColor === 'black');
@@ -1330,31 +1209,6 @@
       }
     }
 
-    function resignAIGame() {
-      if (aiGame.game_over()) return;
-      if (!confirm("Are you sure you want to resign against CogniBot?")) return;
-      AudioEngine.play('loss');
-      alert("You resigned the match. Defeat recorded.");
-      resetAIGame();
-    }
-
-    function offerAIDraw() {
-      if (aiGame.game_over()) return;
-      const history = aiGame.history();
-      if (history.length < 16) {
-        alert("CogniBot: 'It is too early in the match to accept a draw!'");
-        return;
-      }
-      // Bot evaluates: accept if game has developed significantly
-      if (history.length >= 24) {
-        AudioEngine.play('move');
-        alert("CogniBot evaluates the board position as equal and accepts your draw offer!");
-        resetAIGame();
-      } else {
-        alert("CogniBot declines your draw offer and continues playing!");
-      }
-    }
-
     function setAIDifficulty(diff) {
       aiDifficulty = diff;
       $('.diff-btn').removeClass('border-indigo-500 bg-indigo-600 text-white').addClass('border-slate-700 bg-slate-900 text-slate-400');
@@ -1369,15 +1223,12 @@
     function startAIGame(color) {
       aiPlayerColor = color;
       aiGame.reset();
-      clearDotsOnBoard('ai-board');
+      clearDots('ai-board');
       aiBoard.orientation(color);
       aiBoard.start();
       updateAIMoveHistory();
       $('#game-status-pill').text('Turn: White');
-
-      if (color === 'black') {
-        window.setTimeout(makeAIMove, 400);
-      }
+      if (color === 'black') window.setTimeout(makeAIMove, 400);
     }
 
     function resetAIGame() {
@@ -1394,14 +1245,13 @@
       alert('PGN game export copied to clipboard!');
     }
 
-    // --- 8. 1v1 ARENA MULTIPLAYER ENGINE ---
+    // --- 1v1 ARENA ENGINE ---
     let arenaGame = new Chess();
     let arenaBoard = null;
     let currentMatchId = null;
     let arenaColor = 'white';
     let arenaRef = null;
     let arenaSelectedSquare = null;
-    let handledDrawOffer = false;
 
     function initArenaBoard() {
       const config = {
@@ -1412,63 +1262,48 @@
         onDrop: onArenaDrop,
         onSnapEnd: () => {
           arenaBoard.position(arenaGame.fen());
-          clearDotsOnBoard('arena-board');
+          clearDots('arena-board');
         }
       };
       arenaBoard = Chessboard('arena-board', config);
       $(window).resize(() => arenaBoard && arenaBoard.resize());
 
-      // Click-to-Move Listener for Arena Board
+      // Click-to-Move
       $('#arena-board').on('click', '.square-55d63', function() {
         if (!currentMatchId || arenaGame.game_over()) return;
         const turnColor = arenaGame.turn() === 'w' ? 'white' : 'black';
         if (turnColor !== arenaColor) return;
 
-        const clickedSquare = $(this).attr('data-square');
-        const piece = arenaGame.get(clickedSquare);
+        const sq = $(this).attr('data-square');
+        const piece = arenaGame.get(sq);
 
         if (arenaSelectedSquare) {
-          if (clickedSquare === arenaSelectedSquare) {
+          if (sq === arenaSelectedSquare) {
             arenaSelectedSquare = null;
-            clearDotsOnBoard('arena-board');
+            clearDots('arena-board');
             return;
           }
-
           if (piece && piece.color === (arenaColor === 'white' ? 'w' : 'b')) {
-            arenaSelectedSquare = clickedSquare;
-            showDotsOnBoard('arena-board', arenaGame, clickedSquare);
+            arenaSelectedSquare = sq;
+            showDots('arena-board', arenaGame, sq);
             return;
           }
-
-          const move = arenaGame.move({
-            from: arenaSelectedSquare,
-            to: clickedSquare,
-            promotion: 'q'
-          });
-
+          const move = arenaGame.move({ from: arenaSelectedSquare, to: sq, promotion: 'q' });
           arenaSelectedSquare = null;
-          clearDotsOnBoard('arena-board');
+          clearDots('arena-board');
 
           if (move !== null) {
             arenaBoard.position(arenaGame.fen());
             AudioEngine.play(move.captured ? 'capture' : 'move');
-
             if (arenaRef) {
-              arenaRef.update({
-                fen: arenaGame.fen(),
-                lastMove: move,
-                turn: arenaGame.turn()
-              });
+              arenaRef.update({ fen: arenaGame.fen(), lastMove: move, turn: arenaGame.turn() });
             }
-
-            if (arenaGame.game_over()) {
-              finishArenaMatch();
-            }
+            if (arenaGame.game_over()) finishArenaMatch();
           }
         } else {
           if (piece && piece.color === (arenaColor === 'white' ? 'w' : 'b')) {
-            arenaSelectedSquare = clickedSquare;
-            showDotsOnBoard('arena-board', arenaGame, clickedSquare);
+            arenaSelectedSquare = sq;
+            showDots('arena-board', arenaGame, sq);
           }
         }
       });
@@ -1481,40 +1316,23 @@
         return false;
       }
       arenaSelectedSquare = null;
-      showDotsOnBoard('arena-board', arenaGame, source);
+      showDots('arena-board', arenaGame, source);
     }
 
     function onArenaDrop(source, target) {
-      clearDotsOnBoard('arena-board');
-      const move = arenaGame.move({
-        from: source,
-        to: target,
-        promotion: 'q'
-      });
-
+      clearDots('arena-board');
+      const move = arenaGame.move({ from: source, to: target, promotion: 'q' });
       if (move === null) return 'snapback';
 
       AudioEngine.play(move.captured ? 'capture' : 'move');
-
       if (arenaRef) {
-        arenaRef.update({
-          fen: arenaGame.fen(),
-          lastMove: move,
-          turn: arenaGame.turn()
-        });
+        arenaRef.update({ fen: arenaGame.fen(), lastMove: move, turn: arenaGame.turn() });
       }
-
-      if (arenaGame.game_over()) {
-        finishArenaMatch();
-      }
+      if (arenaGame.game_over()) finishArenaMatch();
     }
 
     function startQuickMatch() {
-      if (!currentUser) {
-        alert('Please sign in with Google to enter rated Arena matchmaking.');
-        return;
-      }
-
+      if (!currentUser) return alert('Please sign in with Google to enter rated Arena matchmaking.');
       $('#btn-quick-match').html('<i class="fa-solid fa-spinner fa-spin"></i> Searching for opponent...').prop('disabled', true);
       
       const queueRef = rtdb.ref('matchmaking/queue');
@@ -1531,10 +1349,8 @@
             return currentQueue;
           }
         }
-      }, (error, committed, snapshot) => {
-        if (!error && committed) {
-          createArenaRoom();
-        }
+      }, (error, committed) => {
+        if (!error && committed) createArenaRoom();
       });
     }
 
@@ -1558,9 +1374,8 @@
     function setupArenaRoom(roomId, assignedColor) {
       currentMatchId = roomId;
       arenaColor = assignedColor;
-      handledDrawOffer = false;
       arenaGame.reset();
-      clearDotsOnBoard('arena-board');
+      clearDots('arena-board');
       arenaBoard.orientation(assignedColor);
       arenaBoard.start();
 
@@ -1577,7 +1392,7 @@
           fen: 'start',
           status: 'active',
           turn: 'w',
-          drawOfferFrom: null
+          drawOffer: null
         });
       } else {
         arenaRef.update({
@@ -1589,7 +1404,7 @@
         const data = snap.val();
         if (!data) return;
 
-        // Opponent info display
+        // Opponent info
         if (assignedColor === 'white' && data.black) {
           $('#arena-opp-name').text(data.black.name || 'Opponent');
           $('#arena-opp-rating').text(`${data.black.rating || 1200} Rating`);
@@ -1598,14 +1413,12 @@
           $('#arena-opp-rating').text(`${data.white.rating || 1200} Rating`);
         }
 
-        // Live Move Sync
+        // Live Moves
         if (data.fen && data.fen !== 'start' && data.fen !== arenaGame.fen()) {
           arenaGame.load(data.fen);
           arenaBoard.position(data.fen);
-          clearDotsOnBoard('arena-board');
-          if (data.lastMove) {
-            AudioEngine.play(data.lastMove.captured ? 'capture' : 'move');
-          }
+          clearDots('arena-board');
+          if (data.lastMove) AudioEngine.play(data.lastMove.captured ? 'capture' : 'move');
         }
 
         // Resignation Handler
@@ -1613,37 +1426,35 @@
           if (data.resignedBy === arenaColor) {
             AudioEngine.play('loss');
             updateRatingOnMatchEnd(0);
-            alert('You resigned the match. Defeat recorded.');
+            alert('You resigned the match.');
           } else {
             AudioEngine.play('win');
             awardCoins(50);
             updateRatingOnMatchEnd(1);
-            alert('Opponent resigned! Victory is yours! +50 CC awarded.');
+            alert('Opponent resigned! You win! +50 CC');
           }
-          cleanupArenaRoom();
+          leaveArena();
         }
 
         // Draw Offer Handler
-        if (data.drawOfferFrom && data.drawOfferFrom !== arenaColor && !handledDrawOffer) {
-          handledDrawOffer = true;
-          const accept = confirm("Your opponent has offered a draw! Do you accept?");
-          if (accept) {
-            arenaRef.update({ status: 'draw_agreed', drawOfferFrom: null });
+        if (data.drawOffer && data.drawOffer !== arenaColor) {
+          arenaRef.update({ drawOffer: null });
+          if (confirm("Opponent offers a draw. Do you accept?")) {
+            arenaRef.update({ status: 'draw_agreed' });
           } else {
-            arenaRef.update({ drawOfferFrom: null, drawDeclinedFrom: arenaColor });
+            arenaRef.update({ status: 'draw_declined' });
           }
         }
 
-        if (data.drawDeclinedFrom && data.drawDeclinedFrom !== arenaColor) {
-          alert("Opponent declined your draw offer.");
-          arenaRef.update({ drawDeclinedFrom: null });
+        if (data.status === 'draw_agreed') {
+          updateRatingOnMatchEnd(0.5);
+          alert('Match drawn by agreement.');
+          leaveArena();
         }
 
-        if (data.status === 'draw_agreed') {
-          awardCoins(15);
-          updateRatingOnMatchEnd(0.5);
-          alert('Match drawn by mutual agreement! +15 CC awarded.');
-          cleanupArenaRoom();
+        if (data.status === 'draw_declined') {
+          alert('Draw offer was declined.');
+          arenaRef.update({ status: 'active' });
         }
       });
     }
@@ -1661,6 +1472,7 @@
           updateRatingOnMatchEnd(0);
           alert('Arena Defeat. Glicko rating adjusted.');
         }
+        leaveArena();
       }
     }
 
@@ -1682,22 +1494,22 @@
 
     function resignArenaMatch() {
       if (!arenaRef || !currentMatchId) return;
-      if (!confirm("Are you sure you want to resign this arena match?")) return;
+      if (!confirm("Are you sure you want to resign this match?")) return;
       arenaRef.update({ status: 'resigned', resignedBy: arenaColor });
     }
 
     function offerDraw() {
       if (!arenaRef || !currentMatchId) return;
-      arenaRef.update({ drawOfferFrom: arenaColor });
-      alert('Draw offer transmitted to opponent.');
+      arenaRef.update({ drawOffer: arenaColor });
+      alert('Draw offer sent to opponent.');
     }
 
-    function cleanupArenaRoom() {
+    function leaveArena() {
       if (arenaRef) arenaRef.off();
       arenaRef = null;
       currentMatchId = null;
       arenaGame.reset();
-      clearDotsOnBoard('arena-board');
+      clearDots('arena-board');
       arenaBoard.start();
       $('#arena-unconnected-panel').removeClass('hidden');
       $('#arena-active-panel').addClass('hidden').removeClass('flex');
@@ -1705,13 +1517,12 @@
       $('#btn-quick-match').html('<i class="fa-solid fa-bolt"></i> Quick Matchmaking').prop('disabled', false);
     }
 
-    // --- 9. COGNISHOP & CRATE LOGIC ---
+    // --- COGNISHOP & CRATE LOGIC ---
     function unboxCrate(crateType, cost) {
       if (userProfile.coins < cost) {
         alert(`Insufficient CogniCoins! You need ${cost} CC to open this crate.`);
         return;
       }
-
       userProfile.coins -= cost;
 
       const lootTable = {
@@ -1775,7 +1586,7 @@
       syncUI();
     }
 
-    // --- 10. MASTER CONTROL (ADMIN TOOLS) ---
+    // --- MASTER CONTROL ADMIN TOOLS ---
     function toggleMaintenanceMode() {
       rtdb.ref('system/maintenance').once('value', snap => {
         const current = snap.val() === true;
@@ -1799,7 +1610,6 @@
       alert('System broadcast transmitted.');
     }
 
-    // --- 11. INITIALIZATION LIFECYCLE ---
     $(document).ready(() => {
       initAIBoard();
       initArenaBoard();

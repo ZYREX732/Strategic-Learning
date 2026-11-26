@@ -122,6 +122,7 @@
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+  <!-- Maintenance Overlay -->
   <div id="maintenance-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[9999] hidden flex flex-col items-center justify-center p-6 text-center">
     <div class="bg-slate-900 border border-red-500/40 rounded-2xl p-8 max-w-md w-full shadow-2xl">
       <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
@@ -135,6 +136,7 @@
     </div>
   </div>
 
+  <!-- Connected Navigation Bar -->
   <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-stretch justify-between gap-4">
       <div class="flex items-center gap-3 cursor-pointer py-3" onclick="showSection('ai')">
@@ -193,6 +195,7 @@
   </header>
 
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- Broadcast Announcement Banner -->
     <div id="broadcast-banner" class="hidden mb-6 bg-amber-950/30 border border-amber-500/30 rounded-2xl p-4 shadow-lg flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg flex-shrink-0">
         <i class="fa-solid fa-bullhorn"></i>
@@ -203,6 +206,7 @@
       </div>
     </div>
 
+    <!-- Daily Quests Banner -->
     <div class="mb-6 bg-slate-900 border border-indigo-500/20 rounded-2xl p-4 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-12 h-12 rounded-xl bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-2xl flex-shrink-0">
@@ -219,6 +223,7 @@
       <div id="daily-quests-container" class="w-full md:w-auto grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
     </div>
 
+    <!-- Section: Play vs AI -->
     <section id="section-ai" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center">
@@ -291,6 +296,7 @@
       </div>
     </section>
 
+    <!-- Section: 1v1 Arena -->
     <section id="section-arena" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center">
@@ -360,6 +366,7 @@
       </div>
     </section>
 
+    <!-- Section: CogniShop -->
     <section id="section-shop" class="hidden space-y-8">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
@@ -418,6 +425,7 @@
       </div>
     </section>
 
+    <!-- Section: Profile & Cosmetics Studio -->
     <section id="section-profile" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col items-center text-center">
@@ -449,6 +457,7 @@
       </div>
     </section>
 
+    <!-- Section: Leaderboard -->
     <section id="section-leaderboard" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
         <div class="flex items-center justify-between mb-6">
@@ -467,6 +476,7 @@
       </div>
     </section>
 
+    <!-- Section: Master Control Admin Panel -->
     <section id="section-admin" class="hidden space-y-6">
       <div class="bg-slate-900 border border-red-900/40 rounded-2xl p-6 shadow-xl space-y-6">
         <div class="flex items-center justify-between border-b border-slate-800 pb-4">
@@ -476,20 +486,24 @@
           </div>
           <button id="admin-maint-btn" onclick="toggleMaintenanceMode()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition flex items-center gap-2"><i class="fa-solid fa-power-off"></i> <span id="admin-maint-label">Maintenance Normal (OFF)</span></button>
         </div>
+        <!-- System Controls Grid (Force Global Reload & Purge High Elo) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
-            <div><div class="font-bold text-white text-sm">Force Global Reload</div><div class="text-xs text-slate-400">Trigger immediate page refresh for all active clients</div></div>
+            <div>
+              <div class="font-bold text-white text-sm">Force Global Reload</div>
+              <div class="text-xs text-slate-400">Trigger immediate page refresh for all active clients</div>
+            </div>
             <button onclick="adminForceGlobalReload()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition">Trigger Reload</button>
           </div>
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
-            <div><div class="font-bold text-white text-sm">Purge High Elo (>3000)</div><div class="text-xs text-slate-400">Cap outlier ratings exceeding 3000 down to 1500 Elo</div></div>
+            <div>
+              <div class="font-bold text-white text-sm">Purge High Elo (>3000)</div>
+              <div class="text-xs text-slate-400">Cap outlier ratings exceeding 3000 down to 1500 Elo</div>
+            </div>
             <button onclick="adminPurgeHighElo()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-xs transition">Purge High Elo</button>
           </div>
-          <div class="bg-slate-950 border border-red-800/40 rounded-xl p-4 flex items-center justify-between md:col-span-2">
-            <div><div class="font-bold text-white text-sm">Reset All Inventories</div><div class="text-xs text-slate-400">Wipe every player back to starter defaults (nothing owned)</div></div>
-            <button onclick="adminResetAllInventories()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs transition">Reset All</button>
-          </div>
         </div>
+        <!-- Broadcast Announcement Admin Box -->
         <div class="bg-slate-950 border border-amber-500/20 rounded-xl p-4">
           <div class="font-bold text-white text-sm mb-1 flex items-center gap-2"><i class="fa-solid fa-bullhorn text-amber-400"></i> Broadcast Announcement</div>
           <div class="text-xs text-slate-400 mb-3">Show a banner message to all active players. Use Clear to remove it.</div>
@@ -501,6 +515,7 @@
             </div>
           </div>
         </div>
+        <!-- User Database Management Table -->
         <div>
           <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-users-gear text-slate-400"></i> Registered Account Database</h3>
           <div class="overflow-x-auto bg-slate-950 border border-slate-800 rounded-xl">
@@ -514,6 +529,7 @@
     </section>
   </main>
 
+  <!-- Crate Unboxing Modal -->
   <div id="crate-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl text-center space-y-6">
       <div><h3 class="text-2xl font-bold text-white" id="crate-modal-title">Unboxing Crate</h3><p class="text-xs text-slate-400">Rolling rewards...</p></div>
@@ -542,22 +558,26 @@
     const auth = firebase.auth();
     const db = firebase.database();
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
     const ADMIN_EMAIL = "zainisgo123@gmail.com";
     const WHITELISTED_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
     const PAGE_LOAD_TIME = Date.now();
     let currentUser = null;
     let userProfile = null;
     let currentTheme = localStorage.getItem('cogni_board_theme') || 'theme-wood';
+
     let aiGame = null;
     let aiBoard = null;
     let aiPlayerColor = 'w';
     let selectedSquare = null;
+
     let arenaGame = null;
     let arenaBoard = null;
     let currentRoomCode = null;
     let arenaPlayerColor = 'w';
     let roomRef = null;
     let chatRef = null;
+
     const ALL_TITLE_MAP = {
       "nametag_novice": "Pawn Novice",
       "nametag_tactician": "Tactician",
@@ -571,6 +591,7 @@
       "nametag_gm": "Grandmaster",
       "nametag_legend": "Chess Legend"
     };
+
     const COSMETICS_CATALOG = {
       icons: {
         "icon_user": { name: "Standard User", icon: "fa-user" },
@@ -602,6 +623,7 @@
         "emote_crown": { name: "Crown Flex", emoji: "👑", class: "emote-glow" }
       }
     };
+
     const CRATE_DEFINITIONS = {
       pawn: {
         name: "Pawn Crate", price: 1000,
@@ -638,17 +660,20 @@
         ]
       }
     };
+
     const DAILY_QUESTS_CONFIG = {
       q_black_win: { id: 'q_black_win', title: 'Black Victory', desc: 'Win 1 match playing as Black', req: 1, reward: 75 },
       q_play_3: { id: 'q_play_3', title: 'Battle Hardened', desc: 'Play 3 total chess games', req: 3, reward: 50 },
       q_streak_2: { id: 'q_streak_2', title: 'Hot Streak', desc: 'Achieve a 2-Game Win Streak', req: 2, reward: 100 }
     };
+
     auth.onAuthStateChanged((user) => {
       if (!user) { window.location.href = 'index.html'; return; }
       currentUser = user;
       if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
         $('#admin-nav-link').removeClass('hidden').addClass('flex');
       }
+
       db.ref('system/maintenance').on('value', (snap) => {
         const isMaint = snap.val() === true;
         updateAdminMaintBtn(isMaint);
@@ -657,10 +682,12 @@
         if (isMaint && !isWhitelisted) { $('#maintenance-overlay').removeClass('hidden'); }
         else { $('#maintenance-overlay').addClass('hidden'); }
       });
+
       db.ref('system/global_reload').on('value', (snap) => {
         const reloadTime = snap.val();
         if (reloadTime && typeof reloadTime === 'number' && reloadTime > PAGE_LOAD_TIME + 2000) { window.location.reload(); }
       });
+
       db.ref('system/announcement').on('value', (snap) => {
         const data = snap.val();
         if (data && (data.message || typeof data === 'string')) {
@@ -672,14 +699,17 @@
           $('#broadcast-message').text('');
         }
       });
+
       syncUserData();
     });
+
     function syncUserData() {
       if (!currentUser) return;
       const userRef = db.ref('users/' + currentUser.uid);
       userRef.on('value', (snap) => {
         let val = snap.val();
         const todayStr = new Date().toISOString().split('T')[0];
+
         if (!val) {
           val = {
             username: currentUser.displayName || currentUser.email.split('@')[0],
@@ -702,10 +732,38 @@
             equippedFrame: 'frame_none',
             equippedNametag: 'nametag_novice',
             equippedTheme: 'theme-wood',
-            equippedEmote: 'none'
+            equippedEmote: 'none',
+            inventoryResetV4: true
           };
           userRef.set(val);
         } else {
+          // Automatic Reset for existing inventories to starter defaults
+          if (!val.inventoryResetV4) {
+            val.inventory = {
+              icons: ['icon_user'],
+              frames: ['frame_none'],
+              nametags: ['nametag_novice'],
+              themes: ['theme-wood'],
+              emotes: ['none']
+            };
+            val.equippedIcon = 'icon_user';
+            val.equippedFrame = 'frame_none';
+            val.equippedNametag = 'nametag_novice';
+            val.equippedTheme = 'theme-wood';
+            val.equippedEmote = 'none';
+            val.inventoryResetV4 = true;
+
+            userRef.update({
+              inventory: val.inventory,
+              equippedIcon: 'icon_user',
+              equippedFrame: 'frame_none',
+              equippedNametag: 'nametag_novice',
+              equippedTheme: 'theme-wood',
+              equippedEmote: 'none',
+              inventoryResetV4: true
+            });
+          }
+
           if (val.lastQuestReset !== todayStr) {
             val.lastQuestReset = todayStr;
             val.quests = {
@@ -721,7 +779,9 @@
         renderDailyQuests();
       }, (err) => { console.error("Firebase read error:", err); });
     }
+
     function handleLogout() { auth.signOut().then(() => { window.location.href = 'index.html'; }); }
+
     function parseCategory(data, defaultArr) {
       if (!data) return [...defaultArr];
       if (Array.isArray(data)) return [...data];
@@ -731,6 +791,7 @@
       }
       return [...defaultArr];
     }
+
     function getNormalizedInventory() {
       if (!userProfile) return { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice'], themes: ['theme-wood'], emotes: ['none'] };
       const inv = userProfile.inventory || {};
@@ -745,6 +806,7 @@
       if (hasTactician && !result.nametags.includes('nametag_tactician')) { result.nametags.push('nametag_tactician'); }
       return result;
     }
+
     function renderDailyQuests() {
       if (!userProfile) return;
       const $container = $('#daily-quests-container').empty();
@@ -761,6 +823,7 @@
         $container.append(`<div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between space-y-2"><div><div class="flex items-center justify-between text-xs font-bold text-white mb-0.5"><span>${qConf.title}</span><span class="text-[10px] text-slate-400 font-mono">${Math.min(qState.progress, qConf.req)}/${qConf.req}</span></div><div class="text-[11px] text-slate-400">${qConf.desc}</div></div><div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden"><div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: ${Math.min(100, (qState.progress / qConf.req) * 100)}%"></div></div><div class="flex items-center justify-between pt-1 border-t border-slate-900">${actionBtnHtml}</div></div>`);
       });
     }
+
     function updateQuestProgress(qKey, delta) {
       if (!currentUser || !userProfile) return;
       const quests = userProfile.quests || {};
@@ -768,6 +831,7 @@
       const isClaimed = quests[qKey]?.claimed || false;
       db.ref(`users/${currentUser.uid}/quests/${qKey}`).update({ progress: currentVal, claimed: isClaimed });
     }
+
     function claimQuest(qKey) {
       if (!currentUser || !userProfile) return;
       const qConf = DAILY_QUESTS_CONFIG[qKey];
@@ -776,6 +840,7 @@
       const newCoins = (userProfile.coins || 0) + qConf.reward;
       db.ref(`users/${currentUser.uid}`).update({ coins: newCoins, [`quests/${qKey}/claimed`]: true }).then(() => { alert(`Quest Claimed! Rewards: +${qConf.reward} CogniCoins!`); });
     }
+
     function updateUIProfileDisplay() {
       if (!userProfile) return;
       $('#nav-coins').text((userProfile.coins || 0).toLocaleString());
@@ -785,54 +850,68 @@
       $('#prof-display-username').text(userProfile.username || 'Player');
       $('#prof-stat-elo').text(userProfile.elo || 1500);
       $('#prof-stat-coins').text((userProfile.coins || 0).toLocaleString());
+
       const iconKey = userProfile.equippedIcon || 'icon_user';
       const frameKey = userProfile.equippedFrame || 'frame_none';
       const iconObj = COSMETICS_CATALOG.icons[iconKey] || COSMETICS_CATALOG.icons['icon_user'];
       const frameObj = COSMETICS_CATALOG.frames[frameKey] || COSMETICS_CATALOG.frames['frame_none'];
+
       $('#prof-display-icon').attr('class', 'fa-solid ' + iconObj.icon);
       $('#prof-display-frame').attr('class', 'w-28 h-28 rounded-full bg-slate-800 flex items-center justify-center text-4xl text-slate-300 mb-4 overflow-hidden transition-all duration-300 ' + frameObj.class);
+
       const tagKey = userProfile.equippedNametag || 'nametag_novice';
       const tagText = ALL_TITLE_MAP[tagKey] || ALL_TITLE_MAP[tagKey.toLowerCase()] || tagKey;
       $('#prof-display-nametag').text(tagText);
+
       $('#ai-user-name').text(userProfile.username || 'Player');
       $('#ai-user-elo-text').text(userProfile.elo || 1500);
       $('#ai-user-nametag').text(tagText);
       $('#ai-user-icon').attr('class', 'fa-solid ' + iconObj.icon);
       $('#ai-user-frame-container').attr('class', 'w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg overflow-hidden ' + frameObj.class);
+
       $('#arena-self-name').text(userProfile.username || 'Player');
       $('#arena-self-elo').text(userProfile.elo || 1500);
       $('#arena-self-nametag').text(tagText);
       $('#arena-self-icon').attr('class', 'fa-solid ' + iconObj.icon);
       $('#arena-self-frame').attr('class', 'w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg overflow-hidden ' + frameObj.class);
+
       const theme = userProfile.equippedTheme || currentTheme;
       applyBoardTheme(theme);
       populateProfileDropdowns();
     }
+
     function populateProfileDropdowns() {
       if (!userProfile) return;
       const inv = getNormalizedInventory();
+
       const $iconSel = $('#profile-icon-select').empty();
       inv.icons.forEach(k => { const item = COSMETICS_CATALOG.icons[k]; if (item) { $iconSel.append(`<option value="${k}">${item.name}</option>`); } });
       $iconSel.val(userProfile.equippedIcon || 'icon_user');
+
       const $frameSel = $('#profile-frame-select').empty();
       inv.frames.forEach(k => { const item = COSMETICS_CATALOG.frames[k]; if (item) { $frameSel.append(`<option value="${k}">${item.name}</option>`); } });
       $frameSel.val(userProfile.equippedFrame || 'frame_none');
+
       const $tagSel = $('#profile-nametag-select').empty();
       const uniqueTags = new Set(inv.nametags);
       uniqueTags.forEach(k => { const label = ALL_TITLE_MAP[k] || ALL_TITLE_MAP[k.toLowerCase()] || k; $tagSel.append(`<option value="${k}">${label}</option>`); });
       $tagSel.val(userProfile.equippedNametag || 'nametag_novice');
+
       const $themeSel = $('#profile-theme-select').empty();
       inv.themes.forEach(k => { const label = COSMETICS_CATALOG.themes[k] || k; $themeSel.append(`<option value="${k}">${label}</option>`); });
       $themeSel.val(userProfile.equippedTheme || currentTheme);
+
       const $emoteSel = $('#profile-emote-select').empty();
       inv.emotes.forEach(k => { const item = COSMETICS_CATALOG.emotes[k]; if (item) { $emoteSel.append(`<option value="${k}">${item.name}</option>`); } });
       $emoteSel.val(userProfile.equippedEmote || 'none');
     }
+
     function saveProfileName() {
       const newName = $('#profile-name-input').val().trim();
       if (!newName || !currentUser) return;
       db.ref('users/' + currentUser.uid + '/username').set(newName).then(() => { $('#profile-name-input').val(''); alert("Username updated successfully!"); });
     }
+
     function equipCosmetic(type, value) {
       if (!currentUser) return;
       const updates = {};
@@ -843,22 +922,26 @@
       if (type === 'emote') updates['equippedEmote'] = value;
       db.ref('users/' + currentUser.uid).update(updates);
     }
+
     function applyBoardTheme(themeClass) {
       currentTheme = themeClass;
       localStorage.setItem('cogni_board_theme', themeClass);
       $('#ai-board, #arena-board').removeClass('theme-wood theme-green theme-grey').addClass(themeClass);
     }
+
     function triggerInGameEmote(mode) {
       if (!userProfile) return;
       const emoteKey = userProfile.equippedEmote || 'none';
       const emoteObj = COSMETICS_CATALOG.emotes[emoteKey];
       if (!emoteObj || !emoteObj.emoji) return alert("Select an active emote in Profile & Cosmetics Studio!");
+
       if (mode === 'ai') { showEmoteDisplay('#ai-player-emote-display', emoteObj); }
       else if (mode === 'arena') {
         showEmoteDisplay('#arena-self-emote-display', emoteObj);
         if (currentRoomCode) { db.ref('arena_rooms/' + currentRoomCode + '/lastEmote').set({ senderUid: currentUser.uid, emoteKey: emoteKey, timestamp: Date.now() }); }
       }
     }
+
     function showEmoteDisplay(elementSelector, emoteObj) {
       const $el = $(elementSelector);
       $el.html(`<span class="inline-block ${emoteObj.class}">${emoteObj.emoji}</span>`).removeClass('hidden emote-pop');
@@ -866,27 +949,35 @@
       $el.addClass('emote-pop');
       setTimeout(() => { $el.addClass('hidden').removeClass('emote-pop'); }, 3500);
     }
+
     function showSection(sectionId) {
       $('main > section').addClass('hidden');
       $('#section-' + sectionId).removeClass('hidden');
       $('.nav-btn').removeClass('bg-indigo-600 text-white shadow').addClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
       $('#nav-' + sectionId).addClass('bg-indigo-600 text-white shadow').removeClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
+
       if (sectionId === 'ai' && !aiBoard) { initAiBoard(); }
       else if (sectionId === 'ai' && aiBoard) { aiBoard.resize(); }
+
       if (sectionId === 'arena' && !arenaBoard) { initArenaBoard(); }
       else if (sectionId === 'arena' && arenaBoard) { arenaBoard.resize(); }
+
       if (sectionId === 'leaderboard') { loadLeaderboard(); }
       if (sectionId === 'admin') { loadAdminUserTable(); loadCurrentBroadcast(); }
     }
+
+    // Minimax Chess Bot AI (1500 Elo)
     const PIECE_VALUES = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
     const PST_PAWN = [0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0];
     const PST_KNIGHT = [-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50];
+
     function evaluateBoard(game) {
       let totalEval = 0;
       const board = game.board();
       for (let r = 0; r < 8; r++) { for (let c = 0; c < 8; c++) { const piece = board[r][c]; if (piece) { const val = PIECE_VALUES[piece.type]; let pst = 0; const idx = r * 8 + c; if (piece.type === 'p') pst = PST_PAWN[idx]; if (piece.type === 'n') pst = PST_KNIGHT[idx]; const score = val + pst; totalEval += (piece.color === 'w' ? score : -score); } } }
       return totalEval;
     }
+
     function minimax(game, depth, alpha, beta, isMaximizing) {
       if (depth === 0 || game.game_over()) { return evaluateBoard(game); }
       const moves = game.moves({ verbose: true });
@@ -901,20 +992,24 @@
         return minEval;
       }
     }
+
     function getBestMove(game) {
       const moves = game.moves({ verbose: true });
       if (moves.length === 0) return null;
       const history = game.history();
+
       if (aiPlayerColor === 'b' && history.length <= 6) {
         if (history.length === 3 && history[0] === 'e4' && history[1] === 'e5' && history[2] === 'Qh5') { const move = moves.find(m => m.san === 'Nc6'); if (move) return move; }
         if (history.length === 5 && history[2] === 'Qh5' && (history[4] === 'Bc4' || history[4] === 'Bc4+')) { const move = moves.find(m => m.san === 'g6'); if (move) return move; }
         if (history.length === 5 && history[2] === 'Bc4' && history[4] === 'Qh5') { const move = moves.find(m => m.san === 'g6'); if (move) return move; }
         if (history.length === 7 && history[6] === 'Qf3') { const move = moves.find(m => m.san === 'Nf6'); if (move) return move; }
       }
+
       let bestMove = null;
       let isMax = game.turn() === 'w';
       let bestValue = isMax ? -Infinity : Infinity;
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
+
       for (const move of moves) {
         game.move(move);
         const boardVal = minimax(game, 3, -Infinity, Infinity, !isMax);
@@ -924,6 +1019,7 @@
       }
       return bestMove || moves[Math.floor(Math.random() * moves.length)];
     }
+
     function initAiBoard() {
       aiGame = new Chess();
       const config = { draggable: false, position: 'start', pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png' };
@@ -931,6 +1027,7 @@
       applyBoardTheme(userProfile ? userProfile.equippedTheme : currentTheme);
       setupAiGame(false);
     }
+
     function selectAiColor(color) {
       if (aiGame && aiGame.history().length > 0 && !aiGame.game_over()) {
         const confirmResign = confirm("Match in progress! Changing side will count as a Resignation (-ELO). Do you want to resign and switch sides?");
@@ -944,6 +1041,7 @@
       if (color === 'random') $('#btn-side-random').addClass('bg-indigo-600 border-indigo-500 text-white').removeClass('bg-slate-800 text-slate-300');
       setupAiGame(true);
     }
+
     function setupAiGame(forceReset) {
       if (forceReset && aiGame && aiGame.history().length > 0 && !aiGame.game_over()) {
         const confirmResign = confirm("Game in progress! Restarting now will count as a Resignation (-ELO). Resign current match?");
@@ -958,10 +1056,12 @@
       updateAiMoveLog();
       if (aiPlayerColor === 'b') { setTimeout(makeAiMove, 400); }
     }
+
     $(document).on('click', '#ai-board .square-55d63', function() {
       if (!aiGame || aiGame.game_over()) return;
       if ((aiGame.turn() === 'w' && aiPlayerColor !== 'w') || (aiGame.turn() === 'b' && aiPlayerColor !== 'b')) return;
       const square = $(this).data('square');
+
       if (!selectedSquare) {
         const piece = aiGame.get(square);
         if (piece && piece.color === aiPlayerColor) { selectedSquare = square; showValidMoveDots(square); }
@@ -982,6 +1082,7 @@
         }
       }
     });
+
     function makeAiMove() {
       if (!aiGame || aiGame.game_over()) return;
       $('#ai-status-indicator').text('Bot thinking...').removeClass('bg-emerald-500/10 text-emerald-400').addClass('bg-amber-500/10 text-amber-400');
@@ -997,10 +1098,12 @@
         }
       }, 250);
     }
+
     function showValidMoveDots(sq) { removeDots(); const moves = aiGame.moves({ square: sq, verbose: true }); moves.forEach(m => { $(`#ai-board .square-${m.to}`).append('<div class="valid-move-dot"></div>'); }); }
     function removeDots() { $('.valid-move-dot').remove(); }
     function highlightMove(from, to) { removeHighlights(); $(`#ai-board .square-${from}, #ai-board .square-${to}`).addClass('highlight-last-move'); }
     function removeHighlights() { $('#ai-board .square-55d63').removeClass('highlight-last-move'); }
+
     function updateAiMoveLog() {
       const history = aiGame.history();
       const $log = $('#ai-move-history').empty();
@@ -1008,6 +1111,7 @@
       for (let i = 0; i < history.length; i += 2) { const moveNum = Math.floor(i / 2) + 1; const wMove = history[i] || ''; const bMove = history[i + 1] || ''; $log.append(`<div><span class="text-slate-500">${moveNum}.</span> ${wMove}</div><div>${bMove}</div>`); }
       $log.scrollTop($log[0].scrollHeight);
     }
+
     function checkAiGameOver() {
       if (!aiGame.game_over()) return false;
       updateQuestProgress('q_play_3', 1);
@@ -1017,25 +1121,32 @@
       } else { alert("Game Over: Draw / Stalemate!"); }
       return true;
     }
+
     function resignAiGame() { if (!aiGame || aiGame.history().length === 0 || aiGame.game_over()) return; if (confirm("Are you sure you want to resign this match? (-ELO)")) { handleAiGameLoss(); } }
+
     function calculateElo(playerRating, opponentRating, score, gamesCount) {
       let K = 32; if (gamesCount < 10) K = 40; else if (gamesCount >= 30) K = 16;
       const expected = 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400));
       return Math.round(playerRating + K * (score - expected));
     }
+
     function handleAiGameWin() {
       if (!currentUser || !userProfile) return;
       const currentElo = userProfile.elo || 1500;
       const newElo = calculateElo(currentElo, 1500, 1, userProfile.gamesPlayed || 0);
+
       const currentStreak = (userProfile.winStreak || 0) + 1;
       let streakBonus = 0;
       if (currentStreak >= 3 && currentStreak < 5) streakBonus = 15;
       if (currentStreak >= 5 && currentStreak < 10) streakBonus = 30;
       if (currentStreak >= 10) streakBonus = 50;
+
       const totalGain = 50 + streakBonus;
       const newCoins = (userProfile.coins || 0) + totalGain;
+
       if (aiPlayerColor === 'b') { updateQuestProgress('q_black_win', 1); }
       if (currentStreak >= 2) { updateQuestProgress('q_streak_2', 1); }
+
       db.ref('users/' + currentUser.uid).update({ elo: newElo, coins: newCoins, winStreak: currentStreak, gamesPlayed: (userProfile.gamesPlayed || 0) + 1 }).then(() => {
         let msg = `VICTORY! You defeated the Grandmaster Bot!\n+50 CC Base`;
         if (streakBonus > 0) msg += ` + ${streakBonus} CC Streak Bonus 🔥`;
@@ -1043,18 +1154,22 @@
         alert(msg);
       });
     }
+
     function handleAiGameLoss() {
       if (!currentUser || !userProfile) return;
       const currentElo = userProfile.elo || 1500;
       const newElo = calculateElo(currentElo, 1500, 0, userProfile.gamesPlayed || 0);
       db.ref('users/' + currentUser.uid).update({ elo: Math.max(100, newElo), winStreak: 0, gamesPlayed: (userProfile.gamesPlayed || 0) + 1 }).then(() => { alert(`DEFEAT: Match lost. Win streak reset to 0. New Rating: ${Math.max(100, newElo)} Elo`); });
     }
+
+    // Multiplayer 1v1 Arena Logic
     function initArenaBoard() {
       arenaGame = new Chess();
       const config = { draggable: false, position: 'start', pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png' };
       arenaBoard = Chessboard('arena-board', config);
       applyBoardTheme(userProfile ? userProfile.equippedTheme : currentTheme);
     }
+
     function createArenaRoom() {
       if (!currentUser) return;
       const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -1067,6 +1182,7 @@
         $('#arena-current-code').text(code);
       });
     }
+
     function joinArenaRoom() {
       const code = $('#arena-room-input').val().trim().toUpperCase();
       if (!code || code.length !== 6) return alert("Enter valid 6-digit room code.");
@@ -1083,6 +1199,7 @@
         });
       });
     }
+
     function subscribeToRoom(code) {
       roomRef = db.ref('arena_rooms/' + code);
       chatRef = db.ref('arena_chat/' + code);
@@ -1092,23 +1209,28 @@
         arenaGame.load(room.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : room.fen);
         arenaBoard.orientation(arenaPlayerColor === 'w' ? 'white' : 'black');
         arenaBoard.position(arenaGame.fen());
+
         const isHost = arenaPlayerColor === 'w';
         const oppName = isHost ? room.guestName : room.hostName;
         const oppElo = isHost ? room.guestElo : room.hostElo;
         const oppTagKey = isHost ? room.guestTag : room.hostTag;
+
         if (oppName) { $('#arena-opp-name').text(oppName); $('#arena-opp-elo').text(oppElo || 1500); $('#arena-opp-nametag').text(ALL_TITLE_MAP[oppTagKey] || oppTagKey).removeClass('hidden'); }
         if (room.lastEmote && room.lastEmote.senderUid !== currentUser.uid) {
           const emoteObj = COSMETICS_CATALOG.emotes[room.lastEmote.emoteKey];
           if (emoteObj) { showEmoteDisplay('#arena-opp-emote-display', emoteObj); }
         }
       });
+
       chatRef.on('child_added', (snap) => {
         const msg = snap.val();
         $('#chat-messages').append(`<div><span class="font-bold text-indigo-400">${escapeHtml(msg.sender)}:</span> ${escapeHtml(msg.text)}</div>`);
         $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
       });
     }
+
     function updateChatCharCount() { const len = $('#chat-input').val().length; $('#chat-char-counter').text(`${len}/500`); }
+
     function sendChatMessage(e) {
       e.preventDefault();
       const rawText = $('#chat-input').val().trim();
@@ -1117,10 +1239,13 @@
       chatRef.push({ sender: userProfile.username || 'Player', text: text, timestamp: Date.now() });
       $('#chat-input').val(''); updateChatCharCount();
     }
+
     function escapeHtml(str) { return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
     function copyRoomCode() { if (!currentRoomCode) return; navigator.clipboard.writeText(currentRoomCode); alert("Room Code " + currentRoomCode + " copied!"); }
+
     function resignArenaGame() { if (!currentRoomCode) return; if (confirm("Resign match? (-ELO)")) { db.ref('arena_rooms/' + currentRoomCode).remove(); db.ref('arena_chat/' + currentRoomCode).remove(); leaveArenaLobby(); } }
     function offerArenaDraw() { alert("Draw offer sent to opponent."); }
+
     function leaveArenaLobby() {
       if (roomRef) roomRef.off();
       if (chatRef) chatRef.off();
@@ -1130,10 +1255,12 @@
       $('#chat-messages').empty();
       initArenaBoard();
     }
+
     $(document).on('click', '#arena-board .square-55d63', function() {
       if (!arenaGame || !currentRoomCode) return;
       if ((arenaGame.turn() === 'w' && arenaPlayerColor !== 'w') || (arenaGame.turn() === 'b' && arenaPlayerColor !== 'b')) return;
       const square = $(this).data('square');
+
       if (!selectedSquare) { const piece = arenaGame.get(square); if (piece && piece.color === arenaPlayerColor) { selectedSquare = square; } }
       else {
         const move = arenaGame.move({ from: selectedSquare, to: square, promotion: 'q' });
@@ -1141,6 +1268,8 @@
         else { selectedSquare = null; }
       }
     });
+
+    // CS:GO Unboxing Strip Logic
     function buyCrate(crateType) {
       if (!userProfile) return;
       const crate = CRATE_DEFINITIONS[crateType];
@@ -1149,15 +1278,22 @@
       if (currentCoins < crate.price) { return alert(`Insufficient CogniCoins! You need ${crate.price.toLocaleString()} CC.`); }
       db.ref('users/' + currentUser.uid + '/coins').set(currentCoins - crate.price).then(() => { executeCrateSpin(crate); });
     }
+
     function executeCrateSpin(crate) {
       $('#crate-modal').removeClass('hidden');
       $('#crate-modal-title').text(crate.name);
       $('#crate-result-area, #crate-done-btn').addClass('hidden');
       $('#crate-duplicate-notice').addClass('hidden');
+
       const $strip = $('#crate-strip').empty().css('transform', 'translateX(0px)');
       const winningItem = crate.items[Math.floor(Math.random() * crate.items.length)];
       const stripItems = [];
-      for (let i = 0; i < 40; i++) { if (i === 32) { stripItems.push(winningItem); } else { const randItem = crate.items[Math.floor(Math.random() * crate.items.length)]; stripItems.push(randItem); } }
+
+      for (let i = 0; i < 40; i++) {
+        if (i === 32) { stripItems.push(winningItem); }
+        else { const randItem = crate.items[Math.floor(Math.random() * crate.items.length)]; stripItems.push(randItem); }
+      }
+
       stripItems.forEach(item => {
         let label = item.id;
         if (item.type === 'nametag') label = ALL_TITLE_MAP[item.id] || item.id;
@@ -1165,25 +1301,30 @@
         if (item.type === 'frame') label = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
         $strip.append(`<div class="crate-item-card"><i class="fa-solid fa-gift text-2xl text-amber-400 mb-2"></i><span class="text-[10px] text-center font-bold text-slate-200 px-1 truncate w-full">${label}</span></div>`);
       });
+
       const cardWidth = 132;
       const targetOffset = -(32 * cardWidth - (240 - 60));
       setTimeout(() => { $strip.css('transform', `translateX(${targetOffset}px)`); }, 100);
       setTimeout(() => { processCrateReward(winningItem, crate.price); }, 5200);
     }
+
     function processCrateReward(item, cratePrice) {
       const inv = getNormalizedInventory();
       let categoryArray = []; let catKey = '';
       if (item.type === 'nametag') { catKey = 'nametags'; categoryArray = inv.nametags; }
       if (item.type === 'icon') { catKey = 'icons'; categoryArray = inv.icons; }
       if (item.type === 'frame') { catKey = 'frames'; categoryArray = inv.frames; }
+
       const isDuplicate = categoryArray.includes(item.id);
       let displayName = item.id;
       if (item.type === 'nametag') displayName = ALL_TITLE_MAP[item.id] || item.id;
       if (item.type === 'icon') displayName = COSMETICS_CATALOG.icons[item.id]?.name || item.id;
       if (item.type === 'frame') displayName = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
+
       $('#crate-result-name').text(displayName);
       $('#crate-result-type').text(item.type.toUpperCase());
       $('#crate-result-area, #crate-done-btn').removeClass('hidden');
+
       if (isDuplicate) {
         const refund = Math.floor(cratePrice * 0.5);
         const newCoins = (userProfile.coins || 0) + refund;
@@ -1195,7 +1336,10 @@
         db.ref(`users/${currentUser.uid}/inventory/${catKey}`).set(categoryArray);
       }
     }
+
     function closeCrateModal() { $('#crate-modal').addClass('hidden'); }
+
+    // Leaderboard
     function loadLeaderboard() {
       const $tbody = $('#leaderboard-table-body').empty().append('<tr><td colspan="5" class="py-8 text-center text-slate-500">Loading rankings...</td></tr>');
       db.ref('users').orderByChild('elo').limitToLast(50).once('value').then((snap) => {
@@ -1203,7 +1347,9 @@
         const users = [];
         snap.forEach(child => { users.push(child.val()); });
         users.reverse();
+
         if (users.length === 0) { $tbody.append('<tr><td colspan="5" class="py-6 text-center text-slate-500">No rankings available</td></tr>'); return; }
+
         users.forEach((u, index) => {
           const rank = index + 1;
           const tagKey = u.equippedNametag || 'nametag_novice';
@@ -1214,18 +1360,23 @@
         });
       });
     }
+
+    // Master Control Admin Panel Logic
     function toggleMaintenanceMode() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/maintenance').once('value').then((snap) => { const current = snap.val() === true; db.ref('system/maintenance').set(!current); });
     }
+
     function updateAdminMaintBtn(isMaint) {
       if (isMaint) { $('#admin-maint-btn').removeClass('bg-emerald-600 hover:bg-emerald-500').addClass('bg-red-600 hover:bg-red-500'); $('#admin-maint-label').text('Maintenance Active (ON)'); }
       else { $('#admin-maint-btn').removeClass('bg-red-600 hover:bg-red-500').addClass('bg-emerald-600 hover:bg-emerald-500'); $('#admin-maint-label').text('Maintenance Normal (OFF)'); }
     }
+
     function adminForceGlobalReload() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/global_reload').set(Date.now());
     }
+
     function adminPurgeHighElo() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users').once('value').then((snap) => {
@@ -1234,16 +1385,19 @@
         loadAdminUserTable();
       });
     }
+
     function adminSendBroadcast() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const msg = $('#admin-broadcast-input').val().trim();
       if (!msg) return alert("Enter a broadcast message first.");
       db.ref('system/announcement').set({ message: msg.substring(0, 200), timestamp: Date.now(), by: currentUser.email }).then(() => { alert("Broadcast sent!"); });
     }
+
     function adminClearBroadcast() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/announcement').remove().then(() => { $('#admin-broadcast-input').val(''); });
     }
+
     function loadCurrentBroadcast() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/announcement').once('value').then((snap) => {
@@ -1251,33 +1405,7 @@
         if (data) { const msg = typeof data === 'string' ? data : data.message; if (msg) $('#admin-broadcast-input').val(msg); }
       });
     }
-    function adminResetAllInventories() {
-      if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      if (!confirm("⚠️ WARNING: This will WIPE EVERY player's inventory back to starter (nothing)!\n\n- Icons: Standard only\n- Frames: None only\n- Titles: Pawn Novice only\n- Themes: Classic Wood only\n- Emotes: None\n\nContinue?")) return;
-      if (!confirm("Final confirmation: Reset ALL inventories? This cannot be undone.")) return;
-      const starterInventory = { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice'], themes: ['theme-wood'], emotes: ['none'] };
-      db.ref('users').once('value').then((snap) => {
-        const updates = {};
-        snap.forEach((child) => {
-          const uid = child.key;
-          updates[uid + '/inventory'] = starterInventory;
-          updates[uid + '/equippedIcon'] = 'icon_user';
-          updates[uid + '/equippedFrame'] = 'frame_none';
-          updates[uid + '/equippedNametag'] = 'nametag_novice';
-          updates[uid + '/equippedTheme'] = 'theme-wood';
-          updates[uid + '/equippedEmote'] = 'none';
-        });
-        db.ref('users').update(updates).then(() => { alert("All player inventories have been reset to starter."); loadAdminUserTable(); });
-      });
-    }
-    function adminResetInventory(uid) {
-      if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      if (!confirm("Reset this player's inventory to starter (nothing)?")) return;
-      db.ref('users/' + uid).update({
-        inventory: { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice'], themes: ['theme-wood'], emotes: ['none'] },
-        equippedIcon: 'icon_user', equippedFrame: 'frame_none', equippedNametag: 'nametag_novice', equippedTheme: 'theme-wood', equippedEmote: 'none'
-      }).then(() => { loadAdminUserTable(); });
-    }
+
     function adminGrantCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const input = prompt("Enter CogniCoins (CC) amount to grant:", "5000");
@@ -1289,18 +1417,22 @@
         db.ref('users/' + uid + '/coins').set(cur + amount).then(() => { alert(`Granted ${amount.toLocaleString()} CC successfully!`); loadAdminUserTable(); });
       });
     }
+
     function adminResetCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users/' + uid + '/coins').set(1000).then(() => { loadAdminUserTable(); });
     }
+
     function adminResetElo(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users/' + uid + '/elo').set(1500).then(() => { loadAdminUserTable(); });
     }
+
     function adminDeleteUser(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       if (confirm("Permanently delete this user record from database?")) { db.ref('users/' + uid).remove().then(() => { loadAdminUserTable(); }); }
     }
+
     function loadAdminUserTable() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const $tbody = $('#admin-user-table').empty().append('<tr><td colspan="5" class="py-6 text-center text-slate-500">Loading database...</td></tr>');
@@ -1309,10 +1441,11 @@
         snap.forEach((child) => {
           const uid = child.key;
           const u = child.val();
-          $tbody.append(`<tr class="hover:bg-slate-900 transition"><td class="py-2.5 px-4 text-slate-500 text-[10px]">${uid.substring(0, 8)}...</td><td class="py-2.5 px-4 font-bold text-white">${u.username || 'N/A'} <span class="text-[10px] text-slate-400 font-normal">(${u.email || ''})</span></td><td class="py-2.5 px-4 text-indigo-400 font-bold">${u.elo || 1500}</td><td class="py-2.5 px-4 text-amber-400 font-bold">${(u.coins || 0).toLocaleString()}</td><td class="py-2.5 px-4 text-right space-x-1"><button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">Grant CC</button><button onclick="adminResetInventory('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Inv</button><button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset CC</button><button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Elo</button><button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 rounded border border-red-800 text-[10px]">Delete</button></td></tr>`);
+          $tbody.append(`<tr class="hover:bg-slate-900 transition"><td class="py-2.5 px-4 text-slate-500 text-[10px]">${uid.substring(0, 8)}...</td><td class="py-2.5 px-4 font-bold text-white">${u.username || 'N/A'} <span class="text-[10px] text-slate-400 font-normal">(${u.email || ''})</span></td><td class="py-2.5 px-4 text-indigo-400 font-bold">${u.elo || 1500}</td><td class="py-2.5 px-4 text-amber-400 font-bold">${(u.coins || 0).toLocaleString()}</td><td class="py-2.5 px-4 text-right space-x-1"><button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">Grant CC</button><button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset CC</button><button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Elo</button><button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 rounded border border-red-800 text-[10px]">Delete</button></td></tr>`);
         });
       });
     }
+
     $(document).ready(() => { showSection('ai'); });
   </script>
 </body>

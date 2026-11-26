@@ -41,15 +41,15 @@
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Firebase App & Compat SDKs -->
+  <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
   <style>
-    /* Fix: Dropdown arrow spacing so it never touches the edge */
+    /* Dropdown arrow spacing so it never hugs the border */
     select {
-      padding-right: 2.25rem !important;
+      padding-right: 2.5rem !important;
       cursor: pointer;
     }
 
@@ -58,7 +58,7 @@
       border: 4px solid #334155 !important;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
       position: relative;
     }
     
@@ -88,15 +88,15 @@
       transform: scale(1.18);
       z-index: 999;
     }
-    
-    /* Selected square & Legal move dot indicators */
+
+    /* Legal Move Dots & Selected Square */
     .selected-square {
       background-color: rgba(234, 179, 8, 0.45) !important;
     }
     .legal-dot {
       width: 14px;
       height: 14px;
-      background: rgba(148, 163, 184, 0.75);
+      background: rgba(148, 163, 184, 0.7);
       border-radius: 50%;
       position: absolute;
       top: 50%;
@@ -121,14 +121,6 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #475569;
     }
-
-    @keyframes pulse-subtle {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-    .animate-pulse-subtle {
-      animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none">
@@ -140,8 +132,8 @@
         <i class="fa-solid fa-wrench"></i>
       </div>
       <h2 class="text-2xl font-black text-amber-400 mb-2">System Maintenance</h2>
-      <p class="text-slate-300 text-sm mb-6 leading-relaxed" id="maintenance-msg">
-        CogniLearn is currently undergoing scheduled platform upgrades and calibration. Please check back shortly.
+      <p class="text-slate-300 text-sm mb-6 leading-relaxed">
+        CogniLearn is currently undergoing scheduled platform upgrades. Please check back shortly.
       </p>
       <div class="p-3 bg-slate-800 rounded-lg border border-slate-700 text-xs text-slate-400">
         Administrator access enabled for whitelisted credentials.
@@ -154,7 +146,7 @@
 
   <!-- Announcement Banner -->
   <div id="system-announcement" class="bg-indigo-600 px-4 py-2 text-center text-xs md:text-sm font-medium text-white hidden relative">
-    <span id="announcement-text"><i class="fa-solid fa-bullhorn mr-2"></i>Welcome to CogniLearn Strategic Thinking Lab!</span>
+    <span id="announcement-text"><i class="fa-solid fa-bullhorn mr-2"></i>Welcome to CogniLearn!</span>
     <button onclick="$('#system-announcement').slideUp()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white">
       <i class="fa-solid fa-xmark"></i>
     </button>
@@ -201,13 +193,11 @@
 
       <!-- Currency & Auth Profile Panel -->
       <div class="flex items-center gap-3">
-        <!-- Coins Display -->
         <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg shadow-inner">
-          <i class="fa-solid fa-coins text-amber-400 text-sm animate-pulse-subtle"></i>
+          <i class="fa-solid fa-coins text-amber-400 text-sm"></i>
           <span id="user-coins-display" class="font-bold text-amber-300 font-mono text-sm">0</span>
         </div>
 
-        <!-- Auth Buttons / User Icon -->
         <div id="auth-actions">
           <button onclick="loginWithGoogle()" id="btn-login" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-2">
             <i class="fa-brands fa-google"></i> Sign In
@@ -215,7 +205,7 @@
           
           <div id="user-avatar-badge" class="hidden items-center gap-2 cursor-pointer" onclick="switchTab('profile')">
             <div class="relative">
-              <img id="header-avatar-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cogni" class="w-9 h-9 rounded-lg bg-slate-700 border border-indigo-500 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Cogni';" />
+              <img id="header-avatar-img" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-9 h-9 rounded-lg bg-slate-700 border border-indigo-500 object-cover" />
               <div id="header-badge-icon" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
                 <i class="fa-solid fa-star"></i>
               </div>
@@ -225,10 +215,10 @@
       </div>
     </div>
 
-    <!-- Mobile Nav Bar -->
+    <!-- Mobile Navigation -->
     <div class="flex md:hidden overflow-x-auto px-2 py-1.5 border-t border-slate-700/60 bg-slate-900 gap-1 text-[11px]">
       <button onclick="switchTab('ai')" class="mobile-nav-btn flex-1 py-1 px-2 rounded font-medium text-slate-300 hover:bg-slate-800 text-center whitespace-nowrap">AI</button>
-      <button onclick="switchTab('arena')" class="mobile-nav-btn flex-1 py-1 px-2 rounded font-medium text-slate-300 hover:bg-slate-800 text-center whitespace-nowrap">1v1 Arena</button>
+      <button onclick="switchTab('arena')" class="mobile-nav-btn flex-1 py-1 px-2 rounded font-medium text-slate-300 hover:bg-slate-800 text-center whitespace-nowrap">Arena</button>
       <button onclick="switchTab('shop')" class="mobile-nav-btn flex-1 py-1 px-2 rounded font-medium text-slate-300 hover:bg-slate-800 text-center whitespace-nowrap">Shop</button>
       <button onclick="switchTab('quests')" class="mobile-nav-btn flex-1 py-1 px-2 rounded font-medium text-slate-300 hover:bg-slate-800 text-center whitespace-nowrap">Quests</button>
       <button onclick="switchTab('profile')" class="mobile-nav-btn flex-1 py-1 px-2 rounded font-medium text-slate-300 hover:bg-slate-800 text-center whitespace-nowrap">Profile</button>
@@ -241,7 +231,6 @@
 
     <!-- TAB 1: PRACTICE AI -->
     <section id="tab-ai" class="tab-content flex flex-col lg:flex-row gap-6 items-start justify-center">
-      <!-- Board Column -->
       <div class="flex flex-col items-center w-full max-w-[500px] mx-auto lg:mx-0">
         
         <!-- Opponent Status -->
@@ -270,8 +259,8 @@
         <div class="w-full flex items-center justify-between p-3 bg-slate-800 rounded-b-xl border-b border-x border-slate-700">
           <div class="flex items-center gap-3">
             <div class="relative">
-              <img id="ai-player-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cogni" class="w-9 h-9 rounded-lg bg-slate-700 border border-indigo-500 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Cogni';" />
-              <div id="ai-player-badge" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
+              <img id="ai-player-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-10 h-10 rounded-xl bg-slate-700 border-2 border-indigo-500 object-cover" />
+              <div id="ai-player-badge" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
                 <i class="fa-solid fa-star"></i>
               </div>
             </div>
@@ -291,7 +280,6 @@
 
       <!-- Controls & History Column -->
       <div class="w-full lg:w-96 flex flex-col gap-4">
-        <!-- Match Setup Panel -->
         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
@@ -319,7 +307,6 @@
           </div>
         </div>
 
-        <!-- Move History Box -->
         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex flex-col flex-1 min-h-[220px]">
           <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
             <span>Move Notation</span>
@@ -330,7 +317,6 @@
           </div>
         </div>
 
-        <!-- FEN / PGN Utility Card -->
         <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-xs flex items-center justify-between">
           <button onclick="copyFEN()" class="text-slate-400 hover:text-indigo-400 transition flex items-center gap-1.5">
             <i class="fa-regular fa-copy"></i> Copy FEN
@@ -344,13 +330,10 @@
 
     <!-- TAB 2: 1v1 ARENA -->
     <section id="tab-arena" class="tab-content hidden flex-col lg:flex-row gap-6 items-start justify-center">
-      <!-- Arena Board -->
       <div class="flex flex-col items-center w-full max-w-[500px] mx-auto lg:mx-0">
-        
-        <!-- Opponent Status -->
         <div class="w-full flex items-center justify-between p-3 bg-slate-800 rounded-t-xl border-t border-x border-slate-700">
           <div class="flex items-center gap-3">
-            <img id="arena-opp-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Opponent" class="w-9 h-9 rounded-lg bg-slate-700 border border-slate-600 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Opponent';" />
+            <img id="arena-opp-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/bP.png" class="w-9 h-9 rounded-lg bg-slate-700 border border-slate-600 object-cover" />
             <div>
               <div class="flex items-center gap-2">
                 <span class="font-bold text-sm text-slate-100" id="arena-opp-name">Waiting...</span>
@@ -364,15 +347,13 @@
           </div>
         </div>
 
-        <!-- Board -->
         <div id="arena-board" class="w-full aspect-square theme-slate"></div>
 
-        <!-- Self Status (Synced with Profile) -->
         <div class="w-full flex items-center justify-between p-3 bg-slate-800 rounded-b-xl border-b border-x border-slate-700">
           <div class="flex items-center gap-3">
             <div class="relative">
-              <img id="arena-self-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Self" class="w-9 h-9 rounded-lg bg-slate-700 border border-indigo-500 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Self';" />
-              <div id="arena-self-badge" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
+              <img id="arena-self-avatar" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-10 h-10 rounded-xl bg-slate-700 border-2 border-indigo-500 object-cover" />
+              <div id="arena-self-badge" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-[8px] text-amber-400">
                 <i class="fa-solid fa-star"></i>
               </div>
             </div>
@@ -390,10 +371,7 @@
         </div>
       </div>
 
-      <!-- Arena Matchmaking Column -->
       <div class="w-full lg:w-96 flex flex-col gap-4">
-        
-        <!-- Matchmaking State Card -->
         <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow flex flex-col gap-4">
           <div class="flex items-center justify-between border-b border-slate-700 pb-3">
             <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
@@ -404,7 +382,7 @@
 
           <div id="arena-unconnected-panel" class="flex flex-col gap-3">
             <p class="text-xs text-slate-300 leading-relaxed">
-              Queue into live rated matchmaking or create a direct private classroom match.
+              Queue into rated matchmaking or create a direct room.
             </p>
 
             <button onclick="startQuickMatch()" id="btn-quick-match" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-lg font-bold text-xs shadow-lg transition flex items-center justify-center gap-2">
@@ -427,7 +405,6 @@
             </button>
           </div>
 
-          <!-- Connected Active Match Options -->
           <div id="arena-active-panel" class="hidden flex-col gap-3">
             <div class="p-3 bg-slate-900 rounded-lg border border-slate-700">
               <div class="text-[11px] text-slate-400 mb-1">Room ID: <span class="font-mono text-indigo-400 font-bold" id="active-room-display">----</span></div>
@@ -445,7 +422,6 @@
           </div>
         </div>
 
-        <!-- Match Chat / Activity Log -->
         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex flex-col flex-1 min-h-[200px]">
           <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400 mb-2">Arena Log</h3>
           <div id="arena-chat-box" class="bg-slate-900/80 rounded-lg p-2.5 flex-1 max-h-40 overflow-y-auto text-xs space-y-1.5 font-mono text-slate-300">
@@ -457,7 +433,6 @@
 
     <!-- TAB 3: COGNISHOP -->
     <section id="tab-shop" class="tab-content hidden flex-col gap-6">
-      <!-- Crate Dispensers Section -->
       <div>
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -469,7 +444,6 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Bronze Crate -->
           <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col items-center text-center relative overflow-hidden group hover:border-indigo-500/50 transition">
             <div class="w-16 h-16 bg-slate-700/50 rounded-2xl flex items-center justify-center text-3xl text-slate-300 mb-3 group-hover:scale-110 transition">
               <i class="fa-solid fa-box"></i>
@@ -483,7 +457,6 @@
             </div>
           </div>
 
-          <!-- Silver Crate -->
           <div class="bg-slate-800 border border-indigo-500/30 rounded-2xl p-5 flex flex-col items-center text-center relative overflow-hidden group hover:border-indigo-500 transition">
             <div class="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-3xl text-indigo-400 mb-3 group-hover:scale-110 transition">
               <i class="fa-solid fa-box-open"></i>
@@ -497,7 +470,6 @@
             </div>
           </div>
 
-          <!-- Gold Crate -->
           <div class="bg-slate-800 border border-amber-500/30 rounded-2xl p-5 flex flex-col items-center text-center relative overflow-hidden group hover:border-amber-500 transition">
             <div class="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center text-3xl text-amber-400 mb-3 group-hover:scale-110 transition">
               <i class="fa-solid fa-gem"></i>
@@ -511,13 +483,12 @@
             </div>
           </div>
 
-          <!-- Grandmaster Crate -->
           <div class="bg-slate-800 border border-purple-500/30 rounded-2xl p-5 flex flex-col items-center text-center relative overflow-hidden group hover:border-purple-500 transition">
             <div class="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-3xl text-purple-400 mb-3 group-hover:scale-110 transition">
               <i class="fa-solid fa-crown"></i>
             </div>
             <h3 class="font-black text-slate-100 text-base">Grandmaster Crate</h3>
-            <p class="text-xs text-slate-400 mb-4 mt-1">Legendary animated cosmetics & Grandmaster badges.</p>
+            <p class="text-xs text-slate-400 mb-4 mt-1">Legendary cosmetics & Grandmaster badges.</p>
             <div class="mt-auto w-full">
               <button onclick="unboxCrate('grandmaster', 1000)" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-coins"></i> 1000 CC
@@ -527,14 +498,13 @@
         </div>
       </div>
 
-      <!-- Equipment Customization Hub (With Fixed Dropdown Arrow Spacing) -->
+      <!-- Wardrobe Selectors (With Clean Edge Spacing) -->
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
         <h3 class="text-base font-black text-white mb-4 flex items-center gap-2">
           <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i> Wardrobe & Cosmetic Loadout
         </h3>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!-- Board Theme Selector -->
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-semibold text-slate-300">Board Theme</label>
             <select id="equip-board" onchange="equipCosmetic('board', this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
@@ -546,7 +516,6 @@
             </select>
           </div>
 
-          <!-- Title Selector -->
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-semibold text-slate-300">Player Title</label>
             <select id="equip-title" onchange="equipCosmetic('title', this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
@@ -557,18 +526,18 @@
             </select>
           </div>
 
-          <!-- Avatar Selector -->
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-semibold text-slate-300">Avatar Style</label>
             <select id="equip-avatar" onchange="equipCosmetic('avatar', this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-              <option value="Cogni">Cogni Robot</option>
-              <option value="Strategist">Knight Bot</option>
-              <option value="Scholar">Scholar Owl</option>
-              <option value="Champion">Champion Bot</option>
+              <option value="wP">White Pawn</option>
+              <option value="wN">White Knight</option>
+              <option value="wB">White Bishop</option>
+              <option value="wR">White Rook</option>
+              <option value="wQ">White Queen</option>
+              <option value="wK">White King</option>
             </select>
           </div>
 
-          <!-- Badge Selector -->
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-semibold text-slate-300">Profile Badge</label>
             <select id="equip-badge" onchange="equipCosmetic('badge', this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
@@ -649,7 +618,7 @@
       <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
         <div class="flex items-center gap-4">
           <div class="relative">
-            <img id="profile-avatar-large" src="https://api.dicebear.com/7.x/bottts/svg?seed=Cogni" class="w-20 h-20 rounded-2xl bg-slate-700 border-2 border-indigo-500 object-cover" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Cogni';" />
+            <img id="profile-avatar-large" src="https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/wP.png" class="w-20 h-20 rounded-2xl bg-slate-700 border-2 border-indigo-500 object-cover" />
             <div id="profile-badge-icon" class="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-slate-900 border-2 border-slate-700 flex items-center justify-center text-xs text-amber-400">
               <i class="fa-solid fa-star"></i>
             </div>
@@ -721,6 +690,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Maintenance Toggle -->
           <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col justify-between gap-3">
             <div>
               <h4 class="text-xs font-bold uppercase text-slate-300 tracking-wider">Maintenance Mode</h4>
@@ -731,6 +701,7 @@
             </button>
           </div>
 
+          <!-- Currency Grant Tool -->
           <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col justify-between gap-3">
             <div>
               <h4 class="text-xs font-bold uppercase text-slate-300 tracking-wider">CogniCoin Mint / Grant</h4>
@@ -741,11 +712,21 @@
             </button>
           </div>
 
+          <!-- Customizable Broadcast Announcement Panel -->
           <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 col-span-1 md:col-span-2 flex flex-col gap-3">
-            <h4 class="text-xs font-bold uppercase text-slate-300 tracking-wider">Global System Announcement</h4>
-            <div class="flex gap-2">
-              <input type="text" id="admin-announcement-input" placeholder="Type announcement message..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 flex-1 focus:outline-none focus:border-amber-500" />
-              <button onclick="adminSendBroadcast()" class="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-lg transition">Broadcast</button>
+            <h4 class="text-xs font-bold uppercase text-slate-300 tracking-wider">Global System Announcement (Customizable)</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+              <select id="admin-broadcast-type" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200">
+                <option value="bg-indigo-600">Announcement (Indigo)</option>
+                <option value="bg-amber-600">Alert (Amber)</option>
+                <option value="bg-rose-600">Urgent Notice (Red)</option>
+                <option value="bg-emerald-600">Update / Event (Green)</option>
+              </select>
+              <input type="text" id="admin-announcement-input" placeholder="Type custom announcement text..." class="sm:col-span-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500" />
+              <div class="flex gap-2">
+                <button onclick="adminSendBroadcast()" class="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-lg transition">Broadcast</button>
+                <button onclick="adminClearBroadcast()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold text-xs rounded-lg transition" title="Clear Active Announcement">Clear</button>
+              </div>
             </div>
           </div>
         </div>
@@ -862,13 +843,13 @@
       equipped: {
         board: 'slate',
         title: 'Apprentice',
-        avatar: 'Cogni',
+        avatar: 'wP',
         badge: 'fa-star'
       },
       inventory: {
         boards: ['slate'],
         titles: ['Apprentice'],
-        avatars: ['Cogni'],
+        avatars: ['wP'],
         badges: ['fa-star']
       }
     };
@@ -883,6 +864,15 @@
       return [...defaultArr];
     }
 
+    // Helper: Build piece avatar URL cleanly
+    function getAvatarUrl(avatarKey) {
+      if (currentUser && currentUser.photoURL && (!avatarKey || avatarKey === 'google')) {
+        return currentUser.photoURL;
+      }
+      const key = avatarKey || 'wP';
+      return `https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/${key}.png`;
+    }
+
     // --- AUTHENTICATION & PROFILE ENGINE ---
     auth.onAuthStateChanged(user => {
       if (user) {
@@ -890,7 +880,7 @@
         $('#btn-login').addClass('hidden');
         $('#user-avatar-badge').removeClass('hidden').addClass('flex');
         
-        const isSuperAdmin = (user.email && user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase());
+        const isSuperAdmin = (user.email && user.email.toLowerCase().trim() === SUPER_ADMIN_EMAIL.toLowerCase().trim());
         if (isSuperAdmin) {
           $('#nav-admin, #mobile-nav-admin').removeClass('hidden');
         } else {
@@ -912,7 +902,7 @@
               userProfile.equipped = {
                 board: val.equipped.board || 'slate',
                 title: val.equipped.title || 'Apprentice',
-                avatar: val.equipped.avatar || 'Cogni',
+                avatar: val.equipped.avatar || 'wP',
                 badge: val.equipped.badge || 'fa-star'
               };
             }
@@ -921,7 +911,7 @@
               userProfile.inventory = {
                 boards: parseCategory(val.inventory.boards, ['slate']),
                 titles: parseCategory(val.inventory.titles, ['Apprentice']),
-                avatars: parseCategory(val.inventory.avatars, ['Cogni']),
+                avatars: parseCategory(val.inventory.avatars, ['wP']),
                 badges: parseCategory(val.inventory.badges, ['fa-star'])
               };
             }
@@ -948,7 +938,7 @@
     // --- MAINTENANCE & BROADCAST LISTENERS ---
     rtdb.ref('system/maintenance').on('value', snap => {
       const isMaint = snap.val() === true;
-      const userEmail = currentUser && currentUser.email ? currentUser.email.toLowerCase() : '';
+      const userEmail = currentUser && currentUser.email ? currentUser.email.toLowerCase().trim() : '';
       const isWhitelisted = MAINTENANCE_WHITELIST.includes(userEmail);
 
       if (isMaint && !isWhitelisted) {
@@ -964,9 +954,28 @@
       }
     });
 
+    // Customizable Global Announcement Listener
     rtdb.ref('system/announcement').on('value', snap => {
-      const msg = snap.val();
+      const data = snap.val();
+      if (!data) {
+        $('#system-announcement').slideUp();
+        return;
+      }
+
+      let msg = "";
+      let bannerClass = "bg-indigo-600";
+
+      if (typeof data === 'object') {
+        msg = data.text || "";
+        bannerClass = data.type || "bg-indigo-600";
+      } else {
+        msg = data;
+      }
+
       if (msg) {
+        $('#system-announcement')
+          .removeClass('bg-indigo-600 bg-amber-600 bg-rose-600 bg-emerald-600')
+          .addClass(bannerClass);
         $('#announcement-text').html('<i class="fa-solid fa-bullhorn mr-2"></i>' + msg);
         $('#system-announcement').slideDown();
       } else {
@@ -1001,9 +1010,9 @@
 
     function syncUI() {
       $('#user-coins-display').text(userProfile.coins);
-      const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${userProfile.equipped.avatar}`;
+      const avatarUrl = getAvatarUrl(userProfile.equipped.avatar);
       
-      // Fix: Strictly sync AI avatar and badge with profile
+      // Clean chess piece avatars synced everywhere
       $('#header-avatar-img, #ai-player-avatar, #arena-self-avatar, #profile-avatar-large').attr('src', avatarUrl);
       const badgeHtml = `<i class="fa-solid ${userProfile.equipped.badge}"></i>`;
       $('#header-badge-icon, #profile-badge-icon, #ai-player-badge, #arena-self-badge').html(badgeHtml);
@@ -1404,7 +1413,6 @@
         const data = snap.val();
         if (!data) return;
 
-        // Opponent info
         if (assignedColor === 'white' && data.black) {
           $('#arena-opp-name').text(data.black.name || 'Opponent');
           $('#arena-opp-rating').text(`${data.black.rating || 1200} Rating`);
@@ -1413,7 +1421,6 @@
           $('#arena-opp-rating').text(`${data.white.rating || 1200} Rating`);
         }
 
-        // Live Moves
         if (data.fen && data.fen !== 'start' && data.fen !== arenaGame.fen()) {
           arenaGame.load(data.fen);
           arenaBoard.position(data.fen);
@@ -1421,7 +1428,6 @@
           if (data.lastMove) AudioEngine.play(data.lastMove.captured ? 'capture' : 'move');
         }
 
-        // Resignation Handler
         if (data.status === 'resigned') {
           if (data.resignedBy === arenaColor) {
             AudioEngine.play('loss');
@@ -1436,7 +1442,6 @@
           leaveArena();
         }
 
-        // Draw Offer Handler
         if (data.drawOffer && data.drawOffer !== arenaColor) {
           arenaRef.update({ drawOffer: null });
           if (confirm("Opponent offers a draw. Do you accept?")) {
@@ -1536,7 +1541,7 @@
         ],
         gold: [
           { title: 'Midnight Abyss Skin', desc: 'Deep cosmic slate navy board.', type: 'board', val: 'midnight' },
-          { title: 'Scholar Owl Avatar', desc: 'Academic wisdom avatar style.', type: 'avatar', val: 'Scholar' }
+          { title: 'White Queen Avatar', desc: 'Majestic White Queen avatar.', type: 'avatar', val: 'wQ' }
         ],
         grandmaster: [
           { title: 'Cyber Neon Skin', desc: 'Electrified vibrant arena theme.', type: 'board', val: 'neon' },
@@ -1602,12 +1607,24 @@
       }
     }
 
+    // Customizable Admin Broadcast Dispatcher
     function adminSendBroadcast() {
       const msg = $('#admin-announcement-input').val().trim();
-      if (!msg) return alert('Enter announcement text.');
-      rtdb.ref('system/announcement').set(msg);
+      const bannerType = $('#admin-broadcast-type').val();
+      if (!msg) return alert('Enter announcement text before broadcasting.');
+      
+      rtdb.ref('system/announcement').set({
+        text: msg,
+        type: bannerType
+      });
       $('#admin-announcement-input').val('');
-      alert('System broadcast transmitted.');
+      alert('Custom broadcast transmitted to all users.');
+    }
+
+    // Admin Clear Broadcast Tool
+    function adminClearBroadcast() {
+      rtdb.ref('system/announcement').remove();
+      alert('Active announcement cleared from the system.');
     }
 
     $(document).ready(() => {

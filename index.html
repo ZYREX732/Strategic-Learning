@@ -1,339 +1,558 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CogniLearn Strategic Thinking Lab - Portal Login</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome 6 CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Firebase SDK (v8.10.1 compat) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Z-Chess — Login & Portal</title>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        slate: {
-                            850: '#151e2e',
-                            950: '#070b14',
-                        }
-                    }
-                }
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              900: '#4c1d95',
             }
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
         }
-    </script>
-    <style>
-        body {
-            background-color: #070b14;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.7) 0px, transparent 100%);
-            background-attachment: fixed;
-            min-height: 100vh;
-        }
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
-        }
-        .glass-input {
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
-            transition: all 0.2s ease;
-        }
-        .glass-input:focus {
-            background: rgba(15, 23, 42, 0.9);
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-            outline: none;
-        }
-        .glow-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
-            transition: all 0.2s ease;
-        }
-        .glow-btn:hover {
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
-            transform: translateY(-1px);
-        }
-        .glow-btn:active {
-            transform: translateY(0);
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Firebase Compat SDKs (10.7.1) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #030712;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-input {
+      background: rgba(3, 7, 18, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.2s ease;
+    }
+    .glass-input:focus {
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+      outline: none;
+    }
+    .bg-grid-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .glow-gold {
+      filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.35));
+    }
+  </style>
 </head>
-<body class="text-slate-100 flex items-center justify-center min-h-screen p-4">
 
-    <!-- Main Container -->
-    <div class="w-full max-w-md relative z-10">
-        
-        <!-- Header Branding -->
-        <div class="text-center mb-6">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 shadow-xl shadow-blue-500/20 mb-3 border border-blue-400/30">
-                <i class="fa-solid fa-chess-knight text-3xl text-white"></i>
-            </div>
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Cogni<span class="text-blue-500">Learn</span></h1>
-            <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase mt-0.5">Strategic Thinking Laboratory & 1v1 Arena</p>
+<body class="min-h-screen flex flex-col justify-between relative selection:bg-amber-500 selection:text-slate-950 bg-grid-pattern">
+
+  <!-- Ambient Background Glows -->
+  <div class="fixed top-[-15%] left-[-10%] w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="fixed bottom-[-15%] right-[-10%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- Auth Loading Screen (Checking active session) -->
+  <div id="auth-loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-md transition-opacity duration-300">
+    <div class="relative w-20 h-20 mb-6 flex items-center justify-center">
+      <div class="absolute inset-0 rounded-2xl bg-amber-500/20 animate-ping"></div>
+      <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/30">
+        <i class="fa-solid fa-chess-knight text-3xl text-slate-950"></i>
+      </div>
+    </div>
+    <div class="text-xl font-extrabold tracking-tight text-white mb-2">Connecting to <span class="text-amber-400">Z-Chess</span></div>
+    <div class="text-xs font-mono text-slate-400 flex items-center gap-2">
+      <i class="fa-solid fa-circle-notch fa-spin text-amber-500"></i> Checking authentication state...
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between relative z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
+        <i class="fa-solid fa-chess-knight text-xl text-slate-950"></i>
+      </div>
+      <div>
+        <div class="text-xl font-black tracking-tight text-white flex items-center gap-1.5">
+          Z-CHESS <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 font-mono font-bold">LIVE</span>
         </div>
-
-        <!-- Auth Card -->
-        <div class="glass-panel rounded-2xl p-6 sm:p-8 relative overflow-hidden">
-            <!-- Alert Banner -->
-            <div id="auth-alert" class="hidden mb-4 p-3 rounded-xl text-xs font-medium flex items-center gap-2 border"></div>
-
-            <!-- Tab Switcher -->
-            <div class="flex bg-slate-900/80 p-1 rounded-xl mb-6 border border-white/5">
-                <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-blue-600 text-white shadow-md">
-                    <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Sign In
-                </button>
-                <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-user-plus mr-1.5"></i> Register
-                </button>
-            </div>
-
-            <!-- LOGIN FORM -->
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Email Address</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
-                            <i class="fa-solid fa-envelope text-xs"></i>
-                        </span>
-                        <input type="email" id="login-email" required placeholder="player@cognilearn.org" class="glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500 font-medium">
-                    </div>
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Password</label>
-                        <a href="javascript:void(0)" onclick="handleForgotPassword()" class="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors">Forgot?</a>
-                    </div>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
-                            <i class="fa-solid fa-lock text-xs"></i>
-                        </span>
-                        <input type="password" id="login-password" required placeholder="••••••••••••" class="glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500 font-medium">
-                    </div>
-                </div>
-
-                <button type="submit" id="login-submit-btn" class="glow-btn w-full py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 mt-2">
-                    <span>Enter Laboratory</span>
-                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                </button>
-            </form>
-
-            <!-- REGISTER FORM -->
-            <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Tactical Username</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
-                            <i class="fa-solid fa-user-astronaut text-xs"></i>
-                        </span>
-                        <input type="text" id="reg-username" required minlength="3" maxlength="15" placeholder="GrandmasterX" class="glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500 font-medium">
-                    </div>
-                    <span class="text-[10px] text-slate-400 mt-1 block">Displayed on arena leaderboards & matches</span>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Email Address</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
-                            <i class="fa-solid fa-envelope text-xs"></i>
-                        </span>
-                        <input type="email" id="reg-email" required placeholder="tactician@domain.com" class="glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500 font-medium">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Security Password</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
-                            <i class="fa-solid fa-lock text-xs"></i>
-                        </span>
-                        <input type="password" id="reg-password" required minlength="6" placeholder="Minimum 6 characters" class="glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500 font-medium">
-                    </div>
-                </div>
-
-                <div class="p-3 bg-blue-950/40 border border-blue-500/20 rounded-xl text-[11px] text-blue-200/90 leading-relaxed">
-                    <i class="fa-solid fa-award text-yellow-400 mr-1.5"></i> Initializing rating at standard baseline <strong>500 Elo</strong> + <strong>1,000 Coins</strong>.
-                </div>
-
-                <button type="submit" id="reg-submit-btn" class="glow-btn w-full py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 mt-2">
-                    <span>Create Strategist Account</span>
-                    <i class="fa-solid fa-shield-halved text-xs"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- Footer Notice -->
-        <div class="text-center mt-6 text-xs text-slate-500 font-medium">
-            Strategic Thinking Laboratory &copy; 2025. All Rights Reserved.
-        </div>
+        <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Competitive Chess Platform</p>
+      </div>
     </div>
 
-    <!-- Script Flow -->
-    <script>
-        // Exact Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
-            authDomain: "chess-7df7a.firebaseapp.com",
-            databaseURL: "https://chess-7df7a-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "chess-7df7a",
-            storageBucket: "chess-7df7a.firebasestorage.app",
-            messagingSenderId: "807640572322",
-            appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
+    <div class="flex items-center gap-4 text-xs font-semibold text-slate-400">
+      <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[11px]">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Systems Normal
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Auth Container -->
+  <main class="w-full max-w-md mx-auto px-4 py-8 relative z-10 my-auto">
+    <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <!-- Top Accent Bar -->
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-purple-500 to-emerald-500"></div>
+
+      <!-- Auth Switcher Tabs -->
+      <div class="grid grid-cols-2 p-1 bg-slate-900/90 rounded-2xl border border-white/5 mb-6">
+        <button id="tab-login" onclick="switchAuthTab('login')" class="py-2.5 text-xs font-bold rounded-xl transition-all duration-200 bg-amber-500 text-slate-950 shadow-md">
+          Sign In
+        </button>
+        <button id="tab-register" onclick="switchAuthTab('register')" class="py-2.5 text-xs font-bold rounded-xl transition-all duration-200 text-slate-400 hover:text-white">
+          Create Account
+        </button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Email Address</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+            <input type="email" id="login-email" required placeholder="player@zchess.com" class="glass-input w-full pl-11 pr-4 py-3 rounded-xl text-sm text-white placeholder-slate-500" />
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Password</label>
+            <button type="button" onclick="showForgotPassword()" class="text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors">Forgot?</button>
+          </div>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+            <input type="password" id="login-password" required placeholder="••••••••••••" class="glass-input w-full pl-11 pr-11 py-3 rounded-xl text-sm text-white placeholder-slate-500" />
+            <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+              <i class="fa-solid fa-eye text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-login" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-amber-500/25 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2">
+          <span>Enter Z-Chess</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </form>
+
+      <!-- Register Form (Hidden by default) -->
+      <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Display Username</label>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+            <input type="text" id="reg-username" required maxlength="16" placeholder="GrandmasterZ" class="glass-input w-full pl-11 pr-4 py-3 rounded-xl text-sm text-white placeholder-slate-500" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Email Address</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+            <input type="email" id="reg-email" required placeholder="player@zchess.com" class="glass-input w-full pl-11 pr-4 py-3 rounded-xl text-sm text-white placeholder-slate-500" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+            <input type="password" id="reg-password" required minlength="6" placeholder="Min 6 characters" class="glass-input w-full pl-11 pr-11 py-3 rounded-xl text-sm text-white placeholder-slate-500" />
+            <button type="button" onclick="togglePasswordVisibility('reg-password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+              <i class="fa-solid fa-eye text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+          <div class="flex items-center gap-2 text-amber-400 font-bold">
+            <i class="fa-solid fa-gift"></i> Starter Package Included:
+          </div>
+          <div class="flex items-center justify-between">
+            <span>• Base Rating</span>
+            <span class="font-mono font-bold text-white">500 Elo</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span>• Starter Coins</span>
+            <span class="font-mono font-bold text-amber-400">+500 ZC</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span>• Classic Board</span>
+            <span class="font-mono font-bold text-emerald-400">Wood Theme</span>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-register" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-emerald-500/25 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2">
+          <span>Create Account</span>
+          <i class="fa-solid fa-user-plus text-xs"></i>
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="relative my-6 text-center">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
+        <span class="relative px-3 text-[10px] font-mono tracking-widest uppercase bg-slate-900/90 text-slate-500 rounded-full border border-white/5">OR CONTINUE WITH</span>
+      </div>
+
+      <!-- Social / Quick Sign-In -->
+      <div class="space-y-3">
+        <button type="button" onclick="handleGoogleSignIn()" class="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-3 transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+
+        <button type="button" onclick="handleGuestLogin()" class="w-full py-2.5 px-4 rounded-xl bg-transparent hover:bg-white/5 border border-dashed border-slate-700 text-slate-400 hover:text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 transition-colors">
+          <i class="fa-solid fa-mask"></i>
+          <span>Play Instantly as Guest</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Password Reset Modal -->
+  <div id="reset-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
+    <div class="glass-card rounded-3xl p-6 max-w-sm w-full border border-amber-500/30 shadow-2xl relative">
+      <button onclick="hideForgotPassword()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-4 text-xl">
+        <i class="fa-solid fa-key"></i>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-1">Reset Password</h3>
+      <p class="text-xs text-slate-400 mb-4">Enter your registered email and we'll send you a recovery link.</p>
+
+      <form onsubmit="handlePasswordReset(event)" class="space-y-3">
+        <input type="email" id="reset-email" required placeholder="player@zchess.com" class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white placeholder-slate-500" />
+        <button type="submit" id="btn-reset" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all">
+          Send Recovery Email
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-6xl mx-auto px-6 py-6 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-white/5">
+    <div>
+      <span class="font-bold text-slate-400">Z-Chess</span> &copy; 2025. Master Admin: <span class="text-amber-400 font-mono">zainisgo123@gmail.com</span>
+    </div>
+    <div class="flex items-center gap-4 text-[11px] font-mono">
+      <span>AI BOT: 500 ELO</span>
+      <span>•</span>
+      <span>1V1 ARENA</span>
+      <span>•</span>
+      <span>CRATES & COSMETICS</span>
+    </div>
+  </footer>
+
+  <!-- Firebase Script Logic -->
+  <script>
+    // --- 1. FIREBASE INITIALIZATION ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
+      authDomain: "chess-7df7a.firebaseapp.com",
+      databaseURL: "https://chess-7df7a-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "chess-7df7a",
+      storageBucket: "chess-7df7a.firebasestorage.app",
+      messagingSenderId: "807640572322",
+      appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // --- 2. SESSION ROUTING ---
+    auth.onAuthStateChanged((user) => {
+      const loadingEl = document.getElementById('auth-loading');
+      if (user) {
+        // User already authenticated -> route cleanly to app.html
+        window.location.href = 'app.html';
+      } else {
+        // No session -> reveal login gateway smoothly
+        if (loadingEl) {
+          loadingEl.classList.add('opacity-0');
+          setTimeout(() => {
+            loadingEl.style.display = 'none';
+          }, 300);
+        }
+      }
+    });
+
+    // --- 3. UI CONTROLLERS ---
+    function switchAuthTab(tab) {
+      const loginTab = document.getElementById('tab-login');
+      const regTab = document.getElementById('tab-register');
+      const loginForm = document.getElementById('form-login');
+      const regForm = document.getElementById('form-register');
+
+      if (tab === 'login') {
+        loginTab.className = "py-2.5 text-xs font-bold rounded-xl transition-all duration-200 bg-amber-500 text-slate-950 shadow-md";
+        regTab.className = "py-2.5 text-xs font-bold rounded-xl transition-all duration-200 text-slate-400 hover:text-white";
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+      } else {
+        regTab.className = "py-2.5 text-xs font-bold rounded-xl transition-all duration-200 bg-emerald-500 text-slate-950 shadow-md";
+        loginTab.className = "py-2.5 text-xs font-bold rounded-xl transition-all duration-200 text-slate-400 hover:text-white";
+        regForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+      }
+    }
+
+    function togglePasswordVisibility(fieldId, btn) {
+      const input = document.getElementById(fieldId);
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let borderCol = 'border-amber-500/40 text-amber-300';
+      let icon = 'fa-circle-info text-amber-400';
+      
+      if (type === 'error') {
+        borderCol = 'border-rose-500/50 text-rose-300';
+        icon = 'fa-triangle-exclamation text-rose-400';
+      } else if (type === 'success') {
+        borderCol = 'border-emerald-500/50 text-emerald-300';
+        icon = 'fa-circle-check text-emerald-400';
+      }
+
+      toast.className = `p-4 rounded-2xl bg-slate-900/95 border ${borderCol} shadow-2xl backdrop-blur-xl flex items-center gap-3 text-xs font-bold transition-all transform translate-y-2 opacity-0 pointer-events-auto max-w-sm`;
+      toast.innerHTML = `<i class="fa-solid ${icon} text-base flex-shrink-0"></i> <span>${message}</span>`;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // --- 4. AUTH ACTIONS ---
+
+    // Ensure database profile exists with 500 baseline Elo and default cosmetic drops
+    async function ensureUserDatabaseProfile(user, customDisplayName = null) {
+      const userRef = db.ref(`users/${user.uid}`);
+      const snapshot = await userRef.once('value');
+      
+      if (!snapshot.exists()) {
+        const emailLower = (user.email || '').toLowerCase();
+        const isAdmin = (emailLower === 'zainisgo123@gmail.com');
+        const fallbackName = customDisplayName || user.displayName || (user.email ? user.email.split('@')[0] : `Player_${user.uid.substring(0, 5)}`);
+
+        const initialInventory = {
+          icon_default: true,
+          frame_default: true,
+          title_rookie: true,
+          'theme-wood': true,
+          emote_gg: true
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const db = firebase.database();
-
-        // Check if already authenticated -> go straight to app.html
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                window.location.replace("app.html");
-            }
-        });
-
-        function switchAuthTab(tab) {
-            const loginBtn = document.getElementById('tab-login');
-            const regBtn = document.getElementById('tab-register');
-            const loginForm = document.getElementById('login-form');
-            const regForm = document.getElementById('register-form');
-            clearAlert();
-
-            if (tab === 'login') {
-                loginBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-blue-600 text-white shadow-md";
-                regBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-400 hover:text-white";
-                loginForm.classList.remove('hidden');
-                regForm.classList.add('hidden');
-            } else {
-                regBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-blue-600 text-white shadow-md";
-                loginBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-400 hover:text-white";
-                regForm.classList.remove('hidden');
-                loginForm.classList.add('hidden');
-            }
+        if (isAdmin) {
+          initialInventory['icon_admin_king'] = true;
+          initialInventory['frame_gold'] = true;
+          initialInventory['nametag_admin'] = true;
         }
 
-        function showAlert(msg, isError = true) {
-            const el = document.getElementById('auth-alert');
-            el.className = isError 
-                ? "mb-4 p-3 rounded-xl text-xs font-medium flex items-center gap-2 border bg-rose-950/60 border-rose-500/40 text-rose-200" 
-                : "mb-4 p-3 rounded-xl text-xs font-medium flex items-center gap-2 border bg-emerald-950/60 border-emerald-500/40 text-emerald-200";
-            el.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation text-rose-400' : 'fa-circle-check text-emerald-400'}"></i> <span>${msg}</span>`;
-            el.classList.remove('hidden');
+        const newProfile = {
+          uid: user.uid,
+          email: user.email || 'guest@zchess.com',
+          displayName: fallbackName,
+          elo: 500, // Fixed 500 baseline Elo
+          coins: 500, // Starter Coins
+          role: isAdmin ? 'admin' : 'player',
+          createdAt: firebase.database.ServerValue.TIMESTAMP,
+          stats: {
+            wins: 0,
+            losses: 0,
+            draws: 0,
+            gamesPlayed: 0
+          },
+          equipped: {
+            icon: isAdmin ? 'icon_admin_king' : 'icon_default',
+            frame: isAdmin ? 'frame_gold' : 'frame_default',
+            title: isAdmin ? 'nametag_admin' : 'title_rookie',
+            theme: 'theme-wood',
+            emote: 'emote_gg'
+          },
+          inventory: initialInventory
+        };
+
+        await userRef.set(newProfile);
+      }
+    }
+
+    // Email Login
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('btn-login');
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...`;
+
+      try {
+        const userCred = await auth.signInWithEmailAndPassword(email, password);
+        await ensureUserDatabaseProfile(userCred.user);
+        showToast('Login successful! Entering arena...', 'success');
+        window.location.href = 'app.html';
+      } catch (err) {
+        showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = `<span>Enter Z-Chess</span><i class="fa-solid fa-arrow-right text-xs"></i>`;
+      }
+    }
+
+    // Email Register
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('reg-username').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const btn = document.getElementById('btn-register');
+
+      if (username.length < 3) {
+        showToast('Username must be at least 3 characters.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Creating Account...`;
+
+      try {
+        const userCred = await auth.createUserWithEmailAndPassword(email, password);
+        await userCred.user.updateProfile({ displayName: username });
+        await ensureUserDatabaseProfile(userCred.user, username);
+        showToast('Account initialized with 500 Elo & starter items!', 'success');
+        window.location.href = 'app.html';
+      } catch (err) {
+        showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = `<span>Create Account</span><i class="fa-solid fa-user-plus text-xs"></i>`;
+      }
+    }
+
+    // Google Sign-In
+    async function handleGoogleSignIn() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        const result = await auth.signInWithPopup(provider);
+        await ensureUserDatabaseProfile(result.user);
+        showToast('Google authentication confirmed!', 'success');
+        window.location.href = 'app.html';
+      } catch (err) {
+        if (err.code !== 'auth/popup-closed-by-user') {
+          showToast(err.message, 'error');
         }
+      }
+    }
 
-        function clearAlert() {
-            document.getElementById('auth-alert').classList.add('hidden');
-        }
+    // Guest / Anonymous Play
+    async function handleGuestLogin() {
+      try {
+        const result = await auth.signInAnonymously();
+        const guestName = `Guest_${Math.floor(1000 + Math.random() * 9000)}`;
+        await result.user.updateProfile({ displayName: guestName });
+        await ensureUserDatabaseProfile(result.user, guestName);
+        showToast('Entering as Guest player...', 'success');
+        window.location.href = 'app.html';
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            clearAlert();
-            const btn = document.getElementById('login-submit-btn');
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
+    // Password Reset Modal
+    function showForgotPassword() {
+      document.getElementById('reset-modal').classList.remove('hidden');
+    }
+    function hideForgotPassword() {
+      document.getElementById('reset-modal').classList.add('hidden');
+    }
 
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...`;
+    async function handlePasswordReset(e) {
+      e.preventDefault();
+      const email = document.getElementById('reset-email').value.trim();
+      const btn = document.getElementById('btn-reset');
 
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                // Listener handles instant redirect
-            } catch (err) {
-                showAlert(err.message || "Failed to sign in. Please verify your credentials.");
-                btn.disabled = false;
-                btn.innerHTML = `<span>Enter Laboratory</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
-            }
-        }
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Sending...`;
 
-        async function handleRegister(e) {
-            e.preventDefault();
-            clearAlert();
-            const btn = document.getElementById('reg-submit-btn');
-            const username = document.getElementById('reg-username').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value;
-
-            if (username.length < 3) {
-                showAlert("Username must be at least 3 characters long.");
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Initializing Dossier...`;
-
-            try {
-                const cred = await auth.createUserWithEmailAndPassword(email, password);
-                const uid = cred.user.uid;
-
-                // Create Database Profile strictly at 500 Starting Elo
-                await db.ref(`users/${uid}`).set({
-                    uid: uid,
-                    username: username,
-                    email: email,
-                    elo: 500,
-                    coins: 1000,
-                    solvedPuzzles: 0,
-                    puzzleStreak: 0,
-                    role: email.toLowerCase() === 'zainisgo123@gmail.com' ? 'superadmin' : 'player',
-                    createdAt: firebase.database.ServerValue.TIMESTAMP,
-                    inventory: {
-                        icons: { icon_user: true },
-                        frames: { frame_none: true },
-                        nametags: { nametag_novice: true },
-                        themes: { 'theme-wood': true },
-                        particles: { none: true }
-                    },
-                    equipped: {
-                        icon: 'icon_user',
-                        frame: 'frame_none',
-                        nametag: 'nametag_novice',
-                        theme: 'theme-wood',
-                        particle: 'none'
-                    }
-                });
-
-                // Authenticated listener triggers app.html redirect
-            } catch (err) {
-                showAlert(err.message || "Registration failed. Try a different email.");
-                btn.disabled = false;
-                btn.innerHTML = `<span>Create Strategist Account</span> <i class="fa-solid fa-shield-halved text-xs"></i>`;
-            }
-        }
-
-        async function handleForgotPassword() {
-            const email = document.getElementById('login-email').value.trim();
-            if (!email) {
-                showAlert("Please enter your email above to receive a password reset link.");
-                return;
-            }
-            try {
-                await auth.sendPasswordResetEmail(email);
-                showAlert("Password reset link sent! Check your inbox.", false);
-            } catch (err) {
-                showAlert(err.message || "Could not send reset email.");
-            }
-        }
-    </script>
+      try {
+        await auth.sendPasswordResetEmail(email);
+        showToast('Reset email sent! Check your inbox.', 'success');
+        hideForgotPassword();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `Send Recovery Email`;
+      }
+    }
+  </script>
 </body>
 </html>

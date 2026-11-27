@@ -78,7 +78,7 @@
       box-sizing: border-box;
     }
 
-    /* Tab styling flush against the header bottom border */
+    /* Tab styling flush against header bottom border */
     .nav-tab-btn {
       position: relative;
       border-bottom: 2px solid transparent;
@@ -108,6 +108,34 @@
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-brand-500 selection:text-white">
+
+  <!-- ================= DISCONNECTION VICTORY POPUP MODAL ================= -->
+  <div id="match-result-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4 animate-fade-in">
+    <div class="bg-gradient-to-b from-slate-850 to-slate-900 border-2 border-emerald-500/80 rounded-2xl p-6 max-w-md w-full shadow-2xl relative text-center">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl border border-emerald-500/40 mx-auto mb-4 animate-bounce">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <span id="result-modal-badge" class="text-xs uppercase tracking-widest font-extrabold text-emerald-400">Match Concluded</span>
+      <h3 id="result-modal-title" class="text-xl font-black text-white mt-1 mb-2">Victory by Disconnection!</h3>
+      <p id="result-modal-desc" class="text-slate-300 text-xs leading-relaxed mb-5">
+        Your opponent reloaded their page or disconnected from the arena. You win by abandonment!
+      </p>
+      <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-3 mb-5 flex items-center justify-around text-xs">
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase font-bold">Rating Change</span>
+          <span class="text-emerald-400 font-black font-mono text-sm" id="result-elo-delta">+16 Elo</span>
+        </div>
+        <div class="w-px h-8 bg-slate-800"></div>
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase font-bold">Arena Bounty</span>
+          <span class="text-amber-400 font-black font-mono text-sm" id="result-coin-reward">+50 CC</span>
+        </div>
+      </div>
+      <button onclick="closeMatchResultModal()" class="w-full py-2.5 px-4 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+        <i class="fa-solid fa-check"></i> Return to Arena Lobby
+      </button>
+    </div>
+  </div>
 
   <!-- ================= URGENT BROADCAST POPUP MODAL ================= -->
   <div id="broadcast-popup-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4 animate-fade-in">
@@ -268,8 +296,8 @@
           <!-- Dynamic Turn Indicator HUD -->
           <div class="w-full max-w-[520px] bg-slate-950/90 border-x border-slate-800 py-1.5 px-4 flex items-center justify-between text-xs">
             <div class="flex items-center gap-2 font-bold" id="arena-turn-indicator">
-              <span id="arena-turn-dot" class="w-2.5 h-2.5 rounded-full bg-slate-100 shadow-md"></span>
-              <span id="arena-turn-label" class="text-slate-300">Game Not Started</span>
+              <span id="arena-turn-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500 shadow-md"></span>
+              <span id="arena-turn-label" class="text-slate-300">Match Idle</span>
             </div>
             <div id="arena-game-state" class="text-[11px] font-semibold text-slate-400">
               Ready to challenge
@@ -363,7 +391,7 @@
             <div id="arena-chat-box" class="flex-grow overflow-y-auto space-y-2.5 pr-1 text-xs">
               <div class="text-center py-4 text-slate-500 text-[11px]">
                 <i class="fa-solid fa-shield-halved block text-sm mb-1 text-slate-600"></i>
-                Tactical Comms initialized. Respect arena sportsmanship.
+                Tactical Comms initialized. Sportsmanship active.
               </div>
             </div>
 
@@ -392,7 +420,6 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div class="lg:col-span-8 flex flex-col items-center">
           
-          <!-- Analysis Header Status -->
           <div class="w-full max-w-[520px] bg-slate-900 border border-slate-800 rounded-t-2xl p-3 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow animate-pulse"></div>
@@ -403,12 +430,10 @@
             </div>
           </div>
 
-          <!-- Analysis Board Canvas -->
           <div class="w-full max-w-[520px] aspect-square relative bg-slate-900 border-x border-slate-800 shadow-2xl flex items-center justify-center select-none">
             <div id="analysis-board" class="w-full h-full"></div>
           </div>
 
-          <!-- Analysis Controls -->
           <div class="w-full max-w-[520px] bg-slate-900 border border-slate-800 rounded-b-2xl p-3 flex items-center justify-between gap-2">
             <button onclick="resetAnalysisBoard()" class="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5">
               <i class="fa-solid fa-rotate-left"></i> Reset Board
@@ -424,7 +449,6 @@
           </div>
         </div>
 
-        <!-- Right: FEN & Move Notation -->
         <div class="lg:col-span-4 flex flex-col gap-4">
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
             <h3 class="text-xs uppercase font-extrabold tracking-wider text-slate-400 mb-3 flex items-center gap-2">
@@ -511,7 +535,7 @@
             <h2 class="text-lg font-black text-white flex items-center gap-2">
               <i class="fa-solid fa-trophy text-amber-400"></i> Global Elo Standings
             </h2>
-            <p class="text-xs text-slate-400">Live competitive rankings across the CogniLearn network (Baseline: 800 Elo).</p>
+            <p class="text-xs text-slate-400">Live competitive rankings across CogniLearn (Baseline: 800 Elo).</p>
           </div>
           <button onclick="loadLeaderboard()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5">
             <i class="fa-solid fa-arrows-rotate"></i> Refresh
@@ -556,7 +580,6 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-          <!-- Item 1: Forest Green Board Theme -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div>
               <div class="w-full h-28 rounded-xl bg-gradient-to-tr from-emerald-800 to-emerald-950 border border-emerald-700/50 flex items-center justify-center mb-3 text-emerald-400 text-2xl">
@@ -571,7 +594,6 @@
             </div>
           </div>
 
-          <!-- Item 2: Midnight Dark Theme -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div>
               <div class="w-full h-28 rounded-xl bg-gradient-to-tr from-slate-900 to-indigo-950 border border-indigo-900/50 flex items-center justify-center mb-3 text-indigo-400 text-2xl">
@@ -586,7 +608,6 @@
             </div>
           </div>
 
-          <!-- Item 3: Grandmaster Title -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div>
               <div class="w-full h-28 rounded-xl bg-gradient-to-tr from-amber-900 to-slate-950 border border-amber-700/50 flex items-center justify-center mb-3 text-amber-400 text-2xl">
@@ -620,7 +641,6 @@
           </div>
         </div>
 
-        <!-- Tool 1: Real-time Urgent Broadcast Broadcaster -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
           <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
             <i class="fa-solid fa-bullhorn text-amber-400"></i> Dispatch Priority Broadcast
@@ -644,7 +664,6 @@
           </div>
         </div>
 
-        <!-- Tool 2: Elo Clamping & Purge Tool (Reset to 800) -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
           <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
             <i class="fa-solid fa-rotate text-red-400"></i> Global Elo Calibration & Reset
@@ -736,24 +755,25 @@
       puzzleStreak: 0
     };
 
-    // Game Instances
+    // 1v1 Arena State
     let arenaBoard = null;
     let arenaGame = new Chess();
     let currentMatchId = null;
     let playerColor = 'white';
     let arenaSelectedSquare = null;
+    let matchRef = null;
 
-    // Arena Clocks State
+    // Arena Clocks
     let userClockSeconds = 300;
     let oppClockSeconds = 300;
     let clockInterval = null;
 
-    // Analysis Board State
+    // Analysis State
     let analysisBoard = null;
     let analysisGame = new Chess();
     let analysisSelectedSquare = null;
 
-    // Puzzle Board State
+    // Puzzle State
     let puzzleBoard = null;
     let puzzleGame = new Chess();
     let puzzleSelectedSquare = null;
@@ -780,7 +800,22 @@
       }
     ];
 
-    // ================= BOARD HIGHLIGHTING & DOT HELPERS =================
+    // ================= DISCONNECTION HANDLING ON RELOAD / UNLOAD =================
+    window.addEventListener('beforeunload', () => {
+      // If user is currently playing an unfinished live match, forfeit match instantly on reload
+      if (currentMatchId && !arenaGame.game_over()) {
+        const oppColor = playerColor === 'white' ? 'black' : 'white';
+        db.ref(`games/${currentMatchId}`).update({
+          status: 'abandoned',
+          winner: oppColor,
+          abandonedBy: playerColor,
+          reason: 'disconnection',
+          abandonedByName: userData.username || 'Opponent'
+        });
+      }
+    });
+
+    // ================= BOARD HIGHLIGHTING & LEGAL DOTS =================
     function highlightLastMove(boardContainerId, from, to) {
       $(`#${boardContainerId} .square-55d63`).removeClass('highlight-last-move');
       if (from && to) {
@@ -811,7 +846,7 @@
       });
     }
 
-    // ================= LIVE ARENA CLOCKS =================
+    // ================= TIMER ENGINE =================
     function formatTime(totalSeconds) {
       const minutes = Math.floor(Math.max(0, totalSeconds) / 60);
       const seconds = Math.max(0, totalSeconds) % 60;
@@ -825,7 +860,6 @@
       $userTimer.text(formatTime(userClockSeconds));
       $oppTimer.text(formatTime(oppClockSeconds));
 
-      // Style warning colors
       if (userClockSeconds <= 30) {
         $userTimer.removeClass('text-emerald-400 text-amber-400').addClass('text-red-400 animate-pulse');
       } else if (userClockSeconds <= 90) {
@@ -848,19 +882,15 @@
       clockInterval = setInterval(() => {
         if (!currentMatchId || arenaGame.game_over()) return;
 
-        const turn = arenaGame.turn(); // 'w' or 'b'
+        const turn = arenaGame.turn();
         const isMyTurn = (playerColor === 'white' && turn === 'w') || (playerColor === 'black' && turn === 'b');
 
         if (isMyTurn) {
           userClockSeconds--;
-          if (userClockSeconds <= 0) {
-            handleTimeout(playerColor);
-          }
+          if (userClockSeconds <= 0) handleTimeout(playerColor);
         } else {
           oppClockSeconds--;
-          if (oppClockSeconds <= 0) {
-            handleTimeout(playerColor === 'white' ? 'black' : 'white');
-          }
+          if (oppClockSeconds <= 0) handleTimeout(playerColor === 'white' ? 'black' : 'white');
         }
         renderClocks();
       }, 1000);
@@ -895,15 +925,200 @@
       }
     }
 
-    // ================= INITIALIZE 1v1 ARENA BOARD =================
+    // ================= 1V1 MATCHMAKING & FIREBASE SYNC =================
+    function findRandomMatch() {
+      if (!currentUser) {
+        openAuthModal();
+        return;
+      }
+
+      $('#find-match-btn').prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Searching...');
+      $('#opp-name').text('Searching queue...');
+      $('#opp-status-text').text('Matching...');
+
+      const queueRef = db.ref('matchmaking_queue');
+
+      queueRef.once('value', (snap) => {
+        let opponentKey = null;
+        let opponentData = null;
+
+        snap.forEach((child) => {
+          if (child.key !== currentUser.uid && !opponentKey) {
+            opponentKey = child.key;
+            opponentData = child.val();
+          }
+        });
+
+        if (opponentKey && opponentData) {
+          // Join existing player in queue
+          queueRef.child(opponentKey).remove();
+          const matchId = `match_${Date.now()}`;
+          playerColor = 'black';
+
+          db.ref(`games/${matchId}`).set({
+            whiteUid: opponentKey,
+            whiteName: opponentData.username,
+            whiteElo: opponentData.elo,
+            blackUid: currentUser.uid,
+            blackName: userData.username,
+            blackElo: userData.elo,
+            fen: 'start',
+            status: 'active',
+            startedAt: firebase.database.ServerValue.TIMESTAMP
+          }).then(() => {
+            joinMatch(matchId, 'black');
+          });
+        } else {
+          // Put self in queue
+          const myEntry = queueRef.child(currentUser.uid);
+          myEntry.set({
+            username: userData.username,
+            elo: userData.elo,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+          });
+
+          myEntry.onDisconnect().remove();
+
+          // Listen if someone challenges or pairs with us
+          db.ref('games').orderByChild('whiteUid').equalTo(currentUser.uid).on('child_added', (snapshot) => {
+            const game = snapshot.val();
+            if (game && game.status === 'active') {
+              myEntry.off();
+              myEntry.remove();
+              db.ref('games').off('child_added');
+              joinMatch(snapshot.key, 'white');
+            }
+          });
+        }
+      });
+    }
+
+    function joinMatch(matchId, assignedColor) {
+      currentMatchId = matchId;
+      playerColor = assignedColor;
+      matchRef = db.ref(`games/${matchId}`);
+
+      // Set board orientation & reset chess state
+      arenaGame = new Chess();
+      arenaBoard.orientation(playerColor);
+      arenaBoard.start();
+      clearBoardDots('arena-board');
+      highlightLastMove('arena-board', null, null);
+
+      userClockSeconds = 300;
+      oppClockSeconds = 300;
+      renderClocks();
+      startClockTicker();
+
+      $('#find-match-btn').prop('disabled', false).html('<i class="fa-solid fa-bolt"></i> Quick Match (5 min)');
+      $('#resign-btn, #draw-btn').prop('disabled', false);
+      $('#arena-room-info').removeClass('hidden');
+      $('#current-room-id').text(matchId.replace('match_', '#'));
+      $('#user-piece-color').removeClass('bg-white bg-slate-600').addClass(playerColor === 'white' ? 'bg-white' : 'bg-slate-600');
+      $('#opp-piece-color').removeClass('bg-white bg-slate-600').addClass(playerColor === 'white' ? 'bg-slate-600' : 'bg-white');
+
+      // CRITICAL: Configure Server-Side onDisconnect()
+      const oppColor = playerColor === 'white' ? 'black' : 'white';
+      matchRef.onDisconnect().update({
+        status: 'abandoned',
+        winner: oppColor,
+        abandonedBy: playerColor,
+        reason: 'disconnection',
+        abandonedByName: userData.username || 'Opponent'
+      });
+
+      // Listen for Game Events (Moves, Disconnections, Resignations)
+      matchRef.on('value', (snap) => {
+        const game = snap.val();
+        if (!game) return;
+
+        // Populate Opponent Info
+        if (playerColor === 'white') {
+          $('#opp-name').text(game.blackName || 'Opponent');
+          $('#opp-elo-tag').text(`${game.blackElo || 800} Elo`);
+        } else {
+          $('#opp-name').text(game.whiteName || 'Opponent');
+          $('#opp-elo-tag').text(`${game.whiteElo || 800} Elo`);
+        }
+        $('#opp-status-text').text('In Combat');
+        $('#arena-game-state').text('Live Match Ongoing');
+
+        // Opponent Move Sync
+        if (game.fen && game.fen !== 'start' && game.fen !== arenaGame.fen()) {
+          arenaGame.load(game.fen);
+          arenaBoard.position(game.fen);
+          if (game.lastMove) {
+            highlightLastMove('arena-board', game.lastMove.from, game.lastMove.to);
+          }
+          updateTurnIndicator();
+        }
+
+        // DISCONNECTION & ABANDONMENT POPUP TRIGGER
+        if (game.status === 'abandoned') {
+          handleMatchConclusion(game);
+        }
+      });
+    }
+
+    function handleMatchConclusion(game) {
+      if (!currentMatchId) return;
+      clearInterval(clockInterval);
+      matchRef.onDisconnect().cancel(); // Remove disconnection hook
+      $('#resign-btn, #draw-btn').prop('disabled', true);
+
+      if (game.winner === playerColor) {
+        // You won because the other player disconnected/reloaded
+        const oppName = game.abandonedByName || 'Opponent';
+        $('#result-modal-badge').text('Victory by Abandonment');
+        $('#result-modal-title').text('Victory by Disconnection!');
+        $('#result-modal-desc').text(`${oppName} left or reloaded their browser page. You win the match by disconnection!`);
+        $('#result-elo-delta').text('+16 Elo');
+        $('#result-coin-reward').text('+50 CC');
+
+        // Update player data
+        userData.elo += 16;
+        userData.coins += 50;
+        updateUserUI();
+        if (currentUser) {
+          db.ref(`users/${currentUser.uid}`).update({
+            elo: userData.elo,
+            coins: userData.coins
+          });
+        }
+
+        $('#match-result-modal').removeClass('hidden');
+        $('#arena-game-state').text('Opponent Disconnected (Victory)');
+        $('#arena-turn-label').text('Victory');
+        $('#arena-turn-dot').removeClass('bg-slate-300 bg-white').addClass('bg-emerald-400');
+      } else {
+        // You abandoned
+        $('#arena-game-state').text('Match Disconnected');
+      }
+
+      currentMatchId = null;
+    }
+
+    function closeMatchResultModal() {
+      $('#match-result-modal').addClass('hidden');
+      $('#opp-name').text('Waiting for opponent...');
+      $('#opp-elo-tag').text('-- Elo');
+      $('#opp-status-text').text('Disconnected');
+      $('#arena-room-info').addClass('hidden');
+      arenaGame.reset();
+      arenaBoard.start();
+      clearBoardDots('arena-board');
+      highlightLastMove('arena-board', null, null);
+      updateTurnIndicator();
+    }
+
+    // ================= ARENA BOARD INTERACTION =================
     function initArenaBoard() {
       const cfg = {
         draggable: true,
         position: 'start',
         pieceTheme: PIECE_ASSET_URL,
         onDragStart: (source, piece) => {
-          if (arenaGame.game_over()) return false;
-          // Disallow moving opponent pieces
+          if (arenaGame.game_over() || !currentMatchId) return false;
           if ((playerColor === 'white' && piece.search(/^b/) !== -1) ||
               (playerColor === 'black' && piece.search(/^w/) !== -1)) {
             return false;
@@ -933,13 +1148,13 @@
 
       arenaBoard = Chessboard('arena-board', cfg);
 
-      // CLICK-TO-MOVE DELEGATION LISTENER
+      // CLICK-TO-MOVE DELEGATION
       $('#arena-board').off('click', '.square-55d63').on('click', '.square-55d63', function() {
+        if (!currentMatchId) return;
         const squareClass = $(this).attr('class').match(/square-([a-h][1-8])/);
         if (!squareClass) return;
         const clickedSquare = squareClass[1];
 
-        // 1. If a square is already selected, try to move
         if (arenaSelectedSquare) {
           if (arenaSelectedSquare === clickedSquare) {
             clearBoardDots('arena-board');
@@ -964,19 +1179,17 @@
           }
         }
 
-        // 2. Select the piece if it belongs to current player
-        const pieceOnSquare = arenaGame.get(clickedSquare);
-        if (pieceOnSquare) {
-          const isOwnPiece = (playerColor === 'white' && pieceOnSquare.color === 'w') ||
-                             (playerColor === 'black' && pieceOnSquare.color === 'b');
-          if (isOwnPiece && arenaGame.turn() === pieceOnSquare.color) {
+        const piece = arenaGame.get(clickedSquare);
+        if (piece) {
+          const isOwn = (playerColor === 'white' && piece.color === 'w') ||
+                        (playerColor === 'black' && piece.color === 'b');
+          if (isOwn && arenaGame.turn() === piece.color) {
             arenaSelectedSquare = clickedSquare;
             showLegalMoveDots('arena-board', arenaGame, clickedSquare);
             return;
           }
         }
 
-        // 3. Clear on invalid empty clicks
         clearBoardDots('arena-board');
         arenaSelectedSquare = null;
       });
@@ -1023,7 +1236,6 @@
 
       analysisBoard = Chessboard('analysis-board', cfg);
 
-      // Analysis Click-to-move
       $('#analysis-board').off('click', '.square-55d63').on('click', '.square-55d63', function() {
         const match = $(this).attr('class').match(/square-([a-h][1-8])/);
         if (!match) return;
@@ -1140,7 +1352,6 @@
       $('#puzzle-turn-indicator').text(puzzle.turn === 'w' ? 'White to Move' : 'Black to Move');
       $('#puzzle-feedback').text('Find the winning sequence.').removeClass('text-emerald-400 text-red-400').addClass('text-slate-400');
 
-      // Click to move on Puzzle Board
       $('#puzzle-board').off('click', '.square-55d63').on('click', '.square-55d63', function() {
         const match = $(this).attr('class').match(/square-([a-h][1-8])/);
         if (!match) return;
@@ -1217,11 +1428,9 @@
           const ts = typeof data === 'object' && data.timestamp ? data.timestamp : 0;
           const sender = typeof data === 'object' && data.by ? data.by : 'Admin';
 
-          // 1. Populate top banner
           $('#broadcast-message').text(msgText);
           $('#broadcast-banner').removeClass('hidden');
 
-          // 2. Trigger urgent popup modal if unacknowledged
           const lastDismissed = localStorage.getItem('last_dismissed_broadcast');
           if (!lastDismissed || Number(lastDismissed) !== ts) {
             currentBroadcastTimestamp = ts;
@@ -1264,7 +1473,7 @@
       });
     }
 
-    // ================= ADMIN ELO CALIBRATION (RESET TO 800) =================
+    // ================= ADMIN ELO PURGE TO 800 =================
     function adminResetAllElo() {
       if (!currentUser || currentUser.email !== SUPERADMIN_EMAIL) {
         return alert("Unauthorized: Master admin privileges required.");
@@ -1284,7 +1493,7 @@
       });
     }
 
-    // ================= REALTIME CHAT (500 MAX CHARACTERS) =================
+    // ================= 500-CHAR REALTIME CHAT =================
     function updateChatCounter(input) {
       const len = input.value.length;
       $('#chat-length-counter').text(`${len} / 500`);
@@ -1331,40 +1540,27 @@
       return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // ================= MATCHMAKING STUB =================
-    function findRandomMatch() {
-      $('#opp-name').text('Searching for opponent...');
-      $('#opp-status-text').text('Connecting...');
-      setTimeout(() => {
-        $('#opp-name').text('Grandmaster Nova');
-        $('#opp-elo-tag').text('850 Elo');
-        $('#opp-status-text').text('Connected');
-        $('#arena-game-state').text('Live 1v1 Blitz');
-        $('#resign-btn, #draw-btn').prop('disabled', false);
-        
-        userClockSeconds = 300;
-        oppClockSeconds = 300;
-        renderClocks();
-        startClockTicker();
-        updateTurnIndicator();
-      }, 1500);
-    }
-
-    function flipArenaOrientation() {
-      arenaBoard.flip();
-    }
-
     function resignGame() {
       if (confirm("Are you sure you want to resign this match?")) {
-        clearInterval(clockInterval);
-        $('#arena-game-state').text('Match Resigned (Defeat)');
-        $('#arena-turn-label').text('Defeat');
-        $('#resign-btn, #draw-btn').prop('disabled', true);
+        const oppColor = playerColor === 'white' ? 'black' : 'white';
+        if (currentMatchId) {
+          db.ref(`games/${currentMatchId}`).update({
+            status: 'abandoned',
+            winner: oppColor,
+            abandonedBy: playerColor,
+            reason: 'resignation',
+            abandonedByName: userData.username
+          });
+        }
       }
     }
 
     function offerDraw() {
       alert("Draw offer dispatched to opponent.");
+    }
+
+    function flipArenaOrientation() {
+      arenaBoard.flip();
     }
 
     function toggleCustomRoomModal() {
@@ -1453,7 +1649,6 @@
           updateUserUI();
         });
 
-        // Toggle Admin Tab if Superadmin
         if (user.email === SUPERADMIN_EMAIL) {
           $('#admin-tab-nav').removeClass('hidden');
         } else {
@@ -1528,7 +1723,7 @@
       alert("Aesthetic unlocked and equipped!");
     }
 
-    // ================= TAB NAVIGATION SYSTEM =================
+    // ================= TAB NAVIGATION =================
     function switchTab(tabId) {
       $('.tab-content').addClass('hidden');
       $(`#tab-${tabId}`).removeClass('hidden');
@@ -1536,7 +1731,6 @@
       $('.nav-tab-btn').removeClass('active');
       $(`.nav-tab-btn[data-tab="${tabId}"]`).addClass('active');
 
-      // Resize boards to prevent 0px layout collapsed bug
       setTimeout(() => {
         if (tabId === 'arena' && arenaBoard) arenaBoard.resize();
         if (tabId === 'analysis' && analysisBoard) analysisBoard.resize();
@@ -1545,7 +1739,7 @@
       }, 50);
     }
 
-    // ================= PAGE INITIALIZATION =================
+    // ================= DOM READY INITIALIZATION =================
     $(document).ready(() => {
       initArenaBoard();
       initAnalysisBoard();
@@ -1554,7 +1748,6 @@
       renderClocks();
       updateTurnIndicator();
 
-      // Window resize handler
       $(window).resize(() => {
         if (arenaBoard) arenaBoard.resize();
         if (analysisBoard) analysisBoard.resize();

@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CogniLearn – Strategic Thinking Lab</title>
-
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -26,28 +25,23 @@
       }
     }
   </script>
-
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <!-- jQuery & Chess Libraries -->
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
   <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
-
   <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
   <style>
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
     /* Valid Move Indicator (70% Opaque Grey Dot) */
     .square-55d63 .valid-move-dot {
       width: 24px;
@@ -61,22 +55,17 @@
       pointer-events: none;
       z-index: 100;
     }
-
     /* Move Highlight (Pale Translucent Yellow) */
     .highlight-last-move {
       background-color: rgba(254, 240, 138, 0.45) !important;
     }
-
     /* Board Skins */
     .theme-wood .square-55d63.white-1e1d7 { background-color: #f0d9b5 !important; color: #b58863; }
     .theme-wood .square-55d63.black-3c85d { background-color: #b58863 !important; color: #f0d9b5; }
-
     .theme-green .square-55d63.white-1e1d7 { background-color: #eeeed2 !important; color: #769656; }
     .theme-green .square-55d63.black-3c85d { background-color: #769656 !important; color: #eeeed2; }
-
     .theme-grey .square-55d63.white-1e1d7 { background-color: #e2e8f0 !important; color: #64748b; }
     .theme-grey .square-55d63.black-3c85d { background-color: #64748b !important; color: #e2e8f0; }
-
     /* Cosmetic Avatar Frames */
     .frame-none { border: 2px solid #475569; }
     .frame-bronze { border: 3px solid #cd7f32; box-shadow: 0 0 8px rgba(205, 127, 50, 0.5); }
@@ -85,18 +74,15 @@
     .frame-diamond { border: 3px solid #38bdf8; box-shadow: 0 0 14px rgba(56, 189, 248, 0.8); }
     .frame-neon { border: 3px solid #f43f5e; box-shadow: 0 0 14px rgba(244, 63, 94, 0.8); }
     .frame-cosmic { border: 3px solid #a855f7; box-shadow: 0 0 16px rgba(168, 85, 247, 0.9); }
-
     /* Animated Emotes Keyframes */
     @keyframes emoteBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     @keyframes emotePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
     @keyframes emoteShake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); } }
     @keyframes emoteGlow { 0%, 100% { filter: drop-shadow(0 0 2px #f59e0b); } 50% { filter: drop-shadow(0 0 12px #ef4444); } }
-
     .emote-bounce { animation: emoteBounce 0.8s infinite; }
     .emote-pulse { animation: emotePulse 1s infinite; }
     .emote-shake { animation: emoteShake 0.5s infinite; }
     .emote-glow { animation: emoteGlow 1.2s infinite; }
-
     /* Emote Pop Animation */
     .emote-pop {
       animation: popFade 3.5s forwards;
@@ -108,7 +94,6 @@
       80% { opacity: 1; }
       100% { opacity: 0; transform: translateY(-15px); }
     }
-
     /* Crate Unboxing CS:GO Strip CSS */
     .crate-strip-container {
       overflow: hidden;
@@ -153,7 +138,6 @@
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
-
   <!-- Maintenance Overlay -->
   <div id="maintenance-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[9999] hidden flex flex-col items-center justify-center p-6 text-center">
     <div class="bg-slate-900 border border-red-500/40 rounded-2xl p-8 max-w-md w-full shadow-2xl">
@@ -167,11 +151,9 @@
       </div>
     </div>
   </div>
-
   <!-- Navigation Bar -->
   <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-
       <!-- Logo & Title -->
       <div class="flex items-center gap-3 cursor-pointer" onclick="showSection('ai')">
         <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-black shadow-lg shadow-indigo-500/30">
@@ -182,7 +164,6 @@
           <p class="text-[11px] font-medium text-slate-400 uppercase tracking-widest">Strategic Thinking Lab</p>
         </div>
       </div>
-
       <!-- Main Navigation Tabs -->
       <nav class="hidden md:flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800/80">
         <button onclick="showSection('ai')" id="nav-ai" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition text-white bg-indigo-600 shadow">
@@ -204,7 +185,6 @@
           <i class="fa-solid fa-user-shield mr-2"></i>Admin Panel
         </button>
       </nav>
-
       <!-- Player Stats Bar & Logout -->
       <div class="flex items-center gap-3">
         <div class="flex items-center bg-slate-800/80 border border-slate-700/60 rounded-xl px-3 py-1.5 gap-3">
@@ -226,18 +206,14 @@
             <span id="nav-elo">1500</span>
           </div>
         </div>
-
         <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-red-400 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-xl transition" title="Logout">
           <i class="fa-solid fa-right-from-bracket"></i>
         </button>
       </div>
-
     </div>
   </header>
-
   <!-- Main Content Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-
     <!-- DAILY QUESTS & STREAK BANNER WIDGET -->
     <div class="mb-6 bg-slate-900 border border-indigo-500/20 rounded-2xl p-4 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -252,17 +228,14 @@
           <p class="text-xs text-slate-400">Complete daily chess challenges to earn extra CogniCoins!</p>
         </div>
       </div>
-
       <!-- Quests Cards Container -->
       <div id="daily-quests-container" class="w-full md:w-auto grid grid-cols-1 sm:grid-cols-3 gap-3">
         <!-- Quests populated by JS -->
       </div>
     </div>
-
     <!-- SECTION: PLAY VS AI -->
     <section id="section-ai" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <!-- Chess Board Column -->
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center">
           <!-- Opponent Bar -->
@@ -283,12 +256,10 @@
               Bot Ready
             </div>
           </div>
-
           <!-- Board Mount Container -->
           <div class="w-full max-w-[560px] aspect-square relative shadow-2xl rounded-lg overflow-hidden border border-slate-800">
             <div id="ai-board" class="w-full h-full"></div>
           </div>
-
           <!-- Player Bar -->
           <div class="w-full flex items-center justify-between mt-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
@@ -303,7 +274,6 @@
                 <div class="text-xs text-slate-400">Rating: <span id="ai-user-elo-text" class="text-indigo-400 font-semibold">1500</span></div>
               </div>
             </div>
-
             <!-- In-Game Emote Trigger & Display -->
             <div class="flex items-center gap-3">
               <div id="ai-player-emote-display" class="text-3xl hidden"></div>
@@ -313,14 +283,12 @@
             </div>
           </div>
         </div>
-
         <!-- AI Game Sidebar -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-6">
           <div>
             <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <i class="fa-solid fa-sliders text-indigo-400"></i> Match Controls
             </h2>
-
             <!-- Side Selection -->
             <div class="mb-6">
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Choose Playing Side</label>
@@ -336,7 +304,6 @@
                 </button>
               </div>
             </div>
-
             <!-- Game Actions -->
             <div class="space-y-3 mb-6">
               <button onclick="setupAiGame(true)" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2">
@@ -346,7 +313,6 @@
                 <i class="fa-solid fa-flag"></i> Resign Match
               </button>
             </div>
-
             <!-- Move History Log -->
             <div>
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Move History</label>
@@ -355,7 +321,6 @@
               </div>
             </div>
           </div>
-
           <!-- Rewards Info -->
           <div class="bg-indigo-950/40 border border-indigo-500/20 rounded-xl p-4 text-xs text-indigo-300 flex items-center gap-3">
             <i class="fa-solid fa-award text-2xl text-amber-400 flex-shrink-0"></i>
@@ -365,17 +330,13 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
-
     <!-- SECTION: 1V1 ARENA -->
     <section id="section-arena" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <!-- Board Column -->
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col items-center">
-
           <!-- Opponent Card -->
           <div class="w-full flex items-center justify-between mb-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
@@ -392,12 +353,10 @@
             </div>
             <div id="arena-opp-emote-display" class="text-3xl hidden"></div>
           </div>
-
           <!-- Board Mount -->
           <div class="w-full max-w-[560px] aspect-square relative shadow-2xl rounded-lg overflow-hidden border border-slate-800">
             <div id="arena-board" class="w-full h-full"></div>
           </div>
-
           <!-- Self Card -->
           <div class="w-full flex items-center justify-between mt-4 bg-slate-950/60 border border-slate-800 p-3 rounded-xl relative">
             <div class="flex items-center gap-3">
@@ -419,16 +378,13 @@
               </button>
             </div>
           </div>
-
         </div>
-
         <!-- Arena Control & Match Chat Sidebar -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-6">
           <div>
             <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <i class="fa-solid fa-gamepad text-indigo-400"></i> Multiplayer Arena
             </h2>
-
             <!-- Room Controller -->
             <div id="arena-lobby-controls" class="space-y-4 mb-6">
               <div>
@@ -437,13 +393,11 @@
                   <i class="fa-solid fa-plus"></i> Host 1v1 Room
                 </button>
               </div>
-
               <div class="relative flex py-1 items-center">
                 <div class="flex-grow border-t border-slate-800"></div>
                 <span class="flex-shrink mx-4 text-xs font-semibold text-slate-500">OR JOIN</span>
                 <div class="flex-grow border-t border-slate-800"></div>
               </div>
-
               <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Join Room Code</label>
                 <div class="flex gap-2">
@@ -454,7 +408,6 @@
                 </div>
               </div>
             </div>
-
             <!-- Active Match Status & Actions -->
             <div id="arena-active-controls" class="hidden space-y-4 mb-6">
               <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
@@ -466,7 +419,6 @@
                   <i class="fa-solid fa-copy mr-1"></i> Copy
                 </button>
               </div>
-
               <div class="grid grid-cols-2 gap-2">
                 <button onclick="offerArenaDraw()" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl border border-slate-700 transition flex items-center justify-center gap-1.5">
                   <i class="fa-solid fa-handshake"></i> Offer Draw
@@ -476,7 +428,6 @@
                 </button>
               </div>
             </div>
-
             <!-- Real-Time Match Chat (Strict 500 Char Cap + Counter) -->
             <div id="arena-chat-box" class="hidden flex flex-col h-64 bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
               <div class="bg-slate-900 px-3 py-2 border-b border-slate-800 text-xs font-semibold text-slate-400 flex items-center justify-between">
@@ -493,17 +444,13 @@
                 </button>
               </form>
             </div>
-
           </div>
-
           <div class="text-xs text-slate-500 text-center">
             Wins in 1v1 Arena reward <span class="text-amber-400 font-bold">+50 CC</span> and Elo adjustments!
           </div>
         </div>
-
       </div>
     </section>
-
     <!-- SECTION: COGNI-SHOP -->
     <section id="section-shop" class="hidden space-y-8">
       <!-- Shop Header -->
@@ -522,10 +469,8 @@
           </div>
         </div>
       </div>
-
       <!-- Crate Cards Display Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
         <!-- Pawn Crate -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between hover:border-slate-700 transition">
           <div>
@@ -546,7 +491,6 @@
             <span class="bg-indigo-950/60 text-amber-300 text-xs px-2.5 py-1 rounded-md font-mono border border-indigo-400/30">1,000 CC</span>
           </button>
         </div>
-
         <!-- Knight Crate -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between hover:border-slate-700 transition">
           <div>
@@ -567,7 +511,6 @@
             <span class="bg-blue-950/60 text-amber-300 text-xs px-2.5 py-1 rounded-md font-mono border border-blue-400/30">3,500 CC</span>
           </button>
         </div>
-
         <!-- Grandmaster Crate -->
         <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-xl flex flex-col justify-between hover:border-amber-500/50 transition relative overflow-hidden">
           <div class="absolute -right-8 -top-8 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
@@ -589,27 +532,22 @@
             <span class="bg-amber-950/60 text-amber-300 text-xs px-2.5 py-1 rounded-md font-mono border border-amber-400/30">10,000 CC</span>
           </button>
         </div>
-
       </div>
     </section>
-
     <!-- SECTION: PROFILE & COSMETICS STUDIO -->
     <section id="section-profile" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <!-- Profile Identity Card -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col items-center text-center">
           <!-- Frame & Avatar Display -->
           <div id="prof-display-frame" class="w-28 h-28 rounded-full bg-slate-800 flex items-center justify-center text-4xl text-slate-300 mb-4 frame-none overflow-hidden transition-all duration-300">
             <i id="prof-display-icon" class="fa-solid fa-user"></i>
           </div>
-
           <!-- Player Title & Name -->
           <h2 id="prof-display-username" class="text-2xl font-bold text-white mb-1">Player</h2>
           <div id="prof-display-nametag" class="inline-block bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700 font-mono mb-4">
             Pawn Novice
           </div>
-
           <!-- Key Player Stats -->
           <div class="w-full grid grid-cols-2 gap-3 mt-4 border-t border-slate-800 pt-4">
             <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
@@ -622,13 +560,11 @@
             </div>
           </div>
         </div>
-
         <!-- Cosmetics Customizer Studio Controls -->
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
           <h3 class="text-xl font-bold text-white flex items-center gap-2">
             <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i> Profile & Cosmetics Studio
           </h3>
-
           <!-- Display Name Editor -->
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Display Name</label>
@@ -639,10 +575,8 @@
               </button>
             </div>
           </div>
-
           <!-- Dynamic Dropdown Selectors Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
             <!-- Avatar Icon Selector -->
             <div>
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Avatar Icon</label>
@@ -650,7 +584,6 @@
                 <option value="icon_user">Standard User</option>
               </select>
             </div>
-
             <!-- Cosmetic Frame Selector -->
             <div>
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Avatar Frame</label>
@@ -658,8 +591,6 @@
                 <option value="frame_none">No Frame</option>
               </select>
             </div>
-
-            <!-- Name Tag / Title Selector (Guaranteed Tactician & Unlocked Titles) -->
             <!-- Name Tag / Title Selector -->
             <div>
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Equipped Title / Name Tag</label>
@@ -667,7 +598,6 @@
                 <option value="nametag_novice">Pawn Novice</option>
               </select>
             </div>
-
             <!-- Board Skin Theme Selector -->
             <div>
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Chessboard Skin Theme</label>
@@ -677,7 +607,6 @@
                 <option value="theme-grey">Slate Grey</option>
               </select>
             </div>
-
             <!-- Active Emote Selector -->
             <div class="md:col-span-2">
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Active Animated Emote</label>
@@ -685,13 +614,10 @@
                 <option value="none">None</option>
               </select>
             </div>
-
           </div>
         </div>
-
       </div>
     </section>
-
     <!-- SECTION: LEADERBOARD -->
     <section id="section-leaderboard" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
@@ -706,7 +632,6 @@
             <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh
           </button>
         </div>
-
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -727,7 +652,6 @@
         </div>
       </div>
     </section>
-
     <!-- SECTION: MASTER CONTROL ADMIN PANEL -->
     <section id="section-admin" class="hidden space-y-6">
       <div class="bg-slate-900 border border-red-900/40 rounded-2xl p-6 shadow-xl space-y-6">
@@ -738,13 +662,11 @@
             </h2>
             <p class="text-slate-400 text-sm">Authorized Superadmin Operator Controls (<span class="text-red-400 font-mono">zainisgo123@gmail.com</span>)</p>
           </div>
-
           <!-- Dynamic Red/Green Maintenance Toggle Button -->
           <button id="admin-maint-btn" onclick="toggleMaintenanceMode()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition flex items-center gap-2">
             <i class="fa-solid fa-power-off"></i> <span id="admin-maint-label">Maintenance Normal (OFF)</span>
           </button>
         </div>
-
         <!-- System Controls -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
@@ -756,7 +678,6 @@
               Trigger Reload
             </button>
           </div>
-
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
             <div>
               <div class="font-bold text-white text-sm">Purge High Elo (>3000)</div>
@@ -767,7 +688,6 @@
             </button>
           </div>
         </div>
-
         <!-- User Database Management Table -->
         <div>
           <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
@@ -792,9 +712,7 @@
         </div>
       </div>
     </section>
-
   </main>
-
   <!-- CS:GO Style Crate Unboxing Modal -->
   <div id="crate-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl text-center space-y-6">
@@ -802,13 +720,11 @@
         <h3 class="text-2xl font-bold text-white" id="crate-modal-title">Unboxing Crate</h3>
         <p class="text-xs text-slate-400">Rolling rewards...</p>
       </div>
-
       <!-- Strip Wheel Container -->
       <div class="crate-strip-container">
         <div class="crate-indicator-line"></div>
         <div id="crate-strip" class="crate-strip"></div>
       </div>
-
       <!-- Result Reveal Area -->
       <div id="crate-result-area" class="hidden space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
         <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">You Unlocked</div>
@@ -818,14 +734,12 @@
           <i class="fa-solid fa-coins mr-1"></i> Duplicate Owned! Refunded 50% CogniCoins (+<span id="crate-refund-amount">0</span> CC)
         </div>
       </div>
-
       <!-- Dedicated Done Button -->
       <button id="crate-done-btn" onclick="closeCrateModal()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition hidden">
         Done
       </button>
     </div>
   </div>
-
   <!-- APPLICATION JAVASCRIPT LOGIC -->
   <script>
     // 1. FIREBASE INITIALIZATION CONFIG
@@ -838,30 +752,25 @@
       messagingSenderId: "807640572322",
       appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
-
     
     // Session-only Auth persistence
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-
     // Global Constants & State
     const ADMIN_EMAIL = "zainisgo123@gmail.com";
     const WHITELISTED_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
     const PAGE_LOAD_TIME = Date.now();
-
     let currentUser = null;
     let userProfile = null;
     let currentTheme = localStorage.getItem('cogni_board_theme') || 'theme-wood';
-
     // AI Engine Game State
     let aiGame = null;
     let aiBoard = null;
     let aiPlayerColor = 'w';
     let selectedSquare = null;
-
+    let selectedSquareArena = null;
     // Arena State
     let arenaGame = null;
     let arenaBoard = null;
@@ -869,7 +778,6 @@
     let arenaPlayerColor = 'w';
     let roomRef = null;
     let chatRef = null;
-
     // Cosmetics Master Catalog Mapping
     const ALL_TITLE_MAP = {
       "nametag_novice": "Pawn Novice",
@@ -884,7 +792,6 @@
       "nametag_gm": "Grandmaster",
       "nametag_legend": "Chess Legend"
     };
-
     const COSMETICS_CATALOG = {
       icons: {
         "icon_user": { name: "Standard User", icon: "fa-user" },
@@ -920,7 +827,6 @@
         "emote_crown": { name: "Crown Flex", emoji: "👑", class: "emote-glow" }
       }
     };
-
     // Shop Crates Odds Configuration
     const CRATE_DEFINITIONS = {
       pawn: {
@@ -961,14 +867,12 @@
         ]
       }
     };
-
     // Daily Quest Catalog Definition
     const DAILY_QUESTS_CONFIG = {
       q_black_win: { id: 'q_black_win', title: 'Black Victory', desc: 'Win 1 match playing as Black', req: 1, reward: 75 },
       q_play_3: { id: 'q_play_3', title: 'Battle Hardened', desc: 'Play 3 total chess games', req: 3, reward: 50 },
       q_streak_2: { id: 'q_streak_2', title: 'Hot Streak', desc: 'Achieve a 2-Game Win Streak', req: 2, reward: 100 }
     };
-
     // 2. AUTHENTICATION & MAINTENANCE MODE LISTENERS
     auth.onAuthStateChanged((user) => {
       if (!user) {
@@ -976,26 +880,22 @@
         return;
       }
       currentUser = user;
-
       // Admin Navigation Visibility Check
       if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
         $('#admin-nav-link').removeClass('hidden');
       }
-
       // Check Maintenance Status & Initialize User Profile Data
       db.ref('system/maintenance').on('value', (snap) => {
         const isMaint = snap.val() === true;
         updateAdminMaintBtn(isMaint);
         const userEmail = (user.email || '').toLowerCase();
         const isWhitelisted = WHITELISTED_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
-
         if (isMaint && !isWhitelisted) {
           $('#maintenance-overlay').removeClass('hidden');
         } else {
           $('#maintenance-overlay').addClass('hidden');
         }
       });
-
       // Global Reload Signal Listener with timestamp guard
       db.ref('system/global_reload').on('value', (snap) => {
         const reloadTime = snap.val();
@@ -1003,19 +903,15 @@
           window.location.reload();
         }
       });
-
       // Load & Sync User Data
       syncUserData();
     });
-
     function syncUserData() {
       if (!currentUser) return;
       const userRef = db.ref('users/' + currentUser.uid);
-
       userRef.on('value', (snap) => {
         let val = snap.val();
         const todayStr = new Date().toISOString().split('T')[0];
-
         if (!val) {
           // Initialize new profile defaults
           val = {
@@ -1046,7 +942,6 @@
           };
           userRef.set(val);
         } else {
-          // Verify Daily Quest Reset Date
           // Verify Daily Quest Reset Date with Non-Destructive Update
           if (val.lastQuestReset !== todayStr) {
             val.lastQuestReset = todayStr;
@@ -1061,7 +956,6 @@
             });
           }
         }
-
         userProfile = val;
         updateUIProfileDisplay();
         renderDailyQuests();
@@ -1069,45 +963,31 @@
         console.error("Firebase read error:", err);
       });
     }
-
     function handleLogout() {
       auth.signOut().then(() => {
         window.location.href = 'index.html';
       });
     }
-
     // 3. INVENTORY, PROFILE & DAILY QUEST HELPER FUNCTIONS
     function parseCategory(data, defaultArr) {
-      if (!data) return defaultArr;
       if (!data) return [...defaultArr];
       if (Array.isArray(data)) return [...data];
-      if (typeof data === 'object') return Object.values(data);
-      return defaultArr;
       if (typeof data === 'object') {
         const vals = Object.values(data).filter(v => typeof v === 'string');
         return vals.length > 0 ? vals : [...defaultArr];
       }
       return [...defaultArr];
     }
-
     function getNormalizedInventory() {
-      if (!userProfile) return { icons: [], frames: [], nametags: [], themes: [], emotes: [] };
       if (!userProfile) return { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice', 'nametag_tactician'], themes: ['theme-wood', 'theme-green', 'theme-grey'], emotes: ['none'] };
       const inv = userProfile.inventory || {};
-
       let result = {
-        icons: Array.isArray(inv.icons) ? [...inv.icons] : ['icon_user'],
-        frames: Array.isArray(inv.frames) ? [...inv.frames] : ['frame_none'],
-        nametags: Array.isArray(inv.nametags) ? [...inv.nametags] : ['nametag_novice'],
-        themes: Array.isArray(inv.themes) ? [...inv.themes] : ['theme-wood', 'theme-green', 'theme-grey'],
-        emotes: Array.isArray(inv.emotes) ? [...inv.emotes] : ['none']
         icons: parseCategory(inv.icons, ['icon_user']),
         frames: parseCategory(inv.frames, ['frame_none']),
         nametags: parseCategory(inv.nametags, ['nametag_novice']),
         themes: parseCategory(inv.themes, ['theme-wood', 'theme-green', 'theme-grey']),
         emotes: parseCategory(inv.emotes, ['none'])
       };
-
       // Guarantee Tactician Synonym Inclusion
       const hasTactician = result.nametags.some(t => 
         ['nametag_tactician', 'tactician', 'tactition', 'The Tactician', 'title_tactician'].includes(t)
@@ -1115,21 +995,17 @@
       if (hasTactician && !result.nametags.includes('nametag_tactician')) {
         result.nametags.push('nametag_tactician');
       }
-
       return result;
     }
-
     function renderDailyQuests() {
       if (!userProfile) return;
       const $container = $('#daily-quests-container').empty();
       const userQuests = userProfile.quests || {};
-
       Object.keys(DAILY_QUESTS_CONFIG).forEach(qKey => {
         const qConf = DAILY_QUESTS_CONFIG[qKey];
         const qState = userQuests[qKey] || { progress: 0, claimed: false };
         const isComplete = qState.progress >= qConf.req;
         const isClaimed = qState.claimed === true;
-
         let actionBtnHtml = '';
         if (isClaimed) {
           actionBtnHtml = `<span class="text-[10px] bg-slate-800 text-slate-500 border border-slate-700 px-2 py-1 rounded-md font-semibold">Claimed</span>`;
@@ -1138,7 +1014,6 @@
         } else {
           actionBtnHtml = `<span class="text-[10px] text-amber-400 font-mono font-bold">+${qConf.reward} CC</span>`;
         }
-
         $container.append(`
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between space-y-2">
             <div>
@@ -1148,12 +1023,10 @@
               </div>
               <div class="text-[11px] text-slate-400">${qConf.desc}</div>
             </div>
-
             <!-- Progress Bar -->
             <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
               <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: ${Math.min(100, (qState.progress / qConf.req) * 100)}%"></div>
             </div>
-
             <div class="flex items-center justify-between pt-1 border-t border-slate-900">
               ${actionBtnHtml}
             </div>
@@ -1161,27 +1034,22 @@
         `);
       });
     }
-
     function updateQuestProgress(qKey, delta) {
       if (!currentUser || !userProfile) return;
       const quests = userProfile.quests || {};
       const currentVal = (quests[qKey]?.progress || 0) + delta;
       const isClaimed = quests[qKey]?.claimed || false;
-
       db.ref(`users/${currentUser.uid}/quests/${qKey}`).update({
         progress: currentVal,
         claimed: isClaimed
       });
     }
-
     function claimQuest(qKey) {
       if (!currentUser || !userProfile) return;
       const qConf = DAILY_QUESTS_CONFIG[qKey];
       const qState = userProfile.quests?.[qKey];
       if (!qConf || !qState || qState.claimed || qState.progress < qConf.req) return;
-
       const newCoins = (userProfile.coins || 0) + qConf.reward;
-
       db.ref(`users/${currentUser.uid}`).update({
         coins: newCoins,
         [`quests/${qKey}/claimed`]: true
@@ -1189,63 +1057,50 @@
         alert(`Quest Claimed! Rewards: +${qConf.reward} CogniCoins!`);
       });
     }
-
     function updateUIProfileDisplay() {
       if (!userProfile) return;
-
       // Header Top Bar Sync
       $('#nav-coins').text((userProfile.coins || 0).toLocaleString());
       $('#nav-elo').text(userProfile.elo || 1500);
       $('#nav-streak').text(userProfile.winStreak || 0);
-
       // Shop Coins Sync
       $('#shop-coins-text').text((userProfile.coins || 0).toLocaleString());
-
       // Profile Section Card Sync
       $('#prof-display-username').text(userProfile.username || 'Player');
       $('#prof-stat-elo').text(userProfile.elo || 1500);
       $('#prof-stat-coins').text((userProfile.coins || 0).toLocaleString());
-
       // Icon & Frame Display
       const iconKey = userProfile.equippedIcon || 'icon_user';
       const frameKey = userProfile.equippedFrame || 'frame_none';
       const iconObj = COSMETICS_CATALOG.icons[iconKey] || COSMETICS_CATALOG.icons['icon_user'];
       const frameObj = COSMETICS_CATALOG.frames[frameKey] || COSMETICS_CATALOG.frames['frame_none'];
-
       $('#prof-display-icon').attr('class', 'fa-solid ' + iconObj.icon);
       $('#prof-display-frame').attr('class', 'w-28 h-28 rounded-full bg-slate-800 flex items-center justify-center text-4xl text-slate-300 mb-4 overflow-hidden transition-all duration-300 ' + frameObj.class);
-
       // Title / Nametag Display
       const tagKey = userProfile.equippedNametag || 'nametag_novice';
       const tagText = ALL_TITLE_MAP[tagKey] || ALL_TITLE_MAP[tagKey.toLowerCase()] || tagKey;
       $('#prof-display-nametag').text(tagText);
-
       // AI Player Card Bar Sync
       $('#ai-user-name').text(userProfile.username || 'Player');
       $('#ai-user-elo-text').text(userProfile.elo || 1500);
       $('#ai-user-nametag').text(tagText);
       $('#ai-user-icon').attr('class', 'fa-solid ' + iconObj.icon);
       $('#ai-user-frame-container').attr('class', 'w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg overflow-hidden ' + frameObj.class);
-
       // Arena Self Card Sync
       $('#arena-self-name').text(userProfile.username || 'Player');
       $('#arena-self-elo').text(userProfile.elo || 1500);
       $('#arena-self-nametag').text(tagText);
       $('#arena-self-icon').attr('class', 'fa-solid ' + iconObj.icon);
       $('#arena-self-frame').attr('class', 'w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg overflow-hidden ' + frameObj.class);
-
       // Theme Application
       const theme = userProfile.equippedTheme || currentTheme;
       applyBoardTheme(theme);
-
       // Populate Dropdown Menus in Studio
       populateProfileDropdowns();
     }
-
     function populateProfileDropdowns() {
       if (!userProfile) return;
       const inv = getNormalizedInventory();
-
       // 1. Icon Dropdown
       const $iconSel = $('#profile-icon-select').empty();
       inv.icons.forEach(k => {
@@ -1255,7 +1110,6 @@
         }
       });
       $iconSel.val(userProfile.equippedIcon || 'icon_user');
-
       // 2. Frame Dropdown
       const $frameSel = $('#profile-frame-select').empty();
       inv.frames.forEach(k => {
@@ -1265,7 +1119,6 @@
         }
       });
       $frameSel.val(userProfile.equippedFrame || 'frame_none');
-
       // 3. Name Tag / Title Dropdown
       const $tagSel = $('#profile-nametag-select').empty();
       const uniqueTags = new Set(inv.nametags);
@@ -1274,7 +1127,6 @@
         $tagSel.append(`<option value="${k}">${label}</option>`);
       });
       $tagSel.val(userProfile.equippedNametag || 'nametag_novice');
-
       // 4. Board Theme Dropdown
       const $themeSel = $('#profile-theme-select').empty();
       inv.themes.forEach(k => {
@@ -1282,7 +1134,6 @@
         $themeSel.append(`<option value="${k}">${label}</option>`);
       });
       $themeSel.val(userProfile.equippedTheme || currentTheme);
-
       // 5. Emote Dropdown
       const $emoteSel = $('#profile-emote-select').empty();
       inv.emotes.forEach(k => {
@@ -1293,7 +1144,6 @@
       });
       $emoteSel.val(userProfile.equippedEmote || 'none');
     }
-
     function saveProfileName() {
       const newName = $('#profile-name-input').val().trim();
       if (!newName || !currentUser) return;
@@ -1302,7 +1152,6 @@
         alert("Username updated successfully!");
       });
     }
-
     function equipCosmetic(type, value) {
       if (!currentUser) return;
       const updates = {};
@@ -1314,23 +1163,19 @@
         applyBoardTheme(value);
       }
       if (type === 'emote') updates['equippedEmote'] = value;
-
       db.ref('users/' + currentUser.uid).update(updates);
     }
-
     function applyBoardTheme(themeClass) {
       currentTheme = themeClass;
       localStorage.setItem('cogni_board_theme', themeClass);
       $('#ai-board, #arena-board').removeClass('theme-wood theme-green theme-grey').addClass(themeClass);
     }
-
     // 4. ANIMATED EMOTE TRIGGER SYSTEM
     function triggerInGameEmote(mode) {
       if (!userProfile) return;
       const emoteKey = userProfile.equippedEmote || 'emote_fire';
       const emoteObj = COSMETICS_CATALOG.emotes[emoteKey];
       if (!emoteObj || !emoteObj.emoji) return alert("Select an active emote in Profile & Cosmetics Studio!");
-
       if (mode === 'ai') {
         showEmoteDisplay('#ai-player-emote-display', emoteObj);
       } else if (mode === 'arena') {
@@ -1344,53 +1189,47 @@
         }
       }
     }
-
     function showEmoteDisplay(elementSelector, emoteObj) {
       const $el = $(elementSelector);
       $el.html(`<span class="inline-block ${emoteObj.class}">${emoteObj.emoji}</span>`)
          .removeClass('hidden emote-pop');
-
       void $el[0].offsetWidth; // Trigger reflow for animation reset
       $el.addClass('emote-pop');
-
       setTimeout(() => {
         $el.addClass('hidden').removeClass('emote-pop');
       }, 3500);
     }
-
     // 5. NAVIGATION TABS CONTROLLER
     function showSection(sectionId) {
       $('main > section').addClass('hidden');
       $('#section-' + sectionId).removeClass('hidden');
-
-      $('.nav-btn').removeClass('bg-indigo-600 text-white shadow').addClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
-      $('#nav-' + sectionId).addClass('bg-indigo-600 text-white shadow').removeClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
-
+      $('.nav-btn').not('#admin-nav-link').removeClass('bg-indigo-600 text-white shadow').addClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
+      if (sectionId === 'admin') {
+        $('#admin-nav-link').addClass('bg-indigo-600 text-white shadow').removeClass('text-red-400 hover:text-red-300 hover:bg-red-950/40');
+      } else {
+        $('#admin-nav-link').removeClass('bg-indigo-600 text-white shadow').addClass('text-red-400 hover:text-red-300 hover:bg-red-950/40');
+        $('#nav-' + sectionId).addClass('bg-indigo-600 text-white shadow').removeClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
+      }
       
       if (sectionId === 'ai' && !aiBoard) {
         initAiBoard();
       } else if (sectionId === 'ai' && aiBoard) {
         aiBoard.resize();
       }
-
       if (sectionId === 'arena' && !arenaBoard) {
         initArenaBoard();
       } else if (sectionId === 'arena' && arenaBoard) {
         arenaBoard.resize();
       }
-
       if (sectionId === 'leaderboard') {
         loadLeaderboard();
       }
-
       if (sectionId === 'admin') {
         loadAdminUserTable();
       }
     }
-
     // 6. CHESS AI ENGINE (1500+ ELO MINIMAX + ALPHA-BETA + ANTI-SCHOLAR BOOK)
     const PIECE_VALUES = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
-
     const PST_PAWN = [
       0,  0,  0,  0,  0,  0,  0,  0,
       50, 50, 50, 50, 50, 50, 50, 50,
@@ -1401,7 +1240,6 @@
        5, 10, 10,-20,-20, 10, 10,  5,
        0,  0,  0,  0,  0,  0,  0,  0
     ];
-
     const PST_KNIGHT = [
       -50,-40,-30,-30,-30,-30,-40,-50,
       -40,-20,  0,  0,  0,  0,-20,-40,
@@ -1412,7 +1250,6 @@
       -40,-20,  0,  5,  5,  0,-20,-40,
       -50,-40,-30,-30,-30,-30,-40,-50
     ];
-
     function evaluateBoard(game) {
       let totalEval = 0;
       const board = game.board();
@@ -1425,7 +1262,6 @@
             const idx = r * 8 + c;
             if (piece.type === 'p') pst = PST_PAWN[idx];
             if (piece.type === 'n') pst = PST_KNIGHT[idx];
-
             const score = val + pst;
             totalEval += (piece.color === 'w' ? score : -score);
           }
@@ -1433,15 +1269,12 @@
       }
       return totalEval;
     }
-
     function minimax(game, depth, alpha, beta, isMaximizing) {
       if (depth === 0 || game.game_over()) {
         return evaluateBoard(game);
       }
-
       const moves = game.moves({ verbose: true });
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
-
       if (isMaximizing) {
         let maxEval = -Infinity;
         for (const move of moves) {
@@ -1466,13 +1299,10 @@
         return minEval;
       }
     }
-
     function getBestMove(game) {
       const moves = game.moves({ verbose: true });
       if (moves.length === 0) return null;
-
       const history = game.history();
-
       // Anti-Scholar's Mate Opening Book Defence for Black
       if (aiPlayerColor === 'b' && history.length <= 6) {
         if (history.length === 3 && history[0] === 'e4' && history[1] === 'e5' && history[2] === 'Qh5') {
@@ -1492,18 +1322,14 @@
           if (move) return move;
         }
       }
-
       let bestMove = null;
       let isMax = game.turn() === 'w';
       let bestValue = isMax ? -Infinity : Infinity;
-
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
-
       for (const move of moves) {
         game.move(move);
         const boardVal = minimax(game, 3, -Infinity, Infinity, !isMax);
         game.undo();
-
         if (isMax) {
           if (boardVal > bestValue) {
             bestValue = boardVal;
@@ -1518,7 +1344,6 @@
       }
       return bestMove || moves[Math.floor(Math.random() * moves.length)];
     }
-
     // 7. PLAY VS AI MATCH CONTROLLER
     function initAiBoard() {
       aiGame = new Chess();
@@ -1531,54 +1356,44 @@
       applyBoardTheme(userProfile ? userProfile.equippedTheme : currentTheme);
       setupAiGame(false);
     }
-
     function selectAiColor(color) {
       if (aiGame && aiGame.history().length > 0 && !aiGame.game_over()) {
         const confirmResign = confirm("Match in progress! Changing side will count as a Resignation (-ELO). Do you want to resign and switch sides?");
         if (!confirmResign) return;
         handleAiGameLoss();
       }
-
       if (color === 'random') {
         aiPlayerColor = Math.random() < 0.5 ? 'w' : 'b';
       } else {
         aiPlayerColor = color;
       }
-
       $('.side-btn').removeClass('bg-indigo-600 border-indigo-500 text-white').addClass('bg-slate-800 border-slate-700 text-slate-300');
       if (color === 'w') $('#btn-side-w').addClass('bg-indigo-600 border-indigo-500 text-white').removeClass('bg-slate-800 text-slate-300');
       if (color === 'b') $('#btn-side-b').addClass('bg-indigo-600 border-indigo-500 text-white').removeClass('bg-slate-800 text-slate-300');
       if (color === 'random') $('#btn-side-random').addClass('bg-indigo-600 border-indigo-500 text-white').removeClass('bg-slate-800 text-slate-300');
-
       setupAiGame(true);
     }
-
     function setupAiGame(forceReset) {
       if (forceReset && aiGame && aiGame.history().length > 0 && !aiGame.game_over()) {
         const confirmResign = confirm("Game in progress! Restarting now will count as a Resignation (-ELO). Resign current match?");
         if (!confirmResign) return;
         handleAiGameLoss();
       }
-
       aiGame = new Chess();
       aiBoard.orientation(aiPlayerColor === 'w' ? 'white' : 'black');
       aiBoard.position('start');
       selectedSquare = null;
       removeHighlights();
       updateAiMoveLog();
-
       if (aiPlayerColor === 'b') {
         setTimeout(makeAiMove, 400);
       }
     }
-
     // Delegated Click-to-Move Controls
     $(document).on('click', '#ai-board .square-55d63', function() {
       if (!aiGame || aiGame.game_over()) return;
       if ((aiGame.turn() === 'w' && aiPlayerColor !== 'w') || (aiGame.turn() === 'b' && aiPlayerColor !== 'b')) return;
-
       const square = $(this).data('square');
-
       if (!selectedSquare) {
         const piece = aiGame.get(square);
         if (piece && piece.color === aiPlayerColor) {
@@ -1593,7 +1408,6 @@
           selectedSquare = null;
           removeDots();
           updateAiMoveLog();
-
           if (checkAiGameOver()) return;
           setTimeout(makeAiMove, 400);
         } else {
@@ -1608,11 +1422,9 @@
         }
       }
     });
-
     function makeAiMove() {
       if (!aiGame || aiGame.game_over()) return;
       $('#ai-status-indicator').text('Bot thinking...').removeClass('bg-emerald-500/10 text-emerald-400').addClass('bg-amber-500/10 text-amber-400');
-
       setTimeout(() => {
         const move = getBestMove(aiGame);
         if (move) {
@@ -1625,7 +1437,6 @@
         }
       }, 250);
     }
-
     function showValidMoveDots(sq) {
       removeDots();
       const moves = aiGame.moves({ square: sq, verbose: true });
@@ -1633,20 +1444,16 @@
         $(`#ai-board .square-${m.to}`).append('<div class="valid-move-dot"></div>');
       });
     }
-
     function removeDots() {
       $('.valid-move-dot').remove();
     }
-
     function highlightMove(from, to) {
       removeHighlights();
       $(`#ai-board .square-${from}, #ai-board .square-${to}`).addClass('highlight-last-move');
     }
-
     function removeHighlights() {
       $('#ai-board .square-55d63').removeClass('highlight-last-move');
     }
-
     function updateAiMoveLog() {
       const history = aiGame.history();
       const $log = $('#ai-move-history').empty();
@@ -1662,13 +1469,10 @@
       }
       $log.scrollTop($log[0].scrollHeight);
     }
-
     function checkAiGameOver() {
       if (!aiGame.game_over()) return false;
-
       // Update Quests Progress
       updateQuestProgress('q_play_3', 1);
-
       if (aiGame.in_checkmate()) {
         const winnerColor = aiGame.turn() === 'w' ? 'b' : 'w';
         if (winnerColor === aiPlayerColor) {
@@ -1681,14 +1485,12 @@
       }
       return true;
     }
-
     function resignAiGame() {
       if (!aiGame || aiGame.history().length === 0 || aiGame.game_over()) return;
       if (confirm("Are you sure you want to resign this match? (-ELO)")) {
         handleAiGameLoss();
       }
     }
-
     function calculateElo(playerRating, opponentRating, score, gamesCount) {
       let K = 32;
       if (gamesCount < 10) K = 40;
@@ -1696,22 +1498,18 @@
       const expected = 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400));
       return Math.round(playerRating + K * (score - expected));
     }
-
     function handleAiGameWin() {
       if (!currentUser || !userProfile) return;
       const currentElo = userProfile.elo || 1500;
       const newElo = calculateElo(currentElo, 1500, 1, userProfile.gamesPlayed || 0);
-
       // Win Streak Calculation
       const currentStreak = (userProfile.winStreak || 0) + 1;
       let streakBonus = 0;
       if (currentStreak >= 3 && currentStreak < 5) streakBonus = 15;
       if (currentStreak >= 5 && currentStreak < 10) streakBonus = 30;
       if (currentStreak >= 10) streakBonus = 50;
-
       const totalGain = 50 + streakBonus;
       const newCoins = (userProfile.coins || 0) + totalGain;
-
       // Quest Updates
       if (aiPlayerColor === 'b') {
         updateQuestProgress('q_black_win', 1);
@@ -1719,7 +1517,6 @@
       if (currentStreak >= 2) {
         updateQuestProgress('q_streak_2', 1);
       }
-
       db.ref('users/' + currentUser.uid).update({
         elo: newElo,
         coins: newCoins,
@@ -1732,12 +1529,10 @@
         alert(msg);
       });
     }
-
     function handleAiGameLoss() {
       if (!currentUser || !userProfile) return;
       const currentElo = userProfile.elo || 1500;
       const newElo = calculateElo(currentElo, 1500, 0, userProfile.gamesPlayed || 0);
-
       db.ref('users/' + currentUser.uid).update({
         elo: Math.max(100, newElo),
         winStreak: 0,
@@ -1746,7 +1541,6 @@
         alert(`DEFEAT: Match lost. Win streak reset to 0. New Rating: ${Math.max(100, newElo)} Elo`);
       });
     }
-
     // 8. MULTIPLAYER 1V1 ARENA
     function initArenaBoard() {
       arenaGame = new Chess();
@@ -1758,13 +1552,11 @@
       arenaBoard = Chessboard('arena-board', config);
       applyBoardTheme(userProfile ? userProfile.equippedTheme : currentTheme);
     }
-
     function createArenaRoom() {
       if (!currentUser) return;
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       currentRoomCode = code;
       arenaPlayerColor = 'w';
-
       const roomData = {
         code: code,
         hostUid: currentUser.uid,
@@ -1777,7 +1569,6 @@
         status: 'waiting',
         turn: 'w'
       };
-
       db.ref('arena_rooms/' + code).set(roomData).then(() => {
         subscribeToRoom(code);
         $('#arena-lobby-controls').addClass('hidden');
@@ -1785,19 +1576,15 @@
         $('#arena-current-code').text(code);
       });
     }
-
     function joinArenaRoom() {
       const code = $('#arena-room-input').val().trim().toUpperCase();
       if (!code || code.length !== 6) return alert("Enter valid 6-digit room code.");
-
       db.ref('arena_rooms/' + code).once('value').then((snap) => {
         const room = snap.val();
         if (!room) return alert("Room not found!");
         if (room.guestUid) return alert("Room is full!");
-
         arenaPlayerColor = 'b';
         currentRoomCode = code;
-
         db.ref('arena_rooms/' + code).update({
           guestUid: currentUser.uid,
           guestName: userProfile.username || 'Player',
@@ -1814,11 +1601,9 @@
         });
       });
     }
-
     function subscribeToRoom(code) {
       roomRef = db.ref('arena_rooms/' + code);
       chatRef = db.ref('arena_chat/' + code);
-
       roomRef.on('value', (snap) => {
         const room = snap.val();
         if (!room) {
@@ -1826,23 +1611,19 @@
           leaveArenaLobby();
           return;
         }
-
         arenaGame.load(room.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : room.fen);
         arenaBoard.orientation(arenaPlayerColor === 'w' ? 'white' : 'black');
         arenaBoard.position(arenaGame.fen());
-
         // Update Opponent Info UI
         const isHost = arenaPlayerColor === 'w';
         const oppName = isHost ? room.guestName : room.hostName;
         const oppElo = isHost ? room.guestElo : room.hostElo;
         const oppTagKey = isHost ? room.guestTag : room.hostTag;
-
         if (oppName) {
           $('#arena-opp-name').text(oppName);
           $('#arena-opp-elo').text(oppElo || 1500);
           $('#arena-opp-nametag').text(ALL_TITLE_MAP[oppTagKey] || oppTagKey).removeClass('hidden');
         }
-
         // Live Emote Broadcast Listener
         if (room.lastEmote && room.lastEmote.senderUid !== currentUser.uid) {
           const emoteObj = COSMETICS_CATALOG.emotes[room.lastEmote.emoteKey];
@@ -1851,7 +1632,6 @@
           }
         }
       });
-
       // Chat Listener
       chatRef.on('child_added', (snap) => {
         const msg = snap.val();
@@ -1859,20 +1639,16 @@
         $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
       });
     }
-
     function updateChatCharCount() {
       const len = $('#chat-input').val().length;
       $('#chat-char-counter').text(`${len}/500`);
     }
-
     function sendChatMessage(e) {
       e.preventDefault();
       const rawText = $('#chat-input').val().trim();
       if (!rawText || !currentRoomCode) return;
-
       // 500 Character Limit Enforcement
       const text = rawText.substring(0, 500);
-
       chatRef.push({
         sender: userProfile.username || 'Player',
         text: text,
@@ -1881,17 +1657,14 @@
       $('#chat-input').val('');
       updateChatCharCount();
     }
-
     function escapeHtml(str) {
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
-
     function copyRoomCode() {
       if (!currentRoomCode) return;
       navigator.clipboard.writeText(currentRoomCode);
       alert("Room Code " + currentRoomCode + " copied!");
     }
-
     function resignArenaGame() {
       if (!currentRoomCode) return;
       if (confirm("Resign match? (-ELO)")) {
@@ -1900,77 +1673,66 @@
         leaveArenaLobby();
       }
     }
-
     function offerArenaDraw() {
       alert("Draw offer sent to opponent.");
     }
-
     function leaveArenaLobby() {
       if (roomRef) roomRef.off();
       if (chatRef) chatRef.off();
       currentRoomCode = null;
+      selectedSquareArena = null;
       $('#arena-lobby-controls').removeClass('hidden');
       $('#arena-active-controls, #arena-chat-box').addClass('hidden');
       $('#chat-messages').empty();
       initArenaBoard();
     }
-
     // Delegated Click-to-Move for Arena
     $(document).on('click', '#arena-board .square-55d63', function() {
       if (!arenaGame || !currentRoomCode) return;
       if ((arenaGame.turn() === 'w' && arenaPlayerColor !== 'w') || (arenaGame.turn() === 'b' && arenaPlayerColor !== 'b')) return;
-
       const square = $(this).data('square');
-
-      if (!selectedSquare) {
+      if (!selectedSquareArena) {
         const piece = arenaGame.get(square);
         if (piece && piece.color === arenaPlayerColor) {
-          selectedSquare = square;
+          selectedSquareArena = square;
         }
       } else {
-        const move = arenaGame.move({ from: selectedSquare, to: square, promotion: 'q' });
+        const move = arenaGame.move({ from: selectedSquareArena, to: square, promotion: 'q' });
         if (move) {
           arenaBoard.position(arenaGame.fen());
-          selectedSquare = null;
+          selectedSquareArena = null;
           db.ref('arena_rooms/' + currentRoomCode).update({
             fen: arenaGame.fen(),
             turn: arenaGame.turn()
           });
         } else {
-          selectedSquare = null;
+          selectedSquareArena = null;
         }
       }
     });
-
     // 9. COGNISHOP & CS:GO HORIZONTAL UNBOXING CRATE STRIP LOGIC
     function buyCrate(crateType) {
       if (!userProfile) return;
       const crate = CRATE_DEFINITIONS[crateType];
       if (!crate) return;
-
       const currentCoins = userProfile.coins || 0;
       if (currentCoins < crate.price) {
         return alert(`Insufficient CogniCoins! You need ${crate.price.toLocaleString()} CC.`);
       }
-
       // Deduct Crate Price
       db.ref('users/' + currentUser.uid + '/coins').set(currentCoins - crate.price).then(() => {
         executeCrateSpin(crate);
       });
     }
-
     function executeCrateSpin(crate) {
       $('#crate-modal').removeClass('hidden');
       $('#crate-modal-title').text(crate.name);
       $('#crate-result-area, #crate-done-btn').addClass('hidden');
       $('#crate-duplicate-notice').addClass('hidden');
-
       const $strip = $('#crate-strip').empty().css('transform', 'translateX(0px)');
-
       // Generate 40 horizontal strip items ending on the target winning index (Index 32)
       const winningItem = crate.items[Math.floor(Math.random() * crate.items.length)];
       const stripItems = [];
-
       for (let i = 0; i < 40; i++) {
         if (i === 32) {
           stripItems.push(winningItem);
@@ -1979,14 +1741,12 @@
           stripItems.push(randItem);
         }
       }
-
       // Populate Strip Cards
       stripItems.forEach(item => {
         let label = item.id;
         if (item.type === 'nametag') label = ALL_TITLE_MAP[item.id] || item.id;
         if (item.type === 'icon') label = COSMETICS_CATALOG.icons[item.id]?.name || item.id;
         if (item.type === 'frame') label = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
-
         $strip.append(`
           <div class="crate-item-card">
             <i class="fa-solid fa-gift text-2xl text-amber-400 mb-2"></i>
@@ -1994,41 +1754,32 @@
           </div>
         `);
       });
-
       // Animate Strip Slider
       const cardWidth = 132; // 120px + 12px margin
       const targetOffset = -(32 * cardWidth - (240 - 60));
-
       setTimeout(() => {
         $strip.css('transform', `translateX(${targetOffset}px)`);
       }, 100);
-
       // Reveal Result after 5 Seconds
       setTimeout(() => {
         processCrateReward(winningItem, crate.price);
       }, 5200);
     }
-
     function processCrateReward(item, cratePrice) {
       const inv = getNormalizedInventory();
       let categoryArray = [];
       let catKey = '';
-
       if (item.type === 'nametag') { catKey = 'nametags'; categoryArray = inv.nametags; }
       if (item.type === 'icon') { catKey = 'icons'; categoryArray = inv.icons; }
       if (item.type === 'frame') { catKey = 'frames'; categoryArray = inv.frames; }
-
       const isDuplicate = categoryArray.includes(item.id);
       let displayName = item.id;
-
       if (item.type === 'nametag') displayName = ALL_TITLE_MAP[item.id] || item.id;
       if (item.type === 'icon') displayName = COSMETICS_CATALOG.icons[item.id]?.name || item.id;
       if (item.type === 'frame') displayName = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
-
       $('#crate-result-name').text(displayName);
       $('#crate-result-type').text(item.type.toUpperCase());
       $('#crate-result-area, #crate-done-btn').removeClass('hidden');
-
       if (isDuplicate) {
         const refund = Math.floor(cratePrice * 0.5);
         const newCoins = (userProfile.coins || 0) + refund;
@@ -2040,15 +1791,12 @@
         db.ref(`users/${currentUser.uid}/inventory/${catKey}`).set(categoryArray);
       }
     }
-
     function closeCrateModal() {
       $('#crate-modal').addClass('hidden');
     }
-
     // 10. LEADERBOARD SYSTEM
     function loadLeaderboard() {
       const $tbody = $('#leaderboard-table-body').empty().append('<tr><td colspan="5" class="py-8 text-center text-slate-500">Loading rankings...</td></tr>');
-
       db.ref('users').orderByChild('elo').limitToLast(50).once('value').then((snap) => {
         $tbody.empty();
         const users = [];
@@ -2056,19 +1804,16 @@
           users.push(child.val());
         });
         users.reverse(); // Highest Elo first
-
         if (users.length === 0) {
           $tbody.append('<tr><td colspan="5" class="py-6 text-center text-slate-500">No rankings available</td></tr>');
           return;
         }
-
         users.forEach((u, index) => {
           const rank = index + 1;
           const tagKey = u.equippedNametag || 'nametag_novice';
           const tagText = ALL_TITLE_MAP[tagKey] || ALL_TITLE_MAP[tagKey.toLowerCase()] || tagKey;
           const isTop3 = rank <= 3;
           const rankBadge = isTop3 ? `<span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 inline-flex items-center justify-center font-bold text-xs">${rank}</span>` : `<span class="text-slate-500 font-mono ml-2">${rank}</span>`;
-
           $tbody.append(`
             <tr class="hover:bg-slate-800/40 transition">
               <td class="py-3 px-4">${rankBadge}</td>
@@ -2081,7 +1826,6 @@
         });
       });
     }
-
     // 11. MASTER CONTROL ADMIN PANEL (zainisgo123@gmail.com STRICT)
     function toggleMaintenanceMode() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
@@ -2090,7 +1834,6 @@
         db.ref('system/maintenance').set(!current);
       });
     }
-
     function updateAdminMaintBtn(isMaint) {
       if (isMaint) {
         $('#admin-maint-btn').removeClass('bg-emerald-600 hover:bg-emerald-500').addClass('bg-red-600 hover:bg-red-500');
@@ -2100,12 +1843,10 @@
         $('#admin-maint-label').text('Maintenance Normal (OFF)');
       }
     }
-
     function adminForceGlobalReload() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/global_reload').set(Date.now());
     }
-
     function adminPurgeHighElo() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users').once('value').then((snap) => {
@@ -2119,45 +1860,35 @@
         loadAdminUserTable();
       });
     }
-
     // DYNAMIC GRANT CC WITH PROMPT
     function adminGrantCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-
       const input = prompt("Enter CogniCoins (CC) amount to grant:", "5000");
       if (input === null) return; // Prompt cancelled
-
       const amount = parseInt(input, 10);
       if (isNaN(amount) || amount <= 0) {
         return alert("Invalid CC amount entered.");
       }
-
       db.ref('users/' + uid + '/coins').once('value').then((snap) => {
         const cur = snap.val() || 0;
-        db.ref('users/' + uid + '/coins').set(cur + 5000);
         db.ref('users/' + uid + '/coins').set(cur + amount).then(() => {
           alert(`Granted ${amount.toLocaleString()} CC successfully!`);
           loadAdminUserTable();
         });
       });
     }
-
     function adminResetCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      db.ref('users/' + uid + '/coins').set(1000);
       db.ref('users/' + uid + '/coins').set(1000).then(() => {
         loadAdminUserTable();
       });
     }
-
     function adminResetElo(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      db.ref('users/' + uid + '/elo').set(1500);
       db.ref('users/' + uid + '/elo').set(1500).then(() => {
         loadAdminUserTable();
       });
     }
-
     function adminDeleteUser(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       if (confirm("Permanently delete this user record from database?")) {
@@ -2166,26 +1897,21 @@
         });
       }
     }
-
     function loadAdminUserTable() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const $tbody = $('#admin-user-table').empty().append('<tr><td colspan="5" class="py-6 text-center text-slate-500">Loading database...</td></tr>');
-
       db.ref('users').once('value').then((snap) => {
         $tbody.empty();
         snap.forEach((child) => {
           const uid = child.key;
           const u = child.val();
-
           $tbody.append(`
             <tr class="hover:bg-slate-900 transition">
               <td class="py-2.5 px-4 text-slate-500 text-[10px]">${uid.substring(0, 8)}...</td>
-              <td class="py-2.5 px-4 font-bold text-white">${u.username || 'N/A'}<br><span class="text-[10px] text-slate-400 font-normal">${u.email || ''}</span></td>
               <td class="py-2.5 px-4 font-bold text-white">${u.username || 'N/A'} <span class="text-[10px] text-slate-400 font-normal">(${u.email || ''})</span></td>
               <td class="py-2.5 px-4 text-indigo-400 font-bold">${u.elo || 1500}</td>
               <td class="py-2.5 px-4 text-amber-400 font-bold">${(u.coins || 0).toLocaleString()}</td>
               <td class="py-2.5 px-4 text-right space-x-1">
-                <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">+5k CC</button>
                 <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">Grant CC</button>
                 <button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset CC</button>
                 <button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Elo</button>
@@ -2196,7 +1922,6 @@
         });
       });
     }
-
     // Window Init Event Listener
     $(document).ready(() => {
       showSection('ai');

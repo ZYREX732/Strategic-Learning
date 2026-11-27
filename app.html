@@ -135,9 +135,36 @@
       transform: translateX(-50%);
       box-shadow: 0 0 8px #ef4444;
     }
+    /* Rarity Colors: Common Green, Uncommon Blue, Rare Purple, Legendary Yellow */
+    .rarity-common { border-color: #22c55e !important; box-shadow: 0 0 10px rgba(34,197,94,0.4); }
+    .rarity-uncommon { border-color: #3b82f6 !important; box-shadow: 0 0 10px rgba(59,130,246,0.4); }
+    .rarity-rare { border-color: #a855f7 !important; box-shadow: 0 0 10px rgba(168,85,247,0.4); }
+    .rarity-legendary { border-color: #eab308 !important; box-shadow: 0 0 12px rgba(234,179,8,0.5); }
+    .rarity-text-common { color: #4ade80 !important; }
+    .rarity-text-uncommon { color: #60a5fa !important; }
+    .rarity-text-rare { color: #c084fc !important; }
+    .rarity-text-legendary { color: #facc15 !important; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+  <!-- Tailwind safelist for dynamic tab colors -->
+  <div class="hidden bg-emerald-600 bg-rose-600 bg-amber-600 bg-violet-600 bg-cyan-600 bg-sky-600 bg-red-600"></div>
+  <!-- Global Admin Broadcast Toast -->
+  <div id="broadcast-toast" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-[9998] w-full max-w-lg px-4">
+    <div class="bg-slate-900 border border-amber-500/50 rounded-2xl p-4 shadow-2xl flex items-start gap-3">
+      <div class="w-10 h-10 bg-amber-500/15 text-amber-400 rounded-xl flex items-center justify-center text-lg flex-shrink-0">
+        <i class="fa-solid fa-bullhorn"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-0.5">Admin Broadcast</div>
+        <div id="broadcast-toast-message" class="text-sm text-white font-semibold break-words"></div>
+        <div id="broadcast-toast-by" class="text-[10px] text-slate-500 mt-1"></div>
+      </div>
+      <button onclick="hideBroadcastToast()" class="text-slate-500 hover:text-white transition flex-shrink-0">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
   <!-- Maintenance Overlay -->
   <div id="maintenance-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[9999] hidden flex flex-col items-center justify-center p-6 text-center">
     <div class="bg-slate-900 border border-red-500/40 rounded-2xl p-8 max-w-md w-full shadow-2xl">
@@ -166,20 +193,23 @@
       </div>
       <!-- Main Navigation Tabs -->
       <nav class="hidden md:flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800/80">
-        <button onclick="showSection('ai')" id="nav-ai" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition text-white bg-indigo-600 shadow">
-          <i class="fa-solid fa-robot mr-2"></i>Play vs AI
+        <button onclick="showSection('ai')" id="nav-ai" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition text-white bg-emerald-600 shadow">
+          <i class="fa-solid fa-robot mr-2 text-emerald-200"></i>Play vs AI
         </button>
         <button onclick="showSection('arena')" id="nav-arena" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-users mr-2"></i>1v1 Arena
+          <i class="fa-solid fa-users mr-2 text-rose-400"></i>1v1 Arena
         </button>
         <button onclick="showSection('shop')" id="nav-shop" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-store mr-2"></i>CogniShop
+          <i class="fa-solid fa-store mr-2 text-amber-400"></i>CogniShop
         </button>
         <button onclick="showSection('profile')" id="nav-profile" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-user-gear mr-2"></i>Profile & Cosmetics
+          <i class="fa-solid fa-user-gear mr-2 text-violet-400"></i>Profile & Cosmetics
+        </button>
+        <button onclick="showSection('friends')" id="nav-friends" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-user-group mr-2 text-cyan-400"></i>Friends
         </button>
         <button onclick="showSection('leaderboard')" id="nav-leaderboard" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-trophy mr-2"></i>Leaderboard
+          <i class="fa-solid fa-trophy mr-2 text-sky-400"></i>Leaderboard
         </button>
         <button id="admin-nav-link" onclick="showSection('admin')" class="hidden nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-red-400 hover:text-red-300 hover:bg-red-950/40 transition">
           <i class="fa-solid fa-user-shield mr-2"></i>Admin Panel
@@ -478,13 +508,7 @@
               <i class="fa-solid fa-chess-pawn"></i>
             </div>
             <h3 class="text-xl font-bold text-white mb-1">Pawn Crate</h3>
-            <p class="text-xs text-slate-400 mb-4">A basic crate with low odds for cool items</p>
-            <div class="space-y-1 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-              <div class="flex justify-between"><span>Pawn Novice Title</span><span class="text-slate-400">Common</span></div>
-              <div class="flex justify-between"><span>Tactician Title</span><span class="text-slate-400">Common</span></div>
-              <div class="flex justify-between"><span>Wood League Title</span><span class="text-slate-400">Common</span></div>
-              <div class="flex justify-between"><span>Bronze Border Frame</span><span class="text-slate-400">Common</span></div>
-            </div>
+            <p class="text-xs text-slate-400 mb-6">A basic crate with low odds for cool items. Contains a mix of titles, avatar icons, cosmetic frames and chessboard skins.</p>
           </div>
           <button onclick="buyCrate('pawn')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center justify-center gap-2">
             <span>Unlock Crate</span>
@@ -498,13 +522,7 @@
               <i class="fa-solid fa-chess-knight"></i>
             </div>
             <h3 class="text-xl font-bold text-white mb-1">Knight Crate</h3>
-            <p class="text-xs text-slate-400 mb-4">A decent crate with higher odds for nice items</p>
-            <div class="space-y-1 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-              <div class="flex justify-between"><span>Knight's Valor Title</span><span class="text-blue-400">Rare</span></div>
-              <div class="flex justify-between"><span>Tactician Title</span><span class="text-blue-400">Rare</span></div>
-              <div class="flex justify-between"><span>Checkmate Master</span><span class="text-blue-400">Rare</span></div>
-              <div class="flex justify-between"><span>Gold Radiance Frame</span><span class="text-blue-400">Rare</span></div>
-            </div>
+            <p class="text-xs text-slate-400 mb-6">A decent crate with higher odds for nice items. Contains a mix of titles, avatar icons, cosmetic frames and chessboard skins.</p>
           </div>
           <button onclick="buyCrate('knight')" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20 transition flex items-center justify-center gap-2">
             <span>Unlock Crate</span>
@@ -519,13 +537,7 @@
               <i class="fa-solid fa-chess-king"></i>
             </div>
             <h3 class="text-xl font-bold text-white mb-1">Grandmaster Crate</h3>
-            <p class="text-xs text-slate-400 mb-4">A legendary crate with the best odds for the best items</p>
-            <div class="space-y-1 text-xs text-slate-300 mb-6 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-              <div class="flex justify-between"><span>Grandmaster Title</span><span class="text-amber-400">Legendary</span></div>
-              <div class="flex justify-between"><span>Tactician Title</span><span class="text-amber-400">Legendary</span></div>
-              <div class="flex justify-between"><span>Diamond Legend Frame</span><span class="text-amber-400">Legendary</span></div>
-              <div class="flex justify-between"><span>Cosmic Sparkle Frame</span><span class="text-amber-400">Legendary</span></div>
-            </div>
+            <p class="text-xs text-slate-400 mb-6">A legendary crate with the best odds for the best items. Contains a mix of titles, avatar icons and premium cosmetic frames.</p>
           </div>
           <button onclick="buyCrate('grandmaster')" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-600/20 transition flex items-center justify-center gap-2">
             <span>Unlock Crate</span>
@@ -603,8 +615,6 @@
               <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Chessboard Skin Theme</label>
               <select id="profile-theme-select" onchange="equipCosmetic('theme', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
                 <option value="theme-wood">Classic Wood</option>
-                <option value="theme-green">Chess Green</option>
-                <option value="theme-grey">Slate Grey</option>
               </select>
             </div>
             <!-- Active Emote Selector -->
@@ -614,6 +624,44 @@
                 <option value="none">None</option>
               </select>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- SECTION: FRIENDS -->
+    <section id="section-friends" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Add Friend -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-user-plus text-cyan-400"></i> Add Friend
+          </h2>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Friend's Username</label>
+          <div class="flex gap-2">
+            <input type="text" id="friend-username-input" maxlength="20" placeholder="Enter exact username..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+            <button onclick="sendFriendRequest()" class="px-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-sm transition">
+              Send
+            </button>
+          </div>
+          <p class="text-xs text-slate-500 mt-3">They'll get your request on their Friends tab to accept or decline.</p>
+        </div>
+        <!-- Pending Requests -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-envelope text-cyan-400"></i> Friend Requests
+            <span id="friend-requests-count" class="hidden text-[10px] bg-red-600 text-white px-2 py-0.5 rounded-full font-bold">0</span>
+          </h2>
+          <div id="friend-requests-list" class="space-y-2">
+            <div class="text-xs text-slate-500 italic text-center py-4">No pending requests</div>
+          </div>
+        </div>
+        <!-- Friends List -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl lg:col-span-2">
+          <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-user-group text-cyan-400"></i> Your Friends
+          </h2>
+          <div id="friends-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="text-xs text-slate-500 italic text-center py-6 md:col-span-2">No friends added yet</div>
           </div>
         </div>
       </div>
@@ -685,6 +733,17 @@
             </div>
             <button onclick="adminPurgeHighElo()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-xs transition">
               Purge High Elo
+            </button>
+          </div>
+        </div>
+        <!-- Global Broadcast Dispatcher -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <div class="font-bold text-white text-sm">Global Broadcast</div>
+          <div class="text-xs text-slate-400 mb-3">Send a live announcement to every online player</div>
+          <div class="flex gap-2">
+            <input type="text" id="admin-broadcast-input" maxlength="200" placeholder="Enter broadcast message..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500">
+            <button onclick="adminSendBroadcast()" class="px-5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-sm transition flex items-center gap-2">
+              <i class="fa-solid fa-bullhorn"></i> Broadcast
             </button>
           </div>
         </div>
@@ -778,8 +837,10 @@
     let arenaPlayerColor = 'w';
     let roomRef = null;
     let chatRef = null;
+    let lastArenaFen = null;
     // Cosmetics Master Catalog Mapping
     const ALL_TITLE_MAP = {
+      "nametag_admin": "Admin",
       "nametag_novice": "Pawn Novice",
       "nametag_tactician": "Tactician",
       "tactician": "Tactician",
@@ -795,6 +856,7 @@
     const COSMETICS_CATALOG = {
       icons: {
         "icon_user": { name: "Standard User", icon: "fa-user" },
+        "icon_admin_king": { name: "Golden Admin King", icon: "fa-chess-king text-amber-400" },
         "icon_pawn": { name: "Pawn Novice", icon: "fa-chess-pawn" },
         "icon_knight": { name: "Knight Defender", icon: "fa-chess-knight" },
         "icon_bishop": { name: "Bishop Cleric", icon: "fa-chess-bishop" },
@@ -837,7 +899,8 @@
           { type: 'nametag', id: 'nametag_tactician' },
           { type: 'nametag', id: 'nametag_wood' },
           { type: 'icon', id: 'icon_pawn' },
-          { type: 'frame', id: 'frame_bronze' }
+          { type: 'frame', id: 'frame_bronze' },
+          { type: 'theme', id: 'theme-green' }
         ]
       },
       knight: {
@@ -850,7 +913,7 @@
           { type: 'icon', id: 'icon_knight' },
           { type: 'icon', id: 'icon_bishop' },
           { type: 'frame', id: 'frame_silver' },
-          { type: 'frame', id: 'frame_gold' }
+          { type: 'theme', id: 'theme-grey' }
         ]
       },
       grandmaster: {
@@ -866,6 +929,36 @@
           { type: 'frame', id: 'frame_cosmic' }
         ]
       }
+    };
+    // Item Rarity Mapping: green common, blue uncommon, purple rare, yellow legendary
+    const ITEM_RARITY_MAP = {
+      "nametag_novice": "common",
+      "nametag_wood": "common",
+      "icon_pawn": "common",
+      "frame_bronze": "common",
+      "nametag_tactician": "uncommon",
+      "tactician": "uncommon",
+      "tactition": "uncommon",
+      "The Tactician": "uncommon",
+      "title_tactician": "uncommon",
+      "nametag_knight": "uncommon",
+      "icon_knight": "uncommon",
+      "icon_bishop": "uncommon",
+      "frame_silver": "uncommon",
+      "theme-green": "uncommon",
+      "nametag_master": "rare",
+      "icon_rook": "rare",
+      "frame_gold": "rare",
+      "frame_neon": "rare",
+      "theme-grey": "rare",
+      "nametag_gm": "legendary",
+      "nametag_legend": "legendary",
+      "nametag_admin": "legendary",
+      "icon_admin_king": "legendary",
+      "icon_queen": "legendary",
+      "icon_king": "legendary",
+      "frame_diamond": "legendary",
+      "frame_cosmic": "legendary"
     };
     // Daily Quest Catalog Definition
     const DAILY_QUESTS_CONFIG = {
@@ -903,8 +996,17 @@
           window.location.reload();
         }
       });
+      // Global Admin Broadcast Listener (only shows new broadcasts, not stale ones)
+      db.ref('system/announcement').on('value', (snap) => {
+        const ann = snap.val();
+        if (!ann || !ann.message) return;
+        if (!ann.timestamp || ann.timestamp < PAGE_LOAD_TIME) return;
+        showBroadcastToast(ann.message, ann.by);
+      });
       // Load & Sync User Data
       syncUserData();
+      // Friends System Listeners
+      setupFriendsListeners();
     });
     function syncUserData() {
       if (!currentUser) return;
@@ -931,7 +1033,7 @@
               icons: ['icon_user'],
               frames: ['frame_none'],
               nametags: ['nametag_novice', 'nametag_tactician'],
-              themes: ['theme-wood', 'theme-green', 'theme-grey'],
+              themes: ['theme-wood'],
               emotes: ['none', 'emote_fire', 'emote_gg']
             },
             equippedIcon: 'icon_user',
@@ -957,11 +1059,44 @@
           }
         }
         userProfile = val;
+        // Grant Admin-exclusive gold cosmetics once (icon, title, frame)
+        ensureAdminCosmetics();
         updateUIProfileDisplay();
         renderDailyQuests();
       }, (err) => {
         console.error("Firebase read error:", err);
       });
+    }
+    function ensureAdminCosmetics() {
+      if (!currentUser || !userProfile) return;
+      if ((currentUser.email || '').toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+      const inv = userProfile.inventory || {};
+      const icons = parseCategory(inv.icons, ['icon_user']);
+      const frames = parseCategory(inv.frames, ['frame_none']);
+      const nametags = parseCategory(inv.nametags, ['nametag_novice']);
+      const themes = parseCategory(inv.themes, ['theme-wood']);
+      const emotes = parseCategory(inv.emotes, ['none']);
+      let changed = false;
+      const updates = {};
+      if (!icons.includes('icon_admin_king')) {
+        icons.push('icon_admin_king');
+        updates['equippedIcon'] = 'icon_admin_king';
+        changed = true;
+      }
+      if (!frames.includes('frame_gold')) {
+        frames.push('frame_gold');
+        updates['equippedFrame'] = 'frame_gold';
+        changed = true;
+      }
+      if (!nametags.includes('nametag_admin')) {
+        nametags.push('nametag_admin');
+        updates['equippedNametag'] = 'nametag_admin';
+        changed = true;
+      }
+      if (changed) {
+        updates['inventory'] = { icons, frames, nametags, themes, emotes };
+        db.ref('users/' + currentUser.uid).update(updates);
+      }
     }
     function handleLogout() {
       auth.signOut().then(() => {
@@ -979,13 +1114,13 @@
       return [...defaultArr];
     }
     function getNormalizedInventory() {
-      if (!userProfile) return { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice', 'nametag_tactician'], themes: ['theme-wood', 'theme-green', 'theme-grey'], emotes: ['none'] };
+      if (!userProfile) return { icons: ['icon_user'], frames: ['frame_none'], nametags: ['nametag_novice', 'nametag_tactician'], themes: ['theme-wood'], emotes: ['none'] };
       const inv = userProfile.inventory || {};
       let result = {
         icons: parseCategory(inv.icons, ['icon_user']),
         frames: parseCategory(inv.frames, ['frame_none']),
         nametags: parseCategory(inv.nametags, ['nametag_novice']),
-        themes: parseCategory(inv.themes, ['theme-wood', 'theme-green', 'theme-grey']),
+        themes: parseCategory(inv.themes, ['theme-wood']),
         emotes: parseCategory(inv.emotes, ['none'])
       };
       // Guarantee Tactician Synonym Inclusion
@@ -1080,6 +1215,8 @@
       const tagKey = userProfile.equippedNametag || 'nametag_novice';
       const tagText = ALL_TITLE_MAP[tagKey] || ALL_TITLE_MAP[tagKey.toLowerCase()] || tagKey;
       $('#prof-display-nametag').text(tagText);
+      const isAdminTag = tagKey === 'nametag_admin';
+      $('#prof-display-nametag, #ai-user-nametag, #arena-self-nametag').toggleClass('text-amber-400', isAdminTag);
       // AI Player Card Bar Sync
       $('#ai-user-name').text(userProfile.username || 'Player');
       $('#ai-user-elo-text').text(userProfile.elo || 1500);
@@ -1200,15 +1337,25 @@
       }, 3500);
     }
     // 5. NAVIGATION TABS CONTROLLER
+    const TAB_ACTIVE_BG = {
+      ai: 'bg-emerald-600',
+      arena: 'bg-rose-600',
+      shop: 'bg-amber-600',
+      profile: 'bg-violet-600',
+      friends: 'bg-cyan-600',
+      leaderboard: 'bg-sky-600',
+      admin: 'bg-red-600'
+    };
+    const ALL_TAB_BG = 'bg-emerald-600 bg-rose-600 bg-amber-600 bg-violet-600 bg-cyan-600 bg-sky-600 bg-red-600 bg-indigo-600';
     function showSection(sectionId) {
       $('main > section').addClass('hidden');
       $('#section-' + sectionId).removeClass('hidden');
-      $('.nav-btn').not('#admin-nav-link').removeClass('bg-indigo-600 text-white shadow').addClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
+      $('.nav-btn').not('#admin-nav-link').removeClass(ALL_TAB_BG + ' text-white shadow').addClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
       if (sectionId === 'admin') {
-        $('#admin-nav-link').addClass('bg-indigo-600 text-white shadow').removeClass('text-red-400 hover:text-red-300 hover:bg-red-950/40');
+        $('#admin-nav-link').addClass('bg-red-600 text-white shadow').removeClass('text-red-400 hover:text-red-300 hover:bg-red-950/40');
       } else {
-        $('#admin-nav-link').removeClass('bg-indigo-600 text-white shadow').addClass('text-red-400 hover:text-red-300 hover:bg-red-950/40');
-        $('#nav-' + sectionId).addClass('bg-indigo-600 text-white shadow').removeClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
+        $('#admin-nav-link').removeClass(ALL_TAB_BG + ' text-white shadow').addClass('text-red-400 hover:text-red-300 hover:bg-red-950/40');
+        $('#nav-' + sectionId).addClass(TAB_ACTIVE_BG[sectionId] + ' text-white shadow').removeClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
       }
       
       if (sectionId === 'ai' && !aiBoard) {
@@ -1611,9 +1758,22 @@
           leaveArenaLobby();
           return;
         }
-        arenaGame.load(room.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : room.fen);
+        const fen = room.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : room.fen;
+        // Clear selection only when the position actually changed (opponent moved)
+        if (fen !== lastArenaFen) {
+          lastArenaFen = fen;
+          selectedSquareArena = null;
+          removeDots();
+        }
+        arenaGame.load(fen);
         arenaBoard.orientation(arenaPlayerColor === 'w' ? 'white' : 'black');
         arenaBoard.position(arenaGame.fen());
+        // Sync last-move highlight between both players
+        if (room.lastMove && room.lastMove.from && room.lastMove.to) {
+          highlightArenaMove(room.lastMove.from, room.lastMove.to);
+        } else {
+          removeArenaHighlights();
+        }
         // Update Opponent Info UI
         const isHost = arenaPlayerColor === 'w';
         const oppName = isHost ? room.guestName : room.hostName;
@@ -1623,6 +1783,7 @@
           $('#arena-opp-name').text(oppName);
           $('#arena-opp-elo').text(oppElo || 1500);
           $('#arena-opp-nametag').text(ALL_TITLE_MAP[oppTagKey] || oppTagKey).removeClass('hidden');
+          $('#arena-opp-nametag').toggleClass('text-amber-400', oppTagKey === 'nametag_admin');
         }
         // Live Emote Broadcast Listener
         if (room.lastEmote && room.lastEmote.senderUid !== currentUser.uid) {
@@ -1681,12 +1842,28 @@
       if (chatRef) chatRef.off();
       currentRoomCode = null;
       selectedSquareArena = null;
+      lastArenaFen = null;
       $('#arena-lobby-controls').removeClass('hidden');
       $('#arena-active-controls, #arena-chat-box').addClass('hidden');
       $('#chat-messages').empty();
       initArenaBoard();
     }
-    // Delegated Click-to-Move for Arena
+    // Arena Move Indicator Helpers
+    function showArenaMoveDots(sq) {
+      removeDots();
+      const moves = arenaGame.moves({ square: sq, verbose: true });
+      moves.forEach(m => {
+        $(`#arena-board .square-${m.to}`).append('<div class="valid-move-dot"></div>');
+      });
+    }
+    function highlightArenaMove(from, to) {
+      removeArenaHighlights();
+      $(`#arena-board .square-${from}, #arena-board .square-${to}`).addClass('highlight-last-move');
+    }
+    function removeArenaHighlights() {
+      $('#arena-board .square-55d63').removeClass('highlight-last-move');
+    }
+    // Delegated Click-to-Move for Arena (with dots + re-select + highlights)
     $(document).on('click', '#arena-board .square-55d63', function() {
       if (!arenaGame || !currentRoomCode) return;
       if ((arenaGame.turn() === 'w' && arenaPlayerColor !== 'w') || (arenaGame.turn() === 'b' && arenaPlayerColor !== 'b')) return;
@@ -1695,22 +1872,136 @@
         const piece = arenaGame.get(square);
         if (piece && piece.color === arenaPlayerColor) {
           selectedSquareArena = square;
+          showArenaMoveDots(square);
         }
       } else {
         const move = arenaGame.move({ from: selectedSquareArena, to: square, promotion: 'q' });
         if (move) {
           arenaBoard.position(arenaGame.fen());
+          highlightArenaMove(move.from, move.to);
           selectedSquareArena = null;
+          removeDots();
+          lastArenaFen = arenaGame.fen();
           db.ref('arena_rooms/' + currentRoomCode).update({
             fen: arenaGame.fen(),
-            turn: arenaGame.turn()
+            turn: arenaGame.turn(),
+            lastMove: { from: move.from, to: move.to }
           });
         } else {
-          selectedSquareArena = null;
+          const piece = arenaGame.get(square);
+          if (piece && piece.color === arenaPlayerColor) {
+            selectedSquareArena = square;
+            showArenaMoveDots(square);
+          } else {
+            selectedSquareArena = null;
+            removeDots();
+          }
         }
       }
     });
-    // 9. COGNISHOP & CS:GO HORIZONTAL UNBOXING CRATE STRIP LOGIC
+    // 9. FRIENDS SYSTEM
+    function setupFriendsListeners() {
+      if (!currentUser) return;
+      db.ref('users/' + currentUser.uid + '/friend_requests').on('value', (snap) => {
+        renderFriendRequests(snap.val() || {});
+      });
+      db.ref('users/' + currentUser.uid + '/friends').on('value', (snap) => {
+        renderFriendsList(snap.val() || {});
+      });
+    }
+    function sendFriendRequest() {
+      const name = $('#friend-username-input').val().trim();
+      if (!name || !currentUser || !userProfile) return alert("Enter a username first.");
+      if (name.toLowerCase() === (userProfile.username || '').toLowerCase()) return alert("You can't add yourself!");
+      db.ref('users').orderByChild('username').equalTo(name).limitToFirst(1).once('value').then((snap) => {
+        if (!snap.exists()) return alert("No player found with that username.");
+        let target = null;
+        snap.forEach(child => { target = { uid: child.key }; });
+        db.ref('users/' + currentUser.uid + '/friends/' + target.uid).once('value').then((fSnap) => {
+          if (fSnap.exists()) return alert("You are already friends with " + name + "!");
+          db.ref('users/' + target.uid + '/friend_requests/' + currentUser.uid).set({
+            uid: currentUser.uid,
+            username: userProfile.username || 'Player',
+            timestamp: Date.now()
+          }).then(() => {
+            $('#friend-username-input').val('');
+            alert("Friend request sent to " + name + "!");
+          });
+        });
+      });
+    }
+    function renderFriendRequests(requests) {
+      const $list = $('#friend-requests-list').empty();
+      const keys = Object.keys(requests);
+      const $count = $('#friend-requests-count');
+      if (keys.length === 0) {
+        $count.addClass('hidden');
+        $list.append('<div class="text-xs text-slate-500 italic text-center py-4">No pending requests</div>');
+        return;
+      }
+      $count.removeClass('hidden').text(keys.length);
+      keys.forEach(k => {
+        const r = requests[k];
+        $list.append(`
+          <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl p-3">
+            <span class="text-sm font-bold text-white">${escapeHtml(r.username || 'Player')}</span>
+            <div class="flex gap-2">
+              <button onclick="acceptFriendRequest('${r.uid}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition">Accept</button>
+              <button onclick="declineFriendRequest('${r.uid}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg transition">Decline</button>
+            </div>
+          </div>
+        `);
+      });
+    }
+    function acceptFriendRequest(uid) {
+      if (!currentUser) return;
+      const updates = {};
+      updates['users/' + currentUser.uid + '/friends/' + uid] = true;
+      updates['users/' + uid + '/friends/' + currentUser.uid] = true;
+      updates['users/' + currentUser.uid + '/friend_requests/' + uid] = null;
+      db.ref().update(updates);
+    }
+    function declineFriendRequest(uid) {
+      if (!currentUser) return;
+      db.ref('users/' + currentUser.uid + '/friend_requests/' + uid).remove();
+    }
+    function renderFriendsList(friends) {
+      const $list = $('#friends-list').empty();
+      const keys = Object.keys(friends);
+      if (keys.length === 0) {
+        $list.append('<div class="text-xs text-slate-500 italic text-center py-6 md:col-span-2">No friends added yet</div>');
+        return;
+      }
+      keys.forEach(uid => {
+        db.ref('users/' + uid).once('value').then((snap) => {
+          const u = snap.val();
+          if (!u) return;
+          $list.append(`
+            <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl p-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <div>
+                  <div class="text-sm font-bold text-white">${escapeHtml(u.username || 'Player')}</div>
+                  <div class="text-xs text-slate-400">Elo: <span class="text-indigo-400 font-bold">${u.elo || 1500}</span></div>
+                </div>
+              </div>
+              <button onclick="removeFriend('${uid}')" class="px-3 py-1 bg-red-950/50 hover:bg-red-900/60 text-red-300 text-xs font-bold rounded-lg border border-red-800/50 transition">Remove</button>
+            </div>
+          `);
+        });
+      });
+    }
+    function removeFriend(uid) {
+      if (!currentUser) return;
+      if (!confirm("Remove this friend?")) return;
+      const updates = {};
+      updates['users/' + currentUser.uid + '/friends/' + uid] = null;
+      updates['users/' + uid + '/friends/' + currentUser.uid] = null;
+      db.ref().update(updates);
+    }
+    // 10. COGNISHOP & CS:GO HORIZONTAL UNBOXING CRATE STRIP LOGIC
     function buyCrate(crateType) {
       if (!userProfile) return;
       const crate = CRATE_DEFINITIONS[crateType];
@@ -1741,16 +2032,19 @@
           stripItems.push(randItem);
         }
       }
-      // Populate Strip Cards
+      // Populate Strip Cards with rarity colors
       stripItems.forEach(item => {
         let label = item.id;
         if (item.type === 'nametag') label = ALL_TITLE_MAP[item.id] || item.id;
         if (item.type === 'icon') label = COSMETICS_CATALOG.icons[item.id]?.name || item.id;
         if (item.type === 'frame') label = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
+        if (item.type === 'theme') label = COSMETICS_CATALOG.themes[item.id] || item.id;
+        const rarity = ITEM_RARITY_MAP[item.id] || 'common';
         $strip.append(`
-          <div class="crate-item-card">
-            <i class="fa-solid fa-gift text-2xl text-amber-400 mb-2"></i>
+          <div class="crate-item-card rarity-${rarity}">
+            <i class="fa-solid fa-gift text-2xl mb-2 rarity-text-${rarity}"></i>
             <span class="text-[10px] text-center font-bold text-slate-200 px-1 truncate w-full">${label}</span>
+            <span class="text-[9px] font-bold uppercase tracking-wider rarity-text-${rarity}">${rarity}</span>
           </div>
         `);
       });
@@ -1772,13 +2066,17 @@
       if (item.type === 'nametag') { catKey = 'nametags'; categoryArray = inv.nametags; }
       if (item.type === 'icon') { catKey = 'icons'; categoryArray = inv.icons; }
       if (item.type === 'frame') { catKey = 'frames'; categoryArray = inv.frames; }
+      if (item.type === 'theme') { catKey = 'themes'; categoryArray = inv.themes; }
       const isDuplicate = categoryArray.includes(item.id);
       let displayName = item.id;
       if (item.type === 'nametag') displayName = ALL_TITLE_MAP[item.id] || item.id;
       if (item.type === 'icon') displayName = COSMETICS_CATALOG.icons[item.id]?.name || item.id;
       if (item.type === 'frame') displayName = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
-      $('#crate-result-name').text(displayName);
-      $('#crate-result-type').text(item.type.toUpperCase());
+      if (item.type === 'theme') displayName = COSMETICS_CATALOG.themes[item.id] || item.id;
+      const rarity = ITEM_RARITY_MAP[item.id] || 'common';
+      const rarityHex = { common: '#4ade80', uncommon: '#60a5fa', rare: '#c084fc', legendary: '#facc15' };
+      $('#crate-result-name').text(displayName).css('color', rarityHex[rarity] || '#facc15');
+      $('#crate-result-type').text(item.type.toUpperCase() + ' • ' + rarity.toUpperCase());
       $('#crate-result-area, #crate-done-btn').removeClass('hidden');
       if (isDuplicate) {
         const refund = Math.floor(cratePrice * 0.5);
@@ -1794,7 +2092,7 @@
     function closeCrateModal() {
       $('#crate-modal').addClass('hidden');
     }
-    // 10. LEADERBOARD SYSTEM
+    // 11. LEADERBOARD SYSTEM
     function loadLeaderboard() {
       const $tbody = $('#leaderboard-table-body').empty().append('<tr><td colspan="5" class="py-8 text-center text-slate-500">Loading rankings...</td></tr>');
       db.ref('users').orderByChild('elo').limitToLast(50).once('value').then((snap) => {
@@ -1812,13 +2110,14 @@
           const rank = index + 1;
           const tagKey = u.equippedNametag || 'nametag_novice';
           const tagText = ALL_TITLE_MAP[tagKey] || ALL_TITLE_MAP[tagKey.toLowerCase()] || tagKey;
+          const isAdminTag = tagKey === 'nametag_admin';
           const isTop3 = rank <= 3;
           const rankBadge = isTop3 ? `<span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 inline-flex items-center justify-center font-bold text-xs">${rank}</span>` : `<span class="text-slate-500 font-mono ml-2">${rank}</span>`;
           $tbody.append(`
             <tr class="hover:bg-slate-800/40 transition">
               <td class="py-3 px-4">${rankBadge}</td>
               <td class="py-3 px-4 font-bold text-white">${u.username || 'Player'}</td>
-              <td class="py-3 px-4"><span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-mono">${tagText}</span></td>
+              <td class="py-3 px-4"><span class="text-xs bg-slate-800 ${isAdminTag ? 'text-amber-400' : 'text-slate-300'} px-2 py-0.5 rounded border border-slate-700 font-mono">${tagText}</span></td>
               <td class="py-3 px-4 text-right font-bold text-indigo-400 font-mono">${u.elo || 1500}</td>
               <td class="py-3 px-4 text-right font-bold text-amber-400 font-mono">${(u.coins || 0).toLocaleString()}</td>
             </tr>
@@ -1826,7 +2125,20 @@
         });
       });
     }
-    // 11. MASTER CONTROL ADMIN PANEL (zainisgo123@gmail.com STRICT)
+    // 12. BROADCAST TOAST SYSTEM
+    let broadcastToastTimer = null;
+    function showBroadcastToast(message, by) {
+      $('#broadcast-toast-message').text(message);
+      $('#broadcast-toast-by').text('From: ' + (by || 'Admin'));
+      $('#broadcast-toast').removeClass('hidden');
+      if (broadcastToastTimer) clearTimeout(broadcastToastTimer);
+      broadcastToastTimer = setTimeout(hideBroadcastToast, 7000);
+    }
+    function hideBroadcastToast() {
+      $('#broadcast-toast').addClass('hidden');
+      if (broadcastToastTimer) clearTimeout(broadcastToastTimer);
+    }
+    // 13. MASTER CONTROL ADMIN PANEL (zainisgo123@gmail.com STRICT)
     function toggleMaintenanceMode() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/maintenance').once('value').then((snap) => {
@@ -1846,6 +2158,19 @@
     function adminForceGlobalReload() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/global_reload').set(Date.now());
+    }
+    function adminSendBroadcast() {
+      if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+      const msg = $('#admin-broadcast-input').val().trim();
+      if (!msg) return alert("Enter a broadcast message first.");
+      db.ref('system/announcement').set({
+        message: msg.substring(0, 200),
+        by: userProfile.username || 'Admin',
+        timestamp: Date.now()
+      }).then(() => {
+        $('#admin-broadcast-input').val('');
+        alert("Broadcast sent to all online players!");
+      });
     }
     function adminPurgeHighElo() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;

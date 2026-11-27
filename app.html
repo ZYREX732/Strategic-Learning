@@ -27,8 +27,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
-  <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -122,6 +122,7 @@
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
   <!-- Maintenance Overlay -->
   <div id="maintenance-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[9999] hidden flex flex-col items-center justify-center p-6 text-center">
     <div class="bg-slate-900 border border-red-500/40 rounded-2xl p-8 max-w-md w-full shadow-2xl">
@@ -133,6 +134,32 @@
       <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 text-xs font-mono text-slate-300 rounded-lg">
         <i class="fa-solid fa-lock text-red-400"></i> Restricted Admin Access Only
       </div>
+    </div>
+  </div>
+
+  <!-- URGENT BROADCAST POPUP MODAL (CHALLENGE STYLE) -->
+  <div id="broadcast-popup-modal" class="fixed inset-0 z-[9995] flex items-center justify-center bg-black/85 backdrop-blur-md hidden p-4">
+    <div class="bg-slate-900 border-2 border-amber-500 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-[0_0_50px_rgba(245,158,11,0.4)] text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 animate-pulse"></div>
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 text-3xl shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+        <i class="fa-solid fa-bullhorn animate-bounce"></i>
+      </div>
+      <span class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-black uppercase tracking-widest rounded-full border border-amber-500/40">
+        ⚡ Urgent Server Broadcast
+      </span>
+      <h3 class="text-xl sm:text-2xl font-bold text-white mt-3 mb-2">Notice to All Players</h3>
+      <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-4 my-4 max-h-52 overflow-y-auto text-left shadow-inner">
+        <p id="broadcast-popup-text" class="text-slate-100 text-sm font-medium leading-relaxed whitespace-pre-wrap"></p>
+      </div>
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-5 px-1">
+        <span id="broadcast-popup-sender" class="flex items-center gap-1.5 font-semibold text-amber-400">
+          <i class="fa-solid fa-shield-halved"></i> Sent by Admin
+        </span>
+        <span id="broadcast-popup-time">Just now</span>
+      </div>
+      <button onclick="dismissBroadcastPopup()" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black tracking-wide text-sm transition shadow-lg shadow-amber-500/30 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+        <i class="fa-solid fa-check"></i> I Understand / Dismiss
+      </button>
     </div>
   </div>
 
@@ -184,7 +211,7 @@
           <div class="h-4 w-[1px] bg-slate-700"></div>
           <div class="flex items-center gap-1.5 text-indigo-400 font-bold text-sm" title="Elo Rating">
             <i class="fa-solid fa-chart-line"></i>
-            <span id="nav-elo">1500</span>
+            <span id="nav-elo">800</span>
           </div>
         </div>
         <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-red-400 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-xl transition" title="Logout">
@@ -255,7 +282,7 @@
                   <span id="ai-user-name">Player</span>
                   <span id="ai-user-nametag" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-mono">Pawn Novice</span>
                 </div>
-                <div class="text-xs text-slate-400">Rating: <span id="ai-user-elo-text" class="text-indigo-400 font-semibold">1500</span></div>
+                <div class="text-xs text-slate-400">Rating: <span id="ai-user-elo-text" class="text-indigo-400 font-semibold">800</span></div>
               </div>
             </div>
             <div class="flex items-center gap-3">
@@ -316,7 +343,7 @@
               <div id="arena-self-frame" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg frame-none overflow-hidden"><i id="arena-self-icon" class="fa-solid fa-user"></i></div>
               <div>
                 <div class="font-bold text-sm text-white flex items-center gap-2"><span id="arena-self-name">Player</span><span id="arena-self-nametag" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-mono">Pawn Novice</span></div>
-                <div class="text-xs text-slate-400">Elo: <span id="arena-self-elo" class="text-indigo-400 font-semibold">1500</span></div>
+                <div class="text-xs text-slate-400">Elo: <span id="arena-self-elo" class="text-indigo-400 font-semibold">800</span></div>
               </div>
             </div>
             <div class="flex items-center gap-3">
@@ -433,7 +460,7 @@
           <h2 id="prof-display-username" class="text-2xl font-bold text-white mb-1">Player</h2>
           <div id="prof-display-nametag" class="inline-block bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700 font-mono mb-4">Pawn Novice</div>
           <div class="w-full grid grid-cols-2 gap-3 mt-4 border-t border-slate-800 pt-4">
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><div class="text-xs text-slate-400">Elo Rating</div><div id="prof-stat-elo" class="text-lg font-bold text-indigo-400">1500</div></div>
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><div class="text-xs text-slate-400">Elo Rating</div><div id="prof-stat-elo" class="text-lg font-bold text-indigo-400">800</div></div>
             <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><div class="text-xs text-slate-400">CogniCoins</div><div id="prof-stat-coins" class="text-lg font-bold text-amber-400 font-mono">1,000</div></div>
           </div>
         </div>
@@ -486,10 +513,10 @@
           </div>
           <button id="admin-maint-btn" onclick="toggleMaintenanceMode()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition flex items-center gap-2"><i class="fa-solid fa-power-off"></i> <span id="admin-maint-label">Maintenance Normal (OFF)</span></button>
         </div>
+        
         <!-- System Controls Grid (Force Global Reload & Purge High Elo) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
-            <div><div class="font-bold text-white text-sm">Force Global Reload</div><div class="text-xs text-slate-400">Trigger immediate page refresh for all active clients</div></div>
             <div>
               <div class="font-bold text-white text-sm">Force Global Reload</div>
               <div class="text-xs text-slate-400">Trigger immediate page refresh for all active clients</div>
@@ -497,30 +524,31 @@
             <button onclick="adminForceGlobalReload()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition">Trigger Reload</button>
           </div>
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
-            <div><div class="font-bold text-white text-sm">Purge High Elo (>3000)</div><div class="text-xs text-slate-400">Cap outlier ratings exceeding 3000 down to 1500 Elo</div></div>
             <div>
-              <div class="font-bold text-white text-sm">Purge High Elo (>3000)</div>
-              <div class="text-xs text-slate-400">Cap outlier ratings exceeding 3000 down to 1500 Elo</div>
+              <div class="font-bold text-white text-sm">Purge High Elo (Reset to 800)</div>
+              <div class="text-xs text-slate-400">Reset all player ratings back to baseline 800 Elo</div>
             </div>
-            <button onclick="adminPurgeHighElo()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-xs transition">Purge High Elo</button>
+            <button onclick="adminPurgeHighElo()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-xs transition">Purge Elo</button>
           </div>
           <div class="bg-slate-950 border border-red-800/40 rounded-xl p-4 flex items-center justify-between md:col-span-2">
             <div><div class="font-bold text-white text-sm">Reset All Inventories</div><div class="text-xs text-slate-400">Wipe every player back to starter defaults (nothing owned)</div></div>
             <button onclick="adminResetAllInventories()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs transition">Reset All</button>
           </div>
         </div>
+
         <!-- Broadcast Announcement Admin Box -->
         <div class="bg-slate-950 border border-amber-500/20 rounded-xl p-4">
-          <div class="font-bold text-white text-sm mb-1 flex items-center gap-2"><i class="fa-solid fa-bullhorn text-amber-400"></i> Broadcast Announcement</div>
-          <div class="text-xs text-slate-400 mb-3">Show a banner message to all active players. Use Clear to remove it.</div>
+          <div class="font-bold text-white text-sm mb-1 flex items-center gap-2"><i class="fa-solid fa-bullhorn text-amber-400"></i> Broadcast Announcement Blast</div>
+          <div class="text-xs text-slate-400 mb-3">Pops up a full-screen challenge-style urgent modal directly in front of all active players!</div>
           <div class="flex flex-col sm:flex-row gap-2">
             <input type="text" id="admin-broadcast-input" maxlength="200" placeholder="Type announcement message (max 200 chars)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
             <div class="flex gap-2">
-              <button onclick="adminSendBroadcast()" class="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition whitespace-nowrap">Send Broadcast</button>
+              <button onclick="adminSendBroadcast()" class="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition whitespace-nowrap">Send Blast</button>
               <button onclick="adminClearBroadcast()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-sm border border-slate-700 transition">Clear</button>
             </div>
           </div>
         </div>
+
         <!-- User Database Management Table -->
         <div>
           <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-users-gear text-slate-400"></i> Registered Account Database</h3>
@@ -560,7 +588,10 @@
       messagingSenderId: "807640572322",
       appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
     };
-    firebase.initializeApp(firebaseConfig);
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const auth = firebase.auth();
     const db = firebase.database();
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
@@ -568,6 +599,7 @@
     const ADMIN_EMAIL = "zainisgo123@gmail.com";
     const WHITELISTED_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
     const PAGE_LOAD_TIME = Date.now();
+
     let currentUser = null;
     let userProfile = null;
     let currentTheme = localStorage.getItem('cogni_board_theme') || 'theme-wood';
@@ -583,6 +615,7 @@
     let arenaPlayerColor = 'w';
     let roomRef = null;
     let chatRef = null;
+    let currentBroadcastTimestamp = null;
 
     const ALL_TITLE_MAP = {
       "nametag_novice": "Pawn Novice",
@@ -679,7 +712,6 @@
       if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
         $('#admin-nav-link').removeClass('hidden').addClass('flex');
       }
-
       db.ref('system/maintenance').on('value', (snap) => {
         const isMaint = snap.val() === true;
         updateAdminMaintBtn(isMaint);
@@ -688,26 +720,46 @@
         if (isMaint && !isWhitelisted) { $('#maintenance-overlay').removeClass('hidden'); }
         else { $('#maintenance-overlay').addClass('hidden'); }
       });
-
       db.ref('system/global_reload').on('value', (snap) => {
         const reloadTime = snap.val();
         if (reloadTime && typeof reloadTime === 'number' && reloadTime > PAGE_LOAD_TIME + 2000) { window.location.reload(); }
       });
 
+      // Dual-Mode Broadcast Listener (Banner + Urgent Challenge-Style Modal)
       db.ref('system/announcement').on('value', (snap) => {
         const data = snap.val();
         if (data && (data.message || typeof data === 'string')) {
           const msgText = typeof data === 'string' ? data : data.message;
+          const ts = typeof data === 'object' && data.timestamp ? data.timestamp : 0;
+          const sender = typeof data === 'object' && data.by ? data.by : 'Admin';
+
           $('#broadcast-message').text(msgText);
           $('#broadcast-banner').removeClass('hidden');
+
+          const lastDismissed = localStorage.getItem('last_dismissed_broadcast');
+          if (!lastDismissed || Number(lastDismissed) !== ts) {
+            currentBroadcastTimestamp = ts;
+            $('#broadcast-popup-text').text(msgText);
+            $('#broadcast-popup-sender').html(`<i class="fa-solid fa-shield-halved"></i> Sent by ${sender}`);
+            $('#broadcast-popup-time').text(ts ? new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now');
+            $('#broadcast-popup-modal').removeClass('hidden');
+          }
         } else {
           $('#broadcast-banner').addClass('hidden');
           $('#broadcast-message').text('');
+          $('#broadcast-popup-modal').addClass('hidden');
         }
       });
 
       syncUserData();
     });
+
+    function dismissBroadcastPopup() {
+      if (currentBroadcastTimestamp) {
+        localStorage.setItem('last_dismissed_broadcast', currentBroadcastTimestamp.toString());
+      }
+      $('#broadcast-popup-modal').addClass('hidden');
+    }
 
     function syncUserData() {
       if (!currentUser) return;
@@ -715,12 +767,14 @@
       userRef.on('value', (snap) => {
         let val = snap.val();
         const todayStr = new Date().toISOString().split('T')[0];
-
         if (!val) {
           val = {
             username: currentUser.displayName || currentUser.email.split('@')[0],
             email: currentUser.email,
-            elo: 1500, coins: 1000, gamesPlayed: 0, winStreak: 0,
+            elo: 800, 
+            coins: 1000, 
+            gamesPlayed: 0, 
+            winStreak: 0,
             lastQuestReset: todayStr,
             quests: {
               q_black_win: { progress: 0, claimed: false },
@@ -738,13 +792,11 @@
             equippedFrame: 'frame_none',
             equippedNametag: 'nametag_novice',
             equippedTheme: 'theme-wood',
-            equippedEmote: 'none'
             equippedEmote: 'none',
             inventoryResetV4: true
           };
           userRef.set(val);
         } else {
-          // Automatic Reset for existing inventories to starter defaults
           if (!val.inventoryResetV4) {
             val.inventory = {
               icons: ['icon_user'],
@@ -759,7 +811,6 @@
             val.equippedTheme = 'theme-wood';
             val.equippedEmote = 'none';
             val.inventoryResetV4 = true;
-
             userRef.update({
               inventory: val.inventory,
               equippedIcon: 'icon_user',
@@ -770,7 +821,6 @@
               inventoryResetV4: true
             });
           }
-
           if (val.lastQuestReset !== todayStr) {
             val.lastQuestReset = todayStr;
             val.quests = {
@@ -851,11 +901,11 @@
     function updateUIProfileDisplay() {
       if (!userProfile) return;
       $('#nav-coins').text((userProfile.coins || 0).toLocaleString());
-      $('#nav-elo').text(userProfile.elo || 1500);
+      $('#nav-elo').text(userProfile.elo || 800);
       $('#nav-streak').text(userProfile.winStreak || 0);
       $('#shop-coins-text').text((userProfile.coins || 0).toLocaleString());
       $('#prof-display-username').text(userProfile.username || 'Player');
-      $('#prof-stat-elo').text(userProfile.elo || 1500);
+      $('#prof-stat-elo').text(userProfile.elo || 800);
       $('#prof-stat-coins').text((userProfile.coins || 0).toLocaleString());
 
       const iconKey = userProfile.equippedIcon || 'icon_user';
@@ -871,13 +921,13 @@
       $('#prof-display-nametag').text(tagText);
 
       $('#ai-user-name').text(userProfile.username || 'Player');
-      $('#ai-user-elo-text').text(userProfile.elo || 1500);
+      $('#ai-user-elo-text').text(userProfile.elo || 800);
       $('#ai-user-nametag').text(tagText);
       $('#ai-user-icon').attr('class', 'fa-solid ' + iconObj.icon);
       $('#ai-user-frame-container').attr('class', 'w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg overflow-hidden ' + frameObj.class);
 
       $('#arena-self-name').text(userProfile.username || 'Player');
-      $('#arena-self-elo').text(userProfile.elo || 1500);
+      $('#arena-self-elo').text(userProfile.elo || 800);
       $('#arena-self-nametag').text(tagText);
       $('#arena-self-icon').attr('class', 'fa-solid ' + iconObj.icon);
       $('#arena-self-frame').attr('class', 'w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-lg overflow-hidden ' + frameObj.class);
@@ -890,7 +940,6 @@
     function populateProfileDropdowns() {
       if (!userProfile) return;
       const inv = getNormalizedInventory();
-
       const $iconSel = $('#profile-icon-select').empty();
       inv.icons.forEach(k => { const item = COSMETICS_CATALOG.icons[k]; if (item) { $iconSel.append(`<option value="${k}">${item.name}</option>`); } });
       $iconSel.val(userProfile.equippedIcon || 'icon_user');
@@ -941,7 +990,6 @@
       const emoteKey = userProfile.equippedEmote || 'none';
       const emoteObj = COSMETICS_CATALOG.emotes[emoteKey];
       if (!emoteObj || !emoteObj.emoji) return alert("Select an active emote in Profile & Cosmetics Studio!");
-
       if (mode === 'ai') { showEmoteDisplay('#ai-player-emote-display', emoteObj); }
       else if (mode === 'arena') {
         showEmoteDisplay('#arena-self-emote-display', emoteObj);
@@ -962,13 +1010,15 @@
       $('#section-' + sectionId).removeClass('hidden');
       $('.nav-btn').removeClass('bg-indigo-600 text-white shadow').addClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
       $('#nav-' + sectionId).addClass('bg-indigo-600 text-white shadow').removeClass('text-slate-400 hover:text-white hover:bg-slate-800/60');
-
-      if (sectionId === 'ai' && !aiBoard) { initAiBoard(); }
-      else if (sectionId === 'ai' && aiBoard) { aiBoard.resize(); }
-
-      if (sectionId === 'arena' && !arenaBoard) { initArenaBoard(); }
-      else if (sectionId === 'arena' && arenaBoard) { arenaBoard.resize(); }
-
+      
+      if (sectionId === 'ai') {
+        if (!aiBoard) { initAiBoard(); }
+        setTimeout(() => { if (aiBoard) aiBoard.resize(); }, 150);
+      }
+      if (sectionId === 'arena') {
+        if (!arenaBoard) { initArenaBoard(); }
+        setTimeout(() => { if (arenaBoard) arenaBoard.resize(); }, 150);
+      }
       if (sectionId === 'leaderboard') { loadLeaderboard(); }
       if (sectionId === 'admin') { loadAdminUserTable(); loadCurrentBroadcast(); }
     }
@@ -981,7 +1031,20 @@
     function evaluateBoard(game) {
       let totalEval = 0;
       const board = game.board();
-      for (let r = 0; r < 8; r++) { for (let c = 0; c < 8; c++) { const piece = board[r][c]; if (piece) { const val = PIECE_VALUES[piece.type]; let pst = 0; const idx = r * 8 + c; if (piece.type === 'p') pst = PST_PAWN[idx]; if (piece.type === 'n') pst = PST_KNIGHT[idx]; const score = val + pst; totalEval += (piece.color === 'w' ? score : -score); } } }
+      for (let r = 0; r < 8; r++) { 
+        for (let c = 0; c < 8; c++) { 
+          const piece = board[r][c]; 
+          if (piece) { 
+            const val = PIECE_VALUES[piece.type]; 
+            let pst = 0; 
+            const idx = r * 8 + c; 
+            if (piece.type === 'p') pst = PST_PAWN[idx]; 
+            if (piece.type === 'n') pst = PST_KNIGHT[idx]; 
+            const score = val + pst; 
+            totalEval += (piece.color === 'w' ? score : -score); 
+          } 
+        } 
+      }
       return totalEval;
     }
 
@@ -991,11 +1054,25 @@
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
       if (isMaximizing) {
         let maxEval = -Infinity;
-        for (const move of moves) { game.move(move); const evaluation = minimax(game, depth - 1, alpha, beta, false); game.undo(); maxEval = Math.max(maxEval, evaluation); alpha = Math.max(alpha, evaluation); if (beta <= alpha) break; }
+        for (const move of moves) { 
+          game.move(move); 
+          const evaluation = minimax(game, depth - 1, alpha, beta, false); 
+          game.undo(); 
+          maxEval = Math.max(maxEval, evaluation); 
+          alpha = Math.max(alpha, evaluation); 
+          if (beta <= alpha) break; 
+        }
         return maxEval;
       } else {
         let minEval = Infinity;
-        for (const move of moves) { game.move(move); const evaluation = minimax(game, depth - 1, alpha, beta, true); game.undo(); minEval = Math.min(minEval, evaluation); beta = Math.min(beta, evaluation); if (beta <= alpha) break; }
+        for (const move of moves) { 
+          game.move(move); 
+          const evaluation = minimax(game, depth - 1, alpha, beta, true); 
+          game.undo(); 
+          minEval = Math.min(minEval, evaluation); 
+          beta = Math.min(beta, evaluation); 
+          if (beta <= alpha) break; 
+        }
         return minEval;
       }
     }
@@ -1004,19 +1081,16 @@
       const moves = game.moves({ verbose: true });
       if (moves.length === 0) return null;
       const history = game.history();
-
       if (aiPlayerColor === 'b' && history.length <= 6) {
         if (history.length === 3 && history[0] === 'e4' && history[1] === 'e5' && history[2] === 'Qh5') { const move = moves.find(m => m.san === 'Nc6'); if (move) return move; }
         if (history.length === 5 && history[2] === 'Qh5' && (history[4] === 'Bc4' || history[4] === 'Bc4+')) { const move = moves.find(m => m.san === 'g6'); if (move) return move; }
         if (history.length === 5 && history[2] === 'Bc4' && history[4] === 'Qh5') { const move = moves.find(m => m.san === 'g6'); if (move) return move; }
         if (history.length === 7 && history[6] === 'Qf3') { const move = moves.find(m => m.san === 'Nf6'); if (move) return move; }
       }
-
       let bestMove = null;
       let isMax = game.turn() === 'w';
       let bestValue = isMax ? -Infinity : Infinity;
       moves.sort((a, b) => (b.captured ? PIECE_VALUES[b.captured] : 0) - (a.captured ? PIECE_VALUES[a.captured] : 0));
-
       for (const move of moves) {
         game.move(move);
         const boardVal = minimax(game, 3, -Infinity, Infinity, !isMax);
@@ -1027,11 +1101,35 @@
       return bestMove || moves[Math.floor(Math.random() * moves.length)];
     }
 
+    // Interactive Chessboard Logic (Drag + Drop & Click-to-Move Supported)
     function initAiBoard() {
       aiGame = new Chess();
-      const config = { draggable: false, position: 'start', pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png' };
+      const config = {
+        draggable: true,
+        position: 'start',
+        pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png',
+        onDragStart: (source, piece) => {
+          if (aiGame.game_over()) return false;
+          if ((aiGame.turn() === 'w' && aiPlayerColor !== 'w') || (aiGame.turn() === 'b' && aiPlayerColor !== 'b')) return false;
+          if ((aiPlayerColor === 'w' && piece.search(/^b/) !== -1) || (aiPlayerColor === 'b' && piece.search(/^w/) !== -1)) return false;
+          showValidMoveDots(source);
+        },
+        onDrop: (source, target) => {
+          removeDots();
+          const move = aiGame.move({ from: source, to: target, promotion: 'q' });
+          if (move === null) return 'snapback';
+          highlightMove(source, target);
+          updateAiMoveLog();
+          if (checkAiGameOver()) return;
+          setTimeout(makeAiMove, 350);
+        },
+        onSnapEnd: () => {
+          aiBoard.position(aiGame.fen());
+        }
+      };
+
       aiBoard = Chessboard('ai-board', config);
-      applyBoardTheme(userProfile ? userProfile.equippedTheme : currentTheme);
+      applyBoardTheme(userProfile && userProfile.equippedTheme ? userProfile.equippedTheme : currentTheme);
       setupAiGame(false);
     }
 
@@ -1056,22 +1154,29 @@
         handleAiGameLoss();
       }
       aiGame = new Chess();
-      aiBoard.orientation(aiPlayerColor === 'w' ? 'white' : 'black');
-      aiBoard.position('start');
+      if (aiBoard) {
+        aiBoard.orientation(aiPlayerColor === 'w' ? 'white' : 'black');
+        aiBoard.position('start');
+      }
       selectedSquare = null;
       removeHighlights();
+      removeDots();
       updateAiMoveLog();
+      $('#ai-status-indicator').text('Bot Ready').removeClass('bg-amber-500/10 text-amber-400').addClass('bg-emerald-500/10 text-emerald-400');
       if (aiPlayerColor === 'b') { setTimeout(makeAiMove, 400); }
     }
 
+    // Click to move support alongside drag
     $(document).on('click', '#ai-board .square-55d63', function() {
       if (!aiGame || aiGame.game_over()) return;
       if ((aiGame.turn() === 'w' && aiPlayerColor !== 'w') || (aiGame.turn() === 'b' && aiPlayerColor !== 'b')) return;
       const square = $(this).data('square');
-
       if (!selectedSquare) {
         const piece = aiGame.get(square);
-        if (piece && piece.color === aiPlayerColor) { selectedSquare = square; showValidMoveDots(square); }
+        if (piece && piece.color === aiPlayerColor) { 
+          selectedSquare = square; 
+          showValidMoveDots(square); 
+        }
       } else {
         const move = aiGame.move({ from: selectedSquare, to: square, promotion: 'q' });
         if (move) {
@@ -1081,11 +1186,16 @@
           removeDots();
           updateAiMoveLog();
           if (checkAiGameOver()) return;
-          setTimeout(makeAiMove, 400);
+          setTimeout(makeAiMove, 350);
         } else {
           const piece = aiGame.get(square);
-          if (piece && piece.color === aiPlayerColor) { selectedSquare = square; showValidMoveDots(square); }
-          else { selectedSquare = null; removeDots(); }
+          if (piece && piece.color === aiPlayerColor) { 
+            selectedSquare = square; 
+            showValidMoveDots(square); 
+          } else { 
+            selectedSquare = null; 
+            removeDots(); 
+          }
         }
       }
     });
@@ -1106,7 +1216,13 @@
       }, 250);
     }
 
-    function showValidMoveDots(sq) { removeDots(); const moves = aiGame.moves({ square: sq, verbose: true }); moves.forEach(m => { $(`#ai-board .square-${m.to}`).append('<div class="valid-move-dot"></div>'); }); }
+    function showValidMoveDots(sq) { 
+      removeDots(); 
+      const moves = aiGame.moves({ square: sq, verbose: true }); 
+      moves.forEach(m => { 
+        $(`#ai-board .square-${m.to}`).append('<div class="valid-move-dot"></div>'); 
+      }); 
+    }
     function removeDots() { $('.valid-move-dot').remove(); }
     function highlightMove(from, to) { removeHighlights(); $(`#ai-board .square-${from}, #ai-board .square-${to}`).addClass('highlight-last-move'); }
     function removeHighlights() { $('#ai-board .square-55d63').removeClass('highlight-last-move'); }
@@ -1115,7 +1231,12 @@
       const history = aiGame.history();
       const $log = $('#ai-move-history').empty();
       if (history.length === 0) { $log.append('<div class="text-slate-500 col-span-2 text-center py-4">No moves played yet</div>'); return; }
-      for (let i = 0; i < history.length; i += 2) { const moveNum = Math.floor(i / 2) + 1; const wMove = history[i] || ''; const bMove = history[i + 1] || ''; $log.append(`<div><span class="text-slate-500">${moveNum}.</span> ${wMove}</div><div>${bMove}</div>`); }
+      for (let i = 0; i < history.length; i += 2) { 
+        const moveNum = Math.floor(i / 2) + 1; 
+        const wMove = history[i] || ''; 
+        const bMove = history[i + 1] || ''; 
+        $log.append(`<div><span class="text-slate-500">${moveNum}.</span> ${wMove}</div><div>${bMove}</div>`); 
+      }
       $log.scrollTop($log[0].scrollHeight);
     }
 
@@ -1129,7 +1250,10 @@
       return true;
     }
 
-    function resignAiGame() { if (!aiGame || aiGame.history().length === 0 || aiGame.game_over()) return; if (confirm("Are you sure you want to resign this match? (-ELO)")) { handleAiGameLoss(); } }
+    function resignAiGame() { 
+      if (!aiGame || aiGame.history().length === 0 || aiGame.game_over()) return; 
+      if (confirm("Are you sure you want to resign this match? (-ELO)")) { handleAiGameLoss(); } 
+    }
 
     function calculateElo(playerRating, opponentRating, score, gamesCount) {
       let K = 32; if (gamesCount < 10) K = 40; else if (gamesCount >= 30) K = 16;
@@ -1139,21 +1263,17 @@
 
     function handleAiGameWin() {
       if (!currentUser || !userProfile) return;
-      const currentElo = userProfile.elo || 1500;
+      const currentElo = userProfile.elo || 800;
       const newElo = calculateElo(currentElo, 1500, 1, userProfile.gamesPlayed || 0);
-
       const currentStreak = (userProfile.winStreak || 0) + 1;
       let streakBonus = 0;
       if (currentStreak >= 3 && currentStreak < 5) streakBonus = 15;
       if (currentStreak >= 5 && currentStreak < 10) streakBonus = 30;
       if (currentStreak >= 10) streakBonus = 50;
-
       const totalGain = 50 + streakBonus;
       const newCoins = (userProfile.coins || 0) + totalGain;
-
       if (aiPlayerColor === 'b') { updateQuestProgress('q_black_win', 1); }
       if (currentStreak >= 2) { updateQuestProgress('q_streak_2', 1); }
-
       db.ref('users/' + currentUser.uid).update({ elo: newElo, coins: newCoins, winStreak: currentStreak, gamesPlayed: (userProfile.gamesPlayed || 0) + 1 }).then(() => {
         let msg = `VICTORY! You defeated the Grandmaster Bot!\n+50 CC Base`;
         if (streakBonus > 0) msg += ` + ${streakBonus} CC Streak Bonus 🔥`;
@@ -1164,15 +1284,33 @@
 
     function handleAiGameLoss() {
       if (!currentUser || !userProfile) return;
-      const currentElo = userProfile.elo || 1500;
+      const currentElo = userProfile.elo || 800;
       const newElo = calculateElo(currentElo, 1500, 0, userProfile.gamesPlayed || 0);
-      db.ref('users/' + currentUser.uid).update({ elo: Math.max(100, newElo), winStreak: 0, gamesPlayed: (userProfile.gamesPlayed || 0) + 1 }).then(() => { alert(`DEFEAT: Match lost. Win streak reset to 0. New Rating: ${Math.max(100, newElo)} Elo`); });
+      db.ref('users/' + currentUser.uid).update({ elo: Math.max(100, newElo), winStreak: 0, gamesPlayed: (userProfile.gamesPlayed || 0) + 1 }).then(() => { 
+        alert(`DEFEAT: Match lost. Win streak reset to 0. New Rating: ${Math.max(100, newElo)} Elo`); 
+      });
     }
 
     // Multiplayer 1v1 Arena Logic
     function initArenaBoard() {
       arenaGame = new Chess();
-      const config = { draggable: false, position: 'start', pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png' };
+      const config = { 
+        draggable: true, 
+        position: 'start', 
+        pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png',
+        onDragStart: (source, piece) => {
+          if (!currentRoomCode || arenaGame.game_over()) return false;
+          if ((arenaGame.turn() === 'w' && arenaPlayerColor !== 'w') || (arenaGame.turn() === 'b' && arenaPlayerColor !== 'b')) return false;
+        },
+        onDrop: (source, target) => {
+          const move = arenaGame.move({ from: source, to: target, promotion: 'q' });
+          if (move === null) return 'snapback';
+          db.ref('arena_rooms/' + currentRoomCode).update({ fen: arenaGame.fen(), turn: arenaGame.turn() });
+        },
+        onSnapEnd: () => {
+          arenaBoard.position(arenaGame.fen());
+        }
+      };
       arenaBoard = Chessboard('arena-board', config);
       applyBoardTheme(userProfile ? userProfile.equippedTheme : currentTheme);
     }
@@ -1181,7 +1319,7 @@
       if (!currentUser) return;
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       currentRoomCode = code; arenaPlayerColor = 'w';
-      const roomData = { code: code, hostUid: currentUser.uid, hostName: userProfile.username || 'Player', hostElo: userProfile.elo || 1500, hostTag: userProfile.equippedNametag || 'nametag_novice', hostIcon: userProfile.equippedIcon || 'icon_user', hostFrame: userProfile.equippedFrame || 'frame_none', fen: 'start', status: 'waiting', turn: 'w' };
+      const roomData = { code: code, hostUid: currentUser.uid, hostName: userProfile.username || 'Player', hostElo: userProfile.elo || 800, hostTag: userProfile.equippedNametag || 'nametag_novice', hostIcon: userProfile.equippedIcon || 'icon_user', hostFrame: userProfile.equippedFrame || 'frame_none', fen: 'start', status: 'waiting', turn: 'w' };
       db.ref('arena_rooms/' + code).set(roomData).then(() => {
         subscribeToRoom(code);
         $('#arena-lobby-controls').addClass('hidden');
@@ -1198,7 +1336,7 @@
         if (!room) return alert("Room not found!");
         if (room.guestUid) return alert("Room is full!");
         arenaPlayerColor = 'b'; currentRoomCode = code;
-        db.ref('arena_rooms/' + code).update({ guestUid: currentUser.uid, guestName: userProfile.username || 'Player', guestElo: userProfile.elo || 1500, guestTag: userProfile.equippedNametag || 'nametag_novice', guestIcon: userProfile.equippedIcon || 'icon_user', guestFrame: userProfile.equippedFrame || 'frame_none', status: 'active' }).then(() => {
+        db.ref('arena_rooms/' + code).update({ guestUid: currentUser.uid, guestName: userProfile.username || 'Player', guestElo: userProfile.elo || 800, guestTag: userProfile.equippedNametag || 'nametag_novice', guestIcon: userProfile.equippedIcon || 'icon_user', guestFrame: userProfile.equippedFrame || 'frame_none', status: 'active' }).then(() => {
           subscribeToRoom(code);
           $('#arena-lobby-controls').addClass('hidden');
           $('#arena-active-controls, #arena-chat-box').removeClass('hidden');
@@ -1216,19 +1354,20 @@
         arenaGame.load(room.fen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : room.fen);
         arenaBoard.orientation(arenaPlayerColor === 'w' ? 'white' : 'black');
         arenaBoard.position(arenaGame.fen());
-
         const isHost = arenaPlayerColor === 'w';
         const oppName = isHost ? room.guestName : room.hostName;
         const oppElo = isHost ? room.guestElo : room.hostElo;
         const oppTagKey = isHost ? room.guestTag : room.hostTag;
-
-        if (oppName) { $('#arena-opp-name').text(oppName); $('#arena-opp-elo').text(oppElo || 1500); $('#arena-opp-nametag').text(ALL_TITLE_MAP[oppTagKey] || oppTagKey).removeClass('hidden'); }
+        if (oppName) { 
+          $('#arena-opp-name').text(oppName); 
+          $('#arena-opp-elo').text(oppElo || 800); 
+          $('#arena-opp-nametag').text(ALL_TITLE_MAP[oppTagKey] || oppTagKey).removeClass('hidden'); 
+        }
         if (room.lastEmote && room.lastEmote.senderUid !== currentUser.uid) {
           const emoteObj = COSMETICS_CATALOG.emotes[room.lastEmote.emoteKey];
           if (emoteObj) { showEmoteDisplay('#arena-opp-emote-display', emoteObj); }
         }
       });
-
       chatRef.on('child_added', (snap) => {
         const msg = snap.val();
         $('#chat-messages').append(`<div><span class="font-bold text-indigo-400">${escapeHtml(msg.sender)}:</span> ${escapeHtml(msg.text)}</div>`);
@@ -1237,7 +1376,6 @@
     }
 
     function updateChatCharCount() { const len = $('#chat-input').val().length; $('#chat-char-counter').text(`${len}/500`); }
-
     function sendChatMessage(e) {
       e.preventDefault();
       const rawText = $('#chat-input').val().trim();
@@ -1246,13 +1384,10 @@
       chatRef.push({ sender: userProfile.username || 'Player', text: text, timestamp: Date.now() });
       $('#chat-input').val(''); updateChatCharCount();
     }
-
     function escapeHtml(str) { return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
     function copyRoomCode() { if (!currentRoomCode) return; navigator.clipboard.writeText(currentRoomCode); alert("Room Code " + currentRoomCode + " copied!"); }
-
     function resignArenaGame() { if (!currentRoomCode) return; if (confirm("Resign match? (-ELO)")) { db.ref('arena_rooms/' + currentRoomCode).remove(); db.ref('arena_chat/' + currentRoomCode).remove(); leaveArenaLobby(); } }
     function offerArenaDraw() { alert("Draw offer sent to opponent."); }
-
     function leaveArenaLobby() {
       if (roomRef) roomRef.off();
       if (chatRef) chatRef.off();
@@ -1262,19 +1397,6 @@
       $('#chat-messages').empty();
       initArenaBoard();
     }
-
-    $(document).on('click', '#arena-board .square-55d63', function() {
-      if (!arenaGame || !currentRoomCode) return;
-      if ((arenaGame.turn() === 'w' && arenaPlayerColor !== 'w') || (arenaGame.turn() === 'b' && arenaPlayerColor !== 'b')) return;
-      const square = $(this).data('square');
-
-      if (!selectedSquare) { const piece = arenaGame.get(square); if (piece && piece.color === arenaPlayerColor) { selectedSquare = square; } }
-      else {
-        const move = arenaGame.move({ from: selectedSquare, to: square, promotion: 'q' });
-        if (move) { arenaBoard.position(arenaGame.fen()); selectedSquare = null; db.ref('arena_rooms/' + currentRoomCode).update({ fen: arenaGame.fen(), turn: arenaGame.turn() }); }
-        else { selectedSquare = null; }
-      }
-    });
 
     // CS:GO Unboxing Strip Logic
     function buyCrate(crateType) {
@@ -1291,17 +1413,13 @@
       $('#crate-modal-title').text(crate.name);
       $('#crate-result-area, #crate-done-btn').addClass('hidden');
       $('#crate-duplicate-notice').addClass('hidden');
-
       const $strip = $('#crate-strip').empty().css('transform', 'translateX(0px)');
       const winningItem = crate.items[Math.floor(Math.random() * crate.items.length)];
       const stripItems = [];
-      for (let i = 0; i < 40; i++) { if (i === 32) { stripItems.push(winningItem); } else { const randItem = crate.items[Math.floor(Math.random() * crate.items.length)]; stripItems.push(randItem); } }
-
       for (let i = 0; i < 40; i++) {
         if (i === 32) { stripItems.push(winningItem); }
         else { const randItem = crate.items[Math.floor(Math.random() * crate.items.length)]; stripItems.push(randItem); }
       }
-
       stripItems.forEach(item => {
         let label = item.id;
         if (item.type === 'nametag') label = ALL_TITLE_MAP[item.id] || item.id;
@@ -1309,7 +1427,6 @@
         if (item.type === 'frame') label = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
         $strip.append(`<div class="crate-item-card"><i class="fa-solid fa-gift text-2xl text-amber-400 mb-2"></i><span class="text-[10px] text-center font-bold text-slate-200 px-1 truncate w-full">${label}</span></div>`);
       });
-
       const cardWidth = 132;
       const targetOffset = -(32 * cardWidth - (240 - 60));
       setTimeout(() => { $strip.css('transform', `translateX(${targetOffset}px)`); }, 100);
@@ -1322,17 +1439,14 @@
       if (item.type === 'nametag') { catKey = 'nametags'; categoryArray = inv.nametags; }
       if (item.type === 'icon') { catKey = 'icons'; categoryArray = inv.icons; }
       if (item.type === 'frame') { catKey = 'frames'; categoryArray = inv.frames; }
-
       const isDuplicate = categoryArray.includes(item.id);
       let displayName = item.id;
       if (item.type === 'nametag') displayName = ALL_TITLE_MAP[item.id] || item.id;
       if (item.type === 'icon') displayName = COSMETICS_CATALOG.icons[item.id]?.name || item.id;
       if (item.type === 'frame') displayName = COSMETICS_CATALOG.frames[item.id]?.name || item.id;
-
       $('#crate-result-name').text(displayName);
       $('#crate-result-type').text(item.type.toUpperCase());
       $('#crate-result-area, #crate-done-btn').removeClass('hidden');
-
       if (isDuplicate) {
         const refund = Math.floor(cratePrice * 0.5);
         const newCoins = (userProfile.coins || 0) + refund;
@@ -1344,7 +1458,6 @@
         db.ref(`users/${currentUser.uid}/inventory/${catKey}`).set(categoryArray);
       }
     }
-
     function closeCrateModal() { $('#crate-modal').addClass('hidden'); }
 
     // Leaderboard
@@ -1355,16 +1468,14 @@
         const users = [];
         snap.forEach(child => { users.push(child.val()); });
         users.reverse();
-
         if (users.length === 0) { $tbody.append('<tr><td colspan="5" class="py-6 text-center text-slate-500">No rankings available</td></tr>'); return; }
-
         users.forEach((u, index) => {
           const rank = index + 1;
           const tagKey = u.equippedNametag || 'nametag_novice';
           const tagText = ALL_TITLE_MAP[tagKey] || ALL_TITLE_MAP[tagKey.toLowerCase()] || tagKey;
           const isTop3 = rank <= 3;
           const rankBadge = isTop3 ? `<span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 inline-flex items-center justify-center font-bold text-xs">${rank}</span>` : `<span class="text-slate-500 font-mono ml-2">${rank}</span>`;
-          $tbody.append(`<tr class="hover:bg-slate-800/40 transition"><td class="py-3 px-4">${rankBadge}</td><td class="py-3 px-4 font-bold text-white">${u.username || 'Player'}</td><td class="py-3 px-4"><span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-mono">${tagText}</span></td><td class="py-3 px-4 text-right font-bold text-indigo-400 font-mono">${u.elo || 1500}</td><td class="py-3 px-4 text-right font-bold text-amber-400 font-mono">${(u.coins || 0).toLocaleString()}</td></tr>`);
+          $tbody.append(`<tr class="hover:bg-slate-800/40 transition"><td class="py-3 px-4">${rankBadge}</td><td class="py-3 px-4 font-bold text-white">${u.username || 'Player'}</td><td class="py-3 px-4"><span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-mono">${tagText}</span></td><td class="py-3 px-4 text-right font-bold text-indigo-400 font-mono">${u.elo || 800}</td><td class="py-3 px-4 text-right font-bold text-amber-400 font-mono">${(u.coins || 0).toLocaleString()}</td></tr>`);
         });
       });
     }
@@ -1374,38 +1485,44 @@
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/maintenance').once('value').then((snap) => { const current = snap.val() === true; db.ref('system/maintenance').set(!current); });
     }
-
     function updateAdminMaintBtn(isMaint) {
       if (isMaint) { $('#admin-maint-btn').removeClass('bg-emerald-600 hover:bg-emerald-500').addClass('bg-red-600 hover:bg-red-500'); $('#admin-maint-label').text('Maintenance Active (ON)'); }
       else { $('#admin-maint-btn').removeClass('bg-red-600 hover:bg-red-500').addClass('bg-emerald-600 hover:bg-emerald-500'); $('#admin-maint-label').text('Maintenance Normal (OFF)'); }
     }
-
     function adminForceGlobalReload() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/global_reload').set(Date.now());
     }
-
     function adminPurgeHighElo() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+      if (!confirm("⚠️ Purge all player ratings back to 800 baseline Elo?")) return;
       db.ref('users').once('value').then((snap) => {
-        snap.forEach((child) => { const u = child.val(); if (u.elo && u.elo > 3000) { db.ref('users/' + child.key + '/elo').set(1500); } });
-        alert("Purge complete: Ratings >3000 reset to 1500.");
-        loadAdminUserTable();
+        const updates = {};
+        snap.forEach((child) => {
+          updates[child.key + '/elo'] = 800;
+        });
+        db.ref('users').update(updates).then(() => {
+          alert("Purge complete: All players reset to 800 Elo!");
+          loadAdminUserTable();
+        });
       });
     }
-
     function adminSendBroadcast() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const msg = $('#admin-broadcast-input').val().trim();
       if (!msg) return alert("Enter a broadcast message first.");
-      db.ref('system/announcement').set({ message: msg.substring(0, 200), timestamp: Date.now(), by: currentUser.email }).then(() => { alert("Broadcast sent!"); });
+      db.ref('system/announcement').set({ 
+        message: msg.substring(0, 200), 
+        timestamp: Date.now(), 
+        by: userProfile?.username || currentUser.email 
+      }).then(() => { 
+        alert("Broadcast pop-up dispatched to all online players!"); 
+      });
     }
-
     function adminClearBroadcast() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/announcement').remove().then(() => { $('#admin-broadcast-input').val(''); });
     }
-
     function loadCurrentBroadcast() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('system/announcement').once('value').then((snap) => {
@@ -1440,7 +1557,6 @@
         equippedIcon: 'icon_user', equippedFrame: 'frame_none', equippedNametag: 'nametag_novice', equippedTheme: 'theme-wood', equippedEmote: 'none'
       }).then(() => { loadAdminUserTable(); });
     }
-
     function adminGrantCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const input = prompt("Enter CogniCoins (CC) amount to grant:", "5000");
@@ -1452,22 +1568,18 @@
         db.ref('users/' + uid + '/coins').set(cur + amount).then(() => { alert(`Granted ${amount.toLocaleString()} CC successfully!`); loadAdminUserTable(); });
       });
     }
-
     function adminResetCoins(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       db.ref('users/' + uid + '/coins').set(1000).then(() => { loadAdminUserTable(); });
     }
-
     function adminResetElo(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
-      db.ref('users/' + uid + '/elo').set(1500).then(() => { loadAdminUserTable(); });
+      db.ref('users/' + uid + '/elo').set(800).then(() => { alert("User rating reset to 800 Elo."); loadAdminUserTable(); });
     }
-
     function adminDeleteUser(uid) {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       if (confirm("Permanently delete this user record from database?")) { db.ref('users/' + uid).remove().then(() => { loadAdminUserTable(); }); }
     }
-
     function loadAdminUserTable() {
       if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
       const $tbody = $('#admin-user-table').empty().append('<tr><td colspan="5" class="py-6 text-center text-slate-500">Loading database...</td></tr>');
@@ -1476,13 +1588,18 @@
         snap.forEach((child) => {
           const uid = child.key;
           const u = child.val();
-          $tbody.append(`<tr class="hover:bg-slate-900 transition"><td class="py-2.5 px-4 text-slate-500 text-[10px]">${uid.substring(0, 8)}...</td><td class="py-2.5 px-4 font-bold text-white">${u.username || 'N/A'} <span class="text-[10px] text-slate-400 font-normal">(${u.email || ''})</span></td><td class="py-2.5 px-4 text-indigo-400 font-bold">${u.elo || 1500}</td><td class="py-2.5 px-4 text-amber-400 font-bold">${(u.coins || 0).toLocaleString()}</td><td class="py-2.5 px-4 text-right space-x-1"><button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">Grant CC</button><button onclick="adminResetInventory('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Inv</button><button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset CC</button><button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Elo</button><button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 rounded border border-red-800 text-[10px]">Delete</button></td></tr>`);
-          $tbody.append(`<tr class="hover:bg-slate-900 transition"><td class="py-2.5 px-4 text-slate-500 text-[10px]">${uid.substring(0, 8)}...</td><td class="py-2.5 px-4 font-bold text-white">${u.username || 'N/A'} <span class="text-[10px] text-slate-400 font-normal">(${u.email || ''})</span></td><td class="py-2.5 px-4 text-indigo-400 font-bold">${u.elo || 1500}</td><td class="py-2.5 px-4 text-amber-400 font-bold">${(u.coins || 0).toLocaleString()}</td><td class="py-2.5 px-4 text-right space-x-1"><button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">Grant CC</button><button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset CC</button><button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Elo</button><button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 rounded border border-red-800 text-[10px]">Delete</button></td></tr>`);
+          $tbody.append(`<tr class="hover:bg-slate-900 transition"><td class="py-2.5 px-4 text-slate-500 text-[10px]">${uid.substring(0, 8)}...</td><td class="py-2.5 px-4 font-bold text-white">${u.username || 'N/A'} <span class="text-[10px] text-slate-400 font-normal">(${u.email || ''})</span></td><td class="py-2.5 px-4 text-indigo-400 font-bold">${u.elo || 800}</td><td class="py-2.5 px-4 text-amber-400 font-bold">${(u.coins || 0).toLocaleString()}</td><td class="py-2.5 px-4 text-right space-x-1"><button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded border border-amber-800 text-[10px]">Grant CC</button><button onclick="adminResetInventory('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Inv</button><button onclick="adminResetCoins('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset CC</button><button onclick="adminResetElo('${uid}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Reset Elo</button><button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 rounded border border-red-800 text-[10px]">Delete</button></td></tr>`);
         });
       });
     }
 
-    $(document).ready(() => { showSection('ai'); });
+    $(document).ready(() => {
+      showSection('ai');
+      $(window).on('resize', () => {
+        if (aiBoard) aiBoard.resize();
+        if (arenaBoard) arenaBoard.resize();
+      });
+    });
   </script>
 </body>
 </html>

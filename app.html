@@ -230,7 +230,7 @@
                             <span id="header-username" class="text-xs font-bold text-slate-200 max-w-[100px] truncate block">Guest</span>
                             <span id="header-nametag" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-semibold uppercase">Novice</span>
                         </div>
-                        <span id="header-elo" class="text-[10px] font-mono text-emerald-400">1500 Elo</span>
+                        <span id="header-elo" class="text-[10px] font-mono text-emerald-400">500 Elo</span>
                     </div>
                     <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-rose-400 transition-colors ml-1" title="Sign Out">
                         <i class="fa-solid fa-right-from-bracket"></i>
@@ -272,25 +272,13 @@
         <section id="section-ai" class="space-y-6">
             <!-- AI Header Controls -->
             <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-                <div class="flex flex-wrap items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-semibold text-slate-400 uppercase">Difficulty:</label>
-                        <select id="ai-difficulty-select" onchange="onBotDifficultyChange()" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 font-medium text-white focus:outline-none focus:border-emerald-500">
-                            <option value="novice">Novice (800 Elo)</option>
-                            <option value="intermediate">Intermediate (1200 Elo)</option>
-                            <option value="advanced" selected>Advanced (1500 Elo)</option>
-                            <option value="master">Master (1800 Elo)</option>
-                            <option value="grandmaster">Grandmaster (2200 Elo)</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-semibold text-slate-400 uppercase">Play as:</label>
-                        <select id="ai-side-select" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 font-medium text-white focus:outline-none focus:border-emerald-500">
-                            <option value="w" selected>White</option>
-                            <option value="b">Black</option>
-                            <option value="random">Random</option>
-                        </select>
-                    </div>
+                <div class="flex items-center gap-3">
+                    <label class="text-xs font-semibold text-slate-400 uppercase">Play as:</label>
+                    <select id="ai-side-select" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 font-medium text-white focus:outline-none focus:border-emerald-500">
+                        <option value="w" selected>White</option>
+                        <option value="b">Black</option>
+                        <option value="random">Random</option>
+                    </select>
                 </div>
                 <div class="flex items-center gap-3">
                     <button id="ai-resign-btn" onclick="aiResignGame()" class="text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg transition-all font-semibold">Resign</button>
@@ -312,8 +300,8 @@
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span id="ai-bot-name-display" class="font-bold text-sm text-white">CogniBot Advanced</span>
-                                    <span id="ai-bot-elo-display" class="text-xs px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 font-mono font-bold">1500 Elo</span>
+                                    <span class="font-bold text-sm text-white">CogniBot AI</span>
+                                    <span class="text-xs px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 font-mono font-bold">500 Elo</span>
                                 </div>
                                 <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>Online AI</span>
                             </div>
@@ -339,7 +327,7 @@
                                     <span id="ai-user-name" class="font-bold text-sm text-white">You</span>
                                     <span id="ai-user-nametag" class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">Novice</span>
                                 </div>
-                                <span id="ai-user-elo" class="text-xs font-mono text-emerald-400">1500 Elo</span>
+                                <span id="ai-user-elo" class="text-xs font-mono text-emerald-400">500 Elo</span>
                             </div>
                         </div>
                         <!-- Emote Fire Button -->
@@ -438,7 +426,7 @@
                                         <span id="arena-opp-name" class="font-bold text-sm text-white">Waiting for opponent...</span>
                                         <span id="arena-opp-nametag" class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">--</span>
                                     </div>
-                                    <span id="arena-opp-elo" class="text-xs font-mono text-slate-500">---- Elo</span>
+                                    <span id="arena-opp-elo" class="text-xs font-mono text-slate-500">500 Elo</span>
                                 </div>
                             </div>
                         </div>
@@ -463,7 +451,7 @@
                                         <span id="arena-self-name" class="font-bold text-sm text-white">You</span>
                                         <span id="arena-self-nametag" class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">Novice</span>
                                     </div>
-                                    <span id="arena-self-elo" class="text-xs font-mono text-rose-400">1500 Elo</span>
+                                    <span id="arena-self-elo" class="text-xs font-mono text-rose-400">500 Elo</span>
                                 </div>
                             </div>
                             <button onclick="triggerInGameEmote('arena')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all font-medium flex items-center gap-1.5">
@@ -622,7 +610,7 @@
                     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800 text-left">
                         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
                             <span class="text-[10px] text-slate-500 uppercase font-bold block">Rating</span>
-                            <span id="prof-stat-elo" class="font-mono text-base font-bold text-emerald-400">1500 Elo</span>
+                            <span id="prof-stat-elo" class="font-mono text-base font-bold text-emerald-400">500 Elo</span>
                         </div>
                         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
                             <span class="text-[10px] text-slate-500 uppercase font-bold block">CogniCoins</span>
@@ -773,7 +761,7 @@
                                 <th class="pb-3 text-right pr-3">Games</th>
                             </tr>
                         </thead>
-                        <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/60 font-mono">
+                        <tbody id="leaderboard-tbody" class="divide-y border-slate-800/60 font-mono">
                             <!-- Populated dynamically -->
                         </tbody>
                     </table>
@@ -1099,23 +1087,8 @@
         }
 
         // ==========================================
-        // 4. CHESS.COM ELO FORMULA & BOT DIFFICULTIES
+        // 4. CHESS.COM ELO FORMULA (500 BASE)
         // ==========================================
-        const BOT_DIFFICULTIES = {
-            novice: { name: 'CogniBot Novice', elo: 800, depth: 1, randomness: 40 },
-            intermediate: { name: 'CogniBot Intermediate', elo: 1200, depth: 2, randomness: 15 },
-            advanced: { name: 'CogniBot Advanced', elo: 1500, depth: 3, randomness: 0 },
-            master: { name: 'CogniBot Master', elo: 1800, depth: 3, randomness: 0 },
-            grandmaster: { name: 'CogniBot Grandmaster', elo: 2200, depth: 4, randomness: 0 }
-        };
-
-        function onBotDifficultyChange() {
-            const diffKey = $('#ai-difficulty-select').val() || 'advanced';
-            const bot = BOT_DIFFICULTIES[diffKey] || BOT_DIFFICULTIES.advanced;
-            $('#ai-bot-name-display').text(bot.name);
-            $('#ai-bot-elo-display').text(`${bot.elo} Elo`);
-        }
-
         function calculateElo(playerElo, oppElo, actualScore, gamesPlayed) {
             let k = 32;
             if (gamesPlayed < 10) k = 40;
@@ -1150,19 +1123,13 @@
             "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq": { from: 'b8', to: 'c6' }, // Anti-Wayward Queen
             "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq": { from: 'g7', to: 'g6' },
             "r1bqkbnr/pppp1p1p/2n3p1/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR b KQkq": { from: 'g8', to: 'f6' },
-            "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq": { from: 'g8', to: 'f6' }, // Bishop's Opening
-
-            // As Black vs 1. c4 / 1. Nf3
-            "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq": { from: 'e7', to: 'e5' },
-            "rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq": { from: 'd7', to: 'd5' },
+            "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq": { from: 'g8', to: 'f6' },
 
             // As White
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq": { from: 'e2', to: 'e4' },
             "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq": { from: 'g1', to: 'f3' },
             "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq": { from: 'f1', to: 'c4' },
-            "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq": { from: 'e4', to: 'd5' },
-            "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq": { from: 'd2', to: 'd4' },
-            "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq": { from: 'd2', to: 'd4' }
+            "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq": { from: 'e4', to: 'd5' }
         };
 
         const PIECE_VALS = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
@@ -1251,37 +1218,12 @@
             return totalEval;
         }
 
-        function quiescence(g, alpha, beta, qdepth) {
-            const standPat = evaluateBoard(g);
-            if (qdepth <= 0) return standPat;
-            if (standPat >= beta) return beta;
-            if (alpha < standPat) alpha = standPat;
-
-            const captures = g.moves({ verbose: true }).filter(m => m.captured);
-            captures.sort((a, b) => {
-                const valA = (PIECE_VALS[a.captured] || 0) - (PIECE_VALS[a.piece] || 0);
-                const valB = (PIECE_VALS[b.captured] || 0) - (PIECE_VALS[b.piece] || 0);
-                return valB - valA;
-            });
-
-            for (let i = 0; i < captures.length; i++) {
-                g.move(captures[i]);
-                const score = -quiescence(g, -beta, -alpha, qdepth - 1);
-                g.undo();
-                if (score >= beta) return beta;
-                if (score > alpha) alpha = score;
-            }
-            return alpha;
-        }
-
         function minimaxAlphaBeta(g, depth, alpha, beta, isMaximizing) {
             if (g.game_over()) {
                 if (g.in_checkmate()) return isMaximizing ? -90000 - depth : 90000 + depth;
                 return 0;
             }
-            if (depth === 0) {
-                return isMaximizing ? quiescence(g, alpha, beta, 2) : -quiescence(g, -beta, -alpha, 2);
-            }
+            if (depth === 0) return evaluateBoard(g);
 
             const moves = g.moves({ verbose: true });
             moves.sort((a, b) => {
@@ -1289,8 +1231,6 @@
                 let scoreB = 0;
                 if (a.captured) scoreA += 1000 + (PIECE_VALS[a.captured] || 0) - (PIECE_VALS[a.piece] || 0);
                 if (b.captured) scoreB += 1000 + (PIECE_VALS[b.captured] || 0) - (PIECE_VALS[b.piece] || 0);
-                if (a.san.includes('+')) scoreA += 500;
-                if (b.san.includes('+')) scoreB += 500;
                 return scoreB - scoreA;
             });
 
@@ -1454,9 +1394,7 @@
                 }
             }
 
-            // 2. Minimax Search with Bot Difficulty Depth & Move Ordering
-            const diffKey = $('#ai-difficulty-select').val() || 'advanced';
-            const bot = BOT_DIFFICULTIES[diffKey] || BOT_DIFFICULTIES.advanced;
+            // 2. 3-Ply Minimax Search with PST & Move Ordering
             const isMaximizing = (game.turn() === 'w');
             const moves = game.moves({ verbose: true });
             if (moves.length === 0) return;
@@ -1466,7 +1404,7 @@
 
             for (let i = 0; i < moves.length; i++) {
                 game.move(moves[i]);
-                const evalScore = minimaxAlphaBeta(game, bot.depth, -Infinity, Infinity, !isMaximizing);
+                const evalScore = minimaxAlphaBeta(game, 3, -Infinity, Infinity, !isMaximizing);
                 game.undo();
 
                 if (isMaximizing) {
@@ -1537,18 +1475,13 @@
 
             if (!currentUserData || !currentUser) return;
 
-            const diffKey = $('#ai-difficulty-select').val() || 'advanced';
-            const bot = BOT_DIFFICULTIES[diffKey] || BOT_DIFFICULTIES.advanced;
-            const oldElo = currentUserData.elo || 1500;
+            const oldElo = currentUserData.elo || 500;
             const oldGames = currentUserData.gamesPlayed || 0;
             let score = 0.5;
             if (winner === 'player') score = 1;
             else if (winner === 'ai') score = 0;
 
-            const newElo = calculateElo(oldElo, bot.elo, score, oldGames);
-            const eloDelta = newElo - oldElo;
-            const eloDeltaStr = eloDelta >= 0 ? `+${eloDelta}` : `${eloDelta}`;
-
+            const newElo = calculateElo(oldElo, 500, score, oldGames);
             let coinsEarned = 0;
             let streak = currentUserData.winStreak || 0;
             let updates = {
@@ -1570,12 +1503,9 @@
                 if (aiPlayerColor === 'b') updateQuestProgress('q_black_win', 1);
                 if (streak >= 2) updateQuestProgress('q_streak_2', streak);
 
-                $('#ai-status-text').html(`${statusText} <span class="text-emerald-400 font-bold ml-1">${eloDeltaStr} Elo (${newElo})</span> <span class="text-amber-400 font-bold ml-2">+${coinsEarned} CC</span>`);
+                $('#ai-status-text').html(`${statusText} <span class="text-emerald-400 font-bold ml-2">+${coinsEarned} CC</span>`);
             } else if (winner === 'ai') {
                 updates.winStreak = 0;
-                $('#ai-status-text').html(`${statusText} <span class="text-rose-400 font-bold ml-1">${eloDeltaStr} Elo (${newElo})</span>`);
-            } else {
-                $('#ai-status-text').html(`${statusText} <span class="text-slate-400 font-bold ml-1">${eloDeltaStr} Elo (${newElo})</span>`);
             }
 
             db.ref('users/' + currentUser.uid).update(updates).catch(console.error);
@@ -1732,7 +1662,7 @@
                 code: code,
                 hostUid: currentUser.uid,
                 hostName: currentUserData.username || 'Host',
-                hostElo: currentUserData.elo || 1500,
+                hostElo: currentUserData.elo || 500,
                 hostTag: currentUserData.equippedNametag || 'nametag_novice',
                 hostIcon: currentUserData.equippedIcon || 'icon_pawn',
                 hostFrame: currentUserData.equippedFrame || 'frame_none',
@@ -1771,7 +1701,7 @@
                 arenaRoomRef.update({
                     guestUid: currentUser.uid,
                     guestName: currentUserData.username || 'Guest',
-                    guestElo: currentUserData.elo || 1500,
+                    guestElo: currentUserData.elo || 500,
                     guestTag: currentUserData.equippedNametag || 'nametag_novice',
                     guestIcon: currentUserData.equippedIcon || 'icon_pawn',
                     guestFrame: currentUserData.equippedFrame || 'frame_none',
@@ -1824,7 +1754,7 @@
                         $('#arena-opp-name').text(data.guestName);
                         $('#arena-opp-nametag').text(ALL_TITLE_MAP[data.guestTag] || 'Novice')
                             .toggleClass('text-amber-400', data.guestTag === 'nametag_admin');
-                        $('#arena-opp-elo').text(`${data.guestElo || 1500} Elo`);
+                        $('#arena-opp-elo').text(`${data.guestElo || 500} Elo`);
                         applyFrameClass($('#arena-opp-frame'), data.guestFrame);
                         applyIconClass($('#arena-opp-icon'), data.guestIcon);
                     }
@@ -1832,7 +1762,7 @@
                     $('#arena-opp-name').text(data.hostName);
                     $('#arena-opp-nametag').text(ALL_TITLE_MAP[data.hostTag] || 'Novice')
                         .toggleClass('text-amber-400', data.hostTag === 'nametag_admin');
-                    $('#arena-opp-elo').text(`${data.hostElo || 1500} Elo`);
+                    $('#arena-opp-elo').text(`${data.hostElo || 500} Elo`);
                     applyFrameClass($('#arena-opp-frame'), data.hostFrame);
                     applyIconClass($('#arena-opp-icon'), data.hostIcon);
                 }
@@ -2231,7 +2161,7 @@
                     db.ref(`users/${fUid}`).once('value', userSnap => {
                         const u = userSnap.val() || {};
                         const name = escapeHtml(u.username || 'User');
-                        const elo = u.elo || 1500;
+                        const elo = u.elo || 500;
                         const cardHtml = `
                             <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
                                 <div>
@@ -2364,7 +2294,7 @@
                     }
                 });
 
-                users.sort((a, b) => (b.elo || 1500) - (a.elo || 1500));
+                users.sort((a, b) => (b.elo || 500) - (a.elo || 500));
 
                 let html = '';
                 users.forEach((u, idx) => {
@@ -2378,7 +2308,7 @@
                             <td class="py-2.5 pl-3 ${rankClass}">#${idx + 1}</td>
                             <td class="py-2.5 font-bold text-slate-200">${escapeHtml(u.username || 'Player')}</td>
                             <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 font-bold ${isAdmin ? 'text-amber-400 font-black' : 'text-slate-400'} uppercase">${tag}</span></td>
-                            <td class="py-2.5 text-emerald-400 font-bold">${u.elo || 1500}</td>
+                            <td class="py-2.5 text-emerald-400 font-bold">${u.elo || 500}</td>
                             <td class="py-2.5 text-right pr-3 text-slate-400">${u.gamesPlayed || 0}</td>
                         </tr>
                     `;
@@ -2404,7 +2334,7 @@
                                 <span class="font-bold text-slate-200 block">${escapeHtml(u.username || 'User')}</span>
                                 <span class="text-[10px] text-slate-500 font-mono">${escapeHtml(u.email || uid)}</span>
                             </td>
-                            <td class="py-2.5 text-emerald-400 font-bold">${u.elo || 1500}</td>
+                            <td class="py-2.5 text-emerald-400 font-bold">${u.elo || 500}</td>
                             <td class="py-2.5 text-amber-400 font-bold">${u.coins || 0}</td>
                             <td class="py-2.5 text-slate-400">${u.gamesPlayed || 0}</td>
                             <td class="py-2.5 text-right pr-2 space-x-1">
@@ -2440,8 +2370,8 @@
 
         function adminResetElo(uid) {
             if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
-            if (confirm('Reset this player rating to 1500 Elo?')) {
-                db.ref(`users/${uid}/elo`).set(1500).then(() => loadAdminUsersTable());
+            if (confirm('Reset this player rating to 500 Elo?')) {
+                db.ref(`users/${uid}/elo`).set(500).then(() => loadAdminUsersTable());
             }
         }
 
@@ -2471,12 +2401,12 @@
 
         function adminPurgeInflatedElo() {
             if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
-            if (confirm('Scan and cap all users with >3000 Elo back to 1500?')) {
+            if (confirm('Scan and cap all users with >3000 Elo back to 500?')) {
                 db.ref('users').once('value', snap => {
                     snap.forEach(child => {
                         const u = child.val();
                         if (u && u.elo > 3000) {
-                            db.ref(`users/${child.key}/elo`).set(1500);
+                            db.ref(`users/${child.key}/elo`).set(500);
                         }
                     });
                     alert('Purge complete.');
@@ -2554,7 +2484,7 @@
             const tagKey = data.equippedNametag || 'nametag_novice';
             $('#header-nametag').text(ALL_TITLE_MAP[tagKey] || 'Novice')
                 .toggleClass('text-amber-400 font-black', tagKey === 'nametag_admin');
-            $('#header-elo').text(`${data.elo || 1500} Elo`);
+            $('#header-elo').text(`${data.elo || 500} Elo`);
             applyFrameClass($('#header-avatar-frame'), data.equippedFrame);
             applyIconClass($('#header-avatar-icon'), data.equippedIcon);
 
@@ -2562,7 +2492,7 @@
             $('#ai-user-name').text(data.username || 'You');
             $('#ai-user-nametag').text(ALL_TITLE_MAP[tagKey] || 'Novice')
                 .toggleClass('text-amber-400 font-black', tagKey === 'nametag_admin');
-            $('#ai-user-elo').text(`${data.elo || 1500} Elo`);
+            $('#ai-user-elo').text(`${data.elo || 500} Elo`);
             applyFrameClass($('#ai-user-frame'), data.equippedFrame);
             applyIconClass($('#ai-user-icon'), data.equippedIcon);
 
@@ -2570,7 +2500,7 @@
             $('#arena-self-name').text(data.username || 'You');
             $('#arena-self-nametag').text(ALL_TITLE_MAP[tagKey] || 'Novice')
                 .toggleClass('text-amber-400 font-black', tagKey === 'nametag_admin');
-            $('#arena-self-elo').text(`${data.elo || 1500} Elo`);
+            $('#arena-self-elo').text(`${data.elo || 500} Elo`);
             applyFrameClass($('#arena-self-frame'), data.equippedFrame);
             applyIconClass($('#arena-self-icon'), data.equippedIcon);
 
@@ -2578,7 +2508,7 @@
             $('#prof-preview-username').text(data.username || 'Player');
             $('#prof-preview-nametag').text(ALL_TITLE_MAP[tagKey] || 'Novice')
                 .toggleClass('text-amber-400 font-black', tagKey === 'nametag_admin');
-            $('#prof-stat-elo').text(`${data.elo || 1500} Elo`);
+            $('#prof-stat-elo').text(`${data.elo || 500} Elo`);
             $('#prof-stat-coins').text(`${data.coins || 0} CC`);
             $('#prof-stat-games').text(data.gamesPlayed || 0);
             $('#prof-stat-streak').text(data.winStreak || 0);
@@ -2614,11 +2544,11 @@
             userRef.on('value', snapshot => {
                 let data = snapshot.val();
                 if (!data) {
-                    // New User Registration in Realtime DB
+                    // New User Registration in Realtime DB (500 Elo Baseline)
                     data = {
                         username: user.displayName || user.email.split('@')[0],
                         email: user.email,
-                        elo: 1500,
+                        elo: 500,
                         coins: 1000,
                         gamesPlayed: 0,
                         winStreak: 0,

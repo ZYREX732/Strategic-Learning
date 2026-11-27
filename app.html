@@ -113,7 +113,9 @@
     /* Crate Carousel */
     .spin-track {
       display: flex;
-      transition: transform 5s cubic-bezier(0.12, 0.8, 0.15, 1);
+      flex-wrap: nowrap;
+      will-change: transform;
+      transition: transform 5s cubic-bezier(0.1, 0.85, 0.2, 1);
     }
   </style>
 </head>
@@ -134,15 +136,23 @@
     </div>
   </div>
 
-  <!-- BROADCAST TOAST BANNER -->
-  <div id="broadcast-toast" class="fixed top-4 right-4 z-50 max-w-sm w-full p-4 rounded-2xl cogni-card border-l-4 border-l-amber-500 shadow-2xl transition-all duration-300 transform translate-y-[-150%] opacity-0 flex items-start gap-3">
-    <div class="text-amber-400 text-lg mt-0.5"><i class="fa-solid fa-bullhorn"></i></div>
-    <div class="flex-1">
-      <h4 class="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-0.5">Announcement</h4>
-      <p id="broadcast-toast-text" class="text-xs text-slate-200 leading-snug"></p>
+  <!-- BIG BROADCAST ANNOUNCEMENT BANNER -->
+  <div id="broadcast-toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 max-w-2xl w-[92%] p-5 sm:p-6 rounded-3xl bg-slate-900/95 border-2 border-amber-500 shadow-2xl shadow-amber-500/20 backdrop-blur-2xl transition-all duration-500 transform -translate-y-[250%] opacity-0 flex flex-col sm:flex-row items-center sm:items-start gap-4 pointer-events-auto">
+    <div class="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex-shrink-0 flex items-center justify-center text-amber-400 text-2xl shadow-lg shadow-amber-500/20">
+      <i class="fa-solid fa-bullhorn animate-bounce"></i>
     </div>
-    <button onclick="dismissBroadcastToast()" class="text-slate-400 hover:text-white text-xs p-1">
-      <i class="fa-solid fa-xmark"></i>
+    <div class="flex-1 text-center sm:text-left">
+      <div class="flex items-center justify-between">
+        <h4 class="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-400 flex items-center justify-center sm:justify-start gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          Global System Announcement
+        </h4>
+        <span class="text-[10px] text-slate-400 font-mono hidden sm:inline">Official Broadcast</span>
+      </div>
+      <p id="broadcast-toast-text" class="text-sm sm:text-base text-slate-100 font-semibold leading-relaxed mt-1.5 break-words"></p>
+    </div>
+    <button onclick="dismissBroadcastToast()" class="px-4 py-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition-all border border-slate-700 self-center sm:self-start flex-shrink-0">
+      Dismiss
     </button>
   </div>
 
@@ -630,12 +640,16 @@
           </div>
 
           <!-- Spinner Window -->
-          <div class="my-6 relative rounded-2xl bg-slate-950 border border-slate-800 p-2 overflow-hidden shadow-inner">
+          <div class="my-6 relative rounded-2xl bg-slate-950 border border-slate-800 p-2 overflow-hidden shadow-inner h-36 flex items-center">
+            <!-- Vignette Edge Gradients -->
+            <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-slate-950 to-transparent pointer-events-none z-10"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none z-10"></div>
+
             <!-- Center Indicator Needle -->
-            <div class="absolute top-0 bottom-0 left-1/2 w-1 -translate-x-1/2 bg-amber-400 z-20 shadow-[0_0_12px_#fbbf24]"></div>
+            <div class="absolute top-0 bottom-0 left-1/2 w-1 -translate-x-1/2 bg-amber-400 z-20 shadow-[0_0_14px_#fbbf24]"></div>
             
-            <div id="crate-viewport" class="overflow-hidden w-full h-32 flex items-center">
-              <div id="crate-track" class="spin-track flex gap-2">
+            <div id="crate-viewport" class="overflow-hidden w-full h-full flex items-center">
+              <div id="crate-track" class="spin-track flex gap-2 flex-nowrap will-change-transform">
                 <!-- Populated dynamically with spin items -->
               </div>
             </div>
@@ -1091,7 +1105,6 @@
 
   <!-- NAVIGATION & TABS SCRIPT -->
   <script>
-    // Tab active styles with glowing pill styling matching .cogni-card
     const TAB_ACTIVE_CLASSES = {
       ai: ['bg-emerald-600', 'shadow-md', 'shadow-emerald-950/50', 'ring-1', 'ring-white/20'],
       arena: ['bg-rose-600', 'shadow-md', 'shadow-rose-950/50', 'ring-1', 'ring-white/20'],
@@ -1306,7 +1319,7 @@
       return total;
     }
 
-    // Fast numeric move ordering (No expensive .san disambiguation calls!)
+    // Fast numeric move ordering (No expensive .san disambiguation calls)
     function orderMovesFast(game, moves) {
       return moves.sort((a, b) => {
         let scoreA = 0;
@@ -1712,6 +1725,7 @@
     let arenaRoomRef = null;
     let arenaLocalRole = null; // 'host' or 'guest'
     let arenaPlayerColor = 'white';
+    let arenaMatchActive = false; // Tracks if an active game is in progress
 
     function initArenaChessboard() {
       const config = {
@@ -1856,6 +1870,7 @@
         fen: arenaGame.fen(),
         lastMove: { from: move.from, to: move.to },
         turn: arenaGame.turn(),
+        status: 'playing',
         updatedAt: firebase.database.ServerValue.TIMESTAMP
       });
     }
@@ -1870,6 +1885,7 @@
       currentArenaRoomId = code;
       arenaLocalRole = 'host';
       arenaPlayerColor = 'white';
+      arenaMatchActive = false;
 
       arenaRoomRef = db.ref(`arena_rooms/${code}`);
       arenaRoomRef.set({
@@ -1886,7 +1902,6 @@
         createdAt: firebase.database.ServerValue.TIMESTAMP
       });
 
-      // Disconnect cleanup
       arenaRoomRef.onDisconnect().remove();
 
       enterArenaRoomUI(code);
@@ -1917,6 +1932,7 @@
         arenaLocalRole = 'guest';
         arenaPlayerColor = 'black';
         arenaRoomRef = roomRef;
+        arenaMatchActive = true;
 
         roomRef.update({
           guest: {
@@ -1952,13 +1968,19 @@
     function listenToArenaRoom(code) {
       arenaRoomRef = db.ref(`arena_rooms/${code}`);
       
-      // Board and match updates
       arenaRoomRef.on('value', snap => {
         const data = snap.val();
         if (!data) {
           alert('The opponent left or the room was closed.');
-          leaveArenaRoom();
+          leaveArenaRoom(true);
           return;
+        }
+
+        if (data.status === 'playing' || data.guest) {
+          arenaMatchActive = true;
+        }
+        if (data.status === 'finished' || arenaGame.game_over()) {
+          arenaMatchActive = false;
         }
 
         // Update opponent tag
@@ -2014,7 +2036,7 @@
     }
 
     function sendArenaChatMessage(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       const txt = $('#arena-chat-input').val().trim();
       if (!txt || !currentArenaRoomId || !currentUser) return;
       db.ref(`arena_chats/${currentArenaRoomId}`).push({
@@ -2028,7 +2050,6 @@
 
     function offerArenaDraw() {
       if (!currentArenaRoomId) return;
-      sendArenaChatMessage({ preventDefault: () => {} });
       db.ref(`arena_chats/${currentArenaRoomId}`).push({
         senderUid: currentUser.uid,
         senderName: 'SYSTEM',
@@ -2046,10 +2067,21 @@
         text: `${currentUserData.name} resigned the match.`,
         timestamp: firebase.database.ServerValue.TIMESTAMP
       });
-      leaveArenaRoom();
+      if (arenaRoomRef) {
+        arenaRoomRef.update({ status: 'finished' });
+      }
+      arenaMatchActive = false;
+      leaveArenaRoom(true);
     }
 
-    function leaveArenaRoom() {
+    function leaveArenaRoom(isResigning = false) {
+      // If actively in a match, prevent leaving and prompt resign
+      if (!isResigning && currentArenaRoomId && arenaMatchActive && !arenaGame.game_over()) {
+        alert('cannot do this, you have to resign.');
+        return;
+      }
+
+      arenaMatchActive = false;
       if (arenaRoomRef) {
         arenaRoomRef.off();
         if (arenaLocalRole === 'host') {
@@ -2070,6 +2102,7 @@
 
     function checkArenaGameOver() {
       if (arenaGame.in_checkmate()) {
+        arenaMatchActive = false;
         const loserColor = arenaGame.turn();
         const myColor = arenaPlayerColor === 'black' ? 'b' : 'w';
         if (loserColor === myColor) {
@@ -2083,10 +2116,39 @@
     }
   </script>
 
-  <!-- COGNISHOP & CS:GO STYLE CRATE SPINNER -->
+  <!-- COGNISHOP & CS:GO STYLE CRATE SPINNER (NO BLACKOUT) -->
   <script>
     let activeCrateId = null;
     let isSpinning = false;
+
+    function getCosmeticIcon(item) {
+      if (item.icon) return item.icon;
+      if (item.type === 'title') return 'fa-heading';
+      if (item.type === 'theme') return 'fa-chess-board';
+      if (item.type === 'frame') return 'fa-crop-simple';
+      if (item.type === 'emote') return 'fa-face-smile';
+      return 'fa-tag';
+    }
+
+    // High contrast solid card rendering without CSS backdrop-filter to prevent compositor blackout bugs
+    function renderCrateItemCard(item) {
+      const rarityStyles = {
+        common: 'border-emerald-500/80 bg-emerald-950/60 text-emerald-400',
+        uncommon: 'border-blue-500/80 bg-blue-950/60 text-blue-400',
+        rare: 'border-purple-500/80 bg-purple-950/60 text-purple-400',
+        legendary: 'border-amber-500 bg-amber-950/70 text-amber-400'
+      };
+      const rStyle = rarityStyles[item.rarity] || 'border-slate-700 bg-slate-900 text-slate-300';
+      const iconClass = getCosmeticIcon(item);
+
+      return `
+        <div class="w-28 h-32 flex-shrink-0 rounded-2xl p-2.5 flex flex-col items-center justify-center text-center border-2 ${rStyle} shadow-lg select-none">
+          <div class="text-3xl mb-1.5"><i class="fa-solid ${iconClass}"></i></div>
+          <div class="text-[11px] font-bold text-white truncate w-full px-1">${escapeHtml(item.name)}</div>
+          <div class="text-[9px] uppercase font-black tracking-wider mt-0.5 opacity-90">${item.rarity}</div>
+        </div>
+      `;
+    }
 
     function openCrateModal(crateId) {
       if (isSpinning) return;
@@ -2099,10 +2161,9 @@
       $('#crate-spin-btn').prop('disabled', false).text(`Spin for ${crate.cost.toLocaleString()} CC`);
       $('#crate-modal-close-btn').show();
 
-      // Populate preview ribbon items
       const $track = $('#crate-track');
-      $track.css({ transform: 'translateX(0px)', transition: 'none' }).empty();
-      for (let i = 0; i < 40; i++) {
+      $track.css({ transition: 'none', transform: 'translateX(0px)' }).empty();
+      for (let i = 0; i < 50; i++) {
         const randomItem = pickRandomCrateItem(crate);
         $track.append(renderCrateItemCard(randomItem));
       }
@@ -2127,17 +2188,6 @@
       return COSMETICS_CATALOG[crate.pool[0].id];
     }
 
-    function renderCrateItemCard(item) {
-      const colorClass = `rarity-text-${item.rarity}`;
-      return `
-        <div class="w-24 h-28 flex-shrink-0 cogni-card rounded-2xl p-2 flex flex-col items-center justify-center text-center border-slate-800">
-          <div class="text-2xl mb-1 text-slate-200"><i class="fa-solid ${item.icon || 'fa-tag'}"></i></div>
-          <div class="text-[10px] font-bold text-white truncate w-full">${escapeHtml(item.name)}</div>
-          <div class="text-[9px] uppercase font-bold ${colorClass}">${item.rarity}</div>
-        </div>
-      `;
-    }
-
     function executeSpin() {
       if (isSpinning || !activeCrateId || !currentUser || !currentUserData) return;
       const crate = CRATES[activeCrateId];
@@ -2156,28 +2206,34 @@
       const newBalance = userCoins - crate.cost;
       db.ref(`users/${currentUser.uid}/coins`).set(newBalance);
 
-      // Determine winning item
       const winningItem = pickRandomCrateItem(crate);
-      const winningIndex = 32;
+      const winningIndex = 42;
 
-      // Ensure item at winningIndex matches winningItem
+      // Re-populate track with 60 high-contrast items and insert winning item at index 42
       const $track = $('#crate-track');
-      $track.children().eq(winningIndex).replaceWith(renderCrateItemCard(winningItem));
+      $track.css({ transition: 'none', transform: 'translateX(0px)' }).empty();
 
-      // Calculate translation offset
-      const itemWidth = 96 + 8; // 24rem width + 8px gap
-      const viewportWidth = $('#crate-viewport').width();
-      const centerTarget = (winningIndex * itemWidth) + (itemWidth / 2) - (viewportWidth / 2) + ((Math.random() - 0.5) * 40);
+      for (let i = 0; i < 60; i++) {
+        const it = (i === winningIndex) ? winningItem : pickRandomCrateItem(crate);
+        $track.append(renderCrateItemCard(it));
+      }
 
-      // Audio ticks
-      let tickInterval = setInterval(() => SOUNDS.spinTick(), 160);
-      setTimeout(() => { clearInterval(tickInterval); tickInterval = setInterval(() => SOUNDS.spinTick(), 340); }, 2500);
+      // Force synchronous DOM layout reflow so the reset to 0px is cleanly committed before animation begins
+      void $track[0].offsetWidth;
+
+      const itemWidth = 112 + 8; // w-28 is 112px + 8px gap = 120px
+      const viewportWidth = $('#crate-viewport').width() || 460;
+      const centerTarget = (winningIndex * itemWidth) + (itemWidth / 2) - (viewportWidth / 2) + ((Math.random() - 0.5) * 36);
+
+      // Web Audio spin ticks
+      let tickInterval = setInterval(() => SOUNDS.spinTick(), 150);
+      setTimeout(() => { clearInterval(tickInterval); tickInterval = setInterval(() => SOUNDS.spinTick(), 320); }, 2500);
       setTimeout(() => { clearInterval(tickInterval); }, 4400);
 
-      // Execute CSS transition
+      // Trigger GPU transform transition
       $track.css({
-        transform: `translateX(-${centerTarget}px)`,
-        transition: 'transform 5s cubic-bezier(0.1, 0.85, 0.2, 1)'
+        transition: 'transform 5s cubic-bezier(0.1, 0.85, 0.2, 1)',
+        transform: `translateX(-${centerTarget}px)`
       });
 
       setTimeout(() => {
@@ -2186,10 +2242,8 @@
         $('#crate-spin-btn').prop('disabled', false).text('Spin Again');
         SOUNDS.win();
 
-        // Grant item or duplicate refund
         grantCrateItemToUser(winningItem, crate.cost);
 
-        // Display results
         $('#crate-result-name').text(winningItem.name).removeClass().addClass(`text-lg font-black rarity-text-${winningItem.rarity}`);
         $('#crate-result-rarity').text(winningItem.rarity).removeClass().addClass(`text-xs font-bold uppercase rarity-text-${winningItem.rarity}`);
         $('#crate-result-area').removeClass('hidden');
@@ -2339,17 +2393,14 @@
       const ref = db.ref(`users/${currentUser.uid}/dailyQuests`);
       ref.once('value').then(snap => {
         const q = snap.val() || {};
-        // Match played
         q.q_play_3 = q.q_play_3 || { progress: 0, claimed: false };
         q.q_play_3.progress = Math.min(3, (q.q_play_3.progress || 0) + 1);
 
-        // Win as black
         if (gameResult === 'win' && aiPlayerColor === 'black') {
           q.q_black_win = q.q_black_win || { progress: 0, claimed: false };
           q.q_black_win.progress = 1;
         }
 
-        // Streak quest
         if ((currentUserData.winStreak || 0) >= 2) {
           q.q_streak_2 = q.q_streak_2 || { progress: 0, claimed: false };
           q.q_streak_2.progress = 2;
@@ -2524,7 +2575,6 @@
       if (!data.inventory || !data.inventory.frame_gold) updates['inventory/frame_gold'] = true;
       if (!data.inventory || !data.inventory.nametag_admin) updates['inventory/nametag_admin'] = true;
 
-      // Auto-equip if not set
       if (data.equippedIcon !== 'icon_admin_king') updates['equippedIcon'] = 'icon_admin_king';
       if (data.equippedFrame !== 'frame_gold') updates['equippedFrame'] = 'frame_gold';
       if (data.equippedTitle !== 'nametag_admin') updates['equippedTitle'] = 'nametag_admin';
@@ -2625,10 +2675,9 @@
   <!-- SYSTEM LISTENERS & AUTH LIFECYCLE -->
   <script>
     function dismissBroadcastToast() {
-      $('#broadcast-toast').addClass('translate-y-[-150%] opacity-0');
+      $('#broadcast-toast').addClass('-translate-y-[250%] opacity-0');
     }
 
-    // System live listeners
     function attachSystemListeners() {
       // Maintenance Mode Listener
       db.ref('system/maintenance').on('value', snap => {
@@ -2656,14 +2705,14 @@
         }
       });
 
-      // Global Announcements Listener
+      // Global Announcements Listener (Big Broadcast Toast)
       db.ref('system/broadcast').on('value', snap => {
         const ann = snap.val();
         if (!ann || !ann.message) return;
         if (ann.timestamp && ann.timestamp >= PAGE_LOAD_TIME) {
           $('#broadcast-toast-text').text(ann.message);
-          $('#broadcast-toast').removeClass('translate-y-[-150%] opacity-0');
-          setTimeout(() => dismissBroadcastToast(), 10000);
+          $('#broadcast-toast').removeClass('-translate-y-[250%] opacity-0');
+          setTimeout(() => dismissBroadcastToast(), 14000);
         }
       });
     }
@@ -2677,7 +2726,6 @@
       currentUser = user;
       $('#profile-preview-uid').text(user.uid);
 
-      // Check Admin Nav Link Visibility
       if (user.email === ADMIN_EMAIL) {
         $('#admin-nav-link').removeClass('hidden').addClass('flex');
         $('#admin-mobile-nav-link').removeClass('hidden').addClass('flex');
@@ -2686,12 +2734,10 @@
         $('#admin-mobile-nav-link').addClass('hidden').removeClass('flex');
       }
 
-      // Live user database record listener
       const userRef = db.ref(`users/${user.uid}`);
       userRef.on('value', snap => {
         let data = snap.val();
         if (!data) {
-          // Initialize new account defaults
           data = {
             uid: user.uid,
             email: user.email,
@@ -2716,7 +2762,6 @@
           userRef.set(data);
         }
 
-        // Grant exclusive admin set if logged in as Admin
         if (user.email === ADMIN_EMAIL) {
           ensureAdminCosmetics(user.uid, data);
         }
@@ -2730,7 +2775,6 @@
       attachSystemListeners();
       listenToFriendsAndRequests(user.uid);
 
-      // Initialize AI board on startup
       if (!aiBoard) {
         initAiChessboard();
         startNewAiGame();

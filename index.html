@@ -189,15 +189,15 @@
 
     <!-- Script Flow -->
     <script>
-        // Firebase Config
+        // Exact Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyD-placeholder-key-for-cognilearn",
+            apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
             authDomain: "chess-7df7a.firebaseapp.com",
             databaseURL: "https://chess-7df7a-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "chess-7df7a",
-            storageBucket: "chess-7df7a.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+            storageBucket: "chess-7df7a.firebasestorage.app",
+            messagingSenderId: "807640572322",
+            appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
         };
 
         if (!firebase.apps.length) {
@@ -206,7 +206,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Check if already authenticated -> go to app.html
+        // Check if already authenticated -> go straight to app.html
         auth.onAuthStateChanged((user) => {
             if (user) {
                 window.location.replace("app.html");
@@ -258,7 +258,7 @@
 
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                // Listener will auto redirect
+                // Listener handles instant redirect
             } catch (err) {
                 showAlert(err.message || "Failed to sign in. Please verify your credentials.");
                 btn.disabled = false;
@@ -286,7 +286,7 @@
                 const cred = await auth.createUserWithEmailAndPassword(email, password);
                 const uid = cred.user.uid;
 
-                // Create DB Record at 500 Starting Elo
+                // Create Database Profile strictly at 500 Starting Elo
                 await db.ref(`users/${uid}`).set({
                     uid: uid,
                     username: username,

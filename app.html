@@ -210,7 +210,7 @@
           </div>
           <div class="flex items-center gap-1.5 text-slate-300 font-semibold pl-1">
             <i class="fa-solid fa-bolt text-brand-400"></i>
-            <span id="header-user-elo">800</span> Elo
+            <span id="header-user-elo">500</span> Elo
           </div>
         </div>
 
@@ -321,7 +321,7 @@
               <div>
                 <div class="flex items-center gap-2">
                   <span id="user-display-name" class="font-bold text-sm text-white">Player</span>
-                  <span id="user-elo-tag" class="text-[10px] font-extrabold bg-brand-950/80 border border-brand-800/80 text-brand-400 px-1.5 py-0.2 rounded">800 Elo</span>
+                  <span id="user-elo-tag" class="text-[10px] font-extrabold bg-brand-950/80 border border-brand-800/80 text-brand-400 px-1.5 py-0.2 rounded">500 Elo</span>
                 </div>
                 <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
                   <span id="user-piece-color" class="inline-block w-2 h-2 rounded-full bg-white"></span>
@@ -533,7 +533,7 @@
             <h2 class="text-lg font-black text-white flex items-center gap-2">
               <i class="fa-solid fa-trophy text-amber-400"></i> Global Elo Standings
             </h2>
-            <p class="text-xs text-slate-400">Live competitive rankings across CogniLearn (Baseline: 800 Elo).</p>
+            <p class="text-xs text-slate-400">Live competitive rankings across CogniLearn (Baseline: 500 Elo).</p>
           </div>
           <button onclick="loadLeaderboard()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5">
             <i class="fa-solid fa-arrows-rotate"></i> Refresh
@@ -667,11 +667,11 @@
             <i class="fa-solid fa-rotate text-red-400"></i> Global Elo Calibration & Reset
           </h3>
           <p class="text-xs text-slate-400 mb-4">
-            Reset or clamp player ratings across the entire database to the baseline starting value (<span class="text-white font-bold">800 Elo</span>).
+            Reset or clamp player ratings across the entire database to the baseline starting value (<span class="text-white font-bold">500 Elo</span>).
           </p>
           <div class="flex flex-wrap items-center gap-3">
             <button onclick="adminResetAllElo()" class="py-2.5 px-5 bg-red-600/80 hover:bg-red-600 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-2">
-              <i class="fa-solid fa-triangle-exclamation"></i> Calibrate All Users to 800 Elo
+              <i class="fa-solid fa-triangle-exclamation"></i> Calibrate All Users to 500 Elo
             </button>
             <span class="text-xs text-slate-500">Affects all non-admin registered players.</span>
           </div>
@@ -740,7 +740,7 @@
 
     // Whitelist rules & Constants
     const SUPERADMIN_EMAIL = "zainisgo123@gmail.com";
-    const BASELINE_ELO = 800;
+    const BASELINE_ELO = 500;
     const PIECE_ASSET_URL = 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png';
 
     // Current User Session State
@@ -1025,10 +1025,10 @@
 
         if (playerColor === 'white') {
           $('#opp-name').text(game.blackName || 'Opponent');
-          $('#opp-elo-tag').text(`${game.blackElo || 800} Elo`);
+          $('#opp-elo-tag').text(`${game.blackElo || BASELINE_ELO} Elo`);
         } else {
           $('#opp-name').text(game.whiteName || 'Opponent');
-          $('#opp-elo-tag').text(`${game.whiteElo || 800} Elo`);
+          $('#opp-elo-tag').text(`${game.whiteElo || BASELINE_ELO} Elo`);
         }
         $('#opp-status-text').text('In Combat');
         $('#arena-game-state').text('Live Match Ongoing');
@@ -1133,7 +1133,6 @@
 
       arenaBoard = Chessboard('arena-board', cfg);
 
-      // CLICK-TO-MOVE DELEGATION
       $('#arena-board').off('click', '.square-55d63').on('click', '.square-55d63', function() {
         if (!currentMatchId) return;
         const squareClass = $(this).attr('class').match(/square-([a-h][1-8])/);
@@ -1458,7 +1457,7 @@
       });
     }
 
-    // ================= ADMIN ELO PURGE TO 800 =================
+    // ================= ADMIN ELO PURGE TO 500 =================
     function adminResetAllElo() {
       if (!currentUser || currentUser.email !== SUPERADMIN_EMAIL) {
         return alert("Unauthorized: Master admin privileges required.");
@@ -1685,7 +1684,7 @@
               <tr class="border-b border-slate-800/40 hover:bg-slate-850/50">
                 <td class="py-3 pl-3 font-bold">${rankBadge}</td>
                 <td class="py-3 text-white font-semibold">${escapeHtml(p.username || 'Tactician')}</td>
-                <td class="py-3 text-slate-400">${p.elo >= 1200 ? 'Master' : p.elo >= 900 ? 'Adept' : 'Pawn Novice'}</td>
+                <td class="py-3 text-slate-400">${p.elo >= 1200 ? 'Master' : p.elo >= 800 ? 'Adept' : 'Pawn Novice'}</td>
                 <td class="py-3 text-right pr-3 font-mono font-bold text-brand-400">${p.elo || BASELINE_ELO}</td>
               </tr>
             `;

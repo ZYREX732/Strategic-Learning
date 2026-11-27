@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CogniLearn Chess</title>
+  <title>Z-Chess</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -126,7 +126,7 @@
     <div class="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-6 text-amber-400 text-3xl shadow-xl shadow-amber-500/10 animate-bounce">
       <i class="fa-solid fa-wrench"></i>
     </div>
-    <h2 class="text-3xl font-bold tracking-tight text-white mb-2">CogniLearn Under Maintenance</h2>
+    <h2 class="text-3xl font-bold tracking-tight text-white mb-2">Z-Chess Under Maintenance</h2>
     <p class="text-slate-400 max-w-md text-sm mb-6 leading-relaxed">
       We are updating the platform to improve matchmaking, performance, and security. Please check back shortly!
     </p>
@@ -167,7 +167,7 @@
             <i class="fa-solid fa-chess-knight text-white text-xl"></i>
           </div>
           <div>
-            <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">CogniLearn</h1>
+            <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">Z-Chess</h1>
             <div class="flex items-center gap-1.5 text-xs text-slate-400">
               <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span id="user-display-name">Player</span>
@@ -206,7 +206,7 @@
           <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 font-bold text-xs sm:text-sm shadow-inner">
             <i class="fa-solid fa-coins text-amber-400 animate-pulse"></i>
             <span id="user-coins-display">0</span>
-            <span class="text-[10px] uppercase tracking-wider text-amber-400/70 font-semibold hidden sm:inline">CC</span>
+            <span class="text-[10px] uppercase tracking-wider text-amber-400/70 font-semibold hidden sm:inline">ZC</span>
           </div>
 
           <!-- Elo badge -->
@@ -260,7 +260,7 @@
         </span>
         <div>
           <span class="font-bold text-slate-200 text-sm">Daily Quests</span>
-          <span class="text-slate-400 ml-2 hidden sm:inline">Earn bonus CogniCoins every day</span>
+          <span class="text-slate-400 ml-2 hidden sm:inline">Earn bonus Coins every day</span>
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-2 sm:gap-4" id="quests-container">
@@ -290,7 +290,7 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
-                    <span class="font-bold text-sm text-white">CogniBot AI</span>
+                    <span class="font-bold text-sm text-white">Z-Bot AI</span>
                     <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Stock PST Engine</span>
                   </div>
                   <div class="text-xs text-slate-400 font-medium">Rating: <span class="text-slate-200">500</span></div>
@@ -384,7 +384,7 @@
               </div>
               <div>
                 <div class="font-bold text-white">Win Streak: <span id="ai-streak-display" class="text-amber-400">0</span></div>
-                <div class="text-slate-400 text-[11px]">Win rewards +50 CC base</div>
+                <div class="text-slate-400 text-[11px]">Win rewards +50 Coins base</div>
               </div>
             </div>
             <div class="text-right">
@@ -554,7 +554,7 @@
         <div class="inline-flex w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 items-center justify-center text-amber-400 text-2xl mb-1 shadow-lg shadow-amber-500/10">
           <i class="fa-solid fa-store"></i>
         </div>
-        <h2 class="text-2xl font-black tracking-tight text-white">CogniShop Crates</h2>
+        <h2 class="text-2xl font-black tracking-tight text-white">Crate Shop</h2>
         <p class="text-slate-400 text-xs sm:text-sm">Unlock unique profile icons, glowing frames, elite titles, custom emotes, and chessboard skins.</p>
       </div>
 
@@ -575,7 +575,7 @@
           </div>
           <div class="pt-6 mt-6 border-t border-slate-800/80">
             <button onclick="openCrateModal('pawn')" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-bold text-xs uppercase tracking-wider text-white shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-box-open"></i> Unlock for 1,000 CC
+              <i class="fa-solid fa-box-open"></i> Unlock for 1,000 Coins
             </button>
           </div>
         </div>
@@ -594,7 +594,7 @@
           </div>
           <div class="pt-6 mt-6 border-t border-slate-800/80">
             <button onclick="openCrateModal('knight')" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold text-xs uppercase tracking-wider text-white shadow-lg shadow-blue-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-box-open"></i> Unlock for 3,500 CC
+              <i class="fa-solid fa-box-open"></i> Unlock for 3,500 Coins
             </button>
           </div>
         </div>
@@ -616,7 +616,7 @@
           </div>
           <div class="pt-6 mt-6 border-t border-slate-800/80">
             <button onclick="openCrateModal('grandmaster')" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 font-bold text-xs uppercase tracking-wider text-white shadow-lg shadow-amber-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-crown"></i> Unlock for 10,000 CC
+              <i class="fa-solid fa-crown"></i> Unlock for 10,000 Coins
             </button>
           </div>
         </div>
@@ -712,7 +712,7 @@
               </div>
               <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
                 <div class="text-slate-400">Balance</div>
-                <div id="profile-preview-coins" class="text-base font-bold text-amber-300 mt-0.5">0 CC</div>
+                <div id="profile-preview-coins" class="text-base font-bold text-amber-300 mt-0.5">0 Coins</div>
               </div>
             </div>
 
@@ -847,7 +847,7 @@
           <i class="fa-solid fa-trophy"></i>
         </div>
         <h2 class="text-2xl font-black tracking-tight text-white">Global Leaderboard</h2>
-        <p class="text-slate-400 text-xs sm:text-sm">The top 50 CogniLearn grandmasters ranked by competitive Elo.</p>
+        <p class="text-slate-400 text-xs sm:text-sm">The top 50 Z-Chess players ranked by competitive Elo.</p>
       </div>
 
       <div class="cogni-card rounded-3xl p-4 sm:p-6 shadow-xl border-slate-800 overflow-hidden">
@@ -859,7 +859,7 @@
                 <th class="py-3 px-3">Player</th>
                 <th class="py-3 px-3">Title</th>
                 <th class="py-3 px-3 text-right">Rating</th>
-                <th class="py-3 px-3 text-right">CC Balance</th>
+                <th class="py-3 px-3 text-right">Coins</th>
               </tr>
             </thead>
             <tbody id="leaderboard-table-body" class="divide-y divide-slate-800/60 font-medium">
@@ -1005,7 +1005,6 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Session Persistence
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
     const ADMIN_EMAIL = 'zainisgo123@gmail.com';
@@ -1019,7 +1018,6 @@
     let lastAiMove = null;
     let lastArenaMoveObj = null;
 
-    // Piece theme image resolver
     function pieceThemeUrl(piece) {
       return `https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/${piece}.png`;
     }
@@ -1131,7 +1129,6 @@
         }
       });
 
-      // Update Desktop Nav Tabs
       sections.forEach(tab => {
         const navId = tab === 'admin' ? 'admin-nav-link' : `nav-${tab}`;
         const btn = document.getElementById(navId);
@@ -1148,7 +1145,6 @@
         activeBtn.classList.add('text-white', ...(TAB_ACTIVE_CLASSES[sectionId] || ['bg-slate-700']));
       }
 
-      // Update Mobile Nav Tabs
       document.querySelectorAll('.mobile-nav-tab').forEach(mobBtn => {
         const t = mobBtn.getAttribute('data-mob-tab');
         mobBtn.classList.remove(...ALL_TAB_COLOR_CLASSES);
@@ -1160,7 +1156,6 @@
         }
       });
 
-      // Resize active boards
       if (sectionId === 'ai' && aiBoard) {
         setTimeout(() => {
           aiBoard.resize();
@@ -1186,7 +1181,6 @@
     let aiPlayerColor = 'white';
     let isAiThinking = false;
 
-    // Piece-Square Evaluation Tables
     const PAWN_PST = [
       0,  0,  0,  0,  0,  0,  0,  0,
       50, 50, 50, 50, 50, 50, 50, 50,
@@ -1250,45 +1244,26 @@
 
     const PIECE_VALS = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
 
-    // Expanded Opening Book (Defends Queen's Gambit, Scholar's Mate, etc.)
     const OPENING_BOOK = {
-      // 1. d4 (Queen's Pawn)
       "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq": ["d7d5", "g8f6"],
-      // 1. d4 d5 2. c4 (Queen's Gambit!) -> Play QGD e7e6 or Slav c7c6
       "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq": ["e7e6", "c7c6"],
-      // 1. d4 d5 2. c4 e6 3. Nc3 -> 3... Nf6
       "rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR b KQkq": ["g8f6"],
-      // 1. d4 d5 2. c4 e6 3. Nf3 -> 3... Nf6
       "rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/5N2/PP2PPPP/RNBQKB1R b KQkq": ["g8f6"],
-      // 1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 -> 4... Be7
       "rnbqkb1r/ppp2ppp/4pn2/3p2B1/2PP4/2N5/PP2PPPP/R2QKBNR b KQkq": ["f8e7"],
-      // 1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 5. Nf3 -> 5... O-O
       "rnbqk2r/ppp1bppp/4pn2/3p2B1/2PP4/2N2N2/PP2PPPP/R2QKB1R b KQkq": ["e8g8"],
-      // 1. d4 d5 2. Bf4 (London System) -> 2... Nf6
       "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq": ["g8f6"],
-      // 1. d4 d5 2. Bf4 Nf6 3. e3 -> 3... c5
       "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq": ["c7c5"],
 
-      // 1. e4 (King's Pawn)
       "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq": ["e7e5", "c7c5"],
-      // 1. e4 e5 2. Nf3
       "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq": ["b8c6"],
-      // 1. e4 e5 2. Nf3 Nc6 3. Bc4 (Italian)
       "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq": ["f8c5", "g8f6"],
-      // 1. e4 e5 2. Nf3 Nc6 3. Bb5 (Ruy Lopez)
       "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq": ["a7a6"],
-      // 1. e4 e5 2. Nf3 Nc6 3. d4 (Scotch)
       "r1bqkbnr/pppp1ppp/2n5/4p3/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq": ["e5d4"],
 
-      // Anti-Scholar's Mate Defense
-      // 1. e4 e5 2. Qh5
       "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq": ["b8c6"],
-      // 1. e4 e5 2. Qh5 Nc6 3. Bc4 -> play 3... g6!
       "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq": ["g7g6"],
-      // 1. e4 e5 2. Qh5 Nc6 3. Bc4 g6 4. Qf3 -> play 4... Nf6!
       "r1bqkbnr/pppp1p1p/2n3p1/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR b KQkq": ["g8f6"],
 
-      // White Openings
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq": ["e2e4", "d2d4"],
       "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq": ["g1f3"],
       "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq": ["f1c4", "f1b5", "d2d4"],
@@ -1319,7 +1294,6 @@
       return total;
     }
 
-    // Fast numeric move ordering (No expensive .san disambiguation calls)
     function orderMovesFast(game, moves) {
       return moves.sort((a, b) => {
         let scoreA = 0;
@@ -1339,7 +1313,6 @@
     let searchNodesVisited = 0;
     const MAX_SEARCH_NODES = 6500;
 
-    // 3-Ply Minimax with Alpha-Beta Pruning & Node Visit Safety Limit
     function minimaxAlphaBeta(game, depth, alpha, beta, isMaximizing) {
       searchNodesVisited++;
       if (searchNodesVisited >= MAX_SEARCH_NODES) {
@@ -1360,7 +1333,7 @@
           game.ugly_undo();
           maxEval = Math.max(maxEval, evalScore);
           alpha = Math.max(alpha, evalScore);
-          if (beta <= alpha) break; // Pruning
+          if (beta <= alpha) break;
           if (searchNodesVisited >= MAX_SEARCH_NODES) break;
         }
         return maxEval;
@@ -1372,16 +1345,14 @@
           game.ugly_undo();
           minEval = Math.min(minEval, evalScore);
           beta = Math.min(beta, evalScore);
-          if (beta <= alpha) break; // Pruning
+          if (beta <= alpha) break;
           if (searchNodesVisited >= MAX_SEARCH_NODES) break;
         }
         return minEval;
       }
     }
 
-    // Get Best AI Move
     function getBestAiMove(game) {
-      // 1. Check opening book
       const fenKey = game.fen().split(' ').slice(0, 3).join(' ');
       if (OPENING_BOOK[fenKey]) {
         const bookOptions = OPENING_BOOK[fenKey];
@@ -1393,7 +1364,6 @@
         }
       }
 
-      // 2. Alpha-Beta Minimax search
       searchNodesVisited = 0;
       const rawMoves = game.moves({ verbose: true });
       if (rawMoves.length === 0) return null;
@@ -1407,7 +1377,6 @@
 
       for (let i = 0; i < moves.length; i++) {
         game.ugly_move(moves[i]);
-        // Depth 2 from root = 3-ply total lookahead
         const val = minimaxAlphaBeta(game, 2, alpha, beta, !isWhite);
         game.ugly_undo();
 
@@ -1451,7 +1420,6 @@
       bindAiBoardClickHandling();
     }
 
-    // Reapply visual highlights and move dots after chessboard redraws
     function reapplyAiVisuals() {
       $('#ai-board .square-55d63').removeClass('highlight-selected highlight-last-move move-dest-dot move-dest-capture');
       if (lastAiMove) {
@@ -1474,7 +1442,6 @@
       reapplyAiVisuals();
     }
 
-    // Bind mousedown handling so clicks on pieces or empty squares register reliably
     function bindAiBoardClickHandling() {
       $('#ai-board').off('mousedown', '.square-55d63').on('mousedown', '.square-55d63', function(e) {
         const sq = $(this).attr('data-square');
@@ -1483,7 +1450,6 @@
         const playerColorCode = aiPlayerColor === 'black' ? 'b' : 'w';
         if (aiGame.turn() !== playerColorCode) return;
 
-        // If a square is already selected and user clicks a target square
         if (selectedSquare && selectedSquare !== sq) {
           const legal = aiGame.moves({ square: selectedSquare, verbose: true });
           const isLegalTarget = legal.some(m => m.to === sq);
@@ -1495,7 +1461,6 @@
           }
         }
 
-        // Piece selection
         const piece = aiGame.get(sq);
         if (piece && piece.color === playerColorCode) {
           if (selectedSquare === sq) {
@@ -1585,7 +1550,7 @@
 
     function triggerAiResponse() {
       isAiThinking = true;
-      $('#ai-game-turn-text').html('<i class="fa-solid fa-spinner fa-spin mr-1"></i> CogniBot thinking...');
+      $('#ai-game-turn-text').html('<i class="fa-solid fa-spinner fa-spin mr-1"></i> Z-Bot thinking...');
       setTimeout(() => {
         const best = getBestAiMove(aiGame);
         if (best) {
@@ -1597,7 +1562,7 @@
           reapplyAiVisuals();
         }
         isAiThinking = false;
-        $('#ai-game-turn-text').text(aiGame.turn() === (aiPlayerColor === 'black' ? 'b' : 'w') ? 'Your Turn' : "CogniBot's Turn");
+        $('#ai-game-turn-text').text(aiGame.turn() === (aiPlayerColor === 'black' ? 'b' : 'w') ? 'Your Turn' : "Z-Bot's Turn");
         const evalVal = (evaluateBoard(aiGame) / 100).toFixed(1);
         $('#ai-eval-indicator').text(`Eval: ${evalVal > 0 ? '+' : ''}${evalVal}`);
         checkAiGameOver();
@@ -1653,7 +1618,6 @@
       aiGame.clear();
     }
 
-    // Chess.com Elo Formula
     function calculateElo(playerElo, oppElo, actualScore, gamesPlayed) {
       let K = 32;
       if (gamesPlayed < 10) K = 40;
@@ -1669,7 +1633,7 @@
       if (aiGame.in_checkmate()) {
         if (aiGame.turn() === playerCode) {
           SOUNDS.loss();
-          handleAiGameResolution('loss', 'Checkmate - CogniBot wins!');
+          handleAiGameResolution('loss', 'Checkmate - Z-Bot wins!');
         } else {
           SOUNDS.win();
           handleAiGameResolution('win', 'Checkmate - You win!');
@@ -1710,10 +1674,8 @@
         winStreak: newStreak
       });
 
-      // Update quests
       updateDailyQuestsProgress(result);
-
-      alert(`${msg}\nElo Update: ${currentElo} -> ${updatedElo}\nRewards: +${coinsDelta} CC\nCurrent Streak: ${newStreak}`);
+      alert(`${msg}\nElo Update: ${currentElo} -> ${updatedElo}\nRewards: +${coinsDelta} Coins\nCurrent Streak: ${newStreak}`);
     }
   </script>
 
@@ -1723,9 +1685,9 @@
     let arenaBoard = null;
     let currentArenaRoomId = null;
     let arenaRoomRef = null;
-    let arenaLocalRole = null; // 'host' or 'guest'
+    let arenaLocalRole = null;
     let arenaPlayerColor = 'white';
-    let arenaMatchActive = false; // Tracks if an active game is in progress
+    let arenaMatchActive = false;
 
     function initArenaChessboard() {
       const config = {
@@ -1777,7 +1739,6 @@
         const myTurnColor = arenaPlayerColor === 'black' ? 'b' : 'w';
         if (arenaGame.turn() !== myTurnColor) return;
 
-        // If square already selected and user clicks valid target square
         if (selectedSquareArena && selectedSquareArena !== sq) {
           const legal = arenaGame.moves({ square: selectedSquareArena, verbose: true });
           const isLegalTarget = legal.some(m => m.to === sq);
@@ -1789,7 +1750,6 @@
           }
         }
 
-        // Selection
         const piece = arenaGame.get(sq);
         if (piece && piece.color === myTurnColor) {
           if (selectedSquareArena === sq) {
@@ -1903,7 +1863,6 @@
       });
 
       arenaRoomRef.onDisconnect().remove();
-
       enterArenaRoomUI(code);
       listenToArenaRoom(code);
     }
@@ -1983,7 +1942,6 @@
           arenaMatchActive = false;
         }
 
-        // Update opponent tag
         if (arenaLocalRole === 'host') {
           if (data.guest) {
             $('#arena-opponent-name').text(data.guest.name || 'Guest');
@@ -2000,7 +1958,6 @@
           $('#arena-opponent-title').text(data.host.title || 'Host');
         }
 
-        // FEN updates
         if (data.fen && data.fen !== arenaGame.fen()) {
           arenaGame.load(data.fen);
           arenaBoard.position(data.fen);
@@ -2016,7 +1973,6 @@
         $('#arena-turn-indicator').text(turnText);
       });
 
-      // Chat updates
       db.ref(`arena_chats/${code}`).limitToLast(40).on('child_added', snap => {
         const msg = snap.val();
         if (!msg) return;
@@ -2075,7 +2031,6 @@
     }
 
     function leaveArenaRoom(isResigning = false) {
-      // If actively in a match, prevent leaving and prompt resign
       if (!isResigning && currentArenaRoomId && arenaMatchActive && !arenaGame.game_over()) {
         alert('cannot do this, you have to resign.');
         return;
@@ -2116,7 +2071,7 @@
     }
   </script>
 
-  <!-- COGNISHOP & CS:GO STYLE CRATE SPINNER (NO BLACKOUT) -->
+  <!-- CRATE SPINNER -->
   <script>
     let activeCrateId = null;
     let isSpinning = false;
@@ -2130,7 +2085,6 @@
       return 'fa-tag';
     }
 
-    // High contrast solid card rendering without CSS backdrop-filter to prevent compositor blackout bugs
     function renderCrateItemCard(item) {
       const rarityStyles = {
         common: 'border-emerald-500/80 bg-emerald-950/60 text-emerald-400',
@@ -2158,7 +2112,7 @@
 
       $('#crate-modal-title').text(`Unbox ${crate.name}`);
       $('#crate-result-area').addClass('hidden');
-      $('#crate-spin-btn').prop('disabled', false).text(`Spin for ${crate.cost.toLocaleString()} CC`);
+      $('#crate-spin-btn').prop('disabled', false).text(`Spin for ${crate.cost.toLocaleString()} Coins`);
       $('#crate-modal-close-btn').show();
 
       const $track = $('#crate-track');
@@ -2193,7 +2147,7 @@
       const crate = CRATES[activeCrateId];
       const userCoins = currentUserData.coins || 0;
       if (userCoins < crate.cost) {
-        alert('Insufficient CogniCoins for this crate.');
+        alert('Insufficient Coins for this crate.');
         return;
       }
 
@@ -2202,14 +2156,12 @@
       $('#crate-modal-close-btn').hide();
       $('#crate-result-area').addClass('hidden');
 
-      // Deduct coins
       const newBalance = userCoins - crate.cost;
       db.ref(`users/${currentUser.uid}/coins`).set(newBalance);
 
       const winningItem = pickRandomCrateItem(crate);
       const winningIndex = 42;
 
-      // Re-populate track with 60 high-contrast items and insert winning item at index 42
       const $track = $('#crate-track');
       $track.css({ transition: 'none', transform: 'translateX(0px)' }).empty();
 
@@ -2218,19 +2170,16 @@
         $track.append(renderCrateItemCard(it));
       }
 
-      // Force synchronous DOM layout reflow so the reset to 0px is cleanly committed before animation begins
       void $track[0].offsetWidth;
 
-      const itemWidth = 112 + 8; // w-28 is 112px + 8px gap = 120px
+      const itemWidth = 112 + 8;
       const viewportWidth = $('#crate-viewport').width() || 460;
       const centerTarget = (winningIndex * itemWidth) + (itemWidth / 2) - (viewportWidth / 2) + ((Math.random() - 0.5) * 36);
 
-      // Web Audio spin ticks
       let tickInterval = setInterval(() => SOUNDS.spinTick(), 150);
       setTimeout(() => { clearInterval(tickInterval); tickInterval = setInterval(() => SOUNDS.spinTick(), 320); }, 2500);
       setTimeout(() => { clearInterval(tickInterval); }, 4400);
 
-      // Trigger GPU transform transition
       $track.css({
         transition: 'transform 5s cubic-bezier(0.1, 0.85, 0.2, 1)',
         transform: `translateX(-${centerTarget}px)`
@@ -2255,10 +2204,9 @@
       const invRef = db.ref(`users/${currentUser.uid}/inventory/${item.id}`);
       invRef.once('value').then(snap => {
         if (snap.exists()) {
-          // 50% duplicate refund
           const refund = Math.floor(crateCost * 0.5);
           db.ref(`users/${currentUser.uid}/coins`).transaction(c => (c || 0) + refund);
-          $('#crate-result-refund').text(`Duplicate! 50% Refund credited: +${refund} CC`).removeClass('hidden');
+          $('#crate-result-refund').text(`Duplicate! 50% Refund credited: +${refund} Coins`).removeClass('hidden');
         } else {
           invRef.set(true);
           $('#crate-result-refund').addClass('hidden');
@@ -2339,21 +2287,18 @@
       $('#profile-preview-icon').removeClass().addClass(`fa-solid ${icon.icon}`);
       $('#profile-preview-frame').removeClass('frame-bronze frame-silver frame-neon frame-gold').addClass(frame.css || '');
       $('#profile-preview-elo').text(data.elo || 500);
-      $('#profile-preview-coins').text(`${(data.coins || 0).toLocaleString()} CC`);
+      $('#profile-preview-coins').text(`${(data.coins || 0).toLocaleString()} Coins`);
 
-      // Update AI Board bottom bar
       $('#ai-player-name').text(data.name || 'You');
       $('#ai-player-title').text(title.name);
       $('#ai-player-icon').removeClass().addClass(`fa-solid ${icon.icon}`);
       $('#ai-player-avatar-wrapper').removeClass('frame-bronze frame-silver frame-neon frame-gold').addClass(frame.css || '');
 
-      // Update Top Nav
       $('#user-display-name').text(data.name || 'Player');
       $('#user-coins-display').text((data.coins || 0).toLocaleString());
       $('#user-elo-display').text(data.elo || 500);
       $('#ai-player-elo').text(data.elo || 500);
 
-      // Apply theme CSS to board wrappers
       $('#ai-board, #arena-board').removeClass('theme-wood theme-green theme-grey').addClass(theme.css || 'theme-wood');
     }
   </script>
@@ -2376,7 +2321,7 @@
         const badge = claimed
           ? `<span class="text-slate-500 font-bold"><i class="fa-solid fa-check-double text-emerald-400"></i> Done</span>`
           : isDone
-            ? `<button onclick="claimQuestReward('${q.id}', ${q.reward})" class="px-2 py-0.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] animate-pulse">Claim +${q.reward} CC</button>`
+            ? `<button onclick="claimQuestReward('${q.id}', ${q.reward})" class="px-2 py-0.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] animate-pulse">Claim +${q.reward} Coins</button>`
             : `<span class="text-slate-400 font-semibold">${progress}/${q.target}</span>`;
 
         $c.append(`
@@ -2452,7 +2397,6 @@
     }
 
     function listenToFriendsAndRequests(uid) {
-      // Pending requests
       db.ref(`users/${uid}/friend_requests`).on('value', snap => {
         const reqs = snap.val();
         const $card = $('#friend-requests-card');
@@ -2475,7 +2419,6 @@
         });
       });
 
-      // Confirmed Friends
       db.ref(`users/${uid}/friends`).on('value', snap => {
         const friends = snap.val();
         const $list = $('#friends-list').empty();
@@ -2558,7 +2501,7 @@
               </td>
               <td class="py-3 px-3"><span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-slate-900 text-slate-300 border border-slate-800">${escapeHtml(title.name)}</span></td>
               <td class="py-3 px-3 text-right font-black text-indigo-300">${u.elo || 500}</td>
-              <td class="py-3 px-3 text-right font-semibold text-amber-300">${(u.coins || 0).toLocaleString()} CC</td>
+              <td class="py-3 px-3 text-right font-semibold text-amber-300">${(u.coins || 0).toLocaleString()} Coins</td>
             </tr>
           `);
         });
@@ -2640,8 +2583,8 @@
               <td class="py-2.5 px-2 font-black text-indigo-300">${u.elo || 500}</td>
               <td class="py-2.5 px-2 font-semibold text-amber-300">${(u.coins || 0).toLocaleString()}</td>
               <td class="py-2.5 px-2 text-right space-x-1">
-                <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white text-[10px] font-bold">+10k CC</button>
-                <button onclick="adminResetCoins('${uid}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Reset CC</button>
+                <button onclick="adminGrantCoins('${uid}')" class="px-2 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white text-[10px] font-bold">+10k Coins</button>
+                <button onclick="adminResetCoins('${uid}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold">Reset Coins</button>
                 <button onclick="adminResetElo('${uid}')" class="px-2 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold">Reset Elo</button>
                 <button onclick="adminDeleteUser('${uid}')" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold">Delete</button>
               </td>
@@ -2679,7 +2622,6 @@
     }
 
     function attachSystemListeners() {
-      // Maintenance Mode Listener
       db.ref('system/maintenance').on('value', snap => {
         const isMaint = snap.val() === true;
         const $status = $('#admin-maint-status');
@@ -2697,7 +2639,6 @@
         }
       });
 
-      // Force Reload Listener
       db.ref('system/force_reload').on('value', snap => {
         const time = snap.val();
         if (time && time > PAGE_LOAD_TIME + 2000) {
@@ -2705,7 +2646,6 @@
         }
       });
 
-      // Global Announcements Listener (Big Broadcast Toast)
       db.ref('system/broadcast').on('value', snap => {
         const ann = snap.val();
         if (!ann || !ann.message) return;
@@ -2717,7 +2657,6 @@
       });
     }
 
-    // Auth Lifecycle
     auth.onAuthStateChanged(user => {
       if (!user) {
         window.location.replace('index.html');

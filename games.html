@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Z-Games — World Explorer GeoGuessr</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Pannellum 360 Viewer (Free Open-Source) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+
+  <!-- Leaflet Map (Free OpenStreetMap) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Firebase Compat SDKs (10.7.1) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #030712;
+      color: #f8fafc;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    #panorama-view {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1;
+    }
+    .glass-ui {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    /* Collapsible Mini Map */
+    #guess-map-container {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 30;
+    }
+    #guess-map-container.minimized {
+      width: 240px;
+      height: 160px;
+      opacity: 0.85;
+    }
+    #guess-map-container.expanded {
+      width: min(520px, 90vw);
+      height: min(380px, 60vh);
+      opacity: 1;
+    }
+    .leaflet-container {
+      background: #0f172a !important;
+      border-radius: 1rem;
+    }
+  </style>
+</head>
+
+<body class="relative select-none">
+
+  <!-- 1. Fullscreen 360° Panorama Viewer Container -->
+  <div id="panorama-view"></div>
+
+  <!-- 2. Top Header Overlay -->
+  <header class="absolute top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
+    <!-- Left: Branding & Back to Chess -->
+    <div class="flex items-center gap-3 pointer-events-auto">
+      <a href="app.html" class="glass-ui px-4 py-2.5 rounded-2xl flex items-center gap-2.5 text-xs font-black text-amber-400 hover:text-amber-300 transition-all hover:scale-105 shadow-2xl">
+        <i class="fa-solid fa-chess-knight text-base"></i>
+        <span>Return to Z-Chess</span>
+      </a>
+
+      <div class="glass-ui px-3.5 py-2.5 rounded-2xl flex items-center gap-2 text-xs font-bold text-white shadow-2xl hidden sm:flex">
+        <i class="fa-solid fa-earth-americas text-cyan-400"></i>
+        <span>World Explorer</span>
+      </div>
+    </div>
+
+    <!-- Right: Shared Coins & Round Counter -->
+    <div class="flex items-center gap-3 pointer-events-auto">
+      <div class="glass-ui px-4 py-2 rounded-2xl flex items-center gap-2 text-xs font-bold shadow-2xl">
+        <i class="fa-solid fa-coins text-amber-400 text-sm"></i>
+        <span id="player-coins" class="text-amber-400 font-mono text-sm">0</span>
+        <span class="text-[10px] text-slate-400 font-mono">ZC</span>
+      </div>
+
+      <div class="glass-ui px-3 py-2 rounded-2xl text-xs font-mono font-bold text-cyan-300 shadow-2xl">
+        Round <span id="round-number">1</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. Floating Collapsible Guess Map (Bottom-Right) -->
+  <div id="guess-map-container" class="absolute bottom-5 right-5 minimized glass-ui rounded-3xl p-3 shadow-2xl flex flex-col justify-between">
+    <div class="flex items-center justify-between pb-2 px-1">
+      <div class="text-[11px] font-mono font-bold text-slate-300 flex items-center gap-1.5">
+        <i class="fa-solid fa-location-dot text-rose-500"></i> Click Map to Drop Pin
+      </div>
+      <button onclick="toggleMapSize()" class="text-xs text-slate-400 hover:text-white transition-colors">
+        <i id="expand-icon" class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+
+    <!-- Leaflet Map -->
+    <div id="leaflet-map" class="w-full flex-1 rounded-2xl overflow-hidden my-1"></div>
+
+    <!-- Guess Submit Button -->
+    <button id="btn-submit-guess" onclick="submitGuess()" disabled class="w-full mt-2 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 disabled:opacity-40 disabled:cursor-not-allowed hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-500/20">
+      Place Pin to Guess
+    </button>
+  </div>
+
+  <!-- 4. Round Result & Rewards Modal -->
+  <div id="result-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md hidden">
+    <div class="glass-ui rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-cyan-500/40 shadow-2xl text-center space-y-4">
+      
+      <div class="w-16 h-16 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+
+      <div>
+        <h3 id="result-location-name" class="text-xl font-black text-white">Location Name</h3>
+        <p id="result-distance-text" class="text-xs font-mono text-cyan-300 mt-1">You were 0 km away</p>
+      </div>
+
+      <!-- Coin Payout Card -->
+      <div class="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/30 flex items-center justify-between">
+        <div class="text-left">
+          <div class="text-xs font-bold text-white">Reward Earned</div>
+          <div class="text-[10px] text-slate-400">Added to your shared Z-Chess wallet</div>
+        </div>
+        <div class="text-lg font-mono font-black text-amber-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-coins"></i>
+          <span id="result-coins-awarded">+0 ZC</span>
+        </div>
+      </div>
+
+      <button onclick="nextRound()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-xl shadow-cyan-500/25">
+        Next Location <i class="fa-solid fa-arrow-right ml-1"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // --- 1. FIREBASE AUTH & DATABASE ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
+      authDomain: "chess-7df7a.firebaseapp.com",
+      databaseURL: "https://chess-7df7a-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "chess-7df7a",
+      storageBucket: "chess-7df7a.firebasestorage.app",
+      messagingSenderId: "807640572322",
+      appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    let currentUser = null;
+    let userCoins = 0;
+
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUser = user;
+      db.ref(`users/${user.uid}/coins`).on('value', (snap) => {
+        userCoins = snap.val() || 0;
+        document.getElementById('player-coins').textContent = userCoins;
+      });
+    });
+
+    // --- 2. 100% FREE 360° LOCATION DATASET ---
+    const LOCATIONS = [
+      {
+        name: "Eiffel Tower, Paris, France",
+        lat: 48.8584,
+        lng: 2.2945,
+        panorama: "https://pannellum.org/images/alma.jpg"
+      },
+      {
+        name: "Cerro San Cristóbal, Santiago, Chile",
+        lat: -33.4253,
+        lng: -70.6334,
+        panorama: "https://pannellum.org/images/cerro-toco-0.jpg"
+      },
+      {
+        name: "Milan Botanical Garden, Italy",
+        lat: 45.4707,
+        lng: 9.1895,
+        panorama: "https://pannellum.org/images/bma-0.jpg"
+      },
+      {
+        name: "Historic Charles Bridge, Prague, Czech Republic",
+        lat: 50.0865,
+        lng: 14.4114,
+        panorama: "https://pannellum.org/images/jfk.jpg"
+      }
+    ];
+
+    let currentLocationIndex = 0;
+    let currentRound = 1;
+    let panoViewer = null;
+    let leafletMap = null;
+    let guessMarker = null;
+    let selectedLatLng = null;
+
+    // --- 3. INIT MAP & PANORAMA ---
+    function initGame() {
+      loadLocation(currentLocationIndex);
+      initLeafletMap();
+    }
+
+    function loadLocation(index) {
+      const loc = LOCATIONS[index];
+      if (panoViewer) {
+        try { panoViewer.destroy(); } catch (e) {}
+      }
+      panoViewer = pannellum.viewer('panorama-view', {
+        type: 'equirectangular',
+        panorama: loc.panorama,
+        autoLoad: true,
+        showZoomCtrl: true,
+        showFullscreenCtrl: false,
+        compass: true
+      });
+    }
+
+    function initLeafletMap() {
+      leafletMap = L.map('leaflet-map', {
+        center: [20, 0],
+        zoom: 1,
+        minZoom: 1,
+        maxZoom: 17,
+        zoomControl: false,
+        attributionControl: false
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      }).addTo(leafletMap);
+
+      leafletMap.on('click', (e) => {
+        selectedLatLng = e.latlng;
+        if (guessMarker) {
+          guessMarker.setLatLng(e.latlng);
+        } else {
+          guessMarker = L.marker(e.latlng).addTo(leafletMap);
+        }
+        const btn = document.getElementById('btn-submit-guess');
+        btn.disabled = false;
+        btn.textContent = "Submit Guess";
+      });
+    }
+
+    function toggleMapSize() {
+      const mapBox = document.getElementById('guess-map-container');
+      const icon = document.getElementById('expand-icon');
+      if (mapBox.classList.contains('minimized')) {
+        mapBox.classList.remove('minimized');
+        mapBox.classList.add('expanded');
+        icon.classList.remove('fa-expand');
+        icon.classList.add('fa-compress');
+      } else {
+        mapBox.classList.remove('expanded');
+        mapBox.classList.add('minimized');
+        icon.classList.remove('fa-compress');
+        icon.classList.add('fa-expand');
+      }
+      setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 300);
+    }
+
+    // --- 4. HAVERSINE DISTANCE FORMULA ---
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth radius in km
+      const dLat = (lat2 - lat1) * (Math.PI / 180);
+      const dLon = (lon2 - lon1) * (Math.PI / 180);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    async function submitGuess() {
+      if (!selectedLatLng) return;
+
+      const loc = LOCATIONS[currentLocationIndex];
+      const distKm = Math.round(calculateDistance(selectedLatLng.lat, selectedLatLng.lng, loc.lat, loc.lng));
+
+      // Calculate Coin Award
+      let coinsWon = 5;
+      if (distKm <= 50) coinsWon = 100;
+      else if (distKm <= 350) coinsWon = 60;
+      else if (distKm <= 1500) coinsWon = 30;
+      else if (distKm <= 5000) coinsWon = 15;
+
+      // Update shared Firebase coins
+      if (currentUser) {
+        await db.ref(`users/${currentUser.uid}/coins`).set(userCoins + coinsWon);
+      }
+
+      // Display Results
+      document.getElementById('result-location-name').textContent = loc.name;
+      document.getElementById('result-distance-text').textContent = `Your guess was ${distKm.toLocaleString()} km away.`;
+      document.getElementById('result-coins-awarded').textContent = `+${coinsWon} ZC`;
+      document.getElementById('result-modal').classList.remove('hidden');
+    }
+
+    function nextRound() {
+      document.getElementById('result-modal').classList.add('hidden');
+      if (guessMarker) {
+        leafletMap.removeLayer(guessMarker);
+        guessMarker = null;
+      }
+      selectedLatLng = null;
+      document.getElementById('btn-submit-guess').disabled = true;
+      document.getElementById('btn-submit-guess').textContent = "Place Pin to Guess";
+
+      currentRound++;
+      document.getElementById('round-number').textContent = currentRound;
+
+      currentLocationIndex = (currentLocationIndex + 1) % LOCATIONS.length;
+      loadLocation(currentLocationIndex);
+    }
+
+    window.onload = initGame;
+  </script>
+</body>
+</html>

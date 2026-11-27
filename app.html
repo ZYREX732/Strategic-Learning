@@ -39,11 +39,27 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <style>
-        /* Custom scrollbar */
+        /* Ambient Background & Custom Scrollbar */
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 15% 10%, rgba(16, 185, 129, 0.07) 0px, transparent 45%),
+                radial-gradient(at 85% 20%, rgba(56, 189, 248, 0.06) 0px, transparent 45%),
+                radial-gradient(at 50% 90%, rgba(139, 92, 246, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        /* Glassmorphic Card Surface */
+        .cogni-card {
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.55);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        }
 
         /* Board Themes */
         .theme-wood .white-1e1d7 { background-color: #eedcbe !important; color: #b88b4a; }
@@ -53,12 +69,17 @@
         .theme-grey .white-1e1d7 { background-color: #e0e0e0 !important; color: #4e5663; }
         .theme-grey .black-3c85d { background-color: #4e5663 !important; color: #e0e0e0; }
 
-        /* Board highlights & move dots */
+        /* Board highlights, selected square & move dots */
         .highlight-last-move {
             background-color: rgba(250, 204, 21, 0.45) !important;
         }
+        .highlight-selected {
+            background-color: rgba(16, 185, 129, 0.45) !important;
+            box-shadow: inset 0 0 0 2px rgba(16, 185, 129, 0.85) !important;
+        }
         .move-dest-dot {
             position: relative;
+            cursor: pointer;
         }
         .move-dest-dot::after {
             content: '';
@@ -66,15 +87,17 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 26%;
-            height: 26%;
-            background: rgba(34, 197, 94, 0.7);
+            width: 28%;
+            height: 28%;
+            background: rgba(16, 185, 129, 0.78);
             border-radius: 50%;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
             pointer-events: none;
-            z-index: 5;
+            z-index: 15;
         }
         .move-dest-capture {
             position: relative;
+            cursor: pointer;
         }
         .move-dest-capture::after {
             content: '';
@@ -84,14 +107,14 @@
             transform: translate(-50%, -50%);
             width: 84%;
             height: 84%;
-            border: 4px solid rgba(239, 68, 68, 0.7);
+            border: 4px solid rgba(244, 63, 94, 0.8);
             border-radius: 50%;
             pointer-events: none;
-            z-index: 5;
+            z-index: 15;
         }
 
         /* Avatar Cosmetic Frames */
-        .frame-none { border: 2px solid transparent; }
+        .frame-none { border: 2px solid rgba(51, 65, 85, 0.6); }
         .frame-bronze { border: 2px solid #cd7f32; box-shadow: 0 0 8px rgba(205, 127, 50, 0.4); }
         .frame-silver { border: 2px solid #c0c0c0; box-shadow: 0 0 10px rgba(192, 192, 192, 0.5); }
         .frame-gold { border: 2px solid #ffd700; box-shadow: 0 0 12px rgba(255, 215, 0, 0.6); }
@@ -132,7 +155,7 @@
         #maintenance-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.98);
+            background: rgba(2, 6, 23, 0.98);
             z-index: 9999;
             display: none;
             align-items: center;
@@ -141,14 +164,14 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+<body class="text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
 
     <!-- Tailwind safelist for dynamic tab colors -->
     <div class="hidden bg-emerald-600 bg-rose-600 bg-amber-600 bg-violet-600 bg-cyan-600 bg-sky-600 bg-red-600"></div>
 
     <!-- Maintenance Overlay -->
     <div id="maintenance-overlay">
-        <div class="text-center p-8 max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl">
+        <div class="text-center p-8 max-w-md cogni-card rounded-3xl">
             <i class="fa-solid fa-screwdriver-wrench text-5xl text-amber-500 mb-4 animate-bounce"></i>
             <h1 class="text-2xl font-bold mb-2">CogniLearn Maintenance</h1>
             <p class="text-sm text-slate-400 mb-6">We are currently performing scheduled maintenance to improve your experience. Please check back shortly!</p>
@@ -158,7 +181,7 @@
 
     <!-- Global Broadcast Toast -->
     <div id="broadcast-toast" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-md w-full px-4">
-        <div class="bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 backdrop-blur-md rounded-2xl p-4 shadow-2xl flex items-start gap-3">
+        <div class="bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 backdrop-blur-xl rounded-2xl p-4 shadow-2xl flex items-start gap-3">
             <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
                 <i class="fa-solid fa-bullhorn animate-pulse"></i>
             </div>
@@ -174,65 +197,65 @@
     </div>
 
     <!-- Top Navigation Bar -->
-    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
+    <header class="bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Brand Logo -->
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-600/30">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white shadow-lg shadow-emerald-600/25 ring-1 ring-white/15">
                     <i class="fa-solid fa-chess-knight text-xl"></i>
                 </div>
                 <div>
-                    <span class="font-black text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">CogniLearn</span>
-                    <span class="text-[10px] block font-mono text-emerald-400 -mt-1 font-semibold">CHESS ARENA</span>
+                    <span class="font-black text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">CogniLearn</span>
+                    <span class="text-[10px] block font-mono text-emerald-400 -mt-1 font-semibold tracking-widest">CHESS ARENA</span>
                 </div>
             </div>
 
-            <!-- Navigation Tabs -->
-            <nav class="hidden md:flex items-center gap-1.5">
-                <button onclick="showSection('ai')" id="nav-ai" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+            <!-- Navigation Pill Bar -->
+            <nav class="hidden md:flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800/80">
+                <button onclick="showSection('ai')" id="nav-ai" class="nav-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
                     <i class="fa-solid fa-robot"></i> Play vs AI
                 </button>
-                <button onclick="showSection('arena')" id="nav-arena" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                <button onclick="showSection('arena')" id="nav-arena" class="nav-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
                     <i class="fa-solid fa-swords"></i> 1v1 Arena
                 </button>
-                <button onclick="showSection('shop')" id="nav-shop" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                <button onclick="showSection('shop')" id="nav-shop" class="nav-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
                     <i class="fa-solid fa-store"></i> CogniShop
                 </button>
-                <button onclick="showSection('profile')" id="nav-profile" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                <button onclick="showSection('profile')" id="nav-profile" class="nav-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
                     <i class="fa-solid fa-user-astronaut"></i> Profile
                 </button>
-                <button onclick="showSection('friends')" id="nav-friends" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                <button onclick="showSection('friends')" id="nav-friends" class="nav-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
                     <i class="fa-solid fa-user-group"></i> Friends
                 </button>
-                <button onclick="showSection('leaderboard')" id="nav-leaderboard" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                <button onclick="showSection('leaderboard')" id="nav-leaderboard" class="nav-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
                     <i class="fa-solid fa-trophy"></i> Leaderboard
                 </button>
                 <!-- Master Admin Link (Shown only to zainisgo123@gmail.com) -->
-                <button onclick="showSection('admin')" id="admin-nav-link" class="hidden nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition-all text-red-400 hover:text-white hover:bg-red-950/60 flex items-center gap-2">
+                <button onclick="showSection('admin')" id="admin-nav-link" class="hidden nav-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all text-red-400 hover:text-white hover:bg-red-950/60 flex items-center gap-2">
                     <i class="fa-solid fa-shield-halved"></i> Master Admin
                 </button>
             </nav>
 
             <!-- User Balance & Header Profile -->
             <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2 bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-xl shadow-inner">
+                <div class="flex items-center gap-2 bg-slate-900/90 border border-amber-500/20 px-3.5 py-1.5 rounded-xl shadow-inner">
                     <i class="fa-solid fa-coins text-amber-400 text-sm"></i>
                     <span id="user-coins-display" class="font-mono text-xs font-bold text-amber-400">0</span>
-                    <span class="text-[10px] text-slate-500 font-bold">CC</span>
+                    <span class="text-[10px] text-amber-500/70 font-bold">CC</span>
                 </div>
 
-                <div class="flex items-center gap-2 pl-2 border-l border-slate-800">
-                    <div id="header-avatar-frame" class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-200 overflow-hidden relative frame-none">
+                <div class="flex items-center gap-2.5 pl-2 border-l border-slate-800">
+                    <div id="header-avatar-frame" class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-slate-200 overflow-hidden relative frame-none">
                         <i id="header-avatar-icon" class="fa-solid fa-user text-sm"></i>
                     </div>
                     <div class="hidden lg:block text-left">
                         <div class="flex items-center gap-1.5">
-                            <span id="header-username" class="text-xs font-bold text-slate-200 max-w-[100px] truncate block">Guest</span>
-                            <span id="header-nametag" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-semibold uppercase">Novice</span>
+                            <span id="header-username" class="text-xs font-bold text-slate-100 max-w-[100px] truncate block">Guest</span>
+                            <span id="header-nametag" class="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-800/90 text-slate-400 font-semibold uppercase">Novice</span>
                         </div>
-                        <span id="header-elo" class="text-[10px] font-mono text-emerald-400">500 Elo</span>
+                        <span id="header-elo" class="text-[10px] font-mono text-emerald-400 font-semibold">500 Elo</span>
                     </div>
-                    <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-rose-400 transition-colors ml-1" title="Sign Out">
+                    <button onclick="handleLogout()" class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all ml-1" title="Sign Out">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
@@ -240,7 +263,7 @@
         </div>
 
         <!-- Mobile Navigation Subbar -->
-        <div class="flex md:hidden items-center justify-around border-t border-slate-800 bg-slate-900/95 px-2 py-2 text-xs">
+        <div class="flex md:hidden items-center justify-around border-t border-slate-800/80 bg-slate-950/95 px-2 py-2 text-xs">
             <button onclick="showSection('ai')" class="p-2 text-slate-400 hover:text-emerald-400"><i class="fa-solid fa-robot text-base"></i></button>
             <button onclick="showSection('arena')" class="p-2 text-slate-400 hover:text-rose-400"><i class="fa-solid fa-swords text-base"></i></button>
             <button onclick="showSection('shop')" class="p-2 text-slate-400 hover:text-amber-400"><i class="fa-solid fa-store text-base"></i></button>
@@ -251,13 +274,15 @@
     </header>
 
     <!-- Quests Bar Component -->
-    <div class="bg-slate-900 border-b border-slate-800/80 px-4 py-2 text-xs">
+    <div class="bg-slate-900/60 backdrop-blur-md border-b border-slate-800/70 px-4 py-2.5 text-xs">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
-                <i class="fa-solid fa-scroll text-amber-400"></i>
-                <span class="font-bold uppercase tracking-wider text-slate-400 text-[11px]">Daily Quests</span>
+                <span class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <i class="fa-solid fa-scroll text-[11px]"></i>
+                </span>
+                <span class="font-bold uppercase tracking-wider text-slate-300 text-[11px]">Daily Quests</span>
             </div>
-            <div id="quests-container" class="flex flex-wrap items-center gap-4 text-slate-300">
+            <div id="quests-container" class="flex flex-wrap items-center gap-3 text-slate-300">
                 <!-- Injected via JavaScript -->
             </div>
         </div>
@@ -271,18 +296,18 @@
         <!-- ========================================== -->
         <section id="section-ai" class="space-y-6">
             <!-- AI Header Controls -->
-            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+            <div class="flex flex-wrap items-center justify-between gap-3 cogni-card rounded-2xl p-3.5">
                 <div class="flex items-center gap-3">
-                    <label class="text-xs font-semibold text-slate-400 uppercase">Play as:</label>
-                    <select id="ai-side-select" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 font-medium text-white focus:outline-none focus:border-emerald-500">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Play as:</label>
+                    <select id="ai-side-select" class="bg-slate-950/90 border border-slate-700/80 text-xs rounded-xl px-3 py-1.5 font-semibold text-white focus:outline-none focus:border-emerald-500 transition-colors">
                         <option value="w" selected>White</option>
                         <option value="b">Black</option>
                         <option value="random">Random</option>
                     </select>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button id="ai-resign-btn" onclick="aiResignGame()" class="text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg transition-all font-semibold">Resign</button>
-                    <button onclick="resetAiGame()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg transition-all font-semibold"><i class="fa-solid fa-rotate-right mr-1"></i>New Game</button>
+                <div class="flex items-center gap-2.5">
+                    <button id="ai-resign-btn" onclick="aiResignGame()" class="text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3.5 py-1.5 rounded-xl transition-all font-semibold">Resign</button>
+                    <button onclick="resetAiGame()" class="text-xs bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 px-4 py-1.5 rounded-xl transition-all font-semibold"><i class="fa-solid fa-rotate-right mr-1.5"></i>New Game</button>
                 </div>
             </div>
 
@@ -293,46 +318,46 @@
                 <div class="lg:col-span-7 flex flex-col items-center">
                     
                     <!-- Bot Player Info Display -->
-                    <div class="w-full max-w-[480px] bg-slate-900 border border-slate-800 rounded-t-2xl p-3 flex items-center justify-between">
+                    <div class="w-full max-w-[480px] cogni-card rounded-t-2xl p-3.5 flex items-center justify-between border-b-0">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-emerald-400 text-lg shadow-inner">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg shadow-inner">
                                 <i class="fa-solid fa-robot"></i>
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
                                     <span class="font-bold text-sm text-white">CogniBot AI</span>
-                                    <span class="text-xs px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 font-mono font-bold">500 Elo</span>
+                                    <span class="text-[11px] px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono font-bold">500 Elo</span>
                                 </div>
-                                <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>Online AI</span>
+                                <span class="text-[11px] text-slate-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>Tactical Engine Ready</span>
                             </div>
                         </div>
-                        <div id="ai-eval-badge" class="font-mono text-xs text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">Eval: 0.0</div>
+                        <div id="ai-eval-badge" class="font-mono text-xs text-slate-300 bg-slate-950/90 px-3 py-1 rounded-xl border border-slate-800">Eval: 0.0</div>
                     </div>
 
                     <!-- The Chess Board -->
-                    <div class="w-full max-w-[480px] aspect-square bg-slate-900 border-x border-slate-800 relative">
+                    <div class="w-full max-w-[480px] aspect-square bg-slate-900 border-x border-slate-800/80 relative shadow-2xl">
                         <div id="ai-board" class="w-full h-full"></div>
                         <!-- In-Game Emote Floating Display -->
                         <div id="ai-player-emote-display" class="absolute bottom-6 right-6 pointer-events-none hidden z-20"></div>
                     </div>
 
                     <!-- User Player Info Display -->
-                    <div class="w-full max-w-[480px] bg-slate-900 border border-slate-800 rounded-b-2xl p-3 flex items-center justify-between">
+                    <div class="w-full max-w-[480px] cogni-card rounded-b-2xl p-3.5 flex items-center justify-between border-t-0">
                         <div class="flex items-center gap-3">
-                            <div id="ai-user-frame" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-white text-lg relative frame-none">
+                            <div id="ai-user-frame" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-white text-lg relative frame-none">
                                 <i id="ai-user-icon" class="fa-solid fa-user"></i>
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
                                     <span id="ai-user-name" class="font-bold text-sm text-white">You</span>
-                                    <span id="ai-user-nametag" class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">Novice</span>
+                                    <span id="ai-user-nametag" class="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">Novice</span>
                                 </div>
-                                <span id="ai-user-elo" class="text-xs font-mono text-emerald-400">500 Elo</span>
+                                <span id="ai-user-elo" class="text-xs font-mono text-emerald-400 font-semibold">500 Elo</span>
                             </div>
                         </div>
                         <!-- Emote Fire Button -->
                         <div class="flex items-center gap-2">
-                            <button onclick="triggerInGameEmote('ai')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all font-medium flex items-center gap-1.5">
+                            <button onclick="triggerInGameEmote('ai')" class="text-xs bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-1.5 rounded-xl transition-all font-semibold flex items-center gap-1.5">
                                 <i class="fa-regular fa-face-smile text-amber-400"></i> Emote
                             </button>
                         </div>
@@ -344,21 +369,21 @@
                 <div class="lg:col-span-5 space-y-4">
                     
                     <!-- Turn Status Box -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                    <div class="cogni-card rounded-2xl p-5">
                         <div class="flex items-center justify-between mb-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Match Status</span>
-                            <span id="ai-turn-indicator" class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">White to Move</span>
+                            <span id="ai-turn-indicator" class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">White to Move</span>
                         </div>
-                        <div id="ai-status-text" class="text-sm font-semibold text-slate-200">Game in progress... Good luck!</div>
+                        <div id="ai-status-text" class="text-sm font-semibold text-slate-200">Game in progress... Click or drag a piece to move!</div>
                     </div>
 
                     <!-- Move Log Table -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                    <div class="cogni-card rounded-2xl p-5">
                         <div class="flex items-center justify-between mb-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Move History</span>
                             <span id="ai-move-count" class="text-xs font-mono text-slate-500">0 Moves</span>
                         </div>
-                        <div id="ai-move-history" class="h-64 overflow-y-auto space-y-1 pr-1 font-mono text-xs">
+                        <div id="ai-move-history" class="h-64 overflow-y-auto space-y-1 pr-1 font-mono text-xs bg-slate-950/50 rounded-xl p-2 border border-slate-800/60">
                             <div class="text-slate-500 italic text-center py-8">No moves made yet. Make your first move!</div>
                         </div>
                     </div>
@@ -374,9 +399,9 @@
         <section id="section-arena" class="space-y-6 hidden">
             
             <!-- Room Lobby Overlay / Control Panel -->
-            <div id="arena-lobby-panel" class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div id="arena-lobby-panel" class="cogni-card rounded-3xl p-8">
                 <div class="max-w-xl mx-auto text-center space-y-4">
-                    <div class="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 text-2xl mx-auto">
+                    <div class="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 text-2xl mx-auto shadow-lg shadow-rose-500/10">
                         <i class="fa-solid fa-swords"></i>
                     </div>
                     <h2 class="text-2xl font-black text-white">Live 1v1 Room Arena</h2>
@@ -398,15 +423,15 @@
             <div id="arena-active-match" class="hidden space-y-6">
                 
                 <!-- Arena Top Bar -->
-                <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+                <div class="flex flex-wrap items-center justify-between gap-3 cogni-card rounded-2xl p-3.5">
                     <div class="flex items-center gap-3">
                         <span class="text-xs font-semibold text-slate-400 uppercase">Room Code:</span>
                         <span id="arena-current-code" class="text-sm font-mono font-black text-rose-400 tracking-widest bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-lg">------</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="offerArenaDraw()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all font-semibold">Offer Draw</button>
-                        <button onclick="resignArenaMatch()" class="text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg transition-all font-semibold">Resign</button>
-                        <button onclick="leaveArenaRoom()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-lg transition-all">Leave Room</button>
+                        <button onclick="offerArenaDraw()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl transition-all font-semibold">Offer Draw</button>
+                        <button onclick="resignArenaMatch()" class="text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-xl transition-all font-semibold">Resign</button>
+                        <button onclick="leaveArenaRoom()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-xl transition-all">Leave Room</button>
                     </div>
                 </div>
 
@@ -416,23 +441,23 @@
                     <div class="lg:col-span-7 flex flex-col items-center">
                         
                         <!-- Opponent Card -->
-                        <div class="w-full max-w-[480px] bg-slate-900 border border-slate-800 rounded-t-2xl p-3 flex items-center justify-between">
+                        <div class="w-full max-w-[480px] cogni-card rounded-t-2xl p-3.5 flex items-center justify-between border-b-0">
                             <div class="flex items-center gap-3">
-                                <div id="arena-opp-frame" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-white text-lg relative frame-none">
+                                <div id="arena-opp-frame" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-white text-lg relative frame-none">
                                     <i id="arena-opp-icon" class="fa-solid fa-user-ninja"></i>
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <span id="arena-opp-name" class="font-bold text-sm text-white">Waiting for opponent...</span>
-                                        <span id="arena-opp-nametag" class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">--</span>
+                                        <span id="arena-opp-nametag" class="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">--</span>
                                     </div>
-                                    <span id="arena-opp-elo" class="text-xs font-mono text-slate-500">500 Elo</span>
+                                    <span id="arena-opp-elo" class="text-xs font-mono text-slate-400">500 Elo</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- The 1v1 Board -->
-                        <div class="w-full max-w-[480px] aspect-square bg-slate-900 border-x border-slate-800 relative">
+                        <div class="w-full max-w-[480px] aspect-square bg-slate-900 border-x border-slate-800/80 relative shadow-2xl">
                             <div id="arena-board" class="w-full h-full"></div>
                             <!-- Arena Opponent Emote Display -->
                             <div id="arena-opp-emote-display" class="absolute top-6 left-6 pointer-events-none hidden z-20"></div>
@@ -441,20 +466,20 @@
                         </div>
 
                         <!-- Player Card -->
-                        <div class="w-full max-w-[480px] bg-slate-900 border border-slate-800 rounded-b-2xl p-3 flex items-center justify-between">
+                        <div class="w-full max-w-[480px] cogni-card rounded-b-2xl p-3.5 flex items-center justify-between border-t-0">
                             <div class="flex items-center gap-3">
-                                <div id="arena-self-frame" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-white text-lg relative frame-none">
+                                <div id="arena-self-frame" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-white text-lg relative frame-none">
                                     <i id="arena-self-icon" class="fa-solid fa-user"></i>
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <span id="arena-self-name" class="font-bold text-sm text-white">You</span>
-                                        <span id="arena-self-nametag" class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">Novice</span>
+                                        <span id="arena-self-nametag" class="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-bold uppercase">Novice</span>
                                     </div>
-                                    <span id="arena-self-elo" class="text-xs font-mono text-rose-400">500 Elo</span>
+                                    <span id="arena-self-elo" class="text-xs font-mono text-rose-400 font-semibold">500 Elo</span>
                                 </div>
                             </div>
-                            <button onclick="triggerInGameEmote('arena')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all font-medium flex items-center gap-1.5">
+                            <button onclick="triggerInGameEmote('arena')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-1.5 rounded-xl transition-all font-semibold flex items-center gap-1.5">
                                 <i class="fa-regular fa-face-smile text-amber-400"></i> Emote
                             </button>
                         </div>
@@ -464,22 +489,22 @@
                     <!-- 1v1 Match Chat & Log (5 cols) -->
                     <div class="lg:col-span-5 space-y-4">
                         
-                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                        <div class="cogni-card rounded-2xl p-5">
                             <div class="flex items-center justify-between mb-3">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Room Status</span>
-                                <span id="arena-turn-indicator" class="text-xs font-bold px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">Waiting...</span>
+                                <span id="arena-turn-indicator" class="text-xs font-bold px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">Waiting...</span>
                             </div>
                             <div id="arena-status-msg" class="text-sm font-semibold text-slate-200">Share room code with an opponent to start!</div>
                         </div>
 
                         <!-- Arena Chat Box -->
-                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col h-80">
+                        <div class="cogni-card rounded-2xl p-5 flex flex-col h-80">
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Match Chat</span>
-                            <div id="arena-chat-messages" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
+                            <div id="arena-chat-messages" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs bg-slate-950/50 rounded-xl p-2.5 border border-slate-800/60">
                                 <div class="text-slate-600 italic">Match chat initialized. Be respectful!</div>
                             </div>
                             <form id="arena-chat-form" onsubmit="sendArenaChat(event)" class="mt-3 flex gap-2">
-                                <input type="text" id="arena-chat-input" placeholder="Type message..." maxlength="500" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
+                                <input type="text" id="arena-chat-input" placeholder="Type message..." maxlength="500" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
                                 <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all"><i class="fa-solid fa-paper-plane"></i></button>
                             </form>
                         </div>
@@ -497,14 +522,14 @@
         <section id="section-shop" class="space-y-6 hidden">
             
             <!-- Shop Title Banner -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="cogni-card rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-black text-white flex items-center gap-2">
+                    <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
                         <i class="fa-solid fa-store text-amber-400"></i> CogniShop & Crates
                     </h2>
                     <p class="text-sm text-slate-400 mt-1">Unlock exclusive avatars, glowing cosmetic frames, titles, and board themes.</p>
                 </div>
-                <div class="bg-slate-950 border border-slate-800 px-4 py-2 rounded-xl flex items-center gap-2">
+                <div class="bg-slate-950/90 border border-amber-500/30 px-4 py-2.5 rounded-xl flex items-center gap-2">
                     <span class="text-xs text-slate-400">Your Balance:</span>
                     <i class="fa-solid fa-coins text-amber-400"></i>
                     <span id="shop-coins-display" class="font-mono text-base font-bold text-amber-400">0</span>
@@ -515,43 +540,43 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 <!-- Pawn Crate -->
-                <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all rounded-2xl p-5 flex flex-col justify-between">
+                <div class="cogni-card hover:border-amber-500/40 transition-all rounded-2xl p-6 flex flex-col justify-between">
                     <div>
                         <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl mb-4">
                             <i class="fa-solid fa-chess-pawn"></i>
                         </div>
                         <h3 class="text-lg font-bold text-white">Pawn Crate</h3>
-                        <p class="text-xs text-slate-400 mt-1 mb-4">Starter tier crate with essential avatars, basic frames, titles, and wood board variants.</p>
+                        <p class="text-xs text-slate-400 mt-1 mb-6">Starter tier crate with essential avatars, basic frames, titles, and wood board variants.</p>
                     </div>
-                    <button onclick="openCrate('pawn')" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                    <button onclick="openCrate('pawn')" class="w-full bg-slate-800/90 hover:bg-amber-600 hover:text-white text-amber-400 border border-slate-700 hover:border-amber-500 font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-coins"></i> 1,000 CC
                     </button>
                 </div>
 
                 <!-- Knight Crate -->
-                <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all rounded-2xl p-5 flex flex-col justify-between">
+                <div class="cogni-card hover:border-amber-500/40 transition-all rounded-2xl p-6 flex flex-col justify-between">
                     <div>
                         <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl mb-4">
                             <i class="fa-solid fa-chess-knight"></i>
                         </div>
                         <h3 class="text-lg font-bold text-white">Knight Crate</h3>
-                        <p class="text-xs text-slate-400 mt-1 mb-4">Intermediate crate with higher chances for rare tactical badges, animated frames, and slate boards.</p>
+                        <p class="text-xs text-slate-400 mt-1 mb-6">Intermediate crate with higher chances for rare tactical badges, animated frames, and slate boards.</p>
                     </div>
-                    <button onclick="openCrate('knight')" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                    <button onclick="openCrate('knight')" class="w-full bg-slate-800/90 hover:bg-amber-600 hover:text-white text-amber-400 border border-slate-700 hover:border-amber-500 font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-coins"></i> 3,500 CC
                     </button>
                 </div>
 
                 <!-- Grandmaster Crate -->
-                <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all rounded-2xl p-5 flex flex-col justify-between">
+                <div class="cogni-card hover:border-amber-500/40 transition-all rounded-2xl p-6 flex flex-col justify-between">
                     <div>
                         <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl mb-4">
                             <i class="fa-solid fa-chess-king"></i>
                         </div>
                         <h3 class="text-lg font-bold text-white">Grandmaster Crate</h3>
-                        <p class="text-xs text-slate-400 mt-1 mb-4">Premium tier crate packed with legendary cosmic aura frames, kings, and GM prestige titles.</p>
+                        <p class="text-xs text-slate-400 mt-1 mb-6">Premium tier crate packed with legendary cosmic aura frames, kings, and GM prestige titles.</p>
                     </div>
-                    <button onclick="openCrate('grandmaster')" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                    <button onclick="openCrate('grandmaster')" class="w-full bg-slate-800/90 hover:bg-amber-600 hover:text-white text-amber-400 border border-slate-700 hover:border-amber-500 font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-coins"></i> 10,000 CC
                     </button>
                 </div>
@@ -560,7 +585,7 @@
 
             <!-- Horizontal Spin Opening Modal -->
             <div id="crate-spin-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex-col items-center justify-center p-4">
-                <div class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
+                <div class="max-w-2xl w-full cogni-card rounded-3xl p-6 text-center shadow-2xl relative overflow-hidden">
                     <h3 id="crate-modal-title" class="text-xl font-bold text-white mb-6">Opening Crate...</h3>
                     
                     <!-- CS:GO Style Horizontal Strip Viewport -->
@@ -594,10 +619,10 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
                 <!-- Profile Identity Card (5 cols) -->
-                <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-5">
+                <div class="lg:col-span-5 cogni-card rounded-2xl p-6 text-center space-y-5">
                     
                     <div class="relative inline-block mx-auto">
-                        <div id="prof-preview-frame" class="w-24 h-24 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-4xl text-white relative frame-none">
+                        <div id="prof-preview-frame" class="w-24 h-24 rounded-2xl bg-slate-900 flex items-center justify-center text-4xl text-white relative frame-none">
                             <i id="prof-preview-icon" class="fa-solid fa-user"></i>
                         </div>
                     </div>
@@ -607,20 +632,20 @@
                         <span id="prof-preview-nametag" class="inline-block mt-1 text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold uppercase">Novice</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800 text-left">
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800/80 text-left">
+                        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800/80">
                             <span class="text-[10px] text-slate-500 uppercase font-bold block">Rating</span>
                             <span id="prof-stat-elo" class="font-mono text-base font-bold text-emerald-400">500 Elo</span>
                         </div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800/80">
                             <span class="text-[10px] text-slate-500 uppercase font-bold block">CogniCoins</span>
                             <span id="prof-stat-coins" class="font-mono text-base font-bold text-amber-400">0 CC</span>
                         </div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800/80">
                             <span class="text-[10px] text-slate-500 uppercase font-bold block">Games Played</span>
                             <span id="prof-stat-games" class="font-mono text-base font-bold text-slate-300">0</span>
                         </div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800/80">
                             <span class="text-[10px] text-slate-500 uppercase font-bold block">Win Streak</span>
                             <span id="prof-stat-streak" class="font-mono text-base font-bold text-emerald-400">0</span>
                         </div>
@@ -629,15 +654,15 @@
                     <div class="pt-2">
                         <label class="text-xs font-semibold text-slate-400 uppercase block text-left mb-1.5">Change Display Name</label>
                         <div class="flex gap-2">
-                            <input type="text" id="prof-name-input" placeholder="New username..." maxlength="20" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-violet-500">
-                            <button onclick="updateDisplayName()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all">Save</button>
+                            <input type="text" id="prof-name-input" placeholder="New username..." maxlength="20" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-violet-500">
+                            <button onclick="updateDisplayName()" class="bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all">Save</button>
                         </div>
                     </div>
 
                 </div>
 
                 <!-- Customization Studio Selectors (7 cols) -->
-                <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                <div class="lg:col-span-7 cogni-card rounded-2xl p-6 space-y-6">
                     <h3 class="text-base font-bold text-white flex items-center gap-2">
                         <i class="fa-solid fa-palette text-violet-400"></i> Equipped Cosmetics Studio
                     </h3>
@@ -647,7 +672,7 @@
                         <!-- Avatar Icon Selector -->
                         <div>
                             <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Avatar Icon</label>
-                            <select id="equip-icon-select" onchange="equipCosmetic('icon')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
+                            <select id="equip-icon-select" onchange="equipCosmetic('icon')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
                                 <!-- Populated dynamically from inventory -->
                             </select>
                         </div>
@@ -655,7 +680,7 @@
                         <!-- Frame Selector -->
                         <div>
                             <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Avatar Frame Aura</label>
-                            <select id="equip-frame-select" onchange="equipCosmetic('frame')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
+                            <select id="equip-frame-select" onchange="equipCosmetic('frame')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
                                 <!-- Populated dynamically from inventory -->
                             </select>
                         </div>
@@ -663,7 +688,7 @@
                         <!-- Title / Nametag Selector -->
                         <div>
                             <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Player Title / Nametag</label>
-                            <select id="equip-nametag-select" onchange="equipCosmetic('nametag')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
+                            <select id="equip-nametag-select" onchange="equipCosmetic('nametag')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
                                 <!-- Populated dynamically from inventory -->
                             </select>
                         </div>
@@ -671,7 +696,7 @@
                         <!-- Board Theme Selector -->
                         <div>
                             <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Chess Board Theme</label>
-                            <select id="equip-theme-select" onchange="equipCosmetic('theme')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
+                            <select id="equip-theme-select" onchange="equipCosmetic('theme')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
                                 <!-- Populated dynamically from inventory -->
                             </select>
                         </div>
@@ -679,7 +704,7 @@
                         <!-- In-Game Emote Selector -->
                         <div>
                             <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">In-Game Emote</label>
-                            <select id="equip-emote-select" onchange="equipCosmetic('emote')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
+                            <select id="equip-emote-select" onchange="equipCosmetic('emote')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500">
                                 <!-- Populated dynamically from inventory -->
                             </select>
                         </div>
@@ -696,7 +721,7 @@
         <!-- ========================================== -->
         <section id="section-friends" class="space-y-6 hidden">
             <!-- Add Friend Card -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-6">
+            <div class="cogni-card rounded-2xl p-6 mb-6">
                 <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
                     <i class="fa-solid fa-user-plus text-cyan-400"></i> Add Friend
                 </h3>
@@ -712,7 +737,7 @@
             </div>
 
             <!-- Pending Requests -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-6">
+            <div class="cogni-card rounded-2xl p-6 mb-6">
                 <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-inbox text-cyan-400"></i> Friend Requests <span id="friend-requests-count" class="bg-cyan-500/20 text-cyan-400 text-xs px-2 py-0.5 rounded-full font-mono">0</span>
                 </h3>
@@ -722,7 +747,7 @@
             </div>
 
             <!-- Friends List -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <div class="cogni-card rounded-2xl p-6">
                 <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-users text-cyan-400"></i> Your Friends
                 </h3>
@@ -737,7 +762,7 @@
         <!-- ========================================== -->
         <section id="section-leaderboard" class="space-y-6 hidden">
             
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="cogni-card rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-6">
                     <div>
                         <h2 class="text-xl font-black text-white flex items-center gap-2">
@@ -745,7 +770,7 @@
                         </h2>
                         <p class="text-xs text-slate-400 mt-1">Top rated CogniLearn chess champions.</p>
                     </div>
-                    <button onclick="loadLeaderboard()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all">
+                    <button onclick="loadLeaderboard()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3.5 py-1.5 rounded-xl transition-all">
                         <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
                     </button>
                 </div>
@@ -761,7 +786,7 @@
                                 <th class="pb-3 text-right pr-3">Games</th>
                             </tr>
                         </thead>
-                        <tbody id="leaderboard-tbody" class="divide-y border-slate-800/60 font-mono">
+                        <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/60 font-mono">
                             <!-- Populated dynamically -->
                         </tbody>
                     </table>
@@ -776,7 +801,7 @@
         <section id="section-admin" class="space-y-6 hidden">
             
             <!-- Global Broadcast Announcement Box -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="cogni-card rounded-2xl p-6">
                 <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-bullhorn text-amber-400"></i> Global Announcement Broadcast
                 </h3>
@@ -787,7 +812,7 @@
             </div>
 
             <!-- Admin Action Controls -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="cogni-card rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
                         <i class="fa-solid fa-shield-halved text-red-400"></i> System Control
@@ -812,7 +837,7 @@
             </div>
 
             <!-- User Database Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div class="cogni-card rounded-2xl p-6">
                 <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-users-gear text-red-400"></i> User Management Database
                 </h3>
@@ -1032,10 +1057,10 @@
             $(navBtnId).removeClass('text-slate-400 hover:bg-slate-800/60 text-red-400 hover:bg-red-950/60').addClass(`${activeBg} text-white`);
 
             if (sectionId === 'ai' && aiBoard) {
-                setTimeout(() => { aiBoard.resize(); }, 150);
+                setTimeout(() => { aiBoard.resize(); reapplyAiVisuals(); }, 150);
             }
             if (sectionId === 'arena' && arenaBoard) {
-                setTimeout(() => { arenaBoard.resize(); }, 150);
+                setTimeout(() => { arenaBoard.resize(); reapplyArenaVisuals(); }, 150);
             }
             if (sectionId === 'leaderboard') {
                 loadLeaderboard();
@@ -1098,7 +1123,7 @@
         }
 
         // ==========================================
-        // 5. OPENING BOOK & CHESS ENGINE
+        // 5. OPENING BOOK & ZERO-LAG CHESS ENGINE
         // ==========================================
         const OPENING_BOOK = {
             // As Black vs 1. d4 (Queen's Gambit & London Defense)
@@ -1218,21 +1243,30 @@
             return totalEval;
         }
 
-        function minimaxAlphaBeta(g, depth, alpha, beta, isMaximizing) {
-            if (g.game_over()) {
-                if (g.in_checkmate()) return isMaximizing ? -90000 - depth : 90000 + depth;
-                return 0;
+        let searchNodesVisited = 0;
+        const MAX_SEARCH_NODES = 6500;
+
+        function orderMovesFast(moves) {
+            for (let i = 0; i < moves.length; i++) {
+                const m = moves[i];
+                m._score = m.captured ? (10000 + (PIECE_VALS[m.captured] || 0) - ((PIECE_VALS[m.piece] || 0) * 0.1)) : 0;
             }
-            if (depth === 0) return evaluateBoard(g);
+            moves.sort((a, b) => b._score - a._score);
+        }
+
+        function minimaxAlphaBeta(g, depth, alpha, beta, isMaximizing) {
+            searchNodesVisited++;
+            if (depth === 0 || searchNodesVisited >= MAX_SEARCH_NODES) {
+                return evaluateBoard(g);
+            }
 
             const moves = g.moves({ verbose: true });
-            moves.sort((a, b) => {
-                let scoreA = 0;
-                let scoreB = 0;
-                if (a.captured) scoreA += 1000 + (PIECE_VALS[a.captured] || 0) - (PIECE_VALS[a.piece] || 0);
-                if (b.captured) scoreB += 1000 + (PIECE_VALS[b.captured] || 0) - (PIECE_VALS[b.piece] || 0);
-                return scoreB - scoreA;
-            });
+            if (moves.length === 0) {
+                if (g.in_check()) return isMaximizing ? -90000 - depth : 90000 + depth;
+                return 0;
+            }
+
+            if (depth > 1) orderMovesFast(moves);
 
             if (isMaximizing) {
                 let maxEval = -Infinity;
@@ -1240,8 +1274,8 @@
                     g.move(moves[i]);
                     const evalScore = minimaxAlphaBeta(g, depth - 1, alpha, beta, false);
                     g.undo();
-                    maxEval = Math.max(maxEval, evalScore);
-                    alpha = Math.max(alpha, evalScore);
+                    if (evalScore > maxEval) maxEval = evalScore;
+                    if (evalScore > alpha) alpha = evalScore;
                     if (beta <= alpha) break;
                 }
                 return maxEval;
@@ -1251,8 +1285,8 @@
                     g.move(moves[i]);
                     const evalScore = minimaxAlphaBeta(g, depth - 1, alpha, beta, true);
                     g.undo();
-                    minEval = Math.min(minEval, evalScore);
-                    beta = Math.min(beta, evalScore);
+                    if (evalScore < minEval) minEval = evalScore;
+                    if (evalScore < beta) beta = evalScore;
                     if (beta <= alpha) break;
                 }
                 return minEval;
@@ -1260,31 +1294,53 @@
         }
 
         // ==========================================
-        // 6. PLAY VS AI ENGINE CONTROLLER
+        // 6. PLAY VS AI ENGINE CONTROLLER (CLICK + DRAG)
         // ==========================================
         let game = new Chess();
         let aiBoard = null;
         let aiPlayerColor = 'w';
         let aiGameActive = true;
         let selectedSquare = null;
+        let lastAiMove = null;
 
         function initAiBoard() {
             const config = {
                 draggable: true,
                 position: 'start',
                 orientation: 'white',
+                snapbackSpeed: 40,
+                snapSpeed: 80,
                 pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png',
                 onDragStart: onAiDragStart,
                 onDrop: onAiDrop,
-                onSnapEnd: onAiSnapEnd
+                onSnapEnd: onAiSnapEnd,
+                onSnapbackEnd: onAiSnapbackEnd
             };
             aiBoard = Chessboard('ai-board', config);
             applyStoredTheme();
 
-            $('#ai-board').on('click', '.square-55d63', function() {
+            // Click handler for empty squares & enemy capture squares
+            $('#ai-board').on('mousedown', '.square-55d63', function(e) {
                 const square = $(this).attr('data-square');
-                handleAiSquareClick(square);
+                if (!square || game.game_over() || !aiGameActive || game.turn() !== aiPlayerColor) return;
+
+                const pieceOnTarget = game.get(square);
+                // If we already selected a piece and clicked an empty or enemy square, execute click-move immediately
+                if (selectedSquare && (!pieceOnTarget || pieceOnTarget.color !== aiPlayerColor)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleAiSquareClick(square);
+                }
             });
+        }
+
+        function reapplyAiVisuals() {
+            if (lastAiMove) {
+                highlightMove(lastAiMove.from, lastAiMove.to);
+            }
+            if (selectedSquare) {
+                showMoveDots(selectedSquare);
+            }
         }
 
         function onAiDragStart(source, piece, position, orientation) {
@@ -1298,6 +1354,13 @@
         }
 
         function onAiDrop(source, target) {
+            // If user clicked a piece without dragging to another square, select it and show move dots!
+            if (source === target) {
+                selectedSquare = (selectedSquare === source) ? null : source;
+                setTimeout(reapplyAiVisuals, 50);
+                return 'snapback';
+            }
+
             removeMoveDots();
             const move = game.move({
                 from: source,
@@ -1305,18 +1368,29 @@
                 promotion: 'q'
             });
 
-            if (move === null) return 'snapback';
+            if (move === null) {
+                selectedSquare = null;
+                return 'snapback';
+            }
+
+            selectedSquare = null;
+            lastAiMove = { from: move.from, to: move.to };
             highlightMove(move.from, move.to);
             updateAiMoveHistory();
             checkAiGameStatus();
 
             if (!game.game_over() && aiGameActive) {
-                setTimeout(makeAiMove, 300);
+                setTimeout(makeAiMove, 180);
             }
         }
 
         function onAiSnapEnd() {
             aiBoard.position(game.fen());
+            reapplyAiVisuals();
+        }
+
+        function onAiSnapbackEnd() {
+            reapplyAiVisuals();
         }
 
         function handleAiSquareClick(square) {
@@ -1331,14 +1405,15 @@
                 });
 
                 if (move) {
+                    selectedSquare = null;
+                    removeMoveDots();
+                    lastAiMove = { from: move.from, to: move.to };
                     aiBoard.position(game.fen());
                     highlightMove(move.from, move.to);
-                    removeMoveDots();
-                    selectedSquare = null;
                     updateAiMoveHistory();
                     checkAiGameStatus();
                     if (!game.game_over() && aiGameActive) {
-                        setTimeout(makeAiMove, 300);
+                        setTimeout(makeAiMove, 180);
                     }
                     return;
                 }
@@ -1356,6 +1431,8 @@
 
         function showMoveDots(square) {
             removeMoveDots();
+            if (!square) return;
+            $(`#ai-board .square-${square}`).addClass('highlight-selected');
             const moves = game.moves({ square: square, verbose: true });
             moves.forEach(m => {
                 const $sq = $(`#ai-board .square-${m.to}`);
@@ -1368,13 +1445,15 @@
         }
 
         function removeMoveDots() {
-            $('#ai-board .square-55d63').removeClass('move-dest-dot move-dest-capture');
+            $('#ai-board .square-55d63').removeClass('move-dest-dot move-dest-capture highlight-selected');
         }
 
         function highlightMove(from, to) {
             $('#ai-board .square-55d63').removeClass('highlight-last-move');
-            $(`#ai-board .square-${from}`).addClass('highlight-last-move');
-            $(`#ai-board .square-${to}`).addClass('highlight-last-move');
+            if (from && to) {
+                $(`#ai-board .square-${from}`).addClass('highlight-last-move');
+                $(`#ai-board .square-${to}`).addClass('highlight-last-move');
+            }
         }
 
         function makeAiMove() {
@@ -1386,6 +1465,7 @@
                 const bookMove = OPENING_BOOK[fenPrefix];
                 const res = game.move({ from: bookMove.from, to: bookMove.to, promotion: 'q' });
                 if (res) {
+                    lastAiMove = { from: res.from, to: res.to };
                     aiBoard.position(game.fen());
                     highlightMove(res.from, res.to);
                     updateAiMoveHistory();
@@ -1394,36 +1474,51 @@
                 }
             }
 
-            // 2. 3-Ply Minimax Search with PST & Move Ordering
+            // 2. Fast 3-Ply Alpha-Beta Search with Root Pruning & Node Cap
+            searchNodesVisited = 0;
             const isMaximizing = (game.turn() === 'w');
             const moves = game.moves({ verbose: true });
             if (moves.length === 0) return;
 
-            let bestMove = null;
-            let bestEval = isMaximizing ? -Infinity : Infinity;
+            orderMovesFast(moves);
 
-            for (let i = 0; i < moves.length; i++) {
-                game.move(moves[i]);
-                const evalScore = minimaxAlphaBeta(game, 3, -Infinity, Infinity, !isMaximizing);
-                game.undo();
+            let bestMove = moves[0];
+            let alpha = -Infinity;
+            let beta = Infinity;
 
-                if (isMaximizing) {
+            if (isMaximizing) {
+                let bestEval = -Infinity;
+                for (let i = 0; i < moves.length; i++) {
+                    game.move(moves[i]);
+                    const evalScore = minimaxAlphaBeta(game, 2, alpha, beta, false);
+                    game.undo();
                     if (evalScore > bestEval) {
                         bestEval = evalScore;
                         bestMove = moves[i];
                     }
-                } else {
+                    if (evalScore > alpha) alpha = evalScore;
+                }
+            } else {
+                let bestEval = Infinity;
+                for (let i = 0; i < moves.length; i++) {
+                    game.move(moves[i]);
+                    const evalScore = minimaxAlphaBeta(game, 2, alpha, beta, true);
+                    game.undo();
                     if (evalScore < bestEval) {
                         bestEval = evalScore;
                         bestMove = moves[i];
                     }
+                    if (evalScore < beta) beta = evalScore;
                 }
             }
 
             if (bestMove) {
-                game.move(bestMove);
+                const executed = game.move(bestMove);
+                if (executed) {
+                    lastAiMove = { from: executed.from, to: executed.to };
+                }
                 aiBoard.position(game.fen());
-                highlightMove(bestMove.from, bestMove.to);
+                if (lastAiMove) highlightMove(lastAiMove.from, lastAiMove.to);
                 updateAiMoveHistory();
                 checkAiGameStatus();
             }
@@ -1529,10 +1624,11 @@
             game = new Chess();
             aiGameActive = true;
             selectedSquare = null;
+            lastAiMove = null;
             removeMoveDots();
             $('#ai-board .square-55d63').removeClass('highlight-last-move');
             $('#ai-resign-btn').removeClass('opacity-50 cursor-not-allowed').prop('disabled', false);
-            $('#ai-status-text').text('Game started. Good luck!');
+            $('#ai-status-text').text('Game started. Click or drag a piece to move!');
             $('#ai-turn-indicator').text('White to Move');
 
             aiBoard.orientation(aiPlayerColor === 'w' ? 'white' : 'black');
@@ -1540,12 +1636,12 @@
             updateAiMoveHistory();
 
             if (aiPlayerColor === 'b') {
-                setTimeout(makeAiMove, 400);
+                setTimeout(makeAiMove, 300);
             }
         }
 
         // ==========================================
-        // 7. 1v1 LIVE ARENA CONTROLLER
+        // 7. 1v1 LIVE ARENA CONTROLLER (CLICK + DRAG)
         // ==========================================
         let arenaGame = new Chess();
         let arenaBoard = null;
@@ -1554,24 +1650,49 @@
         let arenaChatRef = null;
         let arenaMyColor = null;
         let selectedSquareArena = null;
+        let lastArenaMoveObj = null;
 
         function initArenaBoard() {
             const config = {
                 draggable: true,
                 position: 'start',
                 orientation: 'white',
+                snapbackSpeed: 40,
+                snapSpeed: 80,
                 pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs@master/website/img/chesspieces/wikipedia/{piece}.png',
                 onDragStart: onArenaDragStart,
                 onDrop: onArenaDrop,
-                onSnapEnd: () => arenaBoard.position(arenaGame.fen())
+                onSnapEnd: () => {
+                    arenaBoard.position(arenaGame.fen());
+                    reapplyArenaVisuals();
+                },
+                onSnapbackEnd: () => {
+                    reapplyArenaVisuals();
+                }
             };
             arenaBoard = Chessboard('arena-board', config);
             applyStoredTheme();
 
-            $('#arena-board').on('click', '.square-55d63', function() {
+            $('#arena-board').on('mousedown', '.square-55d63', function(e) {
                 const sq = $(this).attr('data-square');
-                handleArenaSquareClick(sq);
+                if (!sq || arenaGame.game_over() || !arenaMyColor || arenaGame.turn() !== arenaMyColor) return;
+
+                const pieceOnTarget = arenaGame.get(sq);
+                if (selectedSquareArena && (!pieceOnTarget || pieceOnTarget.color !== arenaMyColor)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleArenaSquareClick(sq);
+                }
             });
+        }
+
+        function reapplyArenaVisuals() {
+            if (lastArenaMoveObj) {
+                highlightArenaMove(lastArenaMoveObj.from, lastArenaMoveObj.to);
+            }
+            if (selectedSquareArena) {
+                showArenaMoveDots(selectedSquareArena);
+            }
         }
 
         function handleArenaSquareClick(sq) {
@@ -1580,10 +1701,11 @@
             if (selectedSquareArena) {
                 const move = arenaGame.move({ from: selectedSquareArena, to: sq, promotion: 'q' });
                 if (move) {
-                    arenaBoard.position(arenaGame.fen());
-                    removeArenaMoveDots();
-                    highlightArenaMove(move.from, move.to);
                     selectedSquareArena = null;
+                    removeArenaMoveDots();
+                    lastArenaMoveObj = { from: move.from, to: move.to };
+                    arenaBoard.position(arenaGame.fen());
+                    highlightArenaMove(move.from, move.to);
                     arenaRoomRef.update({
                         fen: arenaGame.fen(),
                         turn: arenaGame.turn(),
@@ -1605,6 +1727,8 @@
 
         function showArenaMoveDots(square) {
             removeArenaMoveDots();
+            if (!square) return;
+            $(`#arena-board .square-${square}`).addClass('highlight-selected');
             const moves = arenaGame.moves({ square: square, verbose: true });
             moves.forEach(m => {
                 const $sq = $(`#arena-board .square-${m.to}`);
@@ -1617,13 +1741,15 @@
         }
 
         function removeArenaMoveDots() {
-            $('#arena-board .square-55d63').removeClass('move-dest-dot move-dest-capture');
+            $('#arena-board .square-55d63').removeClass('move-dest-dot move-dest-capture highlight-selected');
         }
 
         function highlightArenaMove(from, to) {
             removeArenaHighlights();
-            $(`#arena-board .square-${from}`).addClass('highlight-last-move');
-            $(`#arena-board .square-${to}`).addClass('highlight-last-move');
+            if (from && to) {
+                $(`#arena-board .square-${from}`).addClass('highlight-last-move');
+                $(`#arena-board .square-${to}`).addClass('highlight-last-move');
+            }
         }
 
         function removeArenaHighlights() {
@@ -1640,9 +1766,21 @@
         }
 
         function onArenaDrop(source, target) {
+            if (source === target) {
+                selectedSquareArena = (selectedSquareArena === source) ? null : source;
+                setTimeout(reapplyArenaVisuals, 50);
+                return 'snapback';
+            }
+
             removeArenaMoveDots();
             const move = arenaGame.move({ from: source, to: target, promotion: 'q' });
-            if (move === null) return 'snapback';
+            if (move === null) {
+                selectedSquareArena = null;
+                return 'snapback';
+            }
+
+            selectedSquareArena = null;
+            lastArenaMoveObj = { from: move.from, to: move.to };
             highlightArenaMove(move.from, move.to);
             arenaRoomRef.update({
                 fen: arenaGame.fen(),
@@ -1723,6 +1861,7 @@
             arenaGame = new Chess();
             lastArenaFen = null;
             selectedSquareArena = null;
+            lastArenaMoveObj = null;
             removeArenaMoveDots();
             removeArenaHighlights();
 
@@ -1740,6 +1879,7 @@
                     arenaGame.load(data.fen);
                     arenaBoard.position(data.fen);
                     if (data.lastMove) {
+                        lastArenaMoveObj = data.lastMove;
                         highlightArenaMove(data.lastMove.from, data.lastMove.to);
                     }
                     if (data.fen !== lastArenaFen) {
@@ -2238,7 +2378,7 @@
                 const isComplete = qData.progress >= spec.target;
 
                 html += `
-                    <div class="flex items-center gap-2 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
+                    <div class="flex items-center gap-2 bg-slate-950/90 px-3 py-1 rounded-xl border border-slate-800/90">
                         <span class="text-slate-300 font-semibold">${spec.desc}</span>
                         <span class="font-mono text-[10px] text-slate-500">(${Math.min(qData.progress, spec.target)}/${spec.target})</span>
                         ${qData.claimed 

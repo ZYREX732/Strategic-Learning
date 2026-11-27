@@ -3,40 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Z-Chess — Login & Portal</title>
+  <title>Z-Chess — Portal Hub</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f5f3ff',
-              100: '#ede9fe',
-              500: '#8b5cf6',
-              600: '#7c3aed',
-              700: '#6d28d9',
-              900: '#4c1d95',
-            }
-          },
-          animation: {
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'float': 'float 6s ease-in-out infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-10px)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
-
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Google Fonts -->
@@ -56,9 +26,7 @@
       color: #f8fafc;
       overflow-x: hidden;
     }
-    .font-mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
     .glass-card {
       background: rgba(15, 23, 42, 0.78);
       backdrop-filter: blur(20px);
@@ -79,61 +47,42 @@
       background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
       background-size: 28px 28px;
     }
-    .glow-gold {
-      filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.35));
-    }
   </style>
 </head>
 
 <body class="min-h-screen flex flex-col justify-between relative selection:bg-amber-500 selection:text-slate-950 bg-grid-pattern">
 
-  <!-- Ambient Background Glows -->
-  <div class="fixed top-[-15%] left-[-10%] w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
-  <div class="fixed bottom-[-15%] right-[-10%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <!-- Ambient Glows -->
+  <div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none"></div>
 
-  <!-- Toast Notification Container -->
+  <!-- Toast Container -->
   <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
-  <!-- Auth Loading Screen (Checking active session) -->
-  <div id="auth-loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-md transition-opacity duration-300">
-    <div class="relative w-20 h-20 mb-6 flex items-center justify-center">
-      <div class="absolute inset-0 rounded-2xl bg-amber-500/20 animate-ping"></div>
-      <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/30">
-        <i class="fa-solid fa-chess-knight text-3xl text-slate-950"></i>
-      </div>
-    </div>
-    <div class="text-xl font-extrabold tracking-tight text-white mb-2">Connecting to <span class="text-amber-400">Z-Chess</span></div>
-    <div class="text-xs font-mono text-slate-400 flex items-center gap-2">
-      <i class="fa-solid fa-circle-notch fa-spin text-amber-500"></i> Checking authentication state...
-    </div>
-  </div>
 
   <!-- Header -->
   <header class="w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between relative z-10">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
         <i class="fa-solid fa-chess-knight text-xl text-slate-950"></i>
       </div>
       <div>
         <div class="text-xl font-black tracking-tight text-white flex items-center gap-1.5">
-          Z-CHESS <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 font-mono font-bold">LIVE</span>
+          Z-CHESS <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 font-mono font-bold">PLATFORM</span>
         </div>
-        <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Competitive Chess Platform</p>
+        <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Competitive Chess & Arcade</p>
       </div>
     </div>
-
-    <div class="flex items-center gap-4 text-xs font-semibold text-slate-400">
+    <div id="auth-status-badge" class="flex items-center gap-2 text-xs font-semibold text-slate-400">
       <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[11px]">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Systems Normal
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Systems Online
       </span>
     </div>
   </header>
 
-  <!-- Main Auth Container -->
-  <main class="w-full max-w-md mx-auto px-4 py-8 relative z-10 my-auto">
+  <!-- SCREEN 1: AUTHENTICATION FORM (Shown if logged out) -->
+  <main id="auth-section" class="w-full max-w-md mx-auto px-4 py-8 relative z-10 my-auto">
     <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-      <!-- Top Accent Bar -->
-      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-purple-500 to-emerald-500"></div>
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-cyan-500 to-emerald-500"></div>
 
       <!-- Auth Switcher Tabs -->
       <div class="grid grid-cols-2 p-1 bg-slate-900/90 rounded-2xl border border-white/5 mb-6">
@@ -170,12 +119,12 @@
         </div>
 
         <button type="submit" id="btn-login" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-amber-500/25 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2">
-          <span>Enter Z-Chess</span>
+          <span>Sign In</span>
           <i class="fa-solid fa-arrow-right text-xs"></i>
         </button>
       </form>
 
-      <!-- Register Form (Hidden by default) -->
+      <!-- Register Form -->
       <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Display Username</label>
@@ -204,37 +153,18 @@
           </div>
         </div>
 
-        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 space-y-1">
-          <div class="flex items-center gap-2 text-amber-400 font-bold">
-            <i class="fa-solid fa-gift"></i> Starter Package Included:
-          </div>
-          <div class="flex items-center justify-between">
-            <span>• Base Rating</span>
-            <span class="font-mono font-bold text-white">500 Elo</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span>• Starter Coins</span>
-            <span class="font-mono font-bold text-amber-400">+500 ZC</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span>• Classic Board</span>
-            <span class="font-mono font-bold text-emerald-400">Wood Theme</span>
-          </div>
-        </div>
-
         <button type="submit" id="btn-register" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-emerald-500/25 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2">
           <span>Create Account</span>
           <i class="fa-solid fa-user-plus text-xs"></i>
         </button>
       </form>
 
-      <!-- Divider -->
+      <!-- Social Login Divider -->
       <div class="relative my-6 text-center">
         <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
-        <span class="relative px-3 text-[10px] font-mono tracking-widest uppercase bg-slate-900/90 text-slate-500 rounded-full border border-white/5">OR CONTINUE WITH</span>
+        <span class="relative px-3 text-[10px] font-mono tracking-widest uppercase bg-slate-900 text-slate-500 rounded-full">OR</span>
       </div>
 
-      <!-- Social / Quick Sign-In -->
       <div class="space-y-3">
         <button type="button" onclick="handleGoogleSignIn()" class="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-3 transition-colors">
           <svg class="w-4 h-4" viewBox="0 0 24 24">
@@ -251,50 +181,93 @@
           <span>Play Instantly as Guest</span>
         </button>
       </div>
+    </div>
+  </main>
 
+  <!-- SCREEN 2: MODE SELECTOR HUB (Shown once authenticated) -->
+  <main id="hub-section" class="w-full max-w-4xl mx-auto px-4 py-8 relative z-10 my-auto hidden">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono font-bold uppercase tracking-widest mb-3">
+        Welcome, <span id="hub-player-name" class="text-white">Player</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">Select Destination</h1>
+      <p class="text-xs sm:text-sm text-slate-400 mt-1">Play tactical chess or explore games to earn Coins for crates.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Option A: Z-Chess App -->
+      <a href="app.html" class="glass-card rounded-3xl p-8 border border-amber-500/30 hover:border-amber-500/80 bg-gradient-to-br from-amber-500/10 via-slate-900/90 to-slate-900 shadow-2xl transition-all transform hover:-translate-y-1 group flex flex-col justify-between">
+        <div>
+          <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-amber-500/20">
+            <i class="fa-solid fa-chess-knight"></i>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <h2 class="text-2xl font-black text-white">Z-Chess</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">TACTICAL</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed mb-6">
+            Compete against the 500 Elo Z-Bot AI or battle friends live in 1v1 Arena rooms with room codes, live chat, and Elo rankings.
+          </p>
+        </div>
+        <div class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 group-hover:from-amber-400 group-hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2">
+          <span>Enter Z-Chess</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      </a>
+
+      <!-- Option B: Z-Games / GeoGuessr -->
+      <a href="games.html" class="glass-card rounded-3xl p-8 border border-cyan-500/30 hover:border-cyan-500/80 bg-gradient-to-br from-cyan-500/10 via-slate-900/90 to-slate-900 shadow-2xl transition-all transform hover:-translate-y-1 group flex flex-col justify-between">
+        <div>
+          <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-cyan-500/20">
+            <i class="fa-solid fa-earth-americas"></i>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <h2 class="text-2xl font-black text-white">Z-Games</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-bold">EARN COINS</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed mb-6">
+            Play 100% free 360° World Explorer GeoGuessr. Pan around real-world landmarks, drop your pin on the world map, and earn up to +100 Coins per round!
+          </p>
+        </div>
+        <div class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 group-hover:from-cyan-400 group-hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/25 transition-all flex items-center justify-center gap-2">
+          <span>Enter Z-Games</span>
+          <i class="fa-solid fa-gamepad"></i>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Sign Out Option -->
+    <div class="mt-8 text-center">
+      <button onclick="handleSignOut()" class="text-xs font-mono text-slate-500 hover:text-rose-400 transition-colors">
+        <i class="fa-solid fa-right-from-bracket mr-1"></i> Sign Out of Account
+      </button>
     </div>
   </main>
 
   <!-- Password Reset Modal -->
   <div id="reset-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
     <div class="glass-card rounded-3xl p-6 max-w-sm w-full border border-amber-500/30 shadow-2xl relative">
-      <button onclick="hideForgotPassword()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-
-      <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-4 text-xl">
-        <i class="fa-solid fa-key"></i>
-      </div>
-
+      <button onclick="hideForgotPassword()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-4 text-xl"><i class="fa-solid fa-key"></i></div>
       <h3 class="text-lg font-bold text-white mb-1">Reset Password</h3>
-      <p class="text-xs text-slate-400 mb-4">Enter your registered email and we'll send you a recovery link.</p>
-
+      <p class="text-xs text-slate-400 mb-4">Enter your registered email to receive a password reset link.</p>
       <form onsubmit="handlePasswordReset(event)" class="space-y-3">
         <input type="email" id="reset-email" required placeholder="player@zchess.com" class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white placeholder-slate-500" />
-        <button type="submit" id="btn-reset" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all">
-          Send Recovery Email
-        </button>
+        <button type="submit" id="btn-reset" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all">Send Link</button>
       </form>
     </div>
   </div>
 
   <!-- Footer -->
   <footer class="w-full max-w-6xl mx-auto px-6 py-6 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-white/5">
-    <div>
-      <span class="font-bold text-slate-400">Z-Chess</span> &copy; 2025. Master Admin: <span class="text-amber-400 font-mono">zainisgo123@gmail.com</span>
-    </div>
-    <div class="flex items-center gap-4 text-[11px] font-mono">
-      <span>AI BOT: 500 ELO</span>
-      <span>•</span>
-      <span>1V1 ARENA</span>
-      <span>•</span>
-      <span>CRATES & COSMETICS</span>
-    </div>
+    <div><span class="font-bold text-slate-400">Z-Chess & Games</span> &copy; 2025. Master Admin: <span class="text-amber-400 font-mono">zainisgo123@gmail.com</span></div>
+    <div class="text-[11px] font-mono text-slate-400">SHARED COINS WALLET ACROSS ALL MODES</div>
   </footer>
 
   <!-- Firebase Script Logic -->
   <script>
-    // --- 1. FIREBASE INITIALIZATION ---
     const firebaseConfig = {
       apiKey: "AIzaSyCsV_SJg7cYhZv5srhYw_GBMDwXJ85wGmw",
       authDomain: "chess-7df7a.firebaseapp.com",
@@ -305,30 +278,26 @@
       appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // --- 2. SESSION ROUTING ---
-    auth.onAuthStateChanged((user) => {
-      const loadingEl = document.getElementById('auth-loading');
+    // Session listener
+    auth.onAuthStateChanged(async (user) => {
       if (user) {
-        // User already authenticated -> route cleanly to app.html
-        window.location.href = 'app.html';
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('hub-section').classList.remove('hidden');
+        
+        // Fetch and show display name
+        const snap = await db.ref(`users/${user.uid}/displayName`).once('value');
+        const name = snap.val() || user.displayName || 'Player';
+        document.getElementById('hub-player-name').textContent = name;
       } else {
-        // No session -> reveal login gateway smoothly
-        if (loadingEl) {
-          loadingEl.classList.add('opacity-0');
-          setTimeout(() => {
-            loadingEl.style.display = 'none';
-          }, 300);
-        }
+        document.getElementById('hub-section').classList.add('hidden');
+        document.getElementById('auth-section').classList.remove('hidden');
       }
     });
 
-    // --- 3. UI CONTROLLERS ---
     function switchAuthTab(tab) {
       const loginTab = document.getElementById('tab-login');
       const regTab = document.getElementById('tab-register');
@@ -348,8 +317,8 @@
       }
     }
 
-    function togglePasswordVisibility(fieldId, btn) {
-      const input = document.getElementById(fieldId);
+    function togglePasswordVisibility(id, btn) {
+      const input = document.getElementById(id);
       const icon = btn.querySelector('i');
       if (input.type === 'password') {
         input.type = 'text';
@@ -365,73 +334,37 @@
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      
-      let borderCol = 'border-amber-500/40 text-amber-300';
-      let icon = 'fa-circle-info text-amber-400';
-      
-      if (type === 'error') {
-        borderCol = 'border-rose-500/50 text-rose-300';
-        icon = 'fa-triangle-exclamation text-rose-400';
-      } else if (type === 'success') {
-        borderCol = 'border-emerald-500/50 text-emerald-300';
-        icon = 'fa-circle-check text-emerald-400';
-      }
+      let borderCol = type === 'error' ? 'border-rose-500/50 text-rose-300' : (type === 'success' ? 'border-emerald-500/50 text-emerald-300' : 'border-amber-500/40 text-amber-300');
+      let icon = type === 'error' ? 'fa-triangle-exclamation text-rose-400' : (type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-circle-info text-amber-400');
 
       toast.className = `p-4 rounded-2xl bg-slate-900/95 border ${borderCol} shadow-2xl backdrop-blur-xl flex items-center gap-3 text-xs font-bold transition-all transform translate-y-2 opacity-0 pointer-events-auto max-w-sm`;
       toast.innerHTML = `<i class="fa-solid ${icon} text-base flex-shrink-0"></i> <span>${message}</span>`;
-      
       container.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      }, 10);
 
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
       setTimeout(() => {
         toast.classList.add('opacity-0', '-translate-y-2');
         setTimeout(() => toast.remove(), 300);
-      }, 4000);
+      }, 3500);
     }
 
-    // --- 4. AUTH ACTIONS ---
-
-    // Ensure database profile exists with 500 baseline Elo and default cosmetic drops
     async function ensureUserDatabaseProfile(user, customDisplayName = null) {
       const userRef = db.ref(`users/${user.uid}`);
       const snapshot = await userRef.once('value');
       
       if (!snapshot.exists()) {
-        const emailLower = (user.email || '').toLowerCase();
-        const isAdmin = (emailLower === 'zainisgo123@gmail.com');
+        const isAdmin = ((user.email || '').toLowerCase() === 'zainisgo123@gmail.com');
         const fallbackName = customDisplayName || user.displayName || (user.email ? user.email.split('@')[0] : `Player_${user.uid.substring(0, 5)}`);
 
-        const initialInventory = {
-          icon_default: true,
-          frame_default: true,
-          title_rookie: true,
-          'theme-wood': true,
-          emote_gg: true
-        };
-
-        if (isAdmin) {
-          initialInventory['icon_admin_king'] = true;
-          initialInventory['frame_gold'] = true;
-          initialInventory['nametag_admin'] = true;
-        }
-
-        const newProfile = {
+        await userRef.set({
           uid: user.uid,
           email: user.email || 'guest@zchess.com',
           displayName: fallbackName,
-          elo: 500, // Fixed 500 baseline Elo
-          coins: 500, // Starter Coins
+          elo: 500,
+          coins: 500,
           role: isAdmin ? 'admin' : 'player',
           createdAt: firebase.database.ServerValue.TIMESTAMP,
-          stats: {
-            wins: 0,
-            losses: 0,
-            draws: 0,
-            gamesPlayed: 0
-          },
+          stats: { wins: 0, losses: 0, draws: 0, gamesPlayed: 0 },
           equipped: {
             icon: isAdmin ? 'icon_admin_king' : 'icon_default',
             frame: isAdmin ? 'frame_gold' : 'frame_default',
@@ -439,36 +372,37 @@
             theme: 'theme-wood',
             emote: 'emote_gg'
           },
-          inventory: initialInventory
-        };
-
-        await userRef.set(newProfile);
+          inventory: {
+            icon_default: true,
+            frame_default: true,
+            title_rookie: true,
+            'theme-wood': true,
+            emote_gg: true,
+            ...(isAdmin ? { icon_admin_king: true, frame_gold: true, nametag_admin: true } : {})
+          }
+        });
       }
     }
 
-    // Email Login
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
       const btn = document.getElementById('btn-login');
-
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...`;
 
       try {
         const userCred = await auth.signInWithEmailAndPassword(email, password);
         await ensureUserDatabaseProfile(userCred.user);
-        showToast('Login successful! Entering arena...', 'success');
-        window.location.href = 'app.html';
+        showToast('Authenticated! Select a destination below.', 'success');
       } catch (err) {
         showToast(err.message, 'error');
         btn.disabled = false;
-        btn.innerHTML = `<span>Enter Z-Chess</span><i class="fa-solid fa-arrow-right text-xs"></i>`;
+        btn.innerHTML = `<span>Sign In</span><i class="fa-solid fa-arrow-right text-xs"></i>`;
       }
     }
 
-    // Email Register
     async function handleRegister(e) {
       e.preventDefault();
       const username = document.getElementById('reg-username').value.trim();
@@ -482,14 +416,13 @@
       }
 
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Creating Account...`;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Creating...`;
 
       try {
         const userCred = await auth.createUserWithEmailAndPassword(email, password);
         await userCred.user.updateProfile({ displayName: username });
         await ensureUserDatabaseProfile(userCred.user, username);
-        showToast('Account initialized with 500 Elo & starter items!', 'success');
-        window.location.href = 'app.html';
+        showToast('Account initialized with 500 Elo & 500 Coins!', 'success');
       } catch (err) {
         showToast(err.message, 'error');
         btn.disabled = false;
@@ -497,51 +430,43 @@
       }
     }
 
-    // Google Sign-In
     async function handleGoogleSignIn() {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
         const result = await auth.signInWithPopup(provider);
         await ensureUserDatabaseProfile(result.user);
-        showToast('Google authentication confirmed!', 'success');
-        window.location.href = 'app.html';
+        showToast('Google Sign-In confirmed!', 'success');
       } catch (err) {
-        if (err.code !== 'auth/popup-closed-by-user') {
-          showToast(err.message, 'error');
-        }
+        if (err.code !== 'auth/popup-closed-by-user') showToast(err.message, 'error');
       }
     }
 
-    // Guest / Anonymous Play
     async function handleGuestLogin() {
       try {
         const result = await auth.signInAnonymously();
         const guestName = `Guest_${Math.floor(1000 + Math.random() * 9000)}`;
         await result.user.updateProfile({ displayName: guestName });
         await ensureUserDatabaseProfile(result.user, guestName);
-        showToast('Entering as Guest player...', 'success');
-        window.location.href = 'app.html';
+        showToast('Entering as Guest...', 'success');
       } catch (err) {
         showToast(err.message, 'error');
       }
     }
 
-    // Password Reset Modal
-    function showForgotPassword() {
-      document.getElementById('reset-modal').classList.remove('hidden');
+    async function handleSignOut() {
+      await auth.signOut();
+      showToast('Signed out successfully.', 'info');
     }
-    function hideForgotPassword() {
-      document.getElementById('reset-modal').classList.add('hidden');
-    }
+
+    function showForgotPassword() { document.getElementById('reset-modal').classList.remove('hidden'); }
+    function hideForgotPassword() { document.getElementById('reset-modal').classList.add('hidden'); }
 
     async function handlePasswordReset(e) {
       e.preventDefault();
       const email = document.getElementById('reset-email').value.trim();
       const btn = document.getElementById('btn-reset');
-
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Sending...`;
-
       try {
         await auth.sendPasswordResetEmail(email);
         showToast('Reset email sent! Check your inbox.', 'success');
@@ -550,7 +475,7 @@
         showToast(err.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `Send Recovery Email`;
+        btn.innerHTML = `Send Link`;
       }
     }
   </script>

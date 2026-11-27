@@ -12,7 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
     <style>
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
@@ -27,7 +26,6 @@
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans custom-scrollbar select-none">
-
     <!-- Top Navigation / Educational Header -->
     <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 shadow-lg">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -73,27 +71,26 @@
                         Access strategic simulation environments designed to test foresight, pattern recognition, and real-time tactical positioning.
                     </p>
                 </div>
-
                 <div class="space-y-3 text-sm">
                     <div class="flex items-start space-x-3 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
                         <i class="fa-solid fa-chart-line text-indigo-400 mt-0.5"></i>
                         <div>
                             <h3 class="font-semibold text-slate-200">Dynamic Elo Skill Tracking</h3>
-                            <p class="text-xs text-slate-400">Algorithmic evaluation recalibrates rating after every interactive session.</p>
+                            <p class="text-xs text-slate-400">Algorithmic evaluation recalibrates rating after every interactive session (Starts at 500 Elo).</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-3 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
                         <i class="fa-solid fa-robot text-emerald-400 mt-0.5"></i>
                         <div>
-                            <h3 class="font-semibold text-slate-200">Adaptive AI Simulations</h3>
-                            <p class="text-xs text-slate-400">Train against automated synthetic opponent models scaled to your rating.</p>
+                            <h3 class="font-semibold text-slate-200">Adaptive Tactical Simulations</h3>
+                            <p class="text-xs text-slate-400">Train against puzzles and analyze positional theory with live move indicators.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-3 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
                         <i class="fa-solid fa-network-wired text-indigo-400 mt-0.5"></i>
                         <div>
                             <h3 class="font-semibold text-slate-200">Real-Time Multiplayer Arena</h3>
-                            <p class="text-xs text-slate-400">Engage in peer-to-peer strategy matches with room sharing and friend challenges.</p>
+                            <p class="text-xs text-slate-400">Engage in peer-to-peer strategy matches with live clocks, dot highlights, and disconnection security.</p>
                         </div>
                     </div>
                 </div>
@@ -101,7 +98,6 @@
 
             <!-- Right Panel Auth Card -->
             <div class="md:col-span-7 bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-                <!-- Decorative background elements -->
                 <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
                 <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
 
@@ -185,7 +181,6 @@
                         <i class="fa-solid fa-check text-xs"></i>
                     </button>
                 </form>
-
             </div>
         </div>
     </main>
@@ -226,24 +221,20 @@
             appId: "1:807640572322:web:d2b47b747ee30e314a92fb"
         };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const auth = firebase.auth();
         const db = firebase.database();
-
         let isMaintenanceMode = false;
         const ADMIN_EMAIL = "zainisgo123@gmail.com";
         const ALLOWED_MAINTENANCE_EMAILS = ["zainisgo123@gmail.com", "faceca4769@afronewz.com"];
 
-        // Listen for maintenance mode
         db.ref('system/maintenance').on('value', (snapshot) => {
             isMaintenanceMode = !!snapshot.val();
             checkAndRedirect();
         });
 
-        // Handle initial Auth state check
         auth.onAuthStateChanged((user) => {
             if (user) {
                 checkAndRedirect(user);
@@ -253,16 +244,13 @@
         function checkAndRedirect(user = auth.currentUser) {
             if (!user) return;
             const userEmail = (user.email || "").toLowerCase();
-
             if (isMaintenanceMode && !ALLOWED_MAINTENANCE_EMAILS.includes(userEmail)) {
                 document.getElementById('maintenance-modal').classList.remove('hidden');
             } else {
-                // Verified user, direct to app
                 window.location.href = "app.html";
             }
         }
 
-        // Tab Switching Logic
         function switchAuthTab(tab) {
             hideAlert();
             const tabs = ['login', 'register'];
@@ -279,7 +267,6 @@
             });
         }
 
-        // UI Alert Helper
         function showAlert(msg, isError = true) {
             const box = document.getElementById('auth-alert');
             box.className = `mb-4 p-3 rounded-lg text-xs font-medium flex items-center space-x-2 border ${
@@ -295,29 +282,20 @@
             document.getElementById('auth-alert').classList.add('hidden');
         }
 
-        // Handle Login (By Username or Email)
         async function handleLogin(e) {
             e.preventDefault();
             hideAlert();
-
             const identifier = document.getElementById('login-identifier').value.trim();
             const password = document.getElementById('login-password').value;
             const btn = document.getElementById('btn-login');
-
             if (!identifier || !password) return;
 
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Authenticating...`;
 
             try {
-                // Ensure Session Persistence so closing tab logs user out
-                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-
                 let targetEmail = identifier;
-
-                // Check if identifier is username or email
                 if (!identifier.includes('@')) {
-                    // Search DB for username match
                     const snap = await db.ref('users').orderByChild('username').equalTo(identifier).once('value');
                     if (snap.exists()) {
                         const val = snap.val();
@@ -327,7 +305,6 @@
                         targetEmail = `${identifier.toLowerCase()}@cognilearn.org`;
                     }
                 }
-
                 await auth.signInWithEmailAndPassword(targetEmail, password);
                 window.location.href = "app.html";
             } catch (err) {
@@ -338,11 +315,9 @@
             }
         }
 
-        // Handle Registration
         async function handleRegister(e) {
             e.preventDefault();
             hideAlert();
-
             const username = document.getElementById('reg-username').value.trim();
             const email = document.getElementById('reg-email').value.trim().toLowerCase();
             const password = document.getElementById('reg-password').value;
@@ -353,7 +328,6 @@
                 showAlert("Passwords do not match.");
                 return;
             }
-
             if (username.length < 3) {
                 showAlert("Username must be at least 3 characters.");
                 return;
@@ -363,21 +337,22 @@
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Registering Profile...`;
 
             try {
-                // Check if username is taken
                 const userSnap = await db.ref('users').orderByChild('username').equalTo(username).once('value');
                 if (userSnap.exists()) {
                     throw new Error("Username is already taken by another researcher.");
                 }
 
-                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
                 const cred = await auth.createUserWithEmailAndPassword(email, password);
 
-                // Create profile in RTDB
+                // Calibrated baseline profile: 500 Elo + 1000 Starter Coins
                 await db.ref('users/' + cred.user.uid).set({
                     uid: cred.user.uid,
                     username: username,
                     email: email,
                     elo: 500,
+                    coins: 1000,
+                    solvedPuzzles: 0,
+                    puzzleStreak: 0,
                     role: email === ADMIN_EMAIL ? 'admin' : 'user',
                     createdAt: firebase.database.ServerValue.TIMESTAMP
                 });

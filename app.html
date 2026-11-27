@@ -180,17 +180,17 @@
   <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-md">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 pb-0">
       
-      <!-- Brand Logo -->
+      <!-- Brand Logo (Direct Index Link) -->
       <div class="flex items-center justify-between w-full sm:w-auto">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('arena')">
-          <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white text-lg font-black shadow-lg shadow-brand-500/30">
+        <a href="index.html" class="flex items-center gap-3 cursor-pointer group" title="CogniLearn Index">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white text-lg font-black shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform">
             <i class="fa-solid fa-chess-knight"></i>
           </div>
           <div>
             <h1 class="text-base font-extrabold tracking-tight text-white leading-tight">CogniLearn</h1>
             <p class="text-[10px] text-slate-400 font-medium tracking-wide uppercase">Strategic Thinking Lab</p>
           </div>
-        </div>
+        </a>
 
         <!-- Mobile User Stats -->
         <div class="flex sm:hidden items-center gap-3">
@@ -234,9 +234,12 @@
       </div>
     </div>
 
-    <!-- Flush Navigation Bar -->
+    <!-- Flush Navigation Bar with Index Home Link -->
     <div class="max-w-7xl mx-auto px-4 mt-2">
       <nav class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto border-b-0">
+        <a href="index.html" class="nav-tab-btn px-3.5 py-2.5 text-xs sm:text-sm font-bold text-slate-400 hover:text-white rounded-t-xl transition-all flex items-center gap-1.5" title="Index Page">
+          <i class="fa-solid fa-house"></i> Index
+        </a>
         <button onclick="switchTab('arena')" class="nav-tab-btn active px-4 py-2.5 text-xs sm:text-sm font-bold text-slate-400 hover:text-white rounded-t-xl transition-all flex items-center gap-2" data-tab="arena">
           <i class="fa-solid fa-swords"></i> 1v1 Arena
         </button>
@@ -347,10 +350,8 @@
           </div>
         </div>
 
-        <!-- Right: Lobby, Matchmaking & Realtime Chat -->
+        <!-- Right: Match Controls & Arena Comms -->
         <div class="lg:col-span-4 flex flex-col gap-4">
-          
-          <!-- Matchmaking / Room Box -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
             <h3 class="text-xs uppercase font-extrabold tracking-wider text-slate-400 mb-3 flex items-center gap-2">
               <i class="fa-solid fa-gamepad text-brand-400"></i> Match Controls
@@ -365,7 +366,6 @@
               </button>
             </div>
 
-            <!-- Active Match Details Pill -->
             <div id="arena-room-info" class="hidden bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
               <div class="flex justify-between items-center mb-1">
                 <span class="text-slate-400">Match ID:</span>
@@ -387,7 +387,6 @@
               <span id="chat-length-counter" class="text-[10px] font-mono font-bold text-slate-500">0 / 500</span>
             </div>
 
-            <!-- Messages Window -->
             <div id="arena-chat-box" class="flex-grow overflow-y-auto space-y-2.5 pr-1 text-xs">
               <div class="text-center py-4 text-slate-500 text-[11px]">
                 <i class="fa-solid fa-shield-halved block text-sm mb-1 text-slate-600"></i>
@@ -395,7 +394,6 @@
               </div>
             </div>
 
-            <!-- Chat Input Area -->
             <form id="arena-chat-form" onsubmit="sendArenaChat(event)" class="mt-3 pt-2 border-t border-slate-800 flex gap-2">
               <input 
                 type="text" 
@@ -802,7 +800,6 @@
 
     // ================= DISCONNECTION HANDLING ON RELOAD / UNLOAD =================
     window.addEventListener('beforeunload', () => {
-      // If user is currently playing an unfinished live match, forfeit match instantly on reload
       if (currentMatchId && !arenaGame.game_over()) {
         const oppColor = playerColor === 'white' ? 'black' : 'white';
         db.ref(`games/${currentMatchId}`).update({
@@ -950,7 +947,6 @@
         });
 
         if (opponentKey && opponentData) {
-          // Join existing player in queue
           queueRef.child(opponentKey).remove();
           const matchId = `match_${Date.now()}`;
           playerColor = 'black';
@@ -969,7 +965,6 @@
             joinMatch(matchId, 'black');
           });
         } else {
-          // Put self in queue
           const myEntry = queueRef.child(currentUser.uid);
           myEntry.set({
             username: userData.username,
@@ -979,7 +974,6 @@
 
           myEntry.onDisconnect().remove();
 
-          // Listen if someone challenges or pairs with us
           db.ref('games').orderByChild('whiteUid').equalTo(currentUser.uid).on('child_added', (snapshot) => {
             const game = snapshot.val();
             if (game && game.status === 'active') {
@@ -998,7 +992,6 @@
       playerColor = assignedColor;
       matchRef = db.ref(`games/${matchId}`);
 
-      // Set board orientation & reset chess state
       arenaGame = new Chess();
       arenaBoard.orientation(playerColor);
       arenaBoard.start();
@@ -1017,7 +1010,6 @@
       $('#user-piece-color').removeClass('bg-white bg-slate-600').addClass(playerColor === 'white' ? 'bg-white' : 'bg-slate-600');
       $('#opp-piece-color').removeClass('bg-white bg-slate-600').addClass(playerColor === 'white' ? 'bg-slate-600' : 'bg-white');
 
-      // CRITICAL: Configure Server-Side onDisconnect()
       const oppColor = playerColor === 'white' ? 'black' : 'white';
       matchRef.onDisconnect().update({
         status: 'abandoned',
@@ -1027,12 +1019,10 @@
         abandonedByName: userData.username || 'Opponent'
       });
 
-      // Listen for Game Events (Moves, Disconnections, Resignations)
       matchRef.on('value', (snap) => {
         const game = snap.val();
         if (!game) return;
 
-        // Populate Opponent Info
         if (playerColor === 'white') {
           $('#opp-name').text(game.blackName || 'Opponent');
           $('#opp-elo-tag').text(`${game.blackElo || 800} Elo`);
@@ -1043,7 +1033,6 @@
         $('#opp-status-text').text('In Combat');
         $('#arena-game-state').text('Live Match Ongoing');
 
-        // Opponent Move Sync
         if (game.fen && game.fen !== 'start' && game.fen !== arenaGame.fen()) {
           arenaGame.load(game.fen);
           arenaBoard.position(game.fen);
@@ -1053,7 +1042,6 @@
           updateTurnIndicator();
         }
 
-        // DISCONNECTION & ABANDONMENT POPUP TRIGGER
         if (game.status === 'abandoned') {
           handleMatchConclusion(game);
         }
@@ -1063,11 +1051,10 @@
     function handleMatchConclusion(game) {
       if (!currentMatchId) return;
       clearInterval(clockInterval);
-      matchRef.onDisconnect().cancel(); // Remove disconnection hook
+      matchRef.onDisconnect().cancel();
       $('#resign-btn, #draw-btn').prop('disabled', true);
 
       if (game.winner === playerColor) {
-        // You won because the other player disconnected/reloaded
         const oppName = game.abandonedByName || 'Opponent';
         $('#result-modal-badge').text('Victory by Abandonment');
         $('#result-modal-title').text('Victory by Disconnection!');
@@ -1075,7 +1062,6 @@
         $('#result-elo-delta').text('+16 Elo');
         $('#result-coin-reward').text('+50 CC');
 
-        // Update player data
         userData.elo += 16;
         userData.coins += 50;
         updateUserUI();
@@ -1091,7 +1077,6 @@
         $('#arena-turn-label').text('Victory');
         $('#arena-turn-dot').removeClass('bg-slate-300 bg-white').addClass('bg-emerald-400');
       } else {
-        // You abandoned
         $('#arena-game-state').text('Match Disconnected');
       }
 

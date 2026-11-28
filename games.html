@@ -14,11 +14,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Pannellum 360 Viewer (Free Open-Source) -->
+  <!-- Pannellum 360 Viewer (100% Free Open-Source) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
-  <!-- Leaflet Map (Free OpenStreetMap) -->
+  <!-- Leaflet Map (100% Free OpenStreetMap) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -50,22 +50,31 @@
     }
     /* Collapsible Mini Map */
     #guess-map-container {
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 30;
     }
     #guess-map-container.minimized {
-      width: 240px;
-      height: 160px;
-      opacity: 0.85;
+      width: 280px;
+      height: 190px;
+      opacity: 0.92;
+    }
+    #guess-map-container.minimized:hover {
+      opacity: 1;
     }
     #guess-map-container.expanded {
-      width: min(520px, 90vw);
-      height: min(380px, 60vh);
+      width: min(620px, 92vw);
+      height: min(440px, 68vh);
       opacity: 1;
     }
     .leaflet-container {
-      background: #0f172a !important;
+      background: #090d16 !important;
       border-radius: 1rem;
+    }
+    /* Custom Pin Markers */
+    .custom-guess-icon, .custom-target-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -86,7 +95,7 @@
 
       <div class="glass-ui px-3.5 py-2.5 rounded-2xl flex items-center gap-2 text-xs font-bold text-white shadow-2xl hidden sm:flex">
         <i class="fa-solid fa-earth-americas text-cyan-400"></i>
-        <span>World Explorer</span>
+        <span>World Explorer 360°</span>
       </div>
     </div>
 
@@ -104,18 +113,26 @@
     </div>
   </header>
 
-  <!-- 3. Floating Collapsible Guess Map (Bottom-Right) -->
+  <!-- 3. Clue Hint Pill (Bottom-Left) -->
+  <div class="absolute bottom-5 left-5 z-20 pointer-events-none hidden sm:block">
+    <div class="glass-ui px-4 py-2.5 rounded-2xl text-xs text-slate-300 flex items-center gap-2 shadow-2xl">
+      <i class="fa-solid fa-compass text-cyan-400 animate-spin" style="animation-duration: 12s;"></i>
+      <span>Look around for geography, road signs, architecture, and vegetation clues!</span>
+    </div>
+  </div>
+
+  <!-- 4. Floating Guess Map (Bottom-Right) -->
   <div id="guess-map-container" class="absolute bottom-5 right-5 minimized glass-ui rounded-3xl p-3 shadow-2xl flex flex-col justify-between">
     <div class="flex items-center justify-between pb-2 px-1">
-      <div class="text-[11px] font-mono font-bold text-slate-300 flex items-center gap-1.5">
+      <div id="map-header-label" class="text-[11px] font-mono font-bold text-slate-300 flex items-center gap-1.5">
         <i class="fa-solid fa-location-dot text-rose-500"></i> Click Map to Drop Pin
       </div>
-      <button onclick="toggleMapSize()" class="text-xs text-slate-400 hover:text-white transition-colors">
+      <button onclick="toggleMapSize()" title="Toggle Size" class="text-xs text-slate-400 hover:text-white transition-colors p-1">
         <i id="expand-icon" class="fa-solid fa-expand"></i>
       </button>
     </div>
 
-    <!-- Leaflet Map -->
+    <!-- Leaflet Map Element -->
     <div id="leaflet-map" class="w-full flex-1 rounded-2xl overflow-hidden my-1"></div>
 
     <!-- Guess Submit Button -->
@@ -124,39 +141,38 @@
     </button>
   </div>
 
-  <!-- 4. Round Result & Rewards Modal -->
-  <div id="result-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md hidden">
+  <!-- 5. Interactive Post-Round Reveal Result Modal -->
+  <div id="result-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
     <div class="glass-ui rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-cyan-500/40 shadow-2xl text-center space-y-4">
       
-      <div class="w-16 h-16 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-cyan-500/20">
-        <i class="fa-solid fa-trophy"></i>
+      <div id="result-badge-icon" class="w-16 h-16 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid fa-location-crosshairs"></i>
       </div>
 
       <div>
-        <h3 id="result-location-name" class="text-xl font-black text-white">Location Name</h3>
-        <p id="result-distance-text" class="text-xs font-mono text-cyan-300 mt-1">You were 0 km away</p>
+        <div class="text-[11px] font-mono uppercase tracking-widest text-slate-400 mb-1">Actual Location</div>
+        <h3 id="result-location-name" class="text-xl sm:text-2xl font-black text-white leading-tight">Location Name</h3>
+        <p id="result-distance-text" class="text-sm font-mono text-cyan-300 font-bold mt-2">You were 0 km away</p>
       </div>
 
-      <!-- Coin Payout Card -->
-      <div class="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/30 flex items-center justify-between">
+      <!-- Coin Payout Banner -->
+      <div class="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/40 flex items-center justify-between shadow-inner">
         <div class="text-left">
-          <div class="text-xs font-bold text-white">Reward Earned</div>
-          <div class="text-[10px] text-slate-400">Added to your shared Z-Chess wallet</div>
+          <div class="text-xs font-bold text-white">Coins Awarded</div>
+          <div class="text-[10px] text-slate-400">Added to your shared Z-Chess balance</div>
         </div>
-        <div class="text-lg font-mono font-black text-amber-400 flex items-center gap-1.5">
+        <div class="text-xl font-mono font-black text-amber-400 flex items-center gap-1.5">
           <i class="fa-solid fa-coins"></i>
           <span id="result-coins-awarded">+0 ZC</span>
         </div>
       </div>
 
-      <button onclick="nextRound()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-xl shadow-cyan-500/25">
-        Next Location <i class="fa-solid fa-arrow-right ml-1"></i>
+      <button onclick="nextRound()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-xl shadow-cyan-500/25 flex items-center justify-center gap-2">
+        <span>Continue to Next Location</span>
+        <i class="fa-solid fa-arrow-right"></i>
       </button>
     </div>
   </div>
-
-  <!-- Toast Notification -->
-  <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
   <!-- SCRIPT LOGIC -->
   <script>
@@ -190,31 +206,39 @@
       });
     });
 
-    // --- 2. 100% FREE 360° LOCATION DATASET ---
+    // --- 2. ACCURATE 360° LOCATIONS (COORDINATES MATCH REAL PHOTOS) ---
     const LOCATIONS = [
       {
-        name: "Eiffel Tower, Paris, France",
-        lat: 48.8584,
-        lng: 2.2945,
-        panorama: "https://pannellum.org/images/alma.jpg"
+        name: "ALMA Observatory (Radio Telescopes), Atacama Desert",
+        country: "Chile",
+        lat: -23.0234,
+        lng: -67.7548,
+        panorama: "https://pannellum.org/images/alma.jpg",
+        description: "Giant radio telescopes in the high Andes plateau"
       },
       {
-        name: "Cerro San Cristóbal, Santiago, Chile",
-        lat: -33.4253,
-        lng: -70.6334,
-        panorama: "https://pannellum.org/images/cerro-toco-0.jpg"
+        name: "John F. Kennedy Presidential Library, Boston",
+        country: "United States",
+        lat: 42.3161,
+        lng: -71.0345,
+        panorama: "https://pannellum.org/images/jfk.jpg",
+        description: "Waterfront harbor view and modern memorial architecture"
       },
       {
-        name: "Milan Botanical Garden, Italy",
-        lat: 45.4707,
-        lng: 9.1895,
-        panorama: "https://pannellum.org/images/bma-0.jpg"
+        name: "Historic Pinacoteca di Brera Courtyard, Milan",
+        country: "Italy",
+        lat: 45.4719,
+        lng: 9.1897,
+        panorama: "https://pannellum.org/images/bma-0.jpg",
+        description: "Renaissance columns and courtyard gardens"
       },
       {
-        name: "Historic Charles Bridge, Prague, Czech Republic",
-        lat: 50.0865,
-        lng: 14.4114,
-        panorama: "https://pannellum.org/images/jfk.jpg"
+        name: "Cerro Toco Volcano Summit, Atacama",
+        country: "Chile",
+        lat: -22.9564,
+        lng: -67.7772,
+        panorama: "https://pannellum.org/images/cerro-toco-0.jpg",
+        description: "High-altitude arid Andes volcanic ridge"
       }
     ];
 
@@ -223,12 +247,50 @@
     let panoViewer = null;
     let leafletMap = null;
     let guessMarker = null;
+    let targetMarker = null;
+    let flightPolyline = null;
     let selectedLatLng = null;
+    let isRoundFinished = false;
 
-    // --- 3. INIT MAP & PANORAMA ---
+    // --- 3. AUDIO ENGINE ---
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      },
+      play(freq, type, duration) {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      },
+      fanfare() {
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+          setTimeout(() => this.play(f, 'triangle', 0.25), i * 90);
+        });
+      },
+      ping() {
+        this.play(880, 'sine', 0.12);
+      }
+    };
+
+    // --- 4. GAME INITIALIZATION ---
     function initGame() {
-      loadLocation(currentLocationIndex);
       initLeafletMap();
+      loadLocation(currentLocationIndex);
     }
 
     function loadLocation(index) {
@@ -236,13 +298,17 @@
       if (panoViewer) {
         try { panoViewer.destroy(); } catch (e) {}
       }
+
       panoViewer = pannellum.viewer('panorama-view', {
         type: 'equirectangular',
         panorama: loc.panorama,
         autoLoad: true,
         showZoomCtrl: true,
         showFullscreenCtrl: false,
-        compass: true
+        compass: true,
+        yaw: 0,
+        pitch: 0,
+        hfov: 100
       });
     }
 
@@ -251,7 +317,7 @@
         center: [20, 0],
         zoom: 1,
         minZoom: 1,
-        maxZoom: 17,
+        maxZoom: 18,
         zoomControl: false,
         attributionControl: false
       });
@@ -261,22 +327,35 @@
       }).addTo(leafletMap);
 
       leafletMap.on('click', (e) => {
+        if (isRoundFinished) return;
+
         selectedLatLng = e.latlng;
+        AudioEngine.ping();
+
+        const redIcon = L.divIcon({
+          className: 'custom-guess-icon',
+          html: `<div class="w-5 h-5 rounded-full bg-rose-500 border-2 border-white shadow-lg flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-location-pin"></i></div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+
         if (guessMarker) {
           guessMarker.setLatLng(e.latlng);
         } else {
-          guessMarker = L.marker(e.latlng).addTo(leafletMap);
+          guessMarker = L.marker(e.latlng, { icon: redIcon }).addTo(leafletMap);
         }
+
         const btn = document.getElementById('btn-submit-guess');
         btn.disabled = false;
         btn.textContent = "Submit Guess";
       });
     }
 
-    function toggleMapSize() {
+    function toggleMapSize(forceExpand = false) {
       const mapBox = document.getElementById('guess-map-container');
       const icon = document.getElementById('expand-icon');
-      if (mapBox.classList.contains('minimized')) {
+
+      if (forceExpand || mapBox.classList.contains('minimized')) {
         mapBox.classList.remove('minimized');
         mapBox.classList.add('expanded');
         icon.classList.remove('fa-expand');
@@ -287,12 +366,12 @@
         icon.classList.remove('fa-compress');
         icon.classList.add('fa-expand');
       }
-      setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 300);
+      setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 320);
     }
 
-    // --- 4. HAVERSINE DISTANCE FORMULA ---
+    // --- 5. HAVERSINE DISTANCE MATH ---
     function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371; // Earth radius in km
+      const R = 6371; // Earth's mean radius in km
       const dLat = (lat2 - lat1) * (Math.PI / 180);
       const dLon = (lon2 - lon1) * (Math.PI / 180);
       const a =
@@ -303,10 +382,13 @@
       return R * c;
     }
 
+    // --- 6. SUBMIT GUESS & REVEAL ---
     async function submitGuess() {
-      if (!selectedLatLng) return;
+      if (!selectedLatLng || isRoundFinished) return;
+      isRoundFinished = true;
 
       const loc = LOCATIONS[currentLocationIndex];
+      const targetLatLng = L.latLng(loc.lat, loc.lng);
       const distKm = Math.round(calculateDistance(selectedLatLng.lat, selectedLatLng.lng, loc.lat, loc.lng));
 
       // Calculate Coin Award
@@ -316,28 +398,71 @@
       else if (distKm <= 1500) coinsWon = 30;
       else if (distKm <= 5000) coinsWon = 15;
 
-      // Update shared Firebase coins
+      // Expand map to reveal flight path
+      toggleMapSize(true);
+
+      // Plot actual location pin (Green flag)
+      const greenIcon = L.divIcon({
+        className: 'custom-target-icon',
+        html: `<div class="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white shadow-xl flex items-center justify-center text-slate-950 text-xs font-bold animate-bounce"><i class="fa-solid fa-flag"></i></div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      targetMarker = L.marker(targetLatLng, { icon: greenIcon }).addTo(leafletMap);
+
+      // Draw dotted connector line
+      flightPolyline = L.polyline([selectedLatLng, targetLatLng], {
+        color: '#f59e0b',
+        weight: 3,
+        dashArray: '6, 8',
+        opacity: 0.9
+      }).addTo(leafletMap);
+
+      // Fit both markers into view
+      const bounds = L.latLngBounds([selectedLatLng, targetLatLng]);
+      leafletMap.fitBounds(bounds, { padding: [40, 40] });
+
+      // Play Sound
+      AudioEngine.fanfare();
+
+      // Sync Coins with Firebase
       if (currentUser) {
         await db.ref(`users/${currentUser.uid}/coins`).set(userCoins + coinsWon);
       }
 
-      // Display Results
-      document.getElementById('result-location-name').textContent = loc.name;
-      document.getElementById('result-distance-text').textContent = `Your guess was ${distKm.toLocaleString()} km away.`;
-      document.getElementById('result-coins-awarded').textContent = `+${coinsWon} ZC`;
-      document.getElementById('result-modal').classList.remove('hidden');
+      // Show result modal after a brief map reveal
+      setTimeout(() => {
+        document.getElementById('result-location-name').textContent = `${loc.name}, ${loc.country}`;
+        document.getElementById('result-distance-text').textContent = `Your guess was ${distKm.toLocaleString()} km away.`;
+        document.getElementById('result-coins-awarded').textContent = `+${coinsWon} ZC`;
+        document.getElementById('result-modal').classList.remove('hidden');
+      }, 1200);
     }
 
     function nextRound() {
       document.getElementById('result-modal').classList.add('hidden');
-      if (guessMarker) {
-        leafletMap.removeLayer(guessMarker);
-        guessMarker = null;
-      }
+
+      // Clear map markers
+      if (guessMarker) leafletMap.removeLayer(guessMarker);
+      if (targetMarker) leafletMap.removeLayer(targetMarker);
+      if (flightPolyline) leafletMap.removeLayer(flightPolyline);
+
+      guessMarker = null;
+      targetMarker = null;
+      flightPolyline = null;
       selectedLatLng = null;
+      isRoundFinished = false;
+
+      // Reset map position and size
+      const mapBox = document.getElementById('guess-map-container');
+      mapBox.classList.remove('expanded');
+      mapBox.classList.add('minimized');
+      document.getElementById('expand-icon').className = 'fa-solid fa-expand';
       document.getElementById('btn-submit-guess').disabled = true;
       document.getElementById('btn-submit-guess').textContent = "Place Pin to Guess";
+      leafletMap.setView([20, 0], 1);
 
+      // Advance round
       currentRound++;
       document.getElementById('round-number').textContent = currentRound;
 
